@@ -94,7 +94,7 @@ Game.tick = function (elapsed) {
     window.requestAnimationFrame(this.tick);
 
     // clear previous frame
-    this.ctx.clearRect(0, 0, 1024, 1024);
+    this.ctx.clearRect(0, 0, 512, 512);
 
     // compute delta time in seconds -- also cap it
     var delta = (elapsed - this._previousElapsed) / 1000.0;
@@ -195,12 +195,9 @@ Game.init = function () {
     this.camera = new Camera(map, 512, 512);
 
     // create a canvas for each layer
-    this.layerCanvas = function () {
-        var c = document.createElement('canvas');
-        c.width = 512;
-        c.height = 512;
-        return c;
-    };
+    this.layerCanvas = document.createElement('canvas');
+    this.layerCanvas.width = 512;
+    this.layerCanvas.height = 512;
 
     // initial draw of the map
     this._drawMap();
