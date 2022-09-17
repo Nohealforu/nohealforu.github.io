@@ -257,7 +257,7 @@ var dungeonCells = {cols: 32,
     BMP3: null,
     BMP4: null,
     getTile: function (mapCell, col, row) {
-        return this.[mapCell][row * dungeonCells.cols + col]};
+        return this[mapCell][row * dungeonCells.cols + col]};
 
 var map = {
     cols: 2,
