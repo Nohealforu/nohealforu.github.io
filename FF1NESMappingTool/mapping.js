@@ -224,7 +224,7 @@ Game._drawMap = function () {
     var context = this.layerCanvas.getContext('2d');
     context.imageSmoothingEnabled = false;
     context.clearRect(0, 0, 512, 512);
-    var displayTsize = map.tsize * this.zoom;
+    var displayTsize = map.tsize * this.camera.zoom;
     var startCol = Math.floor(this.camera.x / displayTsize);
     var endCol = startCol + (this.camera.width / displayTsize);
     var startRow = Math.floor(this.camera.y / displayTsize);
