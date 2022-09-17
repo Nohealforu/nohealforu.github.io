@@ -365,9 +365,9 @@ Game._drawMap = function () {
     context.clearRect(0, 0, defaultWidth, defaultHeight);
     var displayTsize = map.tsize * this.camera.zoom;
     var startCol = Math.floor(this.camera.x / displayTsize);
-    var endCol = startCol + (this.camera.width / displayTsize);
+    var endCol = startCol + (this.camera.width + this.camera.x) / displayTsize;
     var startRow = Math.floor(this.camera.y / displayTsize);
-    var endRow = startRow + (this.camera.height / displayTsize);
+    var endRow = startRow + (this.camera.height + this.camera.y) / displayTsize;
     var offsetX = -this.camera.x + startCol * displayTsize;
     var offsetY = -this.camera.y + startRow * displayTsize;
 
