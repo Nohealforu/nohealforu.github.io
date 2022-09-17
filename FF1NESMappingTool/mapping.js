@@ -378,7 +378,7 @@ Game._drawMap = function () {
             var x = (c - startCol) * displayTsize + offsetX;
             var y = (r - startRow) * displayTsize + offsetY;
             let mapCell = x + y * 2;
-            if (tile !== 0) { // 0 => empty tile
+            if (mapCell >= 0 && mapCell <= 4) {
                 context.drawImage(
                     map.cells["BMP" + mapCell], // image
                     0, // source x
