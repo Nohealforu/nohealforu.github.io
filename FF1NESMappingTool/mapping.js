@@ -265,7 +265,10 @@ var map = {
     cols: 2,
     rows: 2,
     tsize: 512,
-    cells: dungeonCells
+    cells: dungeonCells,
+    getTile: function (layer, col, row) {
+        return this.layers[layer][row * map.cols + col];
+    }
 };
 
 function Camera(map, width, height, zoom) {
