@@ -184,14 +184,14 @@ Camera.prototype.move = function (delta, dirx, diry) {
 
 Game.load = function () {
     return [
-        Loader.loadImage('tiles', 'assets/tiles.png'),
+        Loader.loadImage('overworld', 'assets/Overworld.png'),
     ];
 };
 
 Game.init = function () {
     Keyboard.listenForEvents(
         [Keyboard.LEFT, Keyboard.RIGHT, Keyboard.UP, Keyboard.DOWN]);
-    this.tileAtlas = Loader.getImage('tiles');
+    this.tileAtlas = Loader.getImage('overworld');
     this.camera = new Camera(map, 512, 512);
 
     // create a canvas for each layer
