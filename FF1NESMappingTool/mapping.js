@@ -354,6 +354,7 @@ Game._initCells = function () {
                 }
             }
         }
+        console.log(cellName);
         map.cells["BMP" + mapCell] = cellCanvas;
     }
 };
@@ -374,8 +375,8 @@ Game._drawMap = function () {
         for (var r = startRow; r <= endRow; r++) {
             var x = (c - startCol) * displayTsize + offsetX;
             var y = (r - startRow) * displayTsize + offsetY;
-            let mapCell = x + y * 2;
-            if (mapCell >= 0 && mapCell <= 4) {
+            let mapCell = c + r * 2;
+            if (mapCell > -1 && mapCell < 4) {
                 context.drawImage(
                     map.cells["BMP" + mapCell], // image
                     0, // source x
