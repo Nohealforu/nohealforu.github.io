@@ -193,7 +193,7 @@ Game.init = function () {
     Keyboard.listenForEvents(
         [Keyboard.LEFT, Keyboard.RIGHT, Keyboard.UP, Keyboard.DOWN]);
     this.tileAtlas = Loader.getImage('overworld');
-    this.camera = new Camera(map, 512, 512, 2);
+    this.camera = new Camera(map, 512, 512, 4);
 
     // create a canvas for each layer
     this.layerCanvas = document.createElement('canvas');
@@ -222,6 +222,7 @@ Game.update = function (delta) {
 
 Game._drawMap = function () {
     var context = this.layerCanvas.getContext('2d');
+    context.imageSmoothingEnabled = false;
     context.clearRect(0, 0, 512, 512);
     var displayTsize = map.tsize * this.zoom;
     var startCol = Math.floor(this.camera.x / displayTsize);
