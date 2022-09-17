@@ -162,13 +162,14 @@ var map = {
     }
 };
 
-function Camera(map, width, height) {
+function Camera(map, width, height, zoom) {
     this.x = 0;
     this.y = 0;
     this.width = width;
     this.height = height;
-    this.maxX = map.cols * map.tsize - width;
-    this.maxY = map.rows * map.tsize - height;
+    this.maxX = map.cols * map.tsize * zoom - width;
+    this.maxY = map.rows * map.tsize * zoom - height;
+    this.zoom = zoom;
 }
 
 Camera.SPEED = 256; // pixels per second
@@ -178,8 +179,8 @@ Camera.prototype.move = function (delta, dirx, diry) {
     this.x += dirx * Camera.SPEED * delta;
     this.y += diry * Camera.SPEED * delta;
     // clamp values
-    this.x = Math.max(0, Math.min(this.x, this.maxX));
-    this.y = Math.max(0, Math.min(this.y, this.maxY));
+    this.x = Math.max(0, Math.min(this.x, this.maxX * this.zoom));
+    this.y = Math.max(0, Math.min(this.y, this.maxY * this.zoom));
 };
 
 Game.load = function () {
@@ -192,7 +193,7 @@ Game.init = function () {
     Keyboard.listenForEvents(
         [Keyboard.LEFT, Keyboard.RIGHT, Keyboard.UP, Keyboard.DOWN]);
     this.tileAtlas = Loader.getImage('overworld');
-    this.camera = new Camera(map, 512, 512);
+    this.camera = new Camera(map, 512, 512, 2);
 
     // create a canvas for each layer
     this.layerCanvas = document.createElement('canvas');
@@ -220,21 +221,21 @@ Game.update = function (delta) {
 };
 
 Game._drawMap = function () {
-     var context = this.layerCanvas.getContext('2d');
+    var context = this.layerCanvas.getContext('2d');
     context.clearRect(0, 0, 512, 512);
-
-    var startCol = Math.floor(this.camera.x / map.tsize);
-    var endCol = startCol + (this.camera.width / map.tsize);
-    var startRow = Math.floor(this.camera.y / map.tsize);
-    var endRow = startRow + (this.camera.height / map.tsize);
-    var offsetX = -this.camera.x + startCol * map.tsize;
-    var offsetY = -this.camera.y + startRow * map.tsize;
+    var displayTsize = map.tsize * this.zoom;
+    var startCol = Math.floor(this.camera.x / displayTsize);
+    var endCol = startCol + (this.camera.width / displayTsize);
+    var startRow = Math.floor(this.camera.y / displayTsize);
+    var endRow = startRow + (this.camera.height / displayTsize);
+    var offsetX = -this.camera.x + startCol * displayTsize;
+    var offsetY = -this.camera.y + startRow * displayTsize;
 
     for (var c = startCol; c <= endCol; c++) {
         for (var r = startRow; r <= endRow; r++) {
             var tile = map.getTile(c, r);
-            var x = (c - startCol) * map.tsize + offsetX;
-            var y = (r - startRow) * map.tsize + offsetY;
+            var x = (c - startCol) * displayTsize + offsetX;
+            var y = (r - startRow) * displayTsize + offsetY;
             if (tile !== 0) { // 0 => empty tile
                 context.drawImage(
                     this.tileAtlas, // image
@@ -244,8 +245,8 @@ Game._drawMap = function () {
                     map.tsize, // source height
                     Math.round(x),  // target x
                     Math.round(y), // target y
-                    map.tsize, // target width
-                    map.tsize // target height
+                    displayTsize, // target width
+                    displayTsize // target height
                 );
             }
         }
