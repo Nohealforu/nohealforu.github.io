@@ -1,6 +1,8 @@
 //
 // Asset loader
 //
+const defaultWidth = 960;
+const defaultHeight = 640;
 
 var Loader = {
     images: {}
@@ -94,7 +96,7 @@ Game.tick = function (elapsed) {
     window.requestAnimationFrame(this.tick);
 
     // clear previous frame
-    this.ctx.clearRect(0, 0, 512, 512);
+    this.ctx.clearRect(0, 0, defaultWidth, defaultHeight);
 
     // compute delta time in seconds -- also cap it
     var delta = (elapsed - this._previousElapsed) / 1000.0;
@@ -193,12 +195,12 @@ Game.init = function () {
     Keyboard.listenForEvents(
         [Keyboard.LEFT, Keyboard.RIGHT, Keyboard.UP, Keyboard.DOWN]);
     this.tileAtlas = Loader.getImage('overworld');
-    this.camera = new Camera(map, 512, 512, 4);
+    this.camera = new Camera(map, defaultWidth, defaultHeight, 2);
 
     // create a canvas for each layer
     this.layerCanvas = document.createElement('canvas');
-    this.layerCanvas.width = 512;
-    this.layerCanvas.height = 512;
+    this.layerCanvas.width = defaultWidth;
+    this.layerCanvas.height = defaultHeight;
 
     // initial draw of the map
     this._drawMap();
@@ -223,7 +225,7 @@ Game.update = function (delta) {
 Game._drawMap = function () {
     var context = this.layerCanvas.getContext('2d');
     context.imageSmoothingEnabled = false;
-    context.clearRect(0, 0, 512, 512);
+    context.clearRect(0, 0, defaultWidth, defaultHeight);
     var displayTsize = map.tsize * this.camera.zoom;
     var startCol = Math.floor(this.camera.x / displayTsize);
     var endCol = startCol + (this.camera.width / displayTsize);
