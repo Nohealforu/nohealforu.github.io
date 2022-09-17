@@ -265,9 +265,7 @@ var map = {
     cols: 2,
     rows: 2,
     tsize: 512,
-    cells: dungeonCells,
-    getTile: function (layer, col, row) {
-        return this.layers[layer][row * map.cols + col];
+    cells: dungeonCells
     }
 };
 
@@ -378,13 +376,13 @@ Game._drawMap = function () {
 
     for (var c = startCol; c <= endCol; c++) {
         for (var r = startRow; r <= endRow; r++) {
-            var tile = map.getTile(c, r);
             var x = (c - startCol) * displayTsize + offsetX;
             var y = (r - startRow) * displayTsize + offsetY;
+            let mapCell = x + y * 2;
             if (tile !== 0) { // 0 => empty tile
                 context.drawImage(
-                    this.tileAtlas, // image
-                    (tile - 1) * map.tsize, // source x
+                    map.cells["BMP" + mapCell], // image
+                    0, // source x
                     0, // source y
                     map.tsize, // source width
                     map.tsize, // source height
