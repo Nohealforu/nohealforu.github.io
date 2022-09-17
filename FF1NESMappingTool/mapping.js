@@ -266,8 +266,6 @@ var map = {
     rows: 2,
     tsize: 512,
     cells: dungeonCells
-    ];
-    }
 };
 
 function Camera(map, width, height, zoom) {
