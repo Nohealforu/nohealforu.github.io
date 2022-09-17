@@ -328,9 +328,6 @@ Game.update = function (delta) {
 };
 
 Game._initCells = function () {
-    var context = this.layerCanvas.getContext('2d');
-    context.imageSmoothingEnabled = false;
-    context.clearRect(0, 0, defaultWidth, defaultHeight);
     for(var mapCell = 0; mapCell < 4; mapCell++){
         let cellName = "cell" + mapCell;
         let cellCanvas = document.createElement('canvas');
