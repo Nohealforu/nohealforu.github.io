@@ -223,13 +223,7 @@ Game.update = function (delta) {
 };
 
 Game._drawMap = function () {
-    map.layers.forEach(function (layer, index) {
-        this._drawLayer(index);
-    }.bind(this));
-};
-
-Game._drawLayer = function (layer) {
-    var context = this.layerCanvas.getContext('2d');
+     var context = this.layerCanvas.getContext('2d');
     context.clearRect(0, 0, 512, 512);
 
     var startCol = Math.floor(this.camera.x / map.tsize);
