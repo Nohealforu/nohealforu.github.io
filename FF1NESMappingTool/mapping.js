@@ -184,7 +184,7 @@ Camera.prototype.move = function (delta, dirx, diry) {
 
 Game.load = function () {
     return [
-        Loader.loadImage('overworld', 'assets/Overworld.png'),
+        Loader.loadImage('overworld', 'Assets/Overworld.png'),
     ];
 };
 
