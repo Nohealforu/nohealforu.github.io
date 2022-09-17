@@ -340,8 +340,8 @@ Game._initCells = function () {
         for (var c = 0; c <= map.cells.cols; c++) {
             for (var r = 0; r <= map.cells.rows; r++) {
                 var tile = map.cells.getTile(cellName, c, r);
-                var x = (c - startCol) * map.cells.tsize;
-                var y = (r - startRow) * map.cells.tsize;
+                var x = c * map.cells.tsize;
+                var y = r * map.cells.tsize;
                 if (tile !== 0) { // 0 => empty tile
                     context.drawImage(
                         this.tileAtlas, // image
