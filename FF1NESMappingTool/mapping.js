@@ -179,8 +179,8 @@ Camera.prototype.move = function (delta, dirx, diry) {
     this.x += dirx * Camera.SPEED * delta;
     this.y += diry * Camera.SPEED * delta;
     // clamp values
-    this.x = Math.max(0, Math.min(this.x, this.maxX * this.zoom));
-    this.y = Math.max(0, Math.min(this.y, this.maxY * this.zoom));
+    this.x = Math.max(0, Math.min(this.x, this.maxX));
+    this.y = Math.max(0, Math.min(this.y, this.maxY));
 };
 
 Game.load = function () {
