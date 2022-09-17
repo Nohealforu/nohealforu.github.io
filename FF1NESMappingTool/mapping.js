@@ -331,7 +331,7 @@ Game._initCells = function () {
     for(var mapCell = 0; mapCell < 4; mapCell++){
         let cellName = "cell" + mapCell;
         let cellCanvas = document.createElement('canvas');
-        cellCanvas.width = map.cells.col * map.cells.tsize;
+        cellCanvas.width = map.cells.cols * map.cells.tsize;
         cellCanvas.height = map.cells.rows * map.cells.tsize;
         var context = cellCanvas.getContext('2d')
         for (var c = 0; c <= map.cells.cols; c++) {
