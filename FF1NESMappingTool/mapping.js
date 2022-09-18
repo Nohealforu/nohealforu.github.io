@@ -265,7 +265,8 @@ Game._loadCells = function (map) {
         for(let mapY = centerRow - 2; mapY < centerRow + 3; mapY++){*/
     for(let mapX = 0; mapX < map.cols; mapX++){
         for(let mapY = 0; mapY < map.rows; mapY++){
-            let mapIndex = Math.floor(mapX < 0 ? map.cols - 1 : mapX) + Math.floor((mapY < 0 ? map.rows - 1 : mapY) * map.cols);
+            //let mapIndex = Math.floor(mapX < 0 ? map.cols - 1 : mapX) + Math.floor((mapY < 0 ? map.rows - 1 : mapY) * map.cols);
+            let mapIndex = mapX + mapY * map.cols;
             if(map.cells.bitmapData[mapIndex] == null)
             {
                 let cellCanvas = document.createElement('canvas');
@@ -314,6 +315,14 @@ Game._drawMap = function (map) {
         for (let r = startRow; r <= endRow; r++) {
             let x = (c - startCol) * displayTsize + offsetX;
             let y = (r - startRow) * displayTsize + offsetY;
+            if(c < map.cols)
+                c += map.cols;
+            else if(c >= map.cols)
+                c -= map.cols;
+            if(r < map.rows)
+                r += map.rows;
+            else if(r >= map.rows)
+                r -= map.rows;
             let mapIndex = c + r * map.cols;
             console.log("Drawing: " + mapIndex);
             context.drawImage(
