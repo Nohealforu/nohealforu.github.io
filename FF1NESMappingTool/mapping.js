@@ -259,7 +259,7 @@ Player.prototype.getAnimationFrame = function (frame) {
     }
     if(spriteDirectionWalkFrames.length > 0)
     {
-        let frameIndex = Math.mod(Math.floor(this.frames / 30), 2) * spriteDirectionWalkFrames.length);
+        let frameIndex = Math.mod(Math.floor(this.frames / 30), 2) * spriteDirectionWalkFrames.length;
         let frame = spriteDirectionWalkFrames[frameIndex];
         spriteAnimationState.startX = frame * this.width;
     }
