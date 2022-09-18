@@ -201,10 +201,9 @@ function Camera(map, startX, startY, width, height, zoom) {
 
 Camera.SPEED = 1024; // pixels per second
 
-Camera.prototype.move = function (delta, dirx, diry) {
-    // move camera
-    this.x += dirx * Camera.SPEED * delta;
-    this.y += diry * Camera.SPEED * delta;
+Camera.prototype.followPlayer = function (map, player) {
+    this.x = (player.gridX * map.cells.tsize + player.offsetX - this.width / 2) * this.zoom;
+    this.y = (player.gridY * map.cells.tsize + player.offsetY - this.height / 2) * this.zoom;
     // clamp values
     if(this.x < 0)
         this.x += this.maxX;
@@ -355,6 +354,7 @@ Game.update = function (delta) {
     
     if (direction != -1) {
         this.player.move(delta, direction);
+        this.camera.followPlayer(overworldmap, this.player);
         this.hasScrolled = true;
     }
 };
