@@ -5,7 +5,8 @@ const defaultWidth = 960;
 const defaultHeight = 640;
 
 var Loader = {
-    images: {}
+    images: {},
+    mapData: {}
 };
 
 Loader.loadImage = function (key, src) {
@@ -28,6 +29,33 @@ Loader.loadImage = function (key, src) {
 
 Loader.getImage = function (key) {
     return (key in this.images) ? this.images[key] : null;
+};
+
+Loader.loadMapData = function (key, src) {
+    let xhr = new XMLHttpRequest();
+    var mapData;
+
+    var d = new Promise(function (resolve, reject) {
+        let xhr = new XMLHttpRequest();
+        xhr.open('GET', src, true);
+
+        xhr.responseType = 'arraybuffer';
+
+        xhr.onload = function(e) {
+            this.mapData[key] = new Uint8Array(this.response).values();
+            console.log("Overworld Data Retrieved: " + this.mapData[key].length + " array length.");
+            resolve(xhr);
+        }.bind(this);
+        
+        xhr.onerror = function () {
+            reject('Could not load mapData: ' + src);
+    }.bind(this));
+
+    return d;
+};
+
+Loader.getMapData = function (key) {
+    return (key in this.mapData) ? this.mapData[key] : null;
 };
 
 //
@@ -115,20 +143,9 @@ Game.render = function () {};
 //
 // start up function
 //
-
-var overworldTileIndex = [];
-                      
+      
 window.onload = function () {
     var context = document.getElementById('mapping').getContext('2d');
-    let xhr = new XMLHttpRequest();
-    xhr.open('GET', 'Assets/Overworld Map.ffm', true);
-
-    xhr.responseType = 'arraybuffer';
-
-    xhr.onload = function(e) {
-        overworldTileIndex = new Uint8Array(this.response).values();
-        console.log("Overworld Data Retrieved: " + overworldTileIndex.length + " array length.");
-    };
     Game.run(context);
 };
 
@@ -290,7 +307,7 @@ var overworldMap = {
     rows: 8,
     tsize: 512,
     cells: overworldCells,
-    data: overworldTileIndex,
+    data: null,
     getTile: function (mapCell, col, row) {
         return 17; //this.overworldTileIndex[mapCell * overworldCells.rows * overworldCells.cols + row * dungeonCells.cols + col];
     }
@@ -320,6 +337,7 @@ Camera.prototype.move = function (delta, dirx, diry) {
 Game.load = function () {
     return [
         Loader.loadImage('overworld', 'Assets/Overworld.png'),
+        Loader.loadDataMap('overworld', 'Assets/Overworld Map.ffm'),
     ];
 };
 
@@ -327,6 +345,7 @@ Game.init = function () {
     Keyboard.listenForEvents(
         [Keyboard.LEFT, Keyboard.RIGHT, Keyboard.UP, Keyboard.DOWN]);
     this.tileAtlas = Loader.getImage('overworld');
+    overworldMap.data = Loader.getDataMap('overworld');
     this.camera = new Camera(overworldMap, defaultWidth, defaultHeight, 2);
 
     // create a canvas
@@ -409,7 +428,7 @@ Game._loadCells = function (map) {
                         let x = c * map.cells.tsize;
                         let y = r * map.cells.tsize;
                         let tileRow = Math.floor(tile / 16);
-                        let tileCol = Math.mod(tile, 16);
+                        let tileCol = tile % 16;
                         context.drawImage(
                             this.tileAtlas, // image
                             tileCol * map.cells.tsize, // source x
