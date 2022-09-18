@@ -449,8 +449,8 @@ Game._drawSprites = function (map) {
     for (let i = 0; i < spriteList.length; i++) {
         let sprite = spriteList[i];
         let spriteAnimationState = sprite.getAnimationFrame(map);
-        let x = (sprite.gridX - startCol) * displayTsize + offsetX + sprite.offsetX;
-        let y = (sprite.gridY - startRow) * displayTsize + offsetY + sprite.offsetY;
+        let x = (sprite.gridX - startCol) * displayTsize + offsetX + sprite.offsetX * this.camera.zoom;
+        let y = (sprite.gridY - startRow) * displayTsize + offsetY + sprite.offsetY * this.camera.zoom;
         context.drawImage(
             sprite.spriteMap, // image
             spriteAnimationState.startX, // source x
