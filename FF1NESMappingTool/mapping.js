@@ -316,15 +316,7 @@ Game._drawMap = function (map) {
         for (let r = startRow; r <= endRow; r++) {
             let x = (c - startCol) * displayTsize + offsetX;
             let y = (r - startRow) * displayTsize + offsetY;
-            if(c < 0)
-                c += map.cols;
-            else if(c >= map.cols)
-                c -= map.cols;
-            if(r < 0)
-                r += map.rows;
-            else if(r >= map.rows)
-                r -= map.rows;
-            let mapIndex = c + r * map.cols;
+            let mapIndex = (c < 0 ? c + map.cols : c >= map.cols ? c - map.cols : c) + (r < 0 ? r + map.rows : r >= map.rows ? r - map.rows : r) * map.cols;
             context.drawImage(
                 map.cells.bitmapData[mapIndex], // image
                 0, // source x
