@@ -37,6 +37,7 @@ Loader.loadMapData = function (key, src) {
         .then(response => checkStatus(response) && response.arrayBuffer())
         .then(buffer => {
             this.mapData[key] = new Uint8Array(buffer).values();
+            console.log("First entry: " + new Uint8Array(buffer)[0]);
             console.log("Overworld Data Retrieved: " + this.mapData[key].length + " array length.");
             resolve();
         })
