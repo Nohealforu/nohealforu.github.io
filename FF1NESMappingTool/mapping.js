@@ -435,7 +435,7 @@ Game._loadCells = function (map) {
                         let y = r * map.cells.tsize;
                         let tileRow = Math.floor(tile / 16);
                         let tileCol = tile % 16;
-                        console.log("Tile: " + tile
+                        console.log("Tile: " + tile);
                         context.drawImage(
                             this.tileAtlas, // image
                             tileCol * map.cells.tsize, // source x
