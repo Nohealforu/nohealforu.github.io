@@ -315,11 +315,11 @@ Game._drawMap = function (map) {
         for (let r = startRow; r <= endRow; r++) {
             let x = (c - startCol) * displayTsize + offsetX;
             let y = (r - startRow) * displayTsize + offsetY;
-            if(c < map.cols)
+            if(c < 0)
                 c += map.cols;
             else if(c >= map.cols)
                 c -= map.cols;
-            if(r < map.rows)
+            if(r < 0)
                 r += map.rows;
             else if(r >= map.rows)
                 r -= map.rows;
