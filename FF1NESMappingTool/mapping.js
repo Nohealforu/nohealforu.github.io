@@ -354,7 +354,7 @@ Game.update = function (delta) {
     
     if (direction != -1) {
         this.player.move(delta, direction);
-        this.camera.followPlayer(overworldmap, this.player);
+        this.camera.followPlayer(overworldMap, this.player);
         this.hasScrolled = true;
     }
 };
