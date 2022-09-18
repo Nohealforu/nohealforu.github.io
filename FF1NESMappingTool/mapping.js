@@ -37,8 +37,8 @@ Loader.loadMapData = function (key, src) {
         fetch(src)
         .then(response => checkStatus(response) && response.arrayBuffer())
         .then(buffer => {
-            this.mapData[key] = new Uint8Array(buffer).values();
-            console.log("First entry: " + new Uint8Array(buffer).values()[0]);
+            this.mapData[key] = new Uint8Array(buffer);
+            console.log("First entry: " + this.mapData[key][0]);
             console.log("Overworld Data Retrieved: " + this.mapData[key].length + " array length.");
             resolve();
         })
@@ -410,15 +410,12 @@ Game._initCells = function (map) {
 
 Game._loadCells = function (map) {
     let displayTsize = map.tsize * this.camera.zoom;
-    let centerCol = (this.camera.width + this.camera.x) / displayTsize;
-    let centerRow = (this.camera.height + this.camera.y) / displayTsize;
-    console.log("centerCol: " + centerCol + ". centerRow: " + centerRow);
+    let centerCol = Math.floor((this.camera.width / 2 + this.camera.x) / displayTsize);
+    let centerRow = Math.floor((this.camera.height / 2 + this.camera.y) / displayTsize);
     
     for(let mapX = centerCol - 1; mapX < centerCol + 2; mapX++){
-        let mapIndex = Math.floor(mapX < 0 ? map.cols - 1 : mapX);
         for(let mapY = centerRow - 1; mapY < centerRow + 2; mapY++){
-            mapIndex += Math.floor((mapY < 0 ? map.rows - 1 : mapY) * map.cols);
-            console.log("Loaded Map Index: " + mapIndex); 
+            let mapIndex = Math.floor(mapX < 0 ? map.cols - 1 : mapX) + Math.floor((mapY < 0 ? map.rows - 1 : mapY) * map.cols);
             if(map.cells.bitmapData[mapIndex] == null)
             {
                 let cellCanvas = document.createElement('canvas');
