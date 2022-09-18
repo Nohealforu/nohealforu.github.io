@@ -134,10 +134,7 @@ window.onload = function () {
 var overworldCells = {cols: 32,
     rows: 32,
     tsize: 16,
-    bitmapData: {},
-    getTile: function (mapCell, col, row) {
-        return this[mapCell][row * dungeonCells.cols + col];
-    }
+    bitmapData: {}
 };
 
 var dungeonCells = {cols: 32,
@@ -295,6 +292,7 @@ var overworldMap = {
     data: overworldTileIndex,
     getTile: function (mapCell, col, row) {
         return this.overworldTileIndex[mapCell * overworldCells.rows * overworldCells.cols + row * dungeonCells.cols + col];
+    }
 };
 
 function Camera(map, width, height, zoom) {
