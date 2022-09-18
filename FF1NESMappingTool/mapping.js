@@ -273,7 +273,10 @@ Player.AIRSPEED = 128;
 Player.prototype.move = function (delta, direction, active) {
     // move camera
     let speed = this.airship ? Player.AIRSPEED : this.ship ? Player.SEASPEED : Player.SPEED;
-    this.direction = direction;
+    if(active)
+        this.direction = direction;
+    else
+        direction = this.direction;
     let polarity = (direction == Directions.Down || direction == Directions.Right) ? 1 : -1;
     if(direction == Directions.Down || direction == Directions.Up)
     {
