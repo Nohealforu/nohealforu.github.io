@@ -452,7 +452,7 @@ Game._drawSprites = function (map) {
     
     for (let i = 0; i < spriteList.length; i++) {
         let sprite = spriteList[i];
-        let spriteAnimationState = sprite.getAnimationFrame();
+        let spriteAnimationState = sprite.getAnimationFrame(map);
         let x = (c - startCol) * displayTsize + offsetX;
         let y = (r - startRow) * displayTsize + offsetY;
         context.drawImage(
