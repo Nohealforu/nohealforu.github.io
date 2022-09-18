@@ -270,7 +270,7 @@ Player.SPEED = 640; // Raw Pixels Per Second (Unzoomed)
 Player.SEASPEED = 96;
 Player.AIRSPEED = 128;
 
-Player.prototype.move = function (delta, direction) {
+Player.prototype.move = function (delta, direction, active) {
     // move camera
     let speed = this.airship ? Player.AIRSPEED : this.ship ? Player.SEASPEED : Player.SPEED;
     this.direction = direction;
@@ -280,6 +280,9 @@ Player.prototype.move = function (delta, direction) {
         let motion = polarity * speed * delta;
         this.offsetY += motion;
         this.gridY += polarity * Math.floor(Math.abs(this.offsetY / this.height));
+        // if sprite height or tile height is different, figure out how to use tile height
+        if(!active && this.offsetY > polarity * this.height)
+            this.offsetY = 0;
         this.offsetY = this.offsetY % this.height;
         if(this.gridY < 0)
             this.gridY += this.maxY;
@@ -291,6 +294,8 @@ Player.prototype.move = function (delta, direction) {
         let motion = polarity * speed * delta;
         this.offsetX += motion;
         this.gridX += polarity * Math.floor(Math.abs(this.offsetX / this.width));
+        if(!active && this.offsetX > polarity * this.width)
+            this.offsetY = 0;
         this.offsetX = this.offsetX % this.width;
         if(this.gridX < 0)
             this.gridX += this.maxX;
@@ -338,13 +343,17 @@ Game.update = function (delta) {
     this.hasScrolled = false;
     // handle camera movement with arrow keys
     let direction = -1;
+    let activeMovement = false;
     if (Keyboard.isDown(Keyboard.LEFT)) { direction = Directions.Left; }
     else if (Keyboard.isDown(Keyboard.RIGHT)) { direction = Directions.Right; }
     else if (Keyboard.isDown(Keyboard.UP)) { direction = Directions.Up; }
     else if (Keyboard.isDown(Keyboard.DOWN)) { direction = Directions.Down; }
     
-    if (direction != -1) {
-        this.player.move(delta, direction);
+    if (direction != -1)
+        activeMovement = true;
+    
+    if (activeMovement == true || this.player.offsetX != 0 || this.player.offsetY != 0) {
+        this.player.move(delta, direction, activeMovement);
         this.camera.followPlayer(overworldMap, this.player);
         this.hasScrolled = true;
     }
