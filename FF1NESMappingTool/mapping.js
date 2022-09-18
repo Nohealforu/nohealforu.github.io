@@ -37,7 +37,7 @@ Loader.loadMapData = function (key, src) {
         .then(response => checkStatus(response) && response.arrayBuffer())
         .then(buffer => {
             this.mapData[key] = new Uint8Array(buffer).values();
-            console.log("First entry: " + new Uint8Array(buffer)[0]);
+            console.log("First entry: " + this.mapData[key][0]);
             console.log("Overworld Data Retrieved: " + this.mapData[key].length + " array length.");
             resolve();
         })
@@ -416,6 +416,7 @@ Game._loadCells = function (map) {
         let mapIndex = (mapX < 0 ? map.cols - 1 : mapX);
         for(let mapY = centerRow - 1; mapY < centerRow + 2; mapY++){
             mapIndex += (mapY < 0 ? map.rows - 1 : mapY) * map.cols;
+            console.log("Loaded Map Index: " + mapIndex); 
             if(map.cells.bitmapData[mapIndex] == null)
             {
                 let cellCanvas = document.createElement('canvas');
