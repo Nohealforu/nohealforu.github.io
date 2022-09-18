@@ -227,6 +227,8 @@ Game.init = function () {
     overworldMap.data = Loader.getMapData('overworld');
     console.log("INIT Overworldmap Data Length: " + overworldMap.data.length);
     this.camera = new Camera(overworldMap, 153 * overworldMap.cells.tsize, 165 * overworldMap.cells.tsize, defaultWidth, defaultHeight, 2);
+    console.log("MAX X: " + (overworldMap.cols * overworldMap.tsize * 2 - defaultWidth));
+    console.log("Start X: " + (153 * overworldMap.cells.tsize));
     
     // create a canvas
     this.layerCanvas = document.createElement('canvas');
