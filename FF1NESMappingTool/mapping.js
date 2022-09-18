@@ -464,6 +464,7 @@ Game._drawMap = function (map) {
             let x = (c - startCol) * displayTsize + offsetX;
             let y = (r - startRow) * displayTsize + offsetY;
             let mapIndex = c + r * map.cols;
+            console.log("Map Index: " + mapIndex); 
             context.drawImage(
                 map.cells.bitmapData[mapIndex], // image
                 0, // source x
