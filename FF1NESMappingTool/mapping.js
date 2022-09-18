@@ -40,6 +40,7 @@ Loader.loadMapData = function (key, src) {
             console.log("Overworld Data Retrieved: " + this.mapData[key].length + " array length.");
             resolve();
         })
+        .catch(err => reject(err + ' Could not load image: ' + src)); // Never forget the final catch!
     }.bind(this));
 
     return d;
