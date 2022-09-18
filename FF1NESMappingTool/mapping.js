@@ -240,7 +240,7 @@ function Player(map, startX, startY, width, height, image, spriteWalkFrames) {
     this.canoe = false;
     this.ship = false;
     this.airship = false;
-    console.log("Creating Player At: " + this.x + "," + this.y);
+    console.log("Creating Player At: " + this.gridX + "," + this.gridY);
     spriteList.push(this);
 }
 
@@ -412,9 +412,9 @@ Game._drawMap = function (map) {
     context.clearRect(0, 0, defaultWidth, defaultHeight);
     let displayTsize = map.tsize * this.camera.zoom;
     let startCol = Math.floor((this.camera.x - this.camera.width) / displayTsize);
-    let endCol = startCol + (this.camera.width + this.camera.x) / displayTsize;
+    let endCol = startCol + (this.camera.width * this.camera.zoom) / displayTsize;
     let startRow = Math.floor((this.camera.y - this.camera.height) / displayTsize);
-    let endRow = startRow + (this.camera.height + this.camera.y) / displayTsize;
+    let endRow = startRow + (this.camera.height * this.camera.zoom) / displayTsize;
     let offsetX = -this.camera.x + this.camera.width / 2 + startCol * displayTsize;
     let offsetY = -this.camera.y + this.camera.height / 2 + startRow * displayTsize;
     
@@ -443,10 +443,10 @@ Game._drawSprites = function (map) {
     context.imageSmoothingEnabled = false;
     context.clearRect(0, 0, defaultWidth, defaultHeight);
     let displayTsize = map.cells.tsize * this.camera.zoom;
-    let startCol = Math.floor((this.camera.x - this.camera.width) / displayTsize);
-    let endCol = startCol + (this.camera.width + this.camera.x) / displayTsize;
-    let startRow = Math.floor((this.camera.y - this.camera.height) / displayTsize);
-    let endRow = startRow + (this.camera.height + this.camera.y) / displayTsize;
+    let startCol = Math.floor((this.camera.x - this.camera.width / 2) / displayTsize);
+    let endCol = startCol + (this.camera.width) / displayTsize;
+    let startRow = Math.floor((this.camera.y - this.camera.height / 2) / displayTsize);
+    let endRow = startRow + (this.camera.height) / displayTsize;
     let offsetX = -this.camera.x + this.camera.width / 2 + startCol * displayTsize;
     let offsetY = -this.camera.y + this.camera.height / 2 + startRow * displayTsize;
     
