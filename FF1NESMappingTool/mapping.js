@@ -310,8 +310,8 @@ Game._drawMap = function (map) {
     let endCol = startCol + (this.camera.width + this.camera.x) / displayTsize;
     let startRow = Math.floor((this.camera.y - this.camera.height) / displayTsize);
     let endRow = startRow + (this.camera.height + this.camera.y) / displayTsize;
-    let offsetX = -this.camera.x - this.camera.width / 2 + startCol * displayTsize;
-    let offsetY = -this.camera.y - this.camera.height / 2 + startRow * displayTsize;
+    let offsetX = -this.camera.x + this.camera.width / 2 + startCol * displayTsize;
+    let offsetY = -this.camera.y + this.camera.height / 2 + startRow * displayTsize;
 
     for (let c = startCol; c <= endCol; c++) {
         for (let r = startRow; r <= endRow; r++) {
