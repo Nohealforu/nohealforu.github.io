@@ -473,7 +473,7 @@ Game.render = function () {
     // re-draw map if there has been scroll
     if (this.hasScrolled) {
         this._drawMap(overworldMap);
-        this._drawSprites(spriteList);
+        this._drawSprites(overworldMap);
     }
 
     // draw the map layers into game context
