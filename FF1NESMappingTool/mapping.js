@@ -194,6 +194,7 @@ function Camera(map, startX, startY, width, height, zoom) {
     this.maxX = map.cols * map.tsize * zoom - width;
     this.maxY = map.rows * map.tsize * zoom - height;
     this.zoom = zoom;
+    console.log("Moving Camera to: " + this.x + "," + this.y);
 }
 
 Camera.SPEED = 1024; // pixels per second
@@ -227,8 +228,6 @@ Game.init = function () {
     overworldMap.data = Loader.getMapData('overworld');
     console.log("INIT Overworldmap Data Length: " + overworldMap.data.length);
     this.camera = new Camera(overworldMap, 153 * overworldMap.cells.tsize, 165 * overworldMap.cells.tsize, defaultWidth, defaultHeight, 2);
-    console.log("MAX X: " + (overworldMap.cols * overworldMap.tsize * 2 - defaultWidth));
-    console.log("Start X: " + (153 * overworldMap.cells.tsize));
     
     // create a canvas
     this.layerCanvas = document.createElement('canvas');
