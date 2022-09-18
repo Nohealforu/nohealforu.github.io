@@ -234,7 +234,7 @@ function Player(map, startX, startY, width, height, image, spriteWalkFrames) {
     spriteList.push(this);
 }
 
-Player.prototype.getAnimationFrame = function (frame) {
+Player.prototype.getAnimationFrame = function (frames) {
     let spriteDirectionWalkFrames = [];
     let spriteAnimationState = {startX: 0, width: this.width};
     let offset = 0;
@@ -259,7 +259,7 @@ Player.prototype.getAnimationFrame = function (frame) {
     }
     if(spriteDirectionWalkFrames.length > 0)
     {
-        let frameIndex = Math.floor(this.frames / 30) % spriteDirectionWalkFrames.length;
+        let frameIndex = Math.floor(frames / 30) % spriteDirectionWalkFrames.length;
         let frame = spriteDirectionWalkFrames[frameIndex];
         spriteAnimationState.startX = frame * this.width;
     }
