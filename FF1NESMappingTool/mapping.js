@@ -204,15 +204,6 @@ Camera.SPEED = 1024; // pixels per second
 Camera.prototype.followPlayer = function (map, player) {
     this.x = (player.gridX * map.cells.tsize + player.offsetX) * this.zoom;
     this.y = (player.gridY * map.cells.tsize + player.offsetY) * this.zoom;
-    // clamp values
-    if(this.x < 0)
-        this.x += this.maxX;
-    else if (this.x > this.maxX)
-        this.x -= this.maxX;
-    if(this.y < 0)
-        this.y += this.maxY;
-    else if (this.y > this.maxY)
-        this.y -= this.maxY;
 };
 
 const Directions = {
