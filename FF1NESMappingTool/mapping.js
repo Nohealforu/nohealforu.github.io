@@ -354,6 +354,7 @@ Game.init = function () {
         [Keyboard.LEFT, Keyboard.RIGHT, Keyboard.UP, Keyboard.DOWN]);
     this.tileAtlas = Loader.getImage('overworld');
     overworldMap.data = Loader.getMapData('overworld');
+    console.log("INIT Overworldmap Data Length: " + overworldMap.data.length);
     this.camera = new Camera(overworldMap, defaultWidth, defaultHeight, 2);
 
     // create a canvas
