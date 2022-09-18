@@ -338,7 +338,7 @@ Camera.prototype.move = function (delta, dirx, diry) {
 Game.load = function () {
     return [
         Loader.loadImage('overworld', 'Assets/Overworld.png'),
-        Loader.loadDataMap('overworld', 'Assets/Overworld Map.ffm'),
+        Loader.loadMapData('overworld', 'Assets/Overworld Map.ffm'),
     ];
 };
 
@@ -346,7 +346,7 @@ Game.init = function () {
     Keyboard.listenForEvents(
         [Keyboard.LEFT, Keyboard.RIGHT, Keyboard.UP, Keyboard.DOWN]);
     this.tileAtlas = Loader.getImage('overworld');
-    overworldMap.data = Loader.getDataMap('overworld');
+    overworldMap.data = Loader.getMapData('overworld');
     this.camera = new Camera(overworldMap, defaultWidth, defaultHeight, 2);
 
     // create a canvas
