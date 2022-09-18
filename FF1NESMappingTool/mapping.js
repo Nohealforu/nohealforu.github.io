@@ -259,7 +259,7 @@ Player.prototype.getAnimationFrame = function (frame) {
     }
     if(spriteDirectionWalkFrames.length > 0)
     {
-        let frameIndex = Math.floor(this.frames / 30) % 2 * spriteDirectionWalkFrames.length;
+        let frameIndex = Math.floor(this.frames / 30) % spriteDirectionWalkFrames.length;
         let frame = spriteDirectionWalkFrames[frameIndex];
         spriteAnimationState.startX = frame * this.width;
     }
@@ -349,6 +349,7 @@ Game.update = function (delta) {
     // handle camera movement with arrow keys
     let direction = -1;
     let activeMovement = false;
+    let incompleteMovement = false;
     if (Keyboard.isDown(Keyboard.LEFT)) { direction = Directions.Left; }
     else if (Keyboard.isDown(Keyboard.RIGHT)) { direction = Directions.Right; }
     else if (Keyboard.isDown(Keyboard.UP)) { direction = Directions.Up; }
@@ -357,7 +358,14 @@ Game.update = function (delta) {
     if (direction != -1)
         activeMovement = true;
     
-    if (activeMovement == true || this.player.offsetX != 0 || this.player.offsetY != 0) {
+    if(this.player.offsetX != 0 || this.player.offsetY != 0)
+    {
+        incompleteMovement = true;
+        if(this.player.direction != direction)
+            activeMovement = false;
+    }
+    
+    if (activeMovement == true || incompleteMovement == true) {
         this.player.move(delta, direction, activeMovement);
         this.camera.followPlayer(overworldMap, this.player);
         this.hasScrolled = true;
