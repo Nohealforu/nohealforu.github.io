@@ -310,7 +310,7 @@ var overworldMap = {
     cells: overworldCells,
     data: null,
     getTile: function (mapCell, col, row) {
-        console.log("mapCell: " + mapCell + ". col: " + col + ". row: " + row + ". calc: " + (mapCell * overworldCells.rows * overworldCells.cols + row * dungeonCells.cols + col));
+        console.log("mapCell: " + mapCell + ". col: " + col + ". row: " + row + ". calc: " + (mapCell * overworldCells.rows * overworldCells.cols + row * overworldCells.cols + col));
         this.overworldTileIndex[mapCell * overworldCells.rows * overworldCells.cols + row * overworldCells.cols + col];
     }
 };
