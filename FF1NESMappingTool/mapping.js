@@ -345,7 +345,7 @@ Game.init = function () {
 
 Game.update = function (delta) {
     this.hasScrolled = false;
-    this.frames = Math.floor(this.frames + delta * 60));
+    this.frames = Math.floor(this.frames + delta * 60);
     // handle camera movement with arrow keys
     let direction = -1;
     let activeMovement = false;
