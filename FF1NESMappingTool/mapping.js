@@ -38,8 +38,8 @@ Loader.loadMapData = function (key, src) {
         .then(response => checkStatus(response) && response.arrayBuffer())
         .then(buffer => {
             this.mapData[key] = new Uint8Array(buffer);
-            console.log("First entry: " + this.mapData[key][0]);
             console.log("Overworld Data Retrieved: " + this.mapData[key].length + " array length.");
+            console.log("First entry: " + this.mapData[key][0]);
             resolve();
         })
         .catch(err => reject(err + ' Could not load map data: ' + src)); // Never forget the final catch!
@@ -362,9 +362,11 @@ Game.init = function () {
     this.layerCanvas.height = defaultHeight;
 
     // initial draw of the map
-    console.log("Drawing Map");
+    console.log("Intial Map Loading...");
     this._loadCells(overworldMap);
+    console.log("Intial Map Load Complete");
     this._drawMap(overworldMap);
+    console.log("Intial Map Draw Complete");
 };
 
 Game.update = function (delta) {
