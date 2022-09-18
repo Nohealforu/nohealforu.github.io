@@ -4,6 +4,180 @@
 const defaultWidth = 960;
 const defaultHeight = 640;
 
+const worldMapTileFight = {
+	None: 0,
+	Fight: 1,
+	FightRiver: 2,
+	FightOcean: 3
+};	
+
+const teleportEntryRequirement = {
+	None: 0,
+	Crown: 1,
+	Cube: 2,
+	Chime: 3,
+	Orbs: 4
+};
+
+function teleportEntry(name, targetMap, x, y, requirement = teleportEntryRequirement.None){
+	this.name = name;
+	this.targetMap = targetMap;
+	this.gridX = x;
+	this.gridY = y;
+	this.requirement = requirement;
+}
+
+function worldMapTile(walk = false, ship = false, canoe = false, teleport = null, fight = worldMapTileFight.None, landAirship = false, dockShip = false, caravan = false, raiseAirship = false){
+	this.fight = fight;
+	this.walk = walk;
+	this.canoe = canoe;
+	this.ship = ship;
+	this.landAirship = landAirship;
+	this.dockShip = dockShip;
+	this.caravan = caravan;
+	this.teleport = teleport;
+	this.raiseAirship = raiseAirship;
+}
+
+var worldMapTileAtlas = [
+// Row 1
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight, true),
+new worldMapTile(true, false, false, new teleportEntry('CorneriaCastle', 'CorneriaCastle', 12, 35)),
+new worldMapTile(true, false, false, new teleportEntry('CorneriaCastle', 'CorneriaCastle', 12, 35)),
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight),
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight),
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight),
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight),
+new worldMapTile(false, true, false, null, worldMapTileFight.FightOcean),
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight),
+new worldMapTile(),
+new worldMapTile(),
+new worldMapTile(),
+new worldMapTile(),
+new worldMapTile(),
+new worldMapTile(true, false, false, new teleportEntry('EarthCave', 'EarthCave', 23, 24)),
+new worldMapTile(true, false, false, null, worldMapTileFight.None, false, true),
+// Row 2
+new worldMapTile(),
+new worldMapTile(),
+new worldMapTile(),
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight),
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight),
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight),
+new worldMapTile(false, true, false, null, worldMapTileFight.FightOcean),
+new worldMapTile(false, true, false, null, worldMapTileFight.FightOcean),
+new worldMapTile(false, true, false, null, worldMapTileFight.FightOcean),
+new worldMapTile(),
+new worldMapTile(),
+new worldMapTile(true, false, false, new teleportEntry('ElflandCastle', 'ElflandCastle', 16, 31)),
+new worldMapTile(true, false, false, new teleportEntry('ElflandCastle', 'ElflandCastle', 16, 31)),
+new worldMapTile(true, false, false, new teleportEntry('MirageTower', 'MirageTower', 17, 31, teleportEntryRequirement.Chime)),
+new worldMapTile(true),
+new worldMapTile(true, false, false, null, worldMapTileFight.None, false, true),
+// Row 3
+new worldMapTile(),
+new worldMapTile(),
+new worldMapTile(),
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight),
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight),
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight),
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight),
+new worldMapTile(false, true, false, null, worldMapTileFight.FightOcean),
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight),
+new worldMapTile(true, false, false, new teleportEntry('NorthwestCastle', 'NorthwestCastle', 22, 24)),
+new worldMapTile(true, false, false, new teleportEntry('NorthwestCastle', 'NorthwestCastle', 22, 24)),
+new worldMapTile(true, false, false, new teleportEntry('IceCave', 'IceCave', 7, 1)),
+new worldMapTile(),
+new worldMapTile(),
+new worldMapTile(),
+new worldMapTile(true, false, false, new teleportEntry('DwarfCave', 'DwarfCave', 22, 11)),
+// Row 4
+new worldMapTile(),
+new worldMapTile(),
+new worldMapTile(true, false, false, new teleportEntry('MatoyaCave', 'MatoyaCave', 15, 11)),
+new worldMapTile(),
+new worldMapTile(true, false, false, new teleportEntry('TitanTunnelE', 'TitanTunnel', 11, 14)),
+new worldMapTile(true, false, false, new teleportEntry('TitanTunnelW', 'TitanTunnel', 5, 3)),
+new worldMapTile(true, false, false, null, worldMapTileFight.None, true, false, true),
+new worldMapTile(true, false, false, null, worldMapTileFight.None, false, false, false, true),
+new worldMapTile(true, false, false, new teleportEntry('OrdealsCastle', 'OrdealsCastle', 12, 21)),
+new worldMapTile(true, false, false, new teleportEntry('OrdealsCastle', 'OrdealsCastle', 12, 21)),
+new worldMapTile(true, false, false, new teleportEntry('SardaCave', 'SardaCave', 18, 13)),
+new worldMapTile(true),
+new worldMapTile(),
+new worldMapTile(true),
+new worldMapTile(),
+new worldMapTile(true),
+// Row 5
+new worldMapTile(false, false, true, null, worldMapTileFight.FightRiver),
+new worldMapTile(false, false, true, null, worldMapTileFight.FightRiver),
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight),
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight),
+new worldMapTile(false, false, true, null, worldMapTileFight.FightRiver),
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight),
+new worldMapTile(false, false, true, new teleportEntry('Waterfall', 'Waterfall', 57, 56)),
+new worldMapTile(),
+new worldMapTile(),
+new worldMapTile(true, false, false, new teleportEntry('Corneria', 'Corneria', 16, 23)),
+new worldMapTile(true, false, false, new teleportEntry('Provoka', 'Provoka', 19, 32)),
+new worldMapTile(),
+new worldMapTile(true, false, false, new teleportEntry('Elfland', 'Elfland', 41, 22)),
+new worldMapTile(true, false, false, new teleportEntry('Melmond', 'Melmond', 1, 16)),
+new worldMapTile(true, false, false, new teleportEntry('CrescentLake', 'CrescentLake', 11, 23)),
+new worldMapTile(),
+// Row 6
+new worldMapTile(false, false, true, null, worldMapTileFight.FightRiver),
+new worldMapTile(false, false, true, null, worldMapTileFight.FightRiver),
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight),
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight),
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight, true),
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight),
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight, true),
+new worldMapTile(true, false, false, new teleportEntry('FiendsTemple', 'FiendsTemple', 20, 30)),
+new worldMapTile(true, false, false, new teleportEntry('FiendsTemple', 'FiendsTemple', 20, 30)),
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight, true),
+new worldMapTile(true, false, false, new teleportEntry('Gaia', 'Gaia', 61, 61)),
+new worldMapTile(),
+new worldMapTile(),
+new worldMapTile(true, false, false, new teleportEntry('Onrac', 'Onrac', 1, 12)),
+new worldMapTile(),
+new worldMapTile(),
+// Row 7
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight, true),
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight, true),
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight),
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight),
+new worldMapTile(true, false, false, new teleportEntry('GurguVolcano', 'GurguVolcano', 27, 15)),
+new worldMapTile(true, false, false, new teleportEntry('GurguVolcano', 'GurguVolcano', 27, 15)),
+new worldMapTile(true, false, false, new teleportEntry('Cardia1', 'Cardia', 12, 15)),
+new worldMapTile(true, false, false, new teleportEntry('Cardia2', 'Cardia', 19, 36)),
+new worldMapTile(true, false, false, new teleportEntry('Cardia3', 'Cardia', 43, 29)),
+new worldMapTile(true, false, false, new teleportEntry('Cardia4', 'Cardia', 58, 55)),
+new worldMapTile(true, false, false, new teleportEntry('Cardia5', 'Cardia', 30, 18)),
+new worldMapTile(),
+new worldMapTile(true, false, false, new teleportEntry('Bahamut', 'Bahamut', 2, 2)),
+new worldMapTile(true, false, false, new teleportEntry('Leifen', 'Leifen', 19, 23)),
+new worldMapTile(true, false, false, new teleportEntry('MarshCave', 'MarshCave', 21, 27)),
+new worldMapTile(),
+// Row 8
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight, true),
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight, true),
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight),
+new worldMapTile(true, false, false, null, worldMapTileFight.Fight),
+new worldMapTile(true),
+new worldMapTile(true),
+new worldMapTile(true, false, false, null, worldMapTileFight.None, true),
+new worldMapTile(true, false, false, null, worldMapTileFight.None, false, true),
+new worldMapTile(true, false, false, null, worldMapTileFight.None, false, true),
+new worldMapTile(true, false, false, null, worldMapTileFight.None, false, true),
+new worldMapTile(true, false, false, null, worldMapTileFight.None, false, true),
+new worldMapTile(),
+new worldMapTile(),
+new worldMapTile(),
+new worldMapTile(),
+new worldMapTile(),
+];
+
 var Loader = {
     images: {},
     mapData: {}
@@ -129,7 +303,7 @@ Game.tick = function (elapsed) {
 
     // compute delta time in seconds -- also cap it
     var delta = (elapsed - this._previousElapsed) / 1000.0;
-    delta = Math.min(delta, 0.25); // maximum delta of 250 ms
+    delta = Math.min(delta, 0.05); // maximum delta of 50 ms
     this._previousElapsed = elapsed;
 
     this.update(delta);
@@ -183,6 +357,9 @@ var overworldMap = {
     tileAtlas: null,
     getTile: function (mapX, mapY, col, row) {
         return this.data[mapY * this.cells.rows * this.cells.cols * this.cols + row * this.cells.cols * this.cols + mapX * this.cells.cols + col];
+    },
+    getTileData: function (gridX, gridY) {
+        return worldMapTileAtlas[this.data[gridY * this.cells.cols * this.cols + gridX]];
     }
 };
 
@@ -213,6 +390,13 @@ const Directions = {
     Right: 3
 };
 
+const MoveMethod = {
+    Walk: 0,
+    Ship: 1,
+    Canoe: 2,
+    Airship: 3
+}
+
 function Player(map, startX, startY, width, height, image, spriteWalkFrames) {
     this.gridX = startX;
     this.gridY = startY;
@@ -230,6 +414,7 @@ function Player(map, startX, startY, width, height, image, spriteWalkFrames) {
     this.canoe = false;
     this.ship = false;
     this.airship = false;
+    this.moveMethod = MoveMethod.Walk;
     console.log("Creating Player At: " + this.gridX + "," + this.gridY);
     spriteList.push(this);
 }
@@ -266,6 +451,32 @@ Player.prototype.getAnimationFrame = function (frames) {
     return spriteAnimationState;
 }
 
+Player.prototype.checkTargetTile = function (tileX, tileY)
+{
+    let tileData = Game.currentMap.getTileData(tileX, tileY);
+    if(this.moveMethod == MoveMethod.Walk && tileData.walk == false)
+    {
+        if(tileData.canoe == true && this.canoe == true)
+        {
+            this.moveMethod = MoveMethod.Canoe;
+            return false;
+        } // Build out more scenarios to ride boat, etc.
+        else
+            return true;
+    }
+    else if(this.moveMethod == MoveMethod.Ship && tileData.ship == false)
+    {
+        if(tileData.canoe == true && this.canoe == true)
+        {
+            this.moveMethod = MoveMethod.Canoe;
+            return false;
+        } // Build out more scenarios to ride boat, etc.
+        else
+            return true;
+    }
+    return false;
+}
+
 Player.SPEED = 320; // Raw Pixels Per Second (Unzoomed)
 Player.SEASPEED = 96;
 Player.AIRSPEED = 128;
@@ -283,8 +494,9 @@ Player.prototype.move = function (delta, direction, active) {
         let motion = polarity * speed * delta;
         this.offsetY += motion;
         this.gridY += polarity * Math.floor(Math.abs(this.offsetY / this.height));
+        let targetTileInaccessible = this.checkTargetTile(this.gridX, this.gridY + polarity);
         // if sprite height or tile height is different, figure out how to use tile height
-        if(!active && Math.abs(this.offsetY) > Math.abs(this.height))
+        if(!active && Math.abs(this.offsetY) > Math.abs(this.height) || targetTileInaccessible)
             this.offsetY = 0;
         this.offsetY = this.offsetY % this.height;
         if(this.gridY < 0)
@@ -297,7 +509,8 @@ Player.prototype.move = function (delta, direction, active) {
         let motion = polarity * speed * delta;
         this.offsetX += motion;
         this.gridX += polarity * Math.floor(Math.abs(this.offsetX / this.width));
-        if(!active && Math.abs(this.offsetX) > Math.abs(this.width))
+        let targetTileInaccessible = this.checkTargetTile(this.gridX + polarity, this.gridY);
+        if(!active && Math.abs(this.offsetX) > Math.abs(this.width) || targetTileInaccessible)
             this.offsetX = 0;
         this.offsetX = this.offsetX % this.width;
         if(this.gridX < 0)
@@ -324,6 +537,7 @@ Game.init = function () {
     this.camera = new Camera(overworldMap, 153 * overworldMap.cells.tsize, 165 * overworldMap.cells.tsize, defaultWidth, defaultHeight, 2);
     this.player = new Player(overworldMap, 153, 165, 16, 16, Loader.getImage('fighter'), {down:[0,7], up:[1,6], left:[2,3], right:[5,4]});
     this.frames = 0;
+    this.currentMap = overworldMap;
     
     // create a canvas
     this.layerCanvas = document.createElement('canvas');
