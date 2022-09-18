@@ -163,8 +163,8 @@ var dungeonMap = {
     tsize: 512,
     cells: dungeonCells,
     data: null,
-    getTile: function (mapCell, col, row) {
-        this.data[mapCell * dungeonCells.rows * dungeonCells.cols + row * dungeonCells.cols + col];
+    getTile: function (mapX, mapY, col, row) {
+        this.data[mapY * this.cells.rows * this.cells.cols + (mapX + row) * this.cells.cols + col];
     }
 };
 
@@ -181,8 +181,9 @@ var overworldMap = {
     cells: overworldCells,
     data: null,
     tileAtlas: null,
-    getTile: function (mapCell, col, row) {
-        return this.data[mapCell * overworldCells.rows * overworldCells.cols + row * overworldCells.cols + col];
+    getTile: function (mapX, mapY, col, row) {
+        //return this.data[mapCell * this.cells.rows * this.cells.cols + row * this.cells.cols + col];
+        return this.data[mapY * this.cells.rows * this.cells.cols + (mapX + row) * this.cells.cols + col];
     }
 };
 
@@ -276,7 +277,7 @@ Game._loadCells = function (map) {
                 let context = cellCanvas.getContext('2d')
                 for (let c = 0; c <= map.cells.cols; c++) {
                     for (let r = 0; r <= map.cells.rows; r++) {
-                        let tile = map.getTile(mapIndex, c, r);
+                        let tile = map.getTile(mapX, mapY, c, r);
                         let x = c * map.cells.tsize;
                         let y = r * map.cells.tsize;
                         let tileRow = Math.floor(tile / 16);
