@@ -412,7 +412,7 @@ Game._loadCells = function (map) {
     let displayTsize = map.tsize * this.camera.zoom;
     let centerCol = (this.camera.width + this.camera.x) / displayTsize;
     let centerRow = (this.camera.height + this.camera.y) / displayTsize;
-    console.log("centerCol: " + centerCol + ". centerRow: " + centerRow;
+    console.log("centerCol: " + centerCol + ". centerRow: " + centerRow);
     
     for(let mapX = centerCol - 1; mapX < centerCol + 2; mapX++){
         let mapIndex = Math.floor(mapX < 0 ? map.cols - 1 : mapX);
