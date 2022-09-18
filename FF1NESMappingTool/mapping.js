@@ -331,8 +331,14 @@ Camera.prototype.move = function (delta, dirx, diry) {
     this.x += dirx * Camera.SPEED * delta;
     this.y += diry * Camera.SPEED * delta;
     // clamp values
-    this.x = Math.max(0, Math.min(this.x, this.maxX));
-    this.y = Math.max(0, Math.min(this.y, this.maxY));
+    if(this.x < 0)
+        this.x += this.maxX;
+    else if (this.x > this.maxX)
+        this.x -= this.maxX;
+    if(this.y < 0)
+        this.y += this.maxY;
+    else if (this.y > this.maxY)
+        this.y -= this.maxY;
 };
 
 Game.load = function () {
@@ -429,6 +435,7 @@ Game._loadCells = function (map) {
                         let y = r * map.cells.tsize;
                         let tileRow = Math.floor(tile / 16);
                         let tileCol = tile % 16;
+                        console.log("Tile: " + tile
                         context.drawImage(
                             this.tileAtlas, // image
                             tileCol * map.cells.tsize, // source x
@@ -484,6 +491,7 @@ Game._drawMap = function (map) {
 Game.render = function () {
     // re-draw map if there has been scroll
     if (this.hasScrolled) {
+        this._loadCells(overworldMap);
         this._drawMap(overworldMap);
     }
 
