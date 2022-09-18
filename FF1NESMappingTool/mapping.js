@@ -310,7 +310,7 @@ var overworldMap = {
     cells: overworldCells,
     data: null,
     getTile: function (mapCell, col, row) {
-        return 17; //this.overworldTileIndex[mapCell * overworldCells.rows * overworldCells.cols + row * dungeonCells.cols + col];
+        this.overworldTileIndex[mapCell * overworldCells.rows * overworldCells.cols + row * dungeonCells.cols + col];
     }
 };
 
@@ -415,12 +415,14 @@ Game._initCells = function (map) {
 };*/
 
 Game._loadCells = function (map) {
-    let displayTsize = map.tsize * this.camera.zoom;
+    /*let displayTsize = map.tsize * this.camera.zoom;
     let centerCol = Math.floor((this.camera.width / 2 + this.camera.x) / displayTsize);
     let centerRow = Math.floor((this.camera.height / 2 + this.camera.y) / displayTsize);
     
-    for(let mapX = centerCol - 1; mapX < centerCol + 2; mapX++){
-        for(let mapY = centerRow - 1; mapY < centerRow + 2; mapY++){
+    for(let mapX = centerCol - 2; mapX < centerCol + 3; mapX++){
+        for(let mapY = centerRow - 2; mapY < centerRow + 3; mapY++){*/
+    for(let mapX = 0; mapX < map.cols; mapX++){
+        for(let mapY = 0; mapY < map.rows; mapY++){
             let mapIndex = Math.floor(mapX < 0 ? map.cols - 1 : mapX) + Math.floor((mapY < 0 ? map.rows - 1 : mapY) * map.cols);
             if(map.cells.bitmapData[mapIndex] == null)
             {
@@ -435,7 +437,6 @@ Game._loadCells = function (map) {
                         let y = r * map.cells.tsize;
                         let tileRow = Math.floor(tile / 16);
                         let tileCol = tile % 16;
-                        console.log("Tile: " + tile);
                         context.drawImage(
                             this.tileAtlas, // image
                             tileCol * map.cells.tsize, // source x
@@ -472,7 +473,6 @@ Game._drawMap = function (map) {
             let x = (c - startCol) * displayTsize + offsetX;
             let y = (r - startRow) * displayTsize + offsetY;
             let mapIndex = c + r * map.cols;
-            console.log("Map Index: " + mapIndex); 
             context.drawImage(
                 map.cells.bitmapData[mapIndex], // image
                 0, // source x
