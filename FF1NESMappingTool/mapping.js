@@ -407,9 +407,9 @@ Game._drawMap = function (map) {
     context.imageSmoothingEnabled = false;
     context.clearRect(0, 0, defaultWidth, defaultHeight);
     let displayTsize = map.tsize * this.camera.zoom;
-    let startCol = Math.floor((this.camera.x - this.camera.width) / displayTsize);
+    let startCol = Math.floor((this.camera.x - this.camera.width / 2) / displayTsize);
     let endCol = startCol + (this.camera.width * this.camera.zoom) / displayTsize;
-    let startRow = Math.floor((this.camera.y - this.camera.height) / displayTsize);
+    let startRow = Math.floor((this.camera.y - this.camera.height / 2) / displayTsize);
     let endRow = startRow + (this.camera.height * this.camera.zoom) / displayTsize;
     let offsetX = -this.camera.x + this.camera.width / 2 + startCol * displayTsize;
     let offsetY = -this.camera.y + this.camera.height / 2 + startRow * displayTsize;
