@@ -49,7 +49,7 @@ Loader.loadMapData = function (key, src) {
         
         xhr.onerror = function () {
             reject('Could not load mapData: ' + src);
-    }.bind(this);
+    }.bind(this));
 
     return d;
 };
