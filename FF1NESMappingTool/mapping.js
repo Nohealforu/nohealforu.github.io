@@ -229,8 +229,8 @@ function Player(map, startX, startY, width, height, image, spriteWalkFrames) {
     this.offsetY = 0;
     this.width = width;
     this.height = height;
-    this.maxX = map.cols * map.tsize;
-    this.maxY = map.rows * map.tsize;
+    this.maxX = map.cols * map.cells.cols;
+    this.maxY = map.rows * map.cells.rows;
     this.spriteMap = image;
     this.spriteWalkFrames = spriteWalkFrames;
     this.active = true;
@@ -275,7 +275,7 @@ Player.prototype.getAnimationFrame = function (map) {
     return spriteAnimationState;
 }
 
-Player.SPEED = 64; // Raw Pixels Per Second (Unzoomed)
+Player.SPEED = 640; // Raw Pixels Per Second (Unzoomed)
 Player.SEASPEED = 96;
 Player.AIRSPEED = 128;
 
