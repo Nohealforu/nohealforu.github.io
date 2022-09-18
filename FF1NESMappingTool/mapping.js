@@ -186,6 +186,8 @@ var overworldMap = {
     }
 };
 
+var spriteList = [];
+
 function Camera(map, startX, startY, width, height, zoom) {
     this.x = startX * zoom;
     this.y = startY * zoom;
@@ -214,9 +216,109 @@ Camera.prototype.move = function (delta, dirx, diry) {
         this.y -= this.maxY;
 };
 
+const Directions = {
+    Down: 0,
+    Up: 1,
+    Left: 2,
+    Right: 3
+};
+
+function Player(map, startX, startY, width, height, image, spriteWalkFrames) {
+    this.gridX = startX;
+    this.gridY = startY;
+    this.offsetX = 0;
+    this.offsetY = 0;
+    this.width = width;
+    this.height = height;
+    this.maxX = map.cols * map.tsize;
+    this.maxY = map.rows * map.tsize;
+    this.spriteMap = image;
+    this.spriteWalkFrame = spriteWalkFrames;
+    this.active = true;
+    this.direction = Directions.Down;
+    this.frame = 0;
+    this.canoe = false;
+    this.ship = false;
+    this.airship = false;
+    console.log("Creating Player At: " + this.x + "," + this.y);
+    spriteList.push(this);
+}
+
+Player.prototype.getAnimationFrame = function (map) {
+    let spriteDirectionWalkFrames = [];
+    let spriteAnimationState = {startX: 0, width: this.width};
+    let offset = 0;
+    switch(this.direction)
+    {
+        case Direction.Down:
+            spriteDirectionWalkFrames = this.spriteWalkFrames['down'];
+            offset = this.offsetY;
+            break;
+        case Direction.Up:
+            spriteDirectionWalkFrames = this.spriteWalkFrames['up'];
+            offset = this.offsetY;
+            break;
+        case Direction.Left:
+            spriteDirectionWalkFrames = this.spriteWalkFrames['left'];
+            offset = this.offsetX;
+            break;
+        case Direction.Right:
+            spriteDirectionWalkFrames = this.spriteWalkFrames['right'];
+            offset = this.offsetX;
+            break;
+    }
+    if(spriteDirectionWalkFrames.length > 0)
+    {
+        let frameIndex = Math.floor(Math.abs(offset / map.cells.tsize) * spriteDirectionWalkFrames.length);
+        let frame = spriteDirectionWalkFrames[frameIndex];
+        if (frame < 1)
+        {
+            spriteAnimationState.startX = (1 - frame) * this.width;
+            spriteAnimationState.width = -this.width;
+        }
+        else
+            spriteAnimationState.startX = (frame - 1);
+    }
+    return spriteAnimationState;
+}
+
+Player.SPEED = 4; // Tiles per second
+Player.SEASPEED = 6;
+Player.AIRSPEED = 8;
+
+Player.prototype.move = function (delta, direction) {
+    // move camera
+    let speed = this.airship ? Player.AIRSPEED : this.ship ? Player.SEASPEED : Player.SPEED;
+    this.direction = direction;
+    let polarity = (direction == Directions.Down || direction == Directions.Right) ? 1 : -1;
+    if(direction == Directions.Down || direction == Directions.Up)
+    {
+        let motion = polarity * speed * delta;
+        this.offsetY += motion;
+        this.gridY += polarity * Math.floor(Math.abs(this.offsetY / this.height));
+        this.offsetY += this.offsetY % this.height;
+        if(this.gridY < 0)
+            this.gridY += this.maxY;
+        else if (this.gridY >= this.maxY)
+            this.gridY -= this.maxY;
+    }
+    else if(direction == Directions.Left || direction == Directions.Right)
+    {
+        let motion = polarity * speed * delta;
+        this.offsetX += motion;
+        this.gridX += polarity * Math.floor(Math.abs(this.offsetX / this.width));
+        this.offsetX += this.offsetX % this.width;
+        if(this.gridX < 0)
+            this.gridX += this.maxX;
+        else if (this.gridX >= this.maxX)
+            this.gridX -= this.maxX;
+    }
+};
+
 Game.load = function () {
     return [
         Loader.loadImage('overworld', 'Assets/Overworld.png'),
+        Loader.loadImage('fighter', 'Assets/Fighter.png'),
         Loader.loadMapData('overworld', 'Assets/Overworld%20Map.ffm'),
     ];
 };
@@ -228,11 +330,15 @@ Game.init = function () {
     overworldMap.data = Loader.getMapData('overworld');
     console.log("INIT Overworldmap Data Length: " + overworldMap.data.length);
     this.camera = new Camera(overworldMap, 153 * overworldMap.cells.tsize, 165 * overworldMap.cells.tsize, defaultWidth, defaultHeight, 2);
+    this.player = new Player(overworldMap, 153, 165, 16, 16, Loader.getImage('fighter'), {down:[1,-1], up:[2,-2], left:[3,4], right:[-3,-4]});
     
     // create a canvas
     this.layerCanvas = document.createElement('canvas');
     this.layerCanvas.width = defaultWidth;
     this.layerCanvas.height = defaultHeight;
+    this.spriteCanvas = document.createElement('canvas');
+    this.spriteCanvas.width = defaultWidth;
+    this.spriteCanvas.height = defaultHeight;
 
     // initial draw of the map
     console.log("Intial Map Loading...");
@@ -245,15 +351,14 @@ Game.init = function () {
 Game.update = function (delta) {
     this.hasScrolled = false;
     // handle camera movement with arrow keys
-    var dirx = 0;
-    var diry = 0;
-    if (Keyboard.isDown(Keyboard.LEFT)) { dirx = -1; }
-    if (Keyboard.isDown(Keyboard.RIGHT)) { dirx = 1; }
-    if (Keyboard.isDown(Keyboard.UP)) { diry = -1; }
-    if (Keyboard.isDown(Keyboard.DOWN)) { diry = 1; }
-
-    if (dirx !== 0 || diry !== 0) {
-        this.camera.move(delta, dirx, diry);
+    let direction = -1;
+    if (Keyboard.isDown(Keyboard.LEFT)) { direction = Directions.Left; }
+    else if (Keyboard.isDown(Keyboard.RIGHT)) { direction = Directions.Right; }
+    else if (Keyboard.isDown(Keyboard.UP)) { direction = Directions.Up; }
+    else if (Keyboard.isDown(Keyboard.DOWN)) { direction = Directions.Down; }
+    
+    if (direction != -1) {
+        this.player.move(delta, direction);
         this.hasScrolled = true;
     }
 };
@@ -312,7 +417,7 @@ Game._drawMap = function (map) {
     let endRow = startRow + (this.camera.height + this.camera.y) / displayTsize;
     let offsetX = -this.camera.x + this.camera.width / 2 + startCol * displayTsize;
     let offsetY = -this.camera.y + this.camera.height / 2 + startRow * displayTsize;
-
+    
     for (let c = startCol; c <= endCol; c++) {
         for (let r = startRow; r <= endRow; r++) {
             let x = (c - startCol) * displayTsize + offsetX;
@@ -333,12 +438,45 @@ Game._drawMap = function (map) {
     }
 };
 
+Game._drawSprites = function (map) {
+    let context = this.spriteCanvas.getContext('2d');
+    context.imageSmoothingEnabled = false;
+    context.clearRect(0, 0, defaultWidth, defaultHeight);
+    let displayTsize = map.cells.tsize * this.camera.zoom;
+    let startCol = Math.floor((this.camera.x - this.camera.width) / displayTsize);
+    let endCol = startCol + (this.camera.width + this.camera.x) / displayTsize;
+    let startRow = Math.floor((this.camera.y - this.camera.height) / displayTsize);
+    let endRow = startRow + (this.camera.height + this.camera.y) / displayTsize;
+    let offsetX = -this.camera.x + this.camera.width / 2 + startCol * displayTsize;
+    let offsetY = -this.camera.y + this.camera.height / 2 + startRow * displayTsize;
+    
+    for (let i = 0; i < spriteList.length; i++) {
+        let sprite = spriteList[i];
+        let spriteAnimationState = sprite.getAnimationFrame();
+        let x = (c - startCol) * displayTsize + offsetX;
+        let y = (r - startRow) * displayTsize + offsetY;
+        context.drawImage(
+            sprite.spriteMap, // image
+            spriteAnimationState.startX, // source x
+            0, // source y
+            spriteAnimationState.width, // source width
+            sprite.height, // source height
+            Math.round(x),  // target x
+            Math.round(y), // target y
+            sprite.width * this.camera.zoom, // target width
+            sprite.height * this.camera.zoom // target height
+        );
+    }
+};
+
 Game.render = function () {
     // re-draw map if there has been scroll
     if (this.hasScrolled) {
         this._drawMap(overworldMap);
+        this._drawSprites(spriteList);
     }
 
     // draw the map layers into game context
     this.ctx.drawImage(this.layerCanvas, 0, 0);
+    this.ctx.drawImage(this.spriteCanvas, 0, 0);
 };
