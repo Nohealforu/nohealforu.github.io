@@ -284,7 +284,7 @@ Player.prototype.move = function (delta, direction, active) {
         this.offsetY += motion;
         this.gridY += polarity * Math.floor(Math.abs(this.offsetY / this.height));
         // if sprite height or tile height is different, figure out how to use tile height
-        if(!active && this.offsetY > polarity * this.height)
+        if(!active && Math.abs(this.offsetY) > Math.abs(this.height))
             this.offsetY = 0;
         this.offsetY = this.offsetY % this.height;
         if(this.gridY < 0)
@@ -297,8 +297,8 @@ Player.prototype.move = function (delta, direction, active) {
         let motion = polarity * speed * delta;
         this.offsetX += motion;
         this.gridX += polarity * Math.floor(Math.abs(this.offsetX / this.width));
-        if(!active && this.offsetX > polarity * this.width)
-            this.offsetY = 0;
+        if(!active && Math.abs(this.offsetX) > Math.abs(this.width))
+            this.offsetX = 0;
         this.offsetX = this.offsetX % this.width;
         if(this.gridX < 0)
             this.gridX += this.maxX;
