@@ -155,9 +155,6 @@ var dungeonCells = {cols: 32,
     rows: 32,
     tsize: 16,
     bitmapData: {}
-    getTile: function (mapCell, col, row) {
-        return this[mapCell][row * dungeonCells.cols + col];
-    }
 };
 
 var dungeonMap = {
