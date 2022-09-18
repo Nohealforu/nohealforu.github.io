@@ -32,7 +32,8 @@ Loader.getImage = function (key) {
 };
 
 Loader.loadMapData = function (key, src) {
-    let xhr = new XMLHttpRequest();
+    console.log("Retrieving Map Data From: " + src);
+    var xhr = new XMLHttpRequest();
     var mapData;
 
     var d = new Promise(function (resolve, reject) {
