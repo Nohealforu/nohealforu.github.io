@@ -233,7 +233,7 @@ function Player(map, startX, startY, width, height, image, spriteWalkFrames) {
     this.maxX = map.cols * map.tsize;
     this.maxY = map.rows * map.tsize;
     this.spriteMap = image;
-    this.spriteWalkFrame = spriteWalkFrames;
+    this.spriteWalkFrames = spriteWalkFrames;
     this.active = true;
     this.direction = Directions.Down;
     this.frame = 0;
