@@ -36,11 +36,11 @@ Loader.loadMapData = function (key, src) {
         fetch(src)
         .then(response => checkStatus(response) && response.arrayBuffer())
         .then(buffer => {
-            this.mapData[key] = buffer.values();
+            this.mapData[key] = new Uint8Array(buffer).values();
             console.log("Overworld Data Retrieved: " + this.mapData[key].length + " array length.");
             resolve();
         })
-        .catch(err => reject(err + ' Could not load image: ' + src)); // Never forget the final catch!
+        .catch(err => reject(err + ' Could not load map data: ' + src)); // Never forget the final catch!
     }.bind(this));
 
     return d;
