@@ -250,19 +250,19 @@ Player.prototype.getAnimationFrame = function (map) {
     let offset = 0;
     switch(this.direction)
     {
-        case Direction.Down:
+        case Directions.Down:
             spriteDirectionWalkFrames = this.spriteWalkFrames['down'];
             offset = this.offsetY;
             break;
-        case Direction.Up:
+        case Directions.Up:
             spriteDirectionWalkFrames = this.spriteWalkFrames['up'];
             offset = this.offsetY;
             break;
-        case Direction.Left:
+        case Directions.Left:
             spriteDirectionWalkFrames = this.spriteWalkFrames['left'];
             offset = this.offsetX;
             break;
-        case Direction.Right:
+        case Directions.Right:
             spriteDirectionWalkFrames = this.spriteWalkFrames['right'];
             offset = this.offsetX;
             break;
