@@ -116,9 +116,28 @@ Game.render = function () {};
 // start up function
 //
 
+var overworldTileIndex = [];
+                      
 window.onload = function () {
     var context = document.getElementById('mapping').getContext('2d');
+    let xhr = new XMLHttpRequest();
+    xhr.open('GET', 'Assets/Overworld Map.ffm', true);
+
+    xhr.responseType = 'arraybuffer';
+
+    xhr.onload = function(e) {
+      overworldTileIndex = new Uint8Array(this.response).values();
+    };
     Game.run(context);
+};
+
+var overworldCells = {cols: 32,
+    rows: 32,
+    tsize: 16,
+    bitmapData: {},
+    getTile: function (mapCell, col, row) {
+        return this[mapCell][row * dungeonCells.cols + col];
+    }
 };
 
 var dungeonCells = {cols: 32,
@@ -261,11 +280,21 @@ var dungeonCells = {cols: 32,
     }
 };
 
-var map = {
+var dungeonMap = {
     cols: 2,
     rows: 2,
     tsize: 512,
     cells: dungeonCells
+};
+
+var overworldMap = {
+    cols: 8,
+    rows: 8,
+    tsize: 512,
+    cells: overworldCells,
+    data: overworldTileIndex,
+    getTile: function (mapCell, col, row) {
+        return this.overworldTileIndex[mapCell * overworldCells.rows * overworldCells.cols + row * dungeonCells.cols + col];
 };
 
 function Camera(map, width, height, zoom) {
@@ -299,7 +328,7 @@ Game.init = function () {
     Keyboard.listenForEvents(
         [Keyboard.LEFT, Keyboard.RIGHT, Keyboard.UP, Keyboard.DOWN]);
     this.tileAtlas = Loader.getImage('overworld');
-    this.camera = new Camera(map, defaultWidth, defaultHeight, 2);
+    this.camera = new Camera(overworldMap, defaultWidth, defaultHeight, 2);
 
     // create a canvas
     this.layerCanvas = document.createElement('canvas');
@@ -307,8 +336,8 @@ Game.init = function () {
     this.layerCanvas.height = defaultHeight;
 
     // initial draw of the map
-    this._initCells();
-    this._drawMap();
+    this._loadCells(overworldMap);
+    this._drawMap(overworldMap);
 };
 
 Game.update = function (delta) {
@@ -327,7 +356,8 @@ Game.update = function (delta) {
     }
 };
 
-Game._initCells = function () {
+/*
+Game._initCells = function (map) {
     for(var mapCell = 0; mapCell < 4; mapCell++){
         let cellName = "cell" + mapCell;
         let cellCanvas = document.createElement('canvas');
@@ -354,12 +384,52 @@ Game._initCells = function () {
                 }
             }
         }
-        console.log(cellName);
         map.cells["BMP" + mapCell] = cellCanvas;
+    }
+};*/
+
+Game._loadCells = function (map) {
+    let displayTsize = map.tsize * this.camera.zoom;
+    let centerCol = var startCol = (this.camera.width + this.camera.x) / displayTsize;
+    var centerRow = (this.camera.height + this.camera.y) / displayTsize;
+    
+    for(let mapX = centerCol - 1; mapX < centerCol + 2; mapX++){
+        let mapIndex = (mapX < 0 ? map.cols - 1 : mapX);
+        for(let mapY = centerRow - 1; mapY < centerRow + 2; mapY++){
+            mapIndex += (mapY < 0 ? map.rows - 1 : mapY) * map.cols;
+            if(map.cells.bitmapData[mapIndex] == null)
+            {
+                let cellCanvas = document.createElement('canvas');
+                cellCanvas.width = map.cells.cols * map.cells.tsize;
+                cellCanvas.height = map.cells.rows * map.cells.tsize;
+                var context = cellCanvas.getContext('2d')
+                for (let c = 0; c <= map.cells.cols; c++) {
+                    for (let r = 0; r <= map.cells.rows; r++) {
+                        let tile = map.getTile(mapIndex, c, r);
+                        let x = c * map.cells.tsize;
+                        let y = r * map.cells.tsize;
+                        let tileRow = Math.floor(tile / 16);
+                        let tileCol = Math.mod(tile, 16);
+                        context.drawImage(
+                            this.tileAtlas, // image
+                            tileCol * map.cells.tsize, // source x
+                            tileRow, // source y
+                            map.cells.tsize, // source width
+                            map.cells.tsize, // source height
+                            x,  // target x
+                            y, // target y
+                            map.cells.tsize, // target width
+                            map.cells.tsize // target height
+                        );
+                    }
+                }
+                map.cells.bitmapData[mapIndex] = cellCanvas;
+            }
+        }
     }
 };
 
-Game._drawMap = function () {
+Game._drawMap = function (map) {
     var context = this.layerCanvas.getContext('2d');
     context.imageSmoothingEnabled = false;
     context.clearRect(0, 0, defaultWidth, defaultHeight);
@@ -371,24 +441,22 @@ Game._drawMap = function () {
     var offsetX = -this.camera.x + startCol * displayTsize;
     var offsetY = -this.camera.y + startRow * displayTsize;
 
-    for (var c = startCol; c <= endCol; c++) {
-        for (var r = startRow; r <= endRow; r++) {
-            var x = (c - startCol) * displayTsize + offsetX;
-            var y = (r - startRow) * displayTsize + offsetY;
-            let mapCell = c + r * 2;
-            if (mapCell > -1 && mapCell < 4) {
-                context.drawImage(
-                    map.cells["BMP" + mapCell], // image
-                    0, // source x
-                    0, // source y
-                    map.tsize, // source width
-                    map.tsize, // source height
-                    Math.round(x),  // target x
-                    Math.round(y), // target y
-                    displayTsize, // target width
-                    displayTsize // target height
-                );
-            }
+    for (let c = startCol; c <= endCol; c++) {
+        for (let r = startRow; r <= endRow; r++) {
+            let x = (c - startCol) * displayTsize + offsetX;
+            let y = (r - startRow) * displayTsize + offsetY;
+            let mapIndex = c + r * map.cols;
+            context.drawImage(
+                map.cells.bitmapData[mapIndex], // image
+                0, // source x
+                0, // source y
+                map.tsize, // source width
+                map.tsize, // source height
+                Math.round(x),  // target x
+                Math.round(y), // target y
+                displayTsize, // target width
+                displayTsize // target height
+            );
         }
     }
 };
@@ -396,7 +464,7 @@ Game._drawMap = function () {
 Game.render = function () {
     // re-draw map if there has been scroll
     if (this.hasScrolled) {
-        this._drawMap();
+        this._drawMap(overworldMap);
     }
 
     // draw the map layers into game context
