@@ -296,7 +296,7 @@ Player.prototype.move = function (delta, direction) {
         let motion = polarity * speed * delta;
         this.offsetY += motion;
         this.gridY += polarity * Math.floor(Math.abs(this.offsetY / this.height));
-        this.offsetY += this.offsetY % this.height;
+        this.offsetY = this.offsetY % this.height;
         if(this.gridY < 0)
             this.gridY += this.maxY;
         else if (this.gridY >= this.maxY)
@@ -307,7 +307,7 @@ Player.prototype.move = function (delta, direction) {
         let motion = polarity * speed * delta;
         this.offsetX += motion;
         this.gridX += polarity * Math.floor(Math.abs(this.offsetX / this.width));
-        this.offsetX += this.offsetX % this.width;
+        this.offsetX = this.offsetX % this.width;
         if(this.gridX < 0)
             this.gridX += this.maxX;
         else if (this.gridX >= this.maxX)
