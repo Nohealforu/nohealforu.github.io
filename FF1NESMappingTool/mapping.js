@@ -271,9 +271,9 @@ Player.prototype.getAnimationFrame = function (map) {
     {
         let frameIndex = Math.floor(Math.abs(offset / map.cells.tsize) * spriteDirectionWalkFrames.length);
         let frame = spriteDirectionWalkFrames[frameIndex];
-        if (frame < 1)
+        if (frame < 0)
         {
-            spriteAnimationState.startX = (1 - frame) * this.width;
+            spriteAnimationState.startX = (-1 - frame) * this.width;
             spriteAnimationState.width = -this.width;
         }
         else
