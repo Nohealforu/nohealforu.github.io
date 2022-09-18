@@ -266,7 +266,7 @@ Player.prototype.getAnimationFrame = function (map) {
     return spriteAnimationState;
 }
 
-Player.SPEED = 640; // Raw Pixels Per Second (Unzoomed)
+Player.SPEED = 320; // Raw Pixels Per Second (Unzoomed)
 Player.SEASPEED = 96;
 Player.AIRSPEED = 128;
 
