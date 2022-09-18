@@ -175,14 +175,14 @@ var overworldCells = {cols: 32,
 };
 
 var overworldMap = {
-    cols: 2,
-    rows: 2,
+    cols: 8,
+    rows: 8,
     tsize: 512,
     cells: overworldCells,
     data: null,
     tileAtlas: null,
     getTile: function (mapCell, col, row) {
-        this.data[mapCell * overworldCells.rows * overworldCells.cols + row * overworldCells.cols + col];
+        return this.data[mapCell * overworldCells.rows * overworldCells.cols + row * overworldCells.cols + col];
     }
 };
 
