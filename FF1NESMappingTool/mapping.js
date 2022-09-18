@@ -282,9 +282,9 @@ Player.prototype.getAnimationFrame = function (map) {
     return spriteAnimationState;
 }
 
-Player.SPEED = 4; // Tiles per second
-Player.SEASPEED = 6;
-Player.AIRSPEED = 8;
+Player.SPEED = 64; // Raw Pixels Per Second (Unzoomed)
+Player.SEASPEED = 96;
+Player.AIRSPEED = 128;
 
 Player.prototype.move = function (delta, direction) {
     // move camera
