@@ -32,20 +32,14 @@ Loader.getImage = function (key) {
 };
 
 Loader.loadMapData = function (key, src) {
-    
     var d = new Promise(function (resolve, reject) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', src, true);
-        xhr.responseType = 'arraybuffer';
-        xhr.onload = function(e) {
-            this.mapData[key] = new Uint8Array(xhr.response).values();
+        fetch(src)
+        .then(response => checkStatus(response) && response.arrayBuffer())
+        .then(buffer => {
+            this.mapData[key] = buffer.values();
             console.log("Overworld Data Retrieved: " + this.mapData[key].length + " array length.");
-            resolve(xhr);
-        }.bind(this);
-        
-        xhr.onerror = function () {
-            reject('Could not load mapData: ' + src);
-        }
+            resolve();
+        })
     }.bind(this));
 
     return d;
