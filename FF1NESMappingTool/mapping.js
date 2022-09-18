@@ -164,7 +164,7 @@ var dungeonMap = {
     cells: dungeonCells,
     data: null,
     getTile: function (mapX, mapY, col, row) {
-        this.data[mapY * this.cells.rows * this.cells.cols + (mapX + row) * this.cells.cols + col];
+        return this.data[mapY * this.cells.rows * this.rows * this.cells.cols * this.cols + row * this.cells.cols * this.cols + mapX * this.cells.cols + col];
     }
 };
 
@@ -182,14 +182,13 @@ var overworldMap = {
     data: null,
     tileAtlas: null,
     getTile: function (mapX, mapY, col, row) {
-        //return this.data[mapCell * this.cells.rows * this.cells.cols + row * this.cells.cols + col];
-        return this.data[mapY * this.cells.rows * this.cells.cols + (mapX + row) * this.cells.cols + col];
+        return this.data[mapY * this.cells.rows * this.rows * this.cells.cols * this.cols + row * this.cells.cols * this.cols + mapX * this.cells.cols + col];
     }
 };
 
-function Camera(map, width, height, zoom) {
-    this.x = 0;
-    this.y = 0;
+function Camera(map, startX, startY, width, height, zoom) {
+    this.x = startX;
+    this.y = startY;
     this.width = width;
     this.height = height;
     this.maxX = map.cols * map.tsize * zoom - width;
@@ -227,7 +226,7 @@ Game.init = function () {
     overworldMap.tileAtlas = Loader.getImage('overworld');
     overworldMap.data = Loader.getMapData('overworld');
     console.log("INIT Overworldmap Data Length: " + overworldMap.data.length);
-    this.camera = new Camera(overworldMap, defaultWidth, defaultHeight, 2);
+    this.camera = new Camera(overworldMap, 153 * overworldMap.cells.tsize, 165 * overworldMap.cells.tsize, defaultWidth, defaultHeight, 2);
     
     // create a canvas
     this.layerCanvas = document.createElement('canvas');
