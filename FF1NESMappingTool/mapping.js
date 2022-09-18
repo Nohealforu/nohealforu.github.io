@@ -282,7 +282,7 @@ Game._loadCells = function (map) {
                         context.drawImage(
                             this.tileAtlas, // image
                             tileCol * map.cells.tsize, // source x
-                            tileRow, // source y
+                            tileRow * map.cells.tsize, // source y
                             map.cells.tsize, // source width
                             map.cells.tsize, // source height
                             x,  // target x
@@ -315,6 +315,7 @@ Game._drawMap = function (map) {
             let x = (c - startCol) * displayTsize + offsetX;
             let y = (r - startRow) * displayTsize + offsetY;
             let mapIndex = c + r * map.cols;
+            console.log("Drawing: " + mapIndex);
             context.drawImage(
                 map.cells.bitmapData[mapIndex], // image
                 0, // source x
