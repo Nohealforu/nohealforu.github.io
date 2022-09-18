@@ -463,8 +463,8 @@ Game._drawSprites = function (map) {
             0, // source y
             spriteAnimationState.width, // source width
             sprite.height, // source height
-            x,  // target x
-            y, // target y
+            Math.round(x),  // target x
+            Math.round(y), // target y
             sprite.width * this.camera.zoom, // target width
             sprite.height * this.camera.zoom // target height
         );
