@@ -324,7 +324,7 @@ function Camera(map, width, height, zoom) {
     this.zoom = zoom;
 }
 
-Camera.SPEED = 256; // pixels per second
+Camera.SPEED = 1024; // pixels per second
 
 Camera.prototype.move = function (delta, dirx, diry) {
     // move camera
