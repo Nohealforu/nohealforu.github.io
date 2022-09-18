@@ -126,7 +126,8 @@ window.onload = function () {
     xhr.responseType = 'arraybuffer';
 
     xhr.onload = function(e) {
-      overworldTileIndex = new Uint8Array(this.response).values();
+        overworldTileIndex = new Uint8Array(this.response).values();
+        console.log("Overworld Data Retrieved: " + overworldTileIndex.length + " array length.");
     };
     Game.run(context);
 };
@@ -291,7 +292,7 @@ var overworldMap = {
     cells: overworldCells,
     data: overworldTileIndex,
     getTile: function (mapCell, col, row) {
-        return this.overworldTileIndex[mapCell * overworldCells.rows * overworldCells.cols + row * dungeonCells.cols + col];
+        return 17; //this.overworldTileIndex[mapCell * overworldCells.rows * overworldCells.cols + row * dungeonCells.cols + col];
     }
 };
 
@@ -334,6 +335,7 @@ Game.init = function () {
     this.layerCanvas.height = defaultHeight;
 
     // initial draw of the map
+    console.log("Drawing Map");
     this._loadCells(overworldMap);
     this._drawMap(overworldMap);
 };
