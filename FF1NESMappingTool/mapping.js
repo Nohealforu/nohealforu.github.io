@@ -33,15 +33,12 @@ Loader.getImage = function (key) {
 
 Loader.loadMapData = function (key, src) {
     console.log("Retrieving Map Data From: " + src);
-    var xhr = new XMLHttpRequest();
-    var mapData;
-
+    
     var d = new Promise(function (resolve, reject) {
         let xhr = new XMLHttpRequest();
         xhr.open('GET', src, true);
-
         xhr.responseType = 'arraybuffer';
-
+        console.log("Retrieving Map Data " + xhr);
         xhr.onload = function(e) {
             this.mapData[key] = new Uint8Array(this.response).values();
             console.log("Overworld Data Retrieved: " + this.mapData[key].length + " array length.");
