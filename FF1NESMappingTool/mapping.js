@@ -175,11 +175,12 @@ var overworldCells = {cols: 32,
 };
 
 var overworldMap = {
-    cols: 8,
-    rows: 8,
+    cols: 2,
+    rows: 2,
     tsize: 512,
     cells: overworldCells,
     data: null,
+    tileAtlas: null,
     getTile: function (mapCell, col, row) {
         this.data[mapCell * overworldCells.rows * overworldCells.cols + row * overworldCells.cols + col];
     }
@@ -222,11 +223,11 @@ Game.load = function () {
 Game.init = function () {
     Keyboard.listenForEvents(
         [Keyboard.LEFT, Keyboard.RIGHT, Keyboard.UP, Keyboard.DOWN]);
-    this.tileAtlas = Loader.getImage('overworld');
+    overworldMap.tileAtlas = Loader.getImage('overworld');
     overworldMap.data = Loader.getMapData('overworld');
     console.log("INIT Overworldmap Data Length: " + overworldMap.data.length);
     this.camera = new Camera(overworldMap, defaultWidth, defaultHeight, 2);
-
+    
     // create a canvas
     this.layerCanvas = document.createElement('canvas');
     this.layerCanvas.width = defaultWidth;
@@ -281,7 +282,7 @@ Game._loadCells = function (map) {
                         let tileRow = Math.floor(tile / 16);
                         let tileCol = tile % 16;
                         context.drawImage(
-                            this.tileAtlas, // image
+                            map.tileAtlas, // image
                             tileCol * map.cells.tsize, // source x
                             tileRow * map.cells.tsize, // source y
                             map.cells.tsize, // source width
