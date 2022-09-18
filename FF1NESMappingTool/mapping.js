@@ -277,7 +277,7 @@ Player.prototype.getAnimationFrame = function (map) {
             spriteAnimationState.width = -this.width;
         }
         else
-            spriteAnimationState.startX = (frame - 1);
+            spriteAnimationState.startX = (frame - 1) * this.width;
     }
     return spriteAnimationState;
 }
@@ -346,6 +346,8 @@ Game.init = function () {
     console.log("Intial Map Load Complete");
     this._drawMap(overworldMap);
     console.log("Intial Map Draw Complete");
+    this._drawSprites(overworldMap);
+    console.log("Intial Sprite Draw Complete");
 };
 
 Game.update = function (delta) {
