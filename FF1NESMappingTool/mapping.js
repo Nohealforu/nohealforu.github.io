@@ -226,7 +226,7 @@ Game.init = function () {
     overworldMap.tileAtlas = Loader.getImage('overworld');
     overworldMap.data = Loader.getMapData('overworld');
     console.log("INIT Overworldmap Data Length: " + overworldMap.data.length);
-    this.camera = new Camera(overworldMap, 153 * overworldMap.cells.tsize, 165 * overworldMap.cells.tsize, defaultWidth, defaultHeight, 2);
+    this.camera = new Camera(overworldMap, 2 * 153 * overworldMap.cells.tsize, 2* 165 * overworldMap.cells.tsize, defaultWidth, defaultHeight, 2);
     console.log("MAX X: " + (overworldMap.cols * overworldMap.tsize * 2 - defaultWidth));
     console.log("Start X: " + (153 * overworldMap.cells.tsize));
     
