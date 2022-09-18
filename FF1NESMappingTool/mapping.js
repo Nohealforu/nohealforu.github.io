@@ -49,6 +49,13 @@ Loader.getMapData = function (key) {
     return (key in this.mapData) ? this.mapData[key] : null;
 };
 
+function checkStatus(response) {
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status} - ${response.statusText}`);
+  }
+  return response;
+}
+
 //
 // Keyboard handler
 //
