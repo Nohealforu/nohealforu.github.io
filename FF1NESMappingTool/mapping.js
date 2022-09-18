@@ -164,7 +164,7 @@ var dungeonMap = {
     cells: dungeonCells,
     data: null,
     getTile: function (mapX, mapY, col, row) {
-        return this.data[mapY * this.cells.rows * this.rows * this.cells.cols * this.cols + row * this.cells.cols * this.cols + mapX * this.cells.cols + col];
+        return this.data[mapY * this.cells.rows * this.cells.cols * this.cols + row * this.cells.cols * this.cols + mapX * this.cells.cols + col];
     }
 };
 
@@ -182,7 +182,7 @@ var overworldMap = {
     data: null,
     tileAtlas: null,
     getTile: function (mapX, mapY, col, row) {
-        return this.data[mapY * this.cells.rows * this.rows * this.cells.cols * this.cols + row * this.cells.cols * this.cols + mapX * this.cells.cols + col];
+        return this.data[mapY * this.cells.rows * this.cells.cols * this.cols + row * this.cells.cols * this.cols + mapX * this.cells.cols + col];
     }
 };
 
