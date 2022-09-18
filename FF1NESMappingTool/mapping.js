@@ -324,7 +324,6 @@ Game._drawMap = function (map) {
             else if(r >= map.rows)
                 r -= map.rows;
             let mapIndex = c + r * map.cols;
-            console.log("Drawing: " + mapIndex);
             context.drawImage(
                 map.cells.bitmapData[mapIndex], // image
                 0, // source x
