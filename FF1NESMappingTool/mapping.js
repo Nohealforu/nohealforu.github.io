@@ -271,13 +271,7 @@ Player.prototype.getAnimationFrame = function (map) {
     {
         let frameIndex = Math.floor(Math.abs(offset / map.cells.tsize) * spriteDirectionWalkFrames.length);
         let frame = spriteDirectionWalkFrames[frameIndex];
-        if (frame < 0)
-        {
-            spriteAnimationState.startX = (-1 - frame) * this.width;
-            spriteAnimationState.width = -this.width;
-        }
-        else
-            spriteAnimationState.startX = (frame - 1) * this.width;
+        spriteAnimationState.startX = frame * this.width;
     }
     return spriteAnimationState;
 }
@@ -330,7 +324,7 @@ Game.init = function () {
     overworldMap.data = Loader.getMapData('overworld');
     console.log("INIT Overworldmap Data Length: " + overworldMap.data.length);
     this.camera = new Camera(overworldMap, 153 * overworldMap.cells.tsize, 165 * overworldMap.cells.tsize, defaultWidth, defaultHeight, 2);
-    this.player = new Player(overworldMap, 153, 165, 16, 16, Loader.getImage('fighter'), {down:[1,-1], up:[2,-2], left:[3,4], right:[-3,-4]});
+    this.player = new Player(overworldMap, 153, 165, 16, 16, Loader.getImage('fighter'), {down:[0,7], up:[1,6], left:[2,3], right:[5,4]});
     
     // create a canvas
     this.layerCanvas = document.createElement('canvas');
