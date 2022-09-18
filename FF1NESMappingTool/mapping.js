@@ -389,7 +389,7 @@ Game._initCells = function (map) {
 Game._loadCells = function (map) {
     let displayTsize = map.tsize * this.camera.zoom;
     let centerCol = (this.camera.width + this.camera.x) / displayTsize;
-    var centerRow = (this.camera.height + this.camera.y) / displayTsize;
+    let centerRow = (this.camera.height + this.camera.y) / displayTsize;
     
     for(let mapX = centerCol - 1; mapX < centerCol + 2; mapX++){
         let mapIndex = (mapX < 0 ? map.cols - 1 : mapX);
@@ -400,7 +400,7 @@ Game._loadCells = function (map) {
                 let cellCanvas = document.createElement('canvas');
                 cellCanvas.width = map.cells.cols * map.cells.tsize;
                 cellCanvas.height = map.cells.rows * map.cells.tsize;
-                var context = cellCanvas.getContext('2d')
+                let context = cellCanvas.getContext('2d')
                 for (let c = 0; c <= map.cells.cols; c++) {
                     for (let r = 0; r <= map.cells.rows; r++) {
                         let tile = map.getTile(mapIndex, c, r);
@@ -428,16 +428,16 @@ Game._loadCells = function (map) {
 };
 
 Game._drawMap = function (map) {
-    var context = this.layerCanvas.getContext('2d');
+    let context = this.layerCanvas.getContext('2d');
     context.imageSmoothingEnabled = false;
     context.clearRect(0, 0, defaultWidth, defaultHeight);
-    var displayTsize = map.tsize * this.camera.zoom;
-    var startCol = Math.floor(this.camera.x / displayTsize);
-    var endCol = startCol + (this.camera.width + this.camera.x) / displayTsize;
-    var startRow = Math.floor(this.camera.y / displayTsize);
-    var endRow = startRow + (this.camera.height + this.camera.y) / displayTsize;
-    var offsetX = -this.camera.x + startCol * displayTsize;
-    var offsetY = -this.camera.y + startRow * displayTsize;
+    let displayTsize = map.tsize * this.camera.zoom;
+    let startCol = Math.floor(this.camera.x / displayTsize);
+    let endCol = startCol + (this.camera.width + this.camera.x) / displayTsize;
+    let startRow = Math.floor(this.camera.y / displayTsize);
+    let endRow = startRow + (this.camera.height + this.camera.y) / displayTsize;
+    let offsetX = -this.camera.x + startCol * displayTsize;
+    let offsetY = -this.camera.y + startRow * displayTsize;
 
     for (let c = startCol; c <= endCol; c++) {
         for (let r = startRow; r <= endRow; r++) {
