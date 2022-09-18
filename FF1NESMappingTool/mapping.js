@@ -234,7 +234,7 @@ function Player(map, startX, startY, width, height, image, spriteWalkFrames) {
     spriteList.push(this);
 }
 
-Player.prototype.getAnimationFrame = function (map) {
+Player.prototype.getAnimationFrame = function (frame) {
     let spriteDirectionWalkFrames = [];
     let spriteAnimationState = {startX: 0, width: this.width};
     let offset = 0;
@@ -259,7 +259,7 @@ Player.prototype.getAnimationFrame = function (map) {
     }
     if(spriteDirectionWalkFrames.length > 0)
     {
-        let frameIndex = Math.floor(Math.abs(offset / map.cells.tsize) * spriteDirectionWalkFrames.length);
+        let frameIndex = Math.mod(Math.floor(this.frames / 30), 2) * spriteDirectionWalkFrames.length);
         let frame = spriteDirectionWalkFrames[frameIndex];
         spriteAnimationState.startX = frame * this.width;
     }
@@ -323,6 +323,7 @@ Game.init = function () {
     console.log("INIT Overworldmap Data Length: " + overworldMap.data.length);
     this.camera = new Camera(overworldMap, 153 * overworldMap.cells.tsize, 165 * overworldMap.cells.tsize, defaultWidth, defaultHeight, 2);
     this.player = new Player(overworldMap, 153, 165, 16, 16, Loader.getImage('fighter'), {down:[0,7], up:[1,6], left:[2,3], right:[5,4]});
+    this.frames = 0;
     
     // create a canvas
     this.layerCanvas = document.createElement('canvas');
@@ -344,6 +345,7 @@ Game.init = function () {
 
 Game.update = function (delta) {
     this.hasScrolled = false;
+    this.frames = Math.floor(this.frames + delta * 60));
     // handle camera movement with arrow keys
     let direction = -1;
     let activeMovement = false;
@@ -451,7 +453,7 @@ Game._drawSprites = function (map) {
     
     for (let i = 0; i < spriteList.length; i++) {
         let sprite = spriteList[i];
-        let spriteAnimationState = sprite.getAnimationFrame(map);
+        let spriteAnimationState = sprite.getAnimationFrame(this.frames);
         let x = (sprite.gridX - startCol) * displayTsize + offsetX + sprite.offsetX * this.camera.zoom;
         let y = (sprite.gridY - startRow) * displayTsize + offsetY + sprite.offsetY * this.camera.zoom;
         context.drawImage(
