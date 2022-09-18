@@ -202,8 +202,8 @@ function Camera(map, startX, startY, width, height, zoom) {
 Camera.SPEED = 1024; // pixels per second
 
 Camera.prototype.followPlayer = function (map, player) {
-    this.x = (player.gridX * map.cells.tsize + player.offsetX - this.width / 2) * this.zoom;
-    this.y = (player.gridY * map.cells.tsize + player.offsetY - this.height / 2) * this.zoom;
+    this.x = (player.gridX * map.cells.tsize + player.offsetX) * this.zoom - this.width / 2;
+    this.y = (player.gridY * map.cells.tsize + player.offsetY) * this.zoom - this.height / 2;
     // clamp values
     if(this.x < 0)
         this.x += this.maxX;
