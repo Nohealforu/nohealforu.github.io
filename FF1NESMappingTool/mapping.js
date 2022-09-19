@@ -575,11 +575,11 @@ Game.init = function () {
 
     // initial draw of the map
     console.log("Intial Map Loading...");
-    this._loadCells(overworldMap);
+    this._loadCells(this.currentMap);
     console.log("Intial Map Load Complete");
-    this._drawMap(overworldMap);
+    this._drawMap(this.currentMap);
     console.log("Intial Map Draw Complete");
-    this._drawSprites(overworldMap);
+    this._drawSprites(this.currentMap);
     console.log("Intial Sprite Draw Complete");
 };
 
@@ -607,7 +607,7 @@ Game.update = function (delta) {
     
     if (activeMovement == true || incompleteMovement == true) {
         this.player.move(delta, direction, activeMovement);
-        this.camera.followPlayer(overworldMap, this.player);
+        this.camera.followPlayer(this.currentMap, this.player);
         this.hasScrolled = true;
     }
 };
@@ -702,7 +702,7 @@ Game._drawSprites = function (map) {
     for (let i = 0; i < spriteList.length; i++) {
 		let sprite = spriteList[i];
 		if(sprite.active == true)
-	    {
+    	{
 			let spriteAnimationState = sprite.getAnimationFrame(this.frames);
 			let x = (sprite.gridX - startCol) * displayTsize + offsetX + sprite.offsetX * this.camera.zoom;
 			let y = (sprite.gridY - startRow) * displayTsize + offsetY + sprite.offsetY * this.camera.zoom;
@@ -717,15 +717,15 @@ Game._drawSprites = function (map) {
 				sprite.width * this.camera.zoom, // target width
 				sprite.height * this.camera.zoom // target height
 			);
-	    }
+    	}
     }
 };
 
 Game.render = function () {
     // re-draw map if there has been scroll
     if (this.hasScrolled) {
-        this._drawMap(overworldMap);
-        this._drawSprites(overworldMap);
+        this._drawMap(this.currentMap);
+        this._drawSprites(this.currentMap);
     }
 
     // draw the map layers into game context
