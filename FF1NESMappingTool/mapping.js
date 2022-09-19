@@ -457,7 +457,7 @@ Player.prototype.checkTargetTile = function (tileX, tileY)
     if(this.moveMethod == MoveMethod.Walk && tileData.walk == false)
     {
 		if(Game.bridge.active == true && Game.bridge.gridX == tileX && Game.bridge.gridY == tileY)
-			return true;
+			return false;
         if(tileData.canoe == true && this.canoe == true)
         {
             this.moveMethod = MoveMethod.Canoe;
