@@ -456,6 +456,8 @@ Player.prototype.checkTargetTile = function (tileX, tileY)
     let tileData = Game.currentMap.getTileData(tileX, tileY);
     if(this.moveMethod == MoveMethod.Walk && tileData.walk == false)
     {
+		if(Game.bridge.active == true && Game.bridge.gridX = tileX && Game.bridge.gridY = tileY)
+			return true;
         if(tileData.canoe == true && this.canoe == true)
         {
             this.moveMethod = MoveMethod.Canoe;
@@ -520,10 +522,33 @@ Player.prototype.move = function (delta, direction, active) {
     }
 };
 
+function Bridge(image)
+{
+    this.active = false;
+    this.spriteMap = image;
+    this.gridX = 153;
+    this.gridY = 152;
+    this.walk = true;
+    this.ship = true;
+	this.offsetX = 0;
+	this.offsetY = 0;
+    spriteList.push(this);
+}
+// Make generic sprite class to put Bridge/Misc under to prevent animation needs?
+Bridge.prototype.getAnimationFrame = function (frames) {
+    let spriteAnimationState = {startX: 0, width: this.width};
+    return spriteAnimationState;
+}
+
+Game.toggleBridge = function() {
+	this.bridge.active = !this.bridge.active;
+}
+
 Game.load = function () {
     return [
         Loader.loadImage('overworld', 'Assets/Overworld.png'),
         Loader.loadImage('fighter', 'Assets/Fighter.png'),
+        Loader.loadImage('bridge', 'Assets/Bridge.png'),
         Loader.loadMapData('overworld', 'Assets/Overworld%20Map.ffm'),
     ];
 };
@@ -536,6 +561,7 @@ Game.init = function () {
     console.log("INIT Overworldmap Data Length: " + overworldMap.data.length);
     this.camera = new Camera(overworldMap, 153 * overworldMap.cells.tsize, 165 * overworldMap.cells.tsize, defaultWidth, defaultHeight, 2);
     this.player = new Player(overworldMap, 153, 165, 16, 16, Loader.getImage('fighter'), {down:[0,7], up:[1,6], left:[2,3], right:[5,4]});
+    this.bridge = new Bridge(Loader.getImage('bridge'));
     this.frames = 0;
     this.currentMap = overworldMap;
     
@@ -674,21 +700,24 @@ Game._drawSprites = function (map) {
     let offsetY = -this.camera.y + this.camera.height / 2 + startRow * displayTsize;
     
     for (let i = 0; i < spriteList.length; i++) {
-        let sprite = spriteList[i];
-        let spriteAnimationState = sprite.getAnimationFrame(this.frames);
-        let x = (sprite.gridX - startCol) * displayTsize + offsetX + sprite.offsetX * this.camera.zoom;
-        let y = (sprite.gridY - startRow) * displayTsize + offsetY + sprite.offsetY * this.camera.zoom;
-        context.drawImage(
-            sprite.spriteMap, // image
-            spriteAnimationState.startX, // source x
-            0, // source y
-            spriteAnimationState.width, // source width
-            sprite.height, // source height
-            Math.round(x),  // target x
-            Math.round(y), // target y
-            sprite.width * this.camera.zoom, // target width
-            sprite.height * this.camera.zoom // target height
-        );
+		let sprite = spriteList[i];
+		if(sprite.active == true)
+	    {
+			let spriteAnimationState = sprite.getAnimationFrame(this.frames);
+			let x = (sprite.gridX - startCol) * displayTsize + offsetX + sprite.offsetX * this.camera.zoom;
+			let y = (sprite.gridY - startRow) * displayTsize + offsetY + sprite.offsetY * this.camera.zoom;
+			context.drawImage(
+				sprite.spriteMap, // image
+				spriteAnimationState.startX, // source x
+				0, // source y
+				spriteAnimationState.width, // source width
+				sprite.height, // source height
+				Math.round(x),  // target x
+				Math.round(y), // target y
+				sprite.width * this.camera.zoom, // target width
+				sprite.height * this.camera.zoom // target height
+			);
+	    }
     }
 };
 
