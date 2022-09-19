@@ -526,7 +526,7 @@ function Bridge(image)
 {
     this.active = false;
     this.spriteMap = image;
-    this.gridX = 153;
+    this.gridX = 152;
     this.gridY = 152;
     this.walk = true;
     this.ship = true;
