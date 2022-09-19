@@ -544,6 +544,7 @@ Bridge.prototype.getAnimationFrame = function (frames) {
 
 Game.toggleBridge = function(checkboxElement) {
 	this.bridge.active = checkboxElement.checked;
+        this._drawSprites(this.currentMap);
 }
 
 Game.toggleCanoe = function(checkboxElement) {
