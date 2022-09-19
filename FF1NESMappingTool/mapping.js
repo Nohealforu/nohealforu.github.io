@@ -542,8 +542,12 @@ Bridge.prototype.getAnimationFrame = function (frames) {
     return spriteAnimationState;
 }
 
-Game.toggleBridge = function() {
-	this.bridge.active = !this.bridge.active;
+Game.toggleBridge = function(checkboxElement) {
+	this.bridge.active = checkboxElement.checked;
+}
+
+Game.toggleCanoe = function(checkboxElement) {
+	this.player.canoe = checkboxElement.checked;
 }
 
 Game.load = function () {
