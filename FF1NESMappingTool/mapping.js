@@ -705,7 +705,7 @@ Game._drawSprites = function (map) {
     let offsetX = -this.camera.x + this.camera.width / 2 + startCol * displayTsize;
     let offsetY = -this.camera.y + this.camera.height / 2 + startRow * displayTsize;
     
-    for (let i = spriteList.length; i > 0 ; i--) {
+    for (let i = spriteList.length; i > -1 ; i--) {
 		let sprite = spriteList[i];
 		if(sprite.active == true)
     	{
