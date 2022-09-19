@@ -476,6 +476,16 @@ Player.prototype.checkTargetTile = function (tileX, tileY)
         else
             return true;
     }
+	else if(this.moveMethod == MoveMethod.Canoe && tileData.canoe == false)
+	{
+		if(tileData.walk == true)
+		{
+			this.moveMethod = MoveMethod.Walk;
+			return false;
+		} // Build out scenario to get back on boat in water.
+		else
+			return true;
+	}
     return false;
 }
 
