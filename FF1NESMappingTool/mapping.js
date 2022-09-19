@@ -528,6 +528,8 @@ function Bridge(image)
     this.spriteMap = image;
     this.gridX = 152;
     this.gridY = 152;
+	this.width = 16;
+	this.height = 16;
     this.walk = true;
     this.ship = true;
 	this.offsetX = 0;
