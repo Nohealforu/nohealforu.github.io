@@ -517,8 +517,6 @@ Loader.loadMapData = function (key, src) {
         .then(response => checkStatus(response) && response.arrayBuffer())
         .then(buffer => {
             this.mapData[key] = new Uint8Array(buffer);
-            console.log("Overworld Data Retrieved: " + this.mapData[key].length + " array length.");
-            console.log("First entry: " + this.mapData[key][0]);
             resolve();
         })
         .catch(err => reject(err + ' Could not load map data: ' + src)); // Never forget the final catch!
