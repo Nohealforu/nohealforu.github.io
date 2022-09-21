@@ -1936,7 +1936,7 @@ function Ship(image, spriteWalkFrames)
     this.spriteMap = image;
     this.spriteWalkFrames = spriteWalkFrames;
 	this.getSpriteMap = function(){return this.spriteMap;};
-    this.getSpriteWalkFrames = function(){return (this.spriteWalkFrames;};
+    this.getSpriteWalkFrames = function(){return this.spriteWalkFrames;};
     this.gridX = 0xD2;
     this.gridY = 0x99;
 	this.width = 16;
@@ -1991,7 +1991,7 @@ function Airship(image, image2, spriteWalkFrames)
     this.spriteMap = image;
     this.spriteWalkFrames = spriteWalkFrames;
 	this.getSpriteMap = function(){return this.spriteMap;};
-    this.getSpriteWalkFrames = function(){return (this.spriteWalkFrames;};
+    this.getSpriteWalkFrames = function(){return this.spriteWalkFrames;};
     this.gridX = 0xDD;
     this.gridY = 0xED;
 	this.width = 16;
