@@ -2037,7 +2037,7 @@ Airship.prototype.updateElevation = function(player, delta)
 	{
 		this.elevation = Math.max(this.elevation - delta * 32, 0);
 		let tileData = Game.currentMap.getTileData(this.gridX, this.gridY);
-		if((tileData == null || tileData.landAirship = false) && this.elevation < 8)
+		if((tileData == null || tileData.landAirship == false) && this.elevation < 8)
 			this.board(player);
 		if(this.elevation == 0)
 		{
