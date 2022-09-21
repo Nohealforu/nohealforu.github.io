@@ -1647,7 +1647,7 @@ var overworldMap = {
 	maxCol: 8 * overworldCells.cols,
 	maxRow: 8 * overworldCells.rows,
     data: null,
-    mapTileAtlas: null,
+    mapTileAtlas: worldMapTileAtlas,
 	tileAtlasImage: null,
 	showRooms: false,
     getTile: function (mapX, mapY, col, row) {
