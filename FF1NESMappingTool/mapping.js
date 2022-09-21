@@ -2094,7 +2094,7 @@ Airship.prototype.getAnimationFrame = function (frames) {
     }
     if(spriteDirectionWalkFrames.length > 0)
     {
-        let frameIndex = (this.elevation > 0 ? Math.floor(frames / (this.takeoff || this.landing ? 4 : 2)) % spriteDirectionWalkFrames.length : 0);
+        let frameIndex = (this.elevation > 0 ? Math.floor(frames / (this.takeoff || this.landing ? 6 : 3)) % spriteDirectionWalkFrames.length : 0);
         let frame = spriteDirectionWalkFrames[frameIndex];
         spriteAnimationState.startX = frame * this.width;
     }
@@ -2519,6 +2519,10 @@ Game.render = function () {
         this._drawMap(this.currentMap);
         this._drawSprites(this.currentMap);
     }
+	// keep animating airship
+	else if(this.player.moveMethod == MoveMethod.Airship)
+        this._drawSprites(this.currentMap);
+		
 
     // draw the map layers into game context
     this.ctx.drawImage(this.layerCanvas, 0, 0);
