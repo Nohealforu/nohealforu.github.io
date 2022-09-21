@@ -1317,11 +1317,11 @@ new dungeonMapTile(true),
 new dungeonMapTile(true),
 ];
 
-function DungeonInfo(label, mapTileAtlas, tileAtlasImageName, tileRoomAtlasImageName, mapDataName, exitInformation)
+function DungeonInfo(label, mapTileAtlas, tileAtlasImageName, tileAtlasRoomImageName, mapDataName, exitInformation)
 {
 	this.mapTileAtlas = mapTileAtlas;
 	this.tileAtlasImageName = tileAtlasImageName;
-	this.tileRoomAtlasImageName = tileRoomAtlasImageName;
+	this.tileAtlasRoomImageName = tileAtlasRoomImageName;
 	this.mapDataName = mapDataName;
 	this.exitInformation = exitInformation;
 	this.label = label;
@@ -1618,9 +1618,18 @@ var dungeonMap = {
     rows: 2,
     tsize: 512,
     cells: dungeonCells,
+	maxCol: 2 * dungeonCells.cells.cols,
+	maxRow: 2 * dungeonCells.cells.rows,
     data: null,
+    mapTileAtlas: null,
+	tileAtlasImage: null,
+	tileAtlasRoomImage: null,
+	showRooms: false,
     getTile: function (mapX, mapY, col, row) {
-        return this.data[mapY * this.cells.rows * this.cells.cols * this.cols + row * this.cells.cols * this.cols + mapX * this.cells.cols + col];
+        return this.data[mapY * this.cells.rows * this.maxCol + row * this.maxCol + mapX * this.cells.cols + col];
+    },
+    getTileData: function (gridX, gridY) {
+        return this.mapTileAtlas[this.data[gridY * this.cells.cols * this.cols + gridX]];
     }
 };
 
@@ -1635,30 +1644,32 @@ var overworldMap = {
     rows: 8,
     tsize: 512,
     cells: overworldCells,
+	maxCol: 8 * overworldCells.cells.cols,
+	maxRow: 8 * overworldCells.cells.rows,
     data: null,
-    tileAtlas: null,
+    mapTileAtlas: null,
+	tileAtlasImage: null,
+	showRooms: false,
     getTile: function (mapX, mapY, col, row) {
-        return this.data[mapY * this.cells.rows * this.cells.cols * this.cols + row * this.cells.cols * this.cols + mapX * this.cells.cols + col];
+        return this.data[mapY * this.cells.rows * this.maxCol + row * this.maxCol + mapX * this.cells.cols + col];
     },
     getTileData: function (gridX, gridY) {
-        return worldMapTileAtlas[this.data[gridY * this.cells.cols * this.cols + gridX]];
+        return this.mapTileAtlas[this.data[gridY * this.cells.cols * this.cols + gridX]];
     }
 };
 
 var spriteList = [];
 
-function Camera(map, startX, startY, width, height, zoom) {
+function Camera(startX, startY, width, height, zoom) {
     this.x = startX * zoom;
     this.y = startY * zoom;
     this.width = width;
     this.height = height;
-    this.maxX = map.cols * map.tsize * zoom - width;
-    this.maxY = map.rows * map.tsize * zoom - height;
+    //this.maxX = map.cols * map.tsize * zoom - width;
+    //this.maxY = map.rows * map.tsize * zoom - height;
     this.zoom = zoom;
     console.log("Moving Camera to: " + this.x + "," + this.y);
 }
-
-Camera.SPEED = 1024; // pixels per second
 
 Camera.prototype.followPlayer = function (map, player) {
     this.x = (player.gridX * map.cells.tsize + player.offsetX) * this.zoom;
@@ -1686,8 +1697,8 @@ function Player(map, startX, startY, width, height, image, spriteWalkFrames) {
     this.offsetY = 0;
     this.width = width;
     this.height = height;
-    this.maxX = map.cols * map.cells.cols;
-    this.maxY = map.rows * map.cells.rows;
+    this.maxX = map.maxCol;
+    this.maxY = map.maxRow;
     this.spriteMap = image;
     this.spriteWalkFrames = spriteWalkFrames;
     this.active = true;
@@ -1696,9 +1707,29 @@ function Player(map, startX, startY, width, height, image, spriteWalkFrames) {
     this.canoe = false;
     this.ship = false;
     this.airship = false;
+	this.crown = false;
+	this.cube = false;
+	this.chime = false;
+	this.earthOrb = false;
+	this.waterOrb = false;
+	this.airOrb = false;
+	this.fireOrb = false;
+	this.orbs = function(){return this.earthOrb && this.waterOrb && this.airOrb && this.fireOrb;};
+	
     this.moveMethod = MoveMethod.Walk;
     console.log("Creating Player At: " + this.gridX + "," + this.gridY);
     spriteList.push(this);
+}
+
+Player.prototype.teleportPlayer = function (map, gridX, gridY)
+{
+	this.gridX = gridX;
+    this.gridY = gridY;
+    this.maxX = map.maxCol;
+    this.maxY = map.maxRow;
+    this.direction = Directions.Down;
+	let tileData = map.getTileData(gridX, gridY);
+    this.moveMethod = tileData.canoe == true ? MoveMethod.Canoe : MoveMethod.Walk;
 }
 
 Player.prototype.getAnimationFrame = function (frames) {
@@ -1772,12 +1803,14 @@ Player.prototype.checkTargetTile = function (tileX, tileY)
 }
 
 Player.SPEED = 320; // Raw Pixels Per Second (Unzoomed)
-Player.SEASPEED = 96;
-Player.AIRSPEED = 128;
+Player.SEASPEED = 320;
+Player.AIRSPEED = 320;
 
 Player.prototype.move = function (delta, direction, active) {
     // move camera
     let speed = this.airship ? Player.AIRSPEED : this.ship ? Player.SEASPEED : Player.SPEED;
+	let previousGridX = this.gridX;
+	let previousGridY = this.gridY;
     if(active)
         this.direction = direction;
     else
@@ -1788,15 +1821,15 @@ Player.prototype.move = function (delta, direction, active) {
         let motion = polarity * speed * delta;
         this.offsetY += motion;
         this.gridY += polarity * Math.floor(Math.abs(this.offsetY / this.height));
+        if(this.gridY < 0)
+            this.gridY += this.maxY;
+        else if (this.gridY >= this.maxY)
+            this.gridY -= this.maxY;
         let targetTileInaccessible = this.checkTargetTile(this.gridX, this.gridY + polarity);
         // if sprite height or tile height is different, figure out how to use tile height
         if(!active && Math.abs(this.offsetY) > Math.abs(this.height) || targetTileInaccessible)
             this.offsetY = 0;
         this.offsetY = this.offsetY % this.height;
-        if(this.gridY < 0)
-            this.gridY += this.maxY;
-        else if (this.gridY >= this.maxY)
-            this.gridY -= this.maxY;
     }
     else if(direction == Directions.Left || direction == Directions.Right)
     {
@@ -1812,6 +1845,11 @@ Player.prototype.move = function (delta, direction, active) {
         else if (this.gridX >= this.maxX)
             this.gridX -= this.maxX;
     }
+	
+	if(this.gridX != previousGridX || this.gridY != previousGridY)
+	{
+		Game.checkForTeleport(this.gridX, this.gridY);
+	}
 };
 
 function Bridge(image)
@@ -1961,14 +1999,15 @@ Game.load = function () {
 Game.init = function () {
     Keyboard.listenForEvents(
         [Keyboard.LEFT, Keyboard.RIGHT, Keyboard.UP, Keyboard.DOWN]);
-    overworldMap.tileAtlas = Loader.getImage('overworld');
+    overworldMap.tileAtlasImage = Loader.getImage('overworld');
     overworldMap.data = Loader.getMapData('overworld');
     console.log("INIT Overworldmap Data Length: " + overworldMap.data.length);
-    this.camera = new Camera(overworldMap, 153 * overworldMap.cells.tsize, 165 * overworldMap.cells.tsize, defaultWidth, defaultHeight, 2);
+    this.camera = new Camera(0, 0, defaultWidth, defaultHeight, 2);
     this.player = new Player(overworldMap, 153, 165, 16, 16, Loader.getImage('fighter'), {down:[0,7], up:[1,6], left:[2,3], right:[5,4]});
     this.bridge = new Bridge(Loader.getImage('bridge'));
     this.frames = 0;
     this.currentMap = overworldMap;
+    this.camera.followPlayer(this.currentMap, this.player);
     
     // create a canvas
     this.layerCanvas = document.createElement('canvas');
@@ -2016,6 +2055,54 @@ Game.update = function (delta) {
         this.hasScrolled = true;
     }
 };
+
+Game.checkForTeleport = function (tileX, tileY)
+{
+	let teleport = currentMap.getTileData(tileX, tileY).teleport;
+	if(teleport != null)
+	{
+		if(teleport.requirement == teleportEntryRequirement.Crown && this.player.crown == false)
+		{
+			console.log('No Crown :(');	
+		}
+		else if(teleport.requirement == teleportEntryRequirement.Cube && this.player.cube == false)
+		{
+			console.log('No Cube :(');	
+		}
+		else if(teleport.requirement == teleportEntryRequirement.Chime && this.player.chime == false)
+		{
+			console.log('No Chime :(');	
+		}
+		else if(teleport.requirement == teleportEntryRequirement.Orbs && this.player.orbs == false)
+		{
+			console.log('Not enough orbs noob');	
+		}
+		else //teleport
+		{
+			let dungeonInfo = null;
+			let warp = teleport.targetMap == 'WARP';
+			if(warp)
+				teleport = this.currentDungeon.warpInformation;
+			if(teleport.targetMap == 'WorldMap')
+			{
+				this.currentMap = overworldMap;
+			}
+			else
+			{
+				dungeonInfo = dungeons[teleport.targetMap];
+				if(!warp)
+					dungeonInfo.storeWarpInformation(new TeleportEntry('StoredWarp', this.currentMap == overworldMap ? 'WorldMap' : this.currentDungeon.mapDataName, tileX, tileY));
+				this.currentDungeon = dungeonInfo;
+				dungeonMap.tileAtlasImage = Loader.getImage(dungeonInfo.tileAtlasImageName);
+				dungeonMap.tileAtlasRoomImage = Loader.getImage(dungeonInfo.tileAtlasRoomImageName);
+				dungeonMap.data = Loader.getMapData(dungeonInfo.mapDataName);
+				dungeonMap.mapTileAtlas = dungeonInfo.mapTileAtlas;
+				this.currentMap = dungeonMap;
+			}
+			Player.teleportPlayer(this.currentMap, teleport.gridX, teleport.gridY);
+		}
+	}
+}
 
 Game._loadCells = function (map) {
     /*let displayTsize = map.tsize * this.camera.zoom;
