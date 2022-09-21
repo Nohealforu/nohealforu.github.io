@@ -1716,7 +1716,7 @@ const MoveMethod = {
     Airship: 3
 };
 
-function Player(map, startX, startY, width, height, image, spriteWalkFrames) {
+function Player(map, startX, startY, width, height, image, canoeImage, spriteWalkFrames, canoeSpriteFrames) {
     this.gridX = startX;
     this.gridY = startY;
     this.offsetX = 0;
@@ -1725,8 +1725,12 @@ function Player(map, startX, startY, width, height, image, spriteWalkFrames) {
     this.height = height;
     this.maxX = map.maxCol;
     this.maxY = map.maxRow;
-    this.spriteMap = image;
-    this.spriteWalkFrames = spriteWalkFrames;
+    this.characterSpriteMap = image;
+	this.characterSpriteFrames = spriteWalkFrames;
+	this.canoeSpriteMap = canoeImage;
+	this.canoeSpriteFrames = canoeSpriteFrames;
+	this.spriteMap = function(){return (this.drawCanoe ? this.canoeSpriteMap : this.characterSpriteMap);};
+    this.spriteWalkFrames = function(){return (this.drawCanoe ? this.canoeSpriteFrames : this.characterSpriteFrames);};
     this.active = true;
     this.direction = Directions.Right;
 	this.key = true; // CHANGE ALL THESE BACK TO FALSE AFTER IMPLEMENTING METHOD TO OBTAIN
@@ -1741,6 +1745,8 @@ function Player(map, startX, startY, width, height, image, spriteWalkFrames) {
 	this.fireOrb = true;
 	this.queueAirshipBoard = false;
 	this.queueAirshipUnboard = false;
+	this.drawCanoe = false;
+	this.enteringRiver = false;
 	this.mapName = 'Overworld';
 	this.getOrbs = function(){return this.earthOrb && this.waterOrb && this.airOrb && this.fireOrb;};
 	this.allowMovement = true;
@@ -1761,6 +1767,7 @@ Player.prototype.teleportPlayer = function (map, gridX, gridY)
 	this.mapName = map.name;
 	let tileData = map.getTileData(gridX, gridY);
     this.moveMethod = tileData.canoe == true ? MoveMethod.Canoe : MoveMethod.Walk;
+	this.drawCanoe = tileData.canoe;
 };
 
 Player.prototype.getAnimationFrame = function (frames) {
@@ -1788,7 +1795,8 @@ Player.prototype.checkTargetTile = function (tileX, tileY)
 			return false;
         if(tileData.canoe == true && this.canoe == true)
         { // Need special treatment entering/leaving river tile itself, (doesn't count to encounters, don't display canoe unless sitting or moving fully inside river)
-            this.moveMethod = MoveMethod.Canoe; 
+            this.moveMethod = MoveMethod.Canoe;
+			this.enteringRiver = true;
             return false;
         }
 		else if(Game.currentMap.overworldMap && Game.ship.active == true && Game.ship.gridX == tileX && Game.ship.gridY == tileY)
@@ -1818,6 +1826,7 @@ Player.prototype.checkTargetTile = function (tileX, tileY)
 		if(tileData.walk == true)
 		{
 			this.moveMethod = MoveMethod.Walk;
+			this.drawCanoe = false;
 			return false;
 		}
 		else if(Game.currentMap.overworldMap && Game.ship.active == true && Game.ship.gridX == tileX && Game.ship.gridY == tileY)
@@ -1889,6 +1898,11 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
 			Game.airship.board(this);
 		else if(!keyHeld && this.queueAirshipUnboard)
 			Game.airship.unboard(this);
+		if(this.enteringRiver)
+		{
+			this.drawCanoe = true;
+			this.enteringRiver = false;
+		}
 	}
 };
 
@@ -2110,6 +2124,7 @@ Game.load = function () {
     return [
 		Loader.loadImage('overworld', 'Assets/Overworld.png'),
 		Loader.loadImage('fighter', 'Assets/Fighter.png'),
+		Loader.loadImage('canoe', 'Assets/Canoe.png'),
 		Loader.loadImage('bridge', 'Assets/Bridge.png'),
 		Loader.loadImage('airship', 'Assets/Airship.png'),
 		Loader.loadImage('airship_shadow', 'Assets/AirshipShadow.png'),
@@ -2232,10 +2247,10 @@ Game.init = function () {
     overworldMap.data = Loader.getMapData('overworld');
     console.log("INIT Overworldmap Data Length: " + overworldMap.data.length);
     this.camera = new Camera(0, 0, defaultWidth, defaultHeight, 2);
-    this.bridge = new Bridge(Loader.getImage('bridge')); 
     this.ship = new Ship(Loader.getImage('ship'), {[Directions.Down]:[0,1], [Directions.Up]:[3,2], [Directions.Left]:[6,7], [Directions.Right]:[4,5]});
+    this.bridge = new Bridge(Loader.getImage('bridge')); 
     this.airship = new Airship(Loader.getImage('airship'), Loader.getImage('airship_shadow'), {[Directions.Down]:[3,2], [Directions.Up]:[1,0], [Directions.Left]:[5,4], [Directions.Right]:[7,6]});
-    this.player = new Player(overworldMap, 153, 165, 16, 16, Loader.getImage('fighter'), {[Directions.Down]:[0,7], [Directions.Up]:[1,6], [Directions.Left]:[2,3], [Directions.Right]:[5,4]});
+    this.player = new Player(overworldMap, 153, 165, 16, 16, Loader.getImage('fighter'), Loader.getImage('canoe'), {[Directions.Down]:[0,7], [Directions.Up]:[0,6], [Directions.Left]:[2,3], [Directions.Right]:[5,4]}, {[Directions.Down]:[0,1], [Directions.Up]:[0,1], [Directions.Left]:[5,6], [Directions.Right]:[3,4]});
     this.frames = 0;
     this.currentMap = overworldMap;
     this.camera.followPlayer(this.currentMap, this.player);
