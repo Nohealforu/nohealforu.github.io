@@ -2302,7 +2302,7 @@ Game.handleActionButton() = function()
 		this.airship.board(this.player);
 	else if(this.player.gridX == this.airship.gridX && this.player.gridY == this.airship.gridY && this.player.moveMethod == MoveMethod.Airship)
 		this.airship.unboard(this.player);
-}
+};
 
 Game.checkForRoomFlags = function (tileX, tileY, key)
 {
