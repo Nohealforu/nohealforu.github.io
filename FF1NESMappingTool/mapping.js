@@ -2303,7 +2303,11 @@ Game.update = function (delta) {
     }
 	
 	if(this.airship.landing || this.airship.takeoff)
+	{
 		this.airship.updateElevation (this.player, delta);
+        this.camera.followPlayer(this.currentMap, this.player);
+        this.hasScrolled = true;
+	}
 };
 
 Game.handleActionButton = function()
