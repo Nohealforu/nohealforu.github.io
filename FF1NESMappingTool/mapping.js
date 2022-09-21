@@ -2158,6 +2158,8 @@ Game.checkForTeleport = function (tileX, tileY)
 Game._loadCells = function (map) {
 	for(let mapVariants = 0; mapVariants < map.loadRooms ? 2 : 1; mapVariants++)
 	{
+		console.log(mapVariants);
+		console.log(map.tileAtlasImage[mapVariants]);
 		for(let mapX = 0; mapX < map.cols; mapX++){
 			for(let mapY = 0; mapY < map.rows; mapY++){
 				let mapIndex = mapX + mapY * map.cols + map.cols * map.rows * mapVariants;
