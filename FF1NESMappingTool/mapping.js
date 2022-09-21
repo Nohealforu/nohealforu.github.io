@@ -1711,7 +1711,7 @@ const MoveMethod = {
     Ship: 1,
     Canoe: 2,
     Airship: 3
-}
+};
 
 function Player(map, startX, startY, width, height, image, spriteWalkFrames) {
     this.gridX = startX;
@@ -1754,7 +1754,7 @@ Player.prototype.teleportPlayer = function (map, gridX, gridY)
     this.direction = Directions.Down;
 	let tileData = map.getTileData(gridX, gridY);
     this.moveMethod = tileData.canoe == true ? MoveMethod.Canoe : MoveMethod.Walk;
-}
+};
 
 Player.prototype.getAnimationFrame = function (frames) {
     let spriteDirectionWalkFrames = [];
@@ -1786,7 +1786,7 @@ Player.prototype.getAnimationFrame = function (frames) {
         spriteAnimationState.startX = frame * this.width;
     }
     return spriteAnimationState;
-}
+};
 
 Player.prototype.checkTargetTile = function (tileX, tileY)
 {
@@ -1841,7 +1841,7 @@ Player.prototype.checkTargetTile = function (tileX, tileY)
 			return true;
 	}
     return false;
-}
+};
 
 Player.SPEED = 200; // Raw Pixels Per Second (Unzoomed)
 Player.SEASPEED = 240;
@@ -1918,7 +1918,7 @@ function Bridge(image)
 Bridge.prototype.getAnimationFrame = function (frames) {
     let spriteAnimationState = {startX: 0, width: this.width};
     return spriteAnimationState;
-}
+};
 
 
 function Ship(image, spriteWalkFrames)
@@ -1947,7 +1947,7 @@ Ship.prototype.board = function(player)
 	this.offsetY = 0;
     this.gridX = player.gridX;
     this.gridY = player.gridY;
-}
+};
 
 Ship.prototype.unboard = function(player, river)
 {
@@ -1959,7 +1959,7 @@ Ship.prototype.unboard = function(player, river)
 	this.offsetY = 0;
     this.gridX = player.gridX;
     this.gridY = player.gridY;
-}
+};
 
 Ship.prototype.getAnimationFrame = function (frames) {
     let spriteDirectionWalkFrames = [];
@@ -1991,7 +1991,7 @@ Ship.prototype.getAnimationFrame = function (frames) {
         spriteAnimationState.startX = frame * this.width;
     }
     return spriteAnimationState;
-}
+};
 
 function Airship(image, image2, spriteWalkFrames)
 {
@@ -2026,7 +2026,7 @@ Airship.prototype.board = function(player)
 	this.offsetY = 0;
     this.gridX = player.gridX;
     this.gridY = player.gridY;
-}
+};
 
 Airship.prototype.unboard = function(player)
 {
@@ -2040,7 +2040,7 @@ Airship.prototype.unboard = function(player)
 	this.offsetY = 0;
     this.gridX = player.gridX;
     this.gridY = player.gridY;
-}
+};
 
 Airship.prototype.updateElevation = function(player, delta)
 {
@@ -2067,7 +2067,7 @@ Airship.prototype.updateElevation = function(player, delta)
 			this.takeoff = false;
 		}
 	}
-}
+};
 
 Airship.prototype.getAnimationFrame = function (frames) {
     let spriteDirectionWalkFrames = [];
@@ -2099,26 +2099,26 @@ Airship.prototype.getAnimationFrame = function (frames) {
         spriteAnimationState.startX = frame * this.width;
     }
     return spriteAnimationState;
-}
+};
 
 Game.toggleBridge = function(checkboxElement) {
 	this.bridge.active = checkboxElement.checked;
 	this._drawSprites(this.currentMap);
-}
+};
 
 Game.toggleCanoe = function(checkboxElement) {
 	this.player.canoe = checkboxElement.checked;
-}
+};
 
 Game.toggleShip = function(checkboxElement) {
 	this.ship.active = checkboxElement.checked;
 	this._drawSprites(this.currentMap);
-}
+};
 
 Game.toggleAirship = function(checkboxElement) {
 	this.airship.active = checkboxElement.checked;
 	this._drawSprites(this.currentMap);
-}
+};
 
 Game.load = function () {
     return [
