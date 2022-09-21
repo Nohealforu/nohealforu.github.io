@@ -2157,7 +2157,7 @@ Game._loadCells = function (map) {
 						cellCanvasRooms = document.createElement('canvas');
 						cellCanvasRooms.width = map.cells.cols * map.cells.tsize;
 						cellCanvasRooms.height = map.cells.rows * map.cells.tsize;
-						let contextRooms = cellCanvas.getContext('2d')
+						let contextRooms = cellCanvasRooms.getContext('2d')
 						contextRooms.drawImage(
 							map.tileAtlasRoomImage, // image
 							tileCol * map.cells.tsize, // source x
