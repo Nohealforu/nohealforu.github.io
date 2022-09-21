@@ -2100,6 +2100,7 @@ Game.checkForTeleport = function (tileX, tileY)
 				dungeonMap.data = Loader.getMapData(dungeonInfo.mapDataName);
 				dungeonMap.mapTileAtlas = dungeonInfo.mapTileAtlas;
 				this.currentMap = dungeonMap;
+				this._loadCells(dungeonMap);
 			}
 			this.player.teleportPlayer(this.currentMap, teleport.gridX, teleport.gridY);
 		}
