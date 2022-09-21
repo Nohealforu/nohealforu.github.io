@@ -1763,28 +1763,8 @@ Player.prototype.teleportPlayer = function (map, gridX, gridY)
 };
 
 Player.prototype.getAnimationFrame = function (frames) {
-    let spriteDirectionWalkFrames = [];
+    let spriteDirectionWalkFrames = this.spriteWalkFrames[this.direction];
     let spriteAnimationState = {startX: 0, width: this.width};
-    let offset = 0;
-    switch(this.direction)
-    {
-        case Directions.Down:
-            spriteDirectionWalkFrames = this.spriteWalkFrames['down'];
-            offset = this.offsetY;
-            break;
-        case Directions.Up:
-            spriteDirectionWalkFrames = this.spriteWalkFrames['up'];
-            offset = this.offsetY;
-            break;
-        case Directions.Left:
-            spriteDirectionWalkFrames = this.spriteWalkFrames['left'];
-            offset = this.offsetX;
-            break;
-        case Directions.Right:
-            spriteDirectionWalkFrames = this.spriteWalkFrames['right'];
-            offset = this.offsetX;
-            break;
-    }
     if(spriteDirectionWalkFrames.length > 0)
     {
         let frameIndex = Math.floor(frames / 15) % spriteDirectionWalkFrames.length;
@@ -1975,28 +1955,8 @@ Ship.prototype.unboard = function(player, river)
 };
 
 Ship.prototype.getAnimationFrame = function (frames) {
-    let spriteDirectionWalkFrames = [];
+    let spriteDirectionWalkFrames = this.spriteWalkFrames[this.direction];
     let spriteAnimationState = {startX: 0, width: this.width};
-    let offset = 0;
-    switch(this.direction)
-    {
-        case Directions.Down:
-            spriteDirectionWalkFrames = this.spriteWalkFrames['down'];
-            offset = this.offsetY;
-            break;
-        case Directions.Up:
-            spriteDirectionWalkFrames = this.spriteWalkFrames['up'];
-            offset = this.offsetY;
-            break;
-        case Directions.Left:
-            spriteDirectionWalkFrames = this.spriteWalkFrames['left'];
-            offset = this.offsetX;
-            break;
-        case Directions.Right:
-            spriteDirectionWalkFrames = this.spriteWalkFrames['right'];
-            offset = this.offsetX;
-            break;
-    }
     if(spriteDirectionWalkFrames.length > 0)
     {
         let frameIndex = (Game.player.moveMethod == MoveMethod.Ship ? Math.floor(frames / 30) % spriteDirectionWalkFrames.length : 0);
@@ -2031,6 +1991,7 @@ function Airship(image, image2, spriteWalkFrames)
 Airship.prototype.board = function(player)
 {
 	this.direction = Directions.Right;
+	player.direction = Directions.Right;
 	player.active = false;
 	player.allowMovement = false;
 	this.followPlayer = true;
@@ -2048,6 +2009,7 @@ Airship.prototype.board = function(player)
 Airship.prototype.unboard = function(player)
 {
 	this.direction = Directions.Right;
+	player.direction = Directions.Right;
 	player.allowMovement = false;
 	this.landing = true;
 	this.takeoff = false;
@@ -2090,28 +2052,8 @@ Airship.prototype.updateElevation = function(player, delta)
 };
 
 Airship.prototype.getAnimationFrame = function (frames) {
-    let spriteDirectionWalkFrames = [];
+    let spriteDirectionWalkFrames = this.spriteWalkFrames[this.direction];
     let spriteAnimationState = {startX: 0, width: this.width};
-    let offset = 0;
-    switch(this.direction)
-    {
-        case Directions.Down:
-            spriteDirectionWalkFrames = this.spriteWalkFrames['down'];
-            offset = this.offsetY;
-            break;
-        case Directions.Up:
-            spriteDirectionWalkFrames = this.spriteWalkFrames['up'];
-            offset = this.offsetY;
-            break;
-        case Directions.Left:
-            spriteDirectionWalkFrames = this.spriteWalkFrames['left'];
-            offset = this.offsetX;
-            break;
-        case Directions.Right:
-            spriteDirectionWalkFrames = this.spriteWalkFrames['right'];
-            offset = this.offsetX;
-            break;
-    }
     if(spriteDirectionWalkFrames.length > 0)
     {
         let frameIndex = (this.elevation > 0 ? Math.floor(frames / (this.takeoff || this.landing ? 6 : 3)) % spriteDirectionWalkFrames.length : 0);
@@ -2283,10 +2225,10 @@ Game.init = function () {
     overworldMap.data = Loader.getMapData('overworld');
     console.log("INIT Overworldmap Data Length: " + overworldMap.data.length);
     this.camera = new Camera(0, 0, defaultWidth, defaultHeight, 2);
-    this.bridge = new Bridge(Loader.getImage('bridge'));
-    this.ship = new Ship(Loader.getImage('ship'), {down:[0,1], up:[3,2], left:[6,7], right:[4,5]});
-    this.airship = new Airship(Loader.getImage('airship'), Loader.getImage('airship_shadow'), {down:[3,2], up:[1,0], left:[5,4], right:[7,6]});
-    this.player = new Player(overworldMap, 153, 165, 16, 16, Loader.getImage('fighter'), {down:[0,7], up:[1,6], left:[2,3], right:[5,4]});
+    this.bridge = new Bridge(Loader.getImage('bridge')); 
+    this.ship = new Ship(Loader.getImage('ship'), {[Directions.Down]:[0,1], [Directions.Up]:[3,2], [Directions.Left]:[6,7], [Directions.Right]:[4,5]});
+    this.airship = new Airship(Loader.getImage('airship'), Loader.getImage('airship_shadow'), {[Directions.Down]:[3,2], [Directions.Up]:[1,0], [Directions.Left]:[5,4], [Directions.Right]:[7,6]});
+    this.player = new Player(overworldMap, 153, 165, 16, 16, Loader.getImage('fighter'), {[Directions.Down]:[0,7], [Directions.Up]:[1,6], [Directions.Left]:[2,3], [Directions.Right]:[5,4]});
     this.frames = 0;
     this.currentMap = overworldMap;
     this.camera.followPlayer(this.currentMap, this.player);
