@@ -1634,6 +1634,14 @@ var dungeonMap = {
         return this.data[mapY * this.cells.rows * this.maxCol + row * this.maxCol + mapX * this.cells.cols + col];
     },
     getTileData: function (gridX, gridY) {
+		if(gridX >= maxCol)
+			gridX -= maxCol;
+		else if(gridX < 0)
+			gridX += maxCol;
+		if(gridY >= maxRow)
+			gridY -= maxRow;
+		else if(gridY < 0)
+			gridY += maxRow;
         return this.mapTileAtlas[this.data[gridY * this.cells.cols * this.cols + gridX]];
     }
 };
@@ -1661,6 +1669,14 @@ var overworldMap = {
         return this.data[mapY * this.cells.rows * this.maxCol + row * this.maxCol + mapX * this.cells.cols + col];
     },
     getTileData: function (gridX, gridY) {
+		if(gridX >= maxCol)
+			gridX -= maxCol;
+		else if(gridX < 0)
+			gridX += maxCol;
+		if(gridY >= maxRow)
+			gridY -= maxRow;
+		else if(gridY < 0)
+			gridY += maxRow;
         return this.mapTileAtlas[this.data[gridY * this.cells.cols * this.cols + gridX]];
     }
 };
@@ -2076,7 +2092,10 @@ Game.update = function (delta) {
 
 Game.checkForRoomFlags = function (tileX, tileY, key)
 {
-	let roomFlag = this.currentMap.getTileData(tileX, tileY).room;
+	let tileData = this.currentMap.getTileData(tileX, tileY);
+	if(tileData == null)
+		return;
+	let roomFlag = tileData.room;
 	if(roomFlag == roomOpening.Open || (key && roomFlag == roomOpening.Lock))
 		this.currentMap.showRooms = true;
 	else if(roomFlag == roomOpening.Close)
