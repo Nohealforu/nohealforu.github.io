@@ -2500,7 +2500,7 @@ Game._drawSprites = function (map) {
 				sprite.gridY = Game.player.gridY;
 				sprite.offsetX = Game.player.offsetX;
 				sprite.offsetY = Game.player.offsetY;
-				sprite.direction = Game.player.direction;
+				sprite.direction = (sprite.landing || sprite.takeoff ? Directions.Right : Game.player.direction);
 			}
 			let spriteAnimationState = sprite.getAnimationFrame(this.frames);
 			let x = (sprite.gridX - startCol) * displayTsize + offsetX + sprite.offsetX * this.camera.zoom;
