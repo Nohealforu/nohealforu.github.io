@@ -2140,6 +2140,23 @@ Game.toggleAirship = function(checkboxElement) {
 	this._drawSprites(this.currentMap);
 };
 
+Game.handleWarp = function() 
+{
+	if(this.currentMap.overworldMap)
+		return;
+	let teleport = this.currentDungeon.warpInformation;
+	let warp = true;
+	this.handleTeleport(warp, teleport);	
+};
+Game.handleExit = function() 
+{
+	if(this.currentMap.overworldMap)
+		return;
+	let teleport = this.currentDungeon.exitInformation;
+	let warp = false;
+	this.handleTeleport(warp, teleport);
+};
+
 Game.load = function () {
     return [
 		Loader.loadImage('overworld', 'Assets/Overworld.png'),
@@ -2387,32 +2404,36 @@ Game.checkForTeleport = function (tileX, tileY)
 		}
 		else //teleport
 		{
-			let dungeonInfo = null;
 			let warp = teleport.targetMap == 'WARP';
 			if(warp)
 				teleport = this.currentDungeon.warpInformation;
-			if(teleport.targetMap == 'WorldMap')
-			{
-				this.currentMap = overworldMap;
-			}
-			else
-			{
-				dungeonInfo = dungeons[teleport.targetMap];
-				if(!warp)
-					dungeonInfo.storeWarpInformation(new teleportEntry('StoredWarp', this.currentMap.overworldMap ? 'WorldMap' : this.currentDungeon.mapDataName, tileX, tileY));
-				this.currentDungeon = dungeonInfo;
-				dungeonMap.tileAtlasImage[0] = Loader.getImage(dungeonInfo.tileAtlasImageName);
-				dungeonMap.tileAtlasImage[1] = Loader.getImage(dungeonInfo.tileAtlasRoomImageName);
-				dungeonMap.data = Loader.getMapData(dungeonInfo.mapDataName);
-				dungeonMap.mapTileAtlas = dungeonInfo.mapTileAtlas;
-				dungeonMap.name = dungeonInfo.mapDataName;
-				this.currentMap = dungeonMap;
-				this._loadCells(dungeonMap);
-			}
-			this.player.teleportPlayer(this.currentMap, teleport.gridX, teleport.gridY);
+			this.handleTeleport(warp, teleport, tileX, tileY);
 		}
 	}
-}
+};
+
+Game.handleTeleport = function (warp, teleport, sourceX = 0, sourceY = 0)
+{
+	if(teleport.targetMap == 'WorldMap')
+	{
+		this.currentMap = overworldMap;
+	}
+	else
+	{
+		let dungeonInfo = dungeons[teleport.targetMap];
+		if(!warp)
+			dungeonInfo.storeWarpInformation(new teleportEntry('StoredWarp', this.currentMap.overworldMap ? 'WorldMap' : this.currentDungeon.mapDataName, tileX, tileY));
+		this.currentDungeon = dungeonInfo;
+		dungeonMap.tileAtlasImage[0] = Loader.getImage(dungeonInfo.tileAtlasImageName);
+		dungeonMap.tileAtlasImage[1] = Loader.getImage(dungeonInfo.tileAtlasRoomImageName);
+		dungeonMap.data = Loader.getMapData(dungeonInfo.mapDataName);
+		dungeonMap.mapTileAtlas = dungeonInfo.mapTileAtlas;
+		dungeonMap.name = dungeonInfo.mapDataName;
+		this.currentMap = dungeonMap;
+		this._loadCells(dungeonMap);
+	}
+	this.player.teleportPlayer(this.currentMap, teleport.gridX, teleport.gridY);
+};
 
 Game._loadCells = function (map) {
 	console.log(map.loadRooms);
