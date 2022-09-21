@@ -17,6 +17,8 @@
 
 <div class="main-wrapper">
     <canvas id="mapping" width="960" height="640"></canvas>
+	<div><button id="warpButton" onclick="Game.handleWarp();">Warp</button></div>
+	<div><button id="exitButton" onclick="Game.handleExit();">Exit</button></div>
     <div>Bridge <input type="checkbox" id="bridgeCheckbox" onchange="Game.toggleBridge(this);"</div>
     <div>Canoe <input type="checkbox" id="canoeCheckbox" onchange="Game.toggleCanoe(this);"</div>
     <div>Ship <input type="checkbox" id="shipheckbox" onchange="Game.toggleShip(this);"</div>
