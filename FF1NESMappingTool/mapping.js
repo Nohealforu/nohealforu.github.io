@@ -2033,6 +2033,8 @@ Airship.prototype.board = function(player)
 	this.offsetY = 0;
     this.gridX = player.gridX;
     this.gridY = player.gridY;
+	player.offsetX = 0;
+	player.offsetY = 0;
 	player.queueAirshipBoard = false;
 };
 
@@ -2046,6 +2048,8 @@ Airship.prototype.unboard = function(player)
 	this.offsetY = 0;
     this.gridX = player.gridX;
     this.gridY = player.gridY;
+	player.offsetX = 0;
+	player.offsetY = 0;
 	player.queueAirshipUnboard = false;
 };
 
@@ -2321,10 +2325,21 @@ Game.update = function (delta) {
 
 Game.handleActionButton = function()
 {
+	let incompleteMovement = (this.player.offsetX != 0 || this.player.offsetY != 0);
 	if(this.airship.active == true && this.player.gridX == this.airship.gridX && this.player.gridY == this.airship.gridY && this.player.moveMethod == MoveMethod.Walk)
-		this.player.queueAirshipBoard = true;
+	{
+		if(incompleteMovement && !this.airship.takeoff)
+			this.player.queueAirshipBoard = true;
+		else if(!incompleteMovement && this.player.queueAirshipBoard == false) // don't force a board if we're queueing a board
+			this.airship.board(this.player);
+	}
 	else if(this.airship.active == true && this.player.gridX == this.airship.gridX && this.player.gridY == this.airship.gridY && this.player.moveMethod == MoveMethod.Airship)
-		this.player.queueAirshipUnboard = true;
+	{
+		if(incompleteMovement && !this.airship.landing)
+			this.player.queueAirshipUnboard = true;
+		else if(!incompleteMovement && this.player.queueAirshipUnboard == false) // don't force a board if we're queueing an unboard
+			this.airship.unboard(this.player);
+	}
 };
 
 Game.checkForRoomFlags = function (tileX, tileY, key)
