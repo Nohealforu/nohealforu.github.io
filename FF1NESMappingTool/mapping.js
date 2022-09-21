@@ -2089,9 +2089,9 @@ Game.handleWarp = function()
 	let teleport = this.currentDungeon.warpInformation;
 	let warp = true;
 	this.handleTeleport(warp, teleport);
+    this.camera.followPlayer(this.currentMap, this.player);
 	this._drawMap(this.currentMap);
     this._drawSprites(this.currentMap);
-    this.camera.followPlayer(this.currentMap, this.player);
 };
 Game.handleExit = function() 
 {
@@ -2100,9 +2100,9 @@ Game.handleExit = function()
 	let teleport = this.currentDungeon.exitInformation;
 	let warp = false;
 	this.handleTeleport(warp, teleport);
+    this.camera.followPlayer(this.currentMap, this.player);
 	this._drawMap(this.currentMap);
     this._drawSprites(this.currentMap);
-    this.camera.followPlayer(this.currentMap, this.player);
 };
 
 Game.load = function () {
