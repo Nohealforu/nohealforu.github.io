@@ -2098,7 +2098,7 @@ Game.handleExit = function()
 	if(this.currentMap.overworldMap)
 		return;
 	let teleport = this.currentDungeon.exitInformation;
-	let warp = false;
+	let warp = true;
 	this.handleTeleport(warp, teleport);
     this.camera.followPlayer(this.currentMap, this.player);
 	this._drawMap(this.currentMap);
