@@ -2488,7 +2488,7 @@ Game._drawSprites = function (map) {
 					12, // source width
 					3, // source height
 					Math.round(x + 4),  // target x
-					Math.round(y - elevation * 2), // target y
+					Math.round(y - sprite.elevation * 2), // target y
 					12 * this.camera.zoom, // target width
 					3 * this.camera.zoom // target height
 					);
