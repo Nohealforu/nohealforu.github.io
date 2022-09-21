@@ -2298,9 +2298,9 @@ Game.update = function (delta) {
 
 Game.handleActionButton() = function()
 {
-	if(this.player.gridX == this.airship.gridX && this.player.gridY == this.airship.gridY && this.player.moveMethod = MoveMethod.Walk)
+	if(this.player.gridX == this.airship.gridX && this.player.gridY == this.airship.gridY && this.player.moveMethod == MoveMethod.Walk)
 		this.airship.board(this.player);
-	else if(this.player.gridX == this.airship.gridX && this.player.gridY == this.airship.gridY && this.player.moveMethod = MoveMethod.Airship)
+	else if(this.player.gridX == this.airship.gridX && this.player.gridY == this.airship.gridY && this.player.moveMethod == MoveMethod.Airship)
 		this.airship.unboard(this.player);
 }
 
