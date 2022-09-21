@@ -1978,7 +1978,7 @@ Ship.prototype.getAnimationFrame = function (frames) {
     }
     if(spriteDirectionWalkFrames.length > 0)
     {
-        let frameIndex = Math.floor(frames / 30) % spriteDirectionWalkFrames.length;
+        let frameIndex = (Game.player.moveMethod == MoveMethod.Ship ? Math.floor(frames / 30) % spriteDirectionWalkFrames.length : 0);
         let frame = spriteDirectionWalkFrames[frameIndex];
         spriteAnimationState.startX = frame * this.width;
     }
@@ -2078,7 +2078,7 @@ Airship.prototype.getAnimationFrame = function (frames) {
     }
     if(spriteDirectionWalkFrames.length > 0)
     {
-        let frameIndex = Math.floor(frames / (this.takeoff || this.landing ? 4 : 2)) % spriteDirectionWalkFrames.length;
+        let frameIndex = (this.elevation > 0 ? Math.floor(frames / (this.takeoff || this.landing ? 4 : 2)) % spriteDirectionWalkFrames.length : 0);
         let frame = spriteDirectionWalkFrames[frameIndex];
         spriteAnimationState.startX = frame * this.width;
     }
