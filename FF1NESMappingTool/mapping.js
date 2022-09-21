@@ -2296,7 +2296,7 @@ Game.update = function (delta) {
 		this.airship.updateElevation (this.player, delta);
 };
 
-Game.handleActionButton() = function()
+Game.handleActionButton = function()
 {
 	if(this.player.gridX == this.airship.gridX && this.player.gridY == this.airship.gridY && this.player.moveMethod == MoveMethod.Walk)
 		this.airship.board(this.player);
