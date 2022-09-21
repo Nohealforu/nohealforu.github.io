@@ -2031,9 +2031,7 @@ Airship.prototype.board = function(player)
 Airship.prototype.unboard = function(player)
 {
 	this.direction = Directions.Right;
-	player.active = true;
 	player.allowMovement = false;
-	this.followPlayer = false;
 	this.landing = true;
 	this.takeoff = false;
 	this.offsetX = 0;
@@ -2054,6 +2052,8 @@ Airship.prototype.updateElevation = function(player, delta)
 		{
 			player.allowMovement = true;
 			player.moveMethod = MoveMethod.Walk;
+			player.active = true;
+			this.followPlayer = false;
 			this.landing = false;
 		}
 	}
