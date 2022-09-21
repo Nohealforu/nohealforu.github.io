@@ -1845,7 +1845,7 @@ Player.prototype.checkTargetTile = function (tileX, tileY)
 
 Player.SPEED = 200; // Raw Pixels Per Second (Unzoomed)
 Player.SEASPEED = 240;
-Player.AIRSPEED = 320;
+Player.AIRSPEED = 640;
 
 Player.prototype.move = function (delta, direction, active) {
 	if(this.allowMovement == false)
