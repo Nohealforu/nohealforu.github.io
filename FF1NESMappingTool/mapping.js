@@ -1845,12 +1845,12 @@ Player.prototype.checkTargetTile = function (tileX, tileY)
 
 Player.SPEED = 200; // Raw Pixels Per Second (Unzoomed)
 Player.SEASPEED = 240;
-Player.AIRSPEED = 640;
+Player.AIRSPEED = 320;
 
 Player.prototype.move = function (delta, direction, active) {
 	if(this.allowMovement == false)
 		return;
-    let speed = this.airship ? Player.AIRSPEED : this.ship ? Player.SEASPEED : Player.SPEED;
+    let speed = (this.moveMethod == MoveMethod.Airship ? Player.AIRSPEED : (this.moveMethod == MoveMethod.Ship  ? Player.SEASPEED : Player.SPEED));
 	let previousGridX = this.gridX;
 	let previousGridY = this.gridY;
     if(active)
