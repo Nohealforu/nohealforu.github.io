@@ -1610,7 +1610,8 @@ window.onload = function () {
 var dungeonCells = {cols: 32,
     rows: 32,
     tsize: 16,
-    bitmapData: {}
+    bitmapData: {},
+    bitmapDataRooms: {}
 };
 
 var dungeonMap = {
@@ -1624,6 +1625,7 @@ var dungeonMap = {
     mapTileAtlas: null,
 	tileAtlasImage: null,
 	tileAtlasRoomImage: null,
+	loadRooms: true,
 	showRooms: false,
 	overworldMap: false,
     getTile: function (mapX, mapY, col, row) {
@@ -1650,6 +1652,7 @@ var overworldMap = {
     data: null,
     mapTileAtlas: worldMapTileAtlas,
 	tileAtlasImage: null,
+	loadRooms: false,
 	showRooms: false,
 	overworldMap: true,
     getTile: function (mapX, mapY, col, row) {
@@ -1706,6 +1709,7 @@ function Player(map, startX, startY, width, height, image, spriteWalkFrames) {
     this.active = true;
     this.direction = Directions.Down;
     this.frame = 0;
+	this.key = false;
     this.canoe = false;
     this.ship = false;
     this.airship = false;
@@ -1769,6 +1773,8 @@ Player.prototype.getAnimationFrame = function (frames) {
 Player.prototype.checkTargetTile = function (tileX, tileY)
 {
     let tileData = Game.currentMap.getTileData(tileX, tileY);
+	if(this.key == false && tileData.room == roomOpening.Lock)
+		return true;
     if(this.moveMethod == MoveMethod.Walk && tileData.walk == false)
     {
 		if(Game.bridge.active == true && Game.bridge.gridX == tileX && Game.bridge.gridY == tileY)
@@ -1828,6 +1834,7 @@ Player.prototype.move = function (delta, direction, active) {
         else if (this.gridY >= this.maxY)
             this.gridY -= this.maxY;
         let targetTileInaccessible = this.checkTargetTile(this.gridX, this.gridY + polarity);
+		Game.checkForRoomFlags(this.gridX, this.gridY + polarity, this.key);
         // if sprite height or tile height is different, figure out how to use tile height
         if(!active && Math.abs(this.offsetY) > Math.abs(this.height) || targetTileInaccessible)
             this.offsetY = 0;
@@ -1839,6 +1846,7 @@ Player.prototype.move = function (delta, direction, active) {
         this.offsetX += motion;
         this.gridX += polarity * Math.floor(Math.abs(this.offsetX / this.width));
         let targetTileInaccessible = this.checkTargetTile(this.gridX + polarity, this.gridY);
+		Game.checkForRoomFlags(this.gridX + polarity, this.gridY, this.key);
         if(!active && Math.abs(this.offsetX) > Math.abs(this.width) || targetTileInaccessible)
             this.offsetX = 0;
         this.offsetX = this.offsetX % this.width;
@@ -2058,6 +2066,15 @@ Game.update = function (delta) {
     }
 };
 
+Game.checkForRoomFlags = function (tileX, tileY, key)
+{
+	let roomFlag = this.currentMap.getTileData(tileX, tileY).room;
+	if(roomFlag == roomOpening.Open || (key && roomFlag == roomOpening.Lock))
+		this.currentMap.showRooms = true;
+	else if(roomFlag == roomOpening.Close)
+		this.currentMap.showRooms = false;
+};
+
 Game.checkForTeleport = function (tileX, tileY)
 {
 	let teleport = this.currentMap.getTileData(tileX, tileY).teleport;
@@ -2115,6 +2132,7 @@ Game._loadCells = function (map) {
 			cellCanvas.width = map.cells.cols * map.cells.tsize;
 			cellCanvas.height = map.cells.rows * map.cells.tsize;
 			let context = cellCanvas.getContext('2d')
+			let cellCanvasRooms;
 			for (let c = 0; c <= map.cells.cols; c++) {
 				for (let r = 0; r <= map.cells.rows; r++) {
 					let tile = map.getTile(mapX, mapY, c, r);
@@ -2123,7 +2141,7 @@ Game._loadCells = function (map) {
 					let tileRow = Math.floor(tile / 16);
 					let tileCol = tile % 16;
 					context.drawImage(
-						map.showRooms ? map.tileAtlasRoomImage : map.tileAtlasImage, // image
+						map.tileAtlasImage, // image
 						tileCol * map.cells.tsize, // source x
 						tileRow * map.cells.tsize, // source y
 						map.cells.tsize, // source width
@@ -2133,9 +2151,29 @@ Game._loadCells = function (map) {
 						map.cells.tsize, // target width
 						map.cells.tsize // target height
 					);
+					if(map.loadRooms)
+					{
+						cellCanvasRooms = document.createElement('canvas');
+						cellCanvasRooms.width = map.cells.cols * map.cells.tsize;
+						cellCanvasRooms.height = map.cells.rows * map.cells.tsize;
+						let contextRooms = cellCanvas.getContext('2d')
+						contextRooms.drawImage(
+							map.tileAtlasRoomImage, // image
+							tileCol * map.cells.tsize, // source x
+							tileRow * map.cells.tsize, // source y
+							map.cells.tsize, // source width
+							map.cells.tsize, // source height
+							x,  // target x
+							y, // target y
+							map.cells.tsize, // target width
+							map.cells.tsize // target height
+						);
+					}
 				}
 			}
 			map.cells.bitmapData[mapIndex] = cellCanvas;
+			if(map.loadRooms)
+				map.cells.bitmapDataRooms[mapIndex] = cellCanvasRooms;
         }
     }
 };
@@ -2158,7 +2196,7 @@ Game._drawMap = function (map) {
             let y = (r - startRow) * displayTsize + offsetY;
             let mapIndex = (c < 0 ? c + map.cols : c >= map.cols ? c - map.cols : c) + (r < 0 ? r + map.rows : r >= map.rows ? r - map.rows : r) * map.cols;
             context.drawImage(
-                map.cells.bitmapData[mapIndex], // image
+                map.loadRooms && map.drawRooms ? map.cells.bitmapDataRooms[mapIndex] : map.cells.bitmapData[mapIndex], // image
                 0, // source x
                 0, // source y
                 map.tsize, // source width
