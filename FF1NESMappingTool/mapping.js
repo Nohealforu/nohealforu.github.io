@@ -1931,9 +1931,6 @@ function Ship(image, spriteWalkFrames)
     this.gridY = 0x99;
 	this.width = 16;
 	this.height = 16;
-    this.walk = true;
-    this.ship = true;
-    this.active = true;
     this.direction = Directions.Right;
 	this.offsetX = 0;
 	this.offsetY = 0;
@@ -1998,9 +1995,6 @@ function Airship(image, image2, spriteWalkFrames)
     this.gridY = 0xED;
 	this.width = 16;
 	this.height = 16;
-    this.walk = true;
-    this.ship = true;
-    this.active = true;
     this.direction = Directions.Right;
 	this.elevation = 0;
 	this.maxElevation = 32;
