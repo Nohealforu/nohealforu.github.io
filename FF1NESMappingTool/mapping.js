@@ -1625,6 +1625,7 @@ var dungeonMap = {
 	tileAtlasImage: null,
 	tileAtlasRoomImage: null,
 	showRooms: false,
+	overworldMap: false,
     getTile: function (mapX, mapY, col, row) {
         return this.data[mapY * this.cells.rows * this.maxCol + row * this.maxCol + mapX * this.cells.cols + col];
     },
@@ -1650,6 +1651,7 @@ var overworldMap = {
     mapTileAtlas: worldMapTileAtlas,
 	tileAtlasImage: null,
 	showRooms: false,
+	overworldMap: true,
     getTile: function (mapX, mapY, col, row) {
         return this.data[mapY * this.cells.rows * this.maxCol + row * this.maxCol + mapX * this.cells.cols + col];
     },
@@ -2091,7 +2093,7 @@ Game.checkForTeleport = function (tileX, tileY)
 			{
 				dungeonInfo = dungeons[teleport.targetMap];
 				if(!warp)
-					dungeonInfo.storeWarpInformation(new TeleportEntry('StoredWarp', this.currentMap == overworldMap ? 'WorldMap' : this.currentDungeon.mapDataName, tileX, tileY));
+					dungeonInfo.storeWarpInformation(new TeleportEntry('StoredWarp', this.currentMap.overworldMap ? 'WorldMap' : this.currentDungeon.mapDataName, tileX, tileY));
 				this.currentDungeon = dungeonInfo;
 				dungeonMap.tileAtlasImage = Loader.getImage(dungeonInfo.tileAtlasImageName);
 				dungeonMap.tileAtlasRoomImage = Loader.getImage(dungeonInfo.tileAtlasRoomImageName);
