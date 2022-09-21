@@ -2093,7 +2093,7 @@ Game.checkForTeleport = function (tileX, tileY)
 			{
 				dungeonInfo = dungeons[teleport.targetMap];
 				if(!warp)
-					dungeonInfo.storeWarpInformation(new TeleportEntry('StoredWarp', this.currentMap.overworldMap ? 'WorldMap' : this.currentDungeon.mapDataName, tileX, tileY));
+					dungeonInfo.storeWarpInformation(new teleportEntry('StoredWarp', this.currentMap.overworldMap ? 'WorldMap' : this.currentDungeon.mapDataName, tileX, tileY));
 				this.currentDungeon = dungeonInfo;
 				dungeonMap.tileAtlasImage = Loader.getImage(dungeonInfo.tileAtlasImageName);
 				dungeonMap.tileAtlasRoomImage = Loader.getImage(dungeonInfo.tileAtlasRoomImageName);
