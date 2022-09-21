@@ -1833,7 +1833,7 @@ Player.SPEED = 200; // Raw Pixels Per Second (Unzoomed)
 Player.SEASPEED = 240;
 Player.AIRSPEED = 320;
 
-Player.prototype.move = function (delta, direction, active) {
+Player.prototype.move = function (delta, direction, active, keyHeld) {
 	if(this.allowMovement == false)
 		return;
     let speed = (this.moveMethod == MoveMethod.Airship ? Player.AIRSPEED : (this.moveMethod == MoveMethod.Ship  ? Player.SEASPEED : Player.SPEED));
@@ -1886,7 +1886,7 @@ Player.prototype.move = function (delta, direction, active) {
 			Game.ship.board(this);
 		if(this.queueAirshipBoard)
 			Game.airship.board(this);
-		else if(!active && this.queueAirshipUnboard)
+		else if(!keyHeld && this.queueAirshipUnboard)
 			Game.airship.unboard(this);
 	}
 };
@@ -2258,13 +2258,17 @@ Game.update = function (delta) {
     let direction = -1;
     let activeMovement = false;
     let incompleteMovement = false;
+	let keyHeld = false;
     if (Keyboard.isDown(Keyboard.LEFT)) { direction = Directions.Left; }
     else if (Keyboard.isDown(Keyboard.RIGHT)) { direction = Directions.Right; }
     else if (Keyboard.isDown(Keyboard.UP)) { direction = Directions.Up; }
     else if (Keyboard.isDown(Keyboard.DOWN)) { direction = Directions.Down; }
     
     if (direction != -1)
+	{
         activeMovement = true;
+		keyHeld = true;
+	}
     
     if(this.player.offsetX != 0 || this.player.offsetY != 0)
     {
@@ -2278,7 +2282,7 @@ Game.update = function (delta) {
     
     
     if (activeMovement == true || incompleteMovement == true) {
-        this.player.move(delta, direction, activeMovement);
+        this.player.move(delta, direction, activeMovement, keyHeld);
         this.camera.followPlayer(this.currentMap, this.player);
         this.hasScrolled = true;
     }
