@@ -1943,6 +1943,10 @@ Ship.prototype.board = function(player)
 	player.active = false;
 	player.moveMethod = MoveMethod.Ship;
 	this.followPlayer = true;
+	this.offsetX = 0;
+	this.offsetY = 0;
+    this.gridX = player.gridX;
+    this.gridY = player.gridY;
 }
 
 Ship.prototype.unboard = function(player, river)
@@ -1951,6 +1955,10 @@ Ship.prototype.unboard = function(player, river)
 	player.active = true;
 	player.moveMethod = (river ? MoveMethod.Canoe : MoveMethod.Walk);
 	this.followPlayer = false;
+	this.offsetX = 0;
+	this.offsetY = 0;
+    this.gridX = player.gridX;
+    this.gridY = player.gridY;
 }
 
 Ship.prototype.getAnimationFrame = function (frames) {
@@ -2014,6 +2022,10 @@ Airship.prototype.board = function(player)
 	this.followPlayer = true;
 	this.takeoff = true;
 	this.landing = false;
+	this.offsetX = 0;
+	this.offsetY = 0;
+    this.gridX = player.gridX;
+    this.gridY = player.gridY;
 }
 
 Airship.prototype.unboard = function(player)
@@ -2024,6 +2036,10 @@ Airship.prototype.unboard = function(player)
 	this.followPlayer = false;
 	this.landing = true;
 	this.takeoff = false;
+	this.offsetX = 0;
+	this.offsetY = 0;
+    this.gridX = player.gridX;
+    this.gridY = player.gridY;
 }
 
 Airship.prototype.updateElevation = function(player, delta)
