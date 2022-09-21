@@ -2226,7 +2226,7 @@ Game._drawMap = function (map) {
             let y = (r - startRow) * displayTsize + offsetY;
             let mapIndex = (c < 0 ? c + map.cols : c >= map.cols ? c - map.cols : c) + (r < 0 ? r + map.rows : r >= map.rows ? r - map.rows : r) * map.cols;
             context.drawImage(
-                map.loadRooms && map.drawRooms ? map.cells.bitmapDataRooms[mapIndex] : map.cells.bitmapData[mapIndex], // image
+                map.loadRooms && map.showRooms ? map.cells.bitmapDataRooms[mapIndex] : map.cells.bitmapData[mapIndex], // image
                 0, // source x
                 0, // source y
                 map.tsize, // source width
