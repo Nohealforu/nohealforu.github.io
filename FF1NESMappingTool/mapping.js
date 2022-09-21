@@ -1737,7 +1737,7 @@ function Player(map, startX, startY, width, height, image, spriteWalkFrames) {
 	this.waterOrb = false;
 	this.airOrb = false;
 	this.fireOrb = false;
-	this.orbs = function(){return this.earthOrb && this.waterOrb && this.airOrb && this.fireOrb;};
+	this.getOrbs = function(){return this.earthOrb && this.waterOrb && this.airOrb && this.fireOrb;};
 	
     this.moveMethod = MoveMethod.Walk;
     console.log("Creating Player At: " + this.gridX + "," + this.gridY);
@@ -2123,7 +2123,7 @@ Game.checkForTeleport = function (tileX, tileY)
 		{
 			console.log('No Chime :(');	
 		}
-		else if(teleport.requirement == teleportEntryRequirement.Orbs && this.player.orbs == false)
+		else if(teleport.requirement == teleportEntryRequirement.Orbs && this.player.getOrbs() == false)
 		{
 			console.log('Not enough orbs noob');	
 		}
