@@ -2091,6 +2091,7 @@ Game.handleWarp = function()
 	this.handleTeleport(warp, teleport);
 	this._drawMap(this.currentMap);
     this._drawSprites(this.currentMap);
+    this.camera.followPlayer(this.currentMap, this.player);
 };
 Game.handleExit = function() 
 {
@@ -2101,6 +2102,7 @@ Game.handleExit = function()
 	this.handleTeleport(warp, teleport);
 	this._drawMap(this.currentMap);
     this._drawSprites(this.currentMap);
+    this.camera.followPlayer(this.currentMap, this.player);
 };
 
 Game.load = function () {
