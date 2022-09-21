@@ -1857,7 +1857,8 @@ Player.prototype.move = function (delta, direction, active) {
         else if (this.gridY >= this.maxY)
             this.gridY -= this.maxY;
         let targetTileInaccessible = this.checkTargetTile(this.gridX, this.gridY + polarity);
-		Game.checkForRoomFlags(this.gridX, this.gridY + polarity, this.key);
+		if(polarity * this.offsetY > 1)
+			Game.checkForRoomFlags(this.gridX, this.gridY + polarity, this.key);
         // if sprite height or tile height is different, figure out how to use tile height
         if(!active && Math.abs(this.offsetY) > Math.abs(this.height) || targetTileInaccessible)
             this.offsetY = 0;
@@ -1869,7 +1870,8 @@ Player.prototype.move = function (delta, direction, active) {
         this.offsetX += motion;
         this.gridX += polarity * Math.floor(Math.abs(this.offsetX / this.width));
         let targetTileInaccessible = this.checkTargetTile(this.gridX + polarity, this.gridY);
-		Game.checkForRoomFlags(this.gridX + polarity, this.gridY, this.key);
+		if(polarity * this.offsetX > 1)
+			Game.checkForRoomFlags(this.gridX + polarity, this.gridY, this.key);
         if(!active && Math.abs(this.offsetX) > Math.abs(this.width) || targetTileInaccessible)
             this.offsetX = 0;
         this.offsetX = this.offsetX % this.width;
