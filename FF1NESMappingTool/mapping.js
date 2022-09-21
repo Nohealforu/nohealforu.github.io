@@ -37,6 +37,8 @@ function worldMapTile(walk = false, ship = false, canoe = false, teleport = null
 	this.caravan = caravan;
 	this.teleport = teleport;
 	this.raiseAirship = raiseAirship;
+	this.room = 0;
+	this.loot = null;
 }
 
 var worldMapTileAtlas = [
@@ -1733,6 +1735,9 @@ Player.prototype.teleportPlayer = function (map, gridX, gridY)
     this.gridY = gridY;
     this.maxX = map.maxCol;
     this.maxY = map.maxRow;
+    this.offsetX = 0;
+    this.offsetY = 0;
+    this.frame = 0;
     this.direction = Directions.Down;
 	let tileData = map.getTileData(gridX, gridY);
     this.moveMethod = tileData.canoe == true ? MoveMethod.Canoe : MoveMethod.Walk;
