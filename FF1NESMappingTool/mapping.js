@@ -1994,8 +1994,8 @@ function Airship(image, image2, spriteWalkFrames)
 	this.followPlayer = false;
     this.spriteMap = image;
     this.spriteWalkFrames = spriteWalkFrames;
-    this.gridX = 0xD2;
-    this.gridY = 0x99;
+    this.gridX = 0xDD;
+    this.gridY = 0xED;
 	this.width = 16;
 	this.height = 16;
     this.walk = true;
@@ -2236,10 +2236,10 @@ Game.init = function () {
     overworldMap.data = Loader.getMapData('overworld');
     console.log("INIT Overworldmap Data Length: " + overworldMap.data.length);
     this.camera = new Camera(0, 0, defaultWidth, defaultHeight, 2);
-    this.player = new Player(overworldMap, 153, 165, 16, 16, Loader.getImage('fighter'), {down:[0,7], up:[1,6], left:[2,3], right:[5,4]});
     this.bridge = new Bridge(Loader.getImage('bridge'));
     this.ship = new Ship(Loader.getImage('ship'), {down:[0,1], up:[3,2], left:[6,7], right:[4,5]});
     this.airship = new Airship(Loader.getImage('airship'), Loader.getImage('airship_shadow'), {down:[3,2], up:[1,0], left:[5,4], right:[7,6]});
+    this.player = new Player(overworldMap, 153, 165, 16, 16, Loader.getImage('fighter'), {down:[0,7], up:[1,6], left:[2,3], right:[5,4]});
     this.frames = 0;
     this.currentMap = overworldMap;
     this.camera.followPlayer(this.currentMap, this.player);
@@ -2452,7 +2452,7 @@ Game._drawSprites = function (map) {
     let offsetX = -this.camera.x + this.camera.width / 2 + startCol * displayTsize;
     let offsetY = -this.camera.y + this.camera.height / 2 + startRow * displayTsize;
     
-    for (let i = spriteList.length - 1; i > -1 ; i--) {
+    for (let i = 0; i < spriteList.length ; i++) {
 		let sprite = spriteList[i];
 		if(sprite.active == true)
     	{
