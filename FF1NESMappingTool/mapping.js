@@ -1729,8 +1729,8 @@ function Player(map, startX, startY, width, height, image, canoeImage, spriteWal
 	this.characterSpriteFrames = spriteWalkFrames;
 	this.canoeSpriteMap = canoeImage;
 	this.canoeSpriteFrames = canoeSpriteFrames;
-	this.spriteMap = function(){return (this.drawCanoe ? this.canoeSpriteMap : this.characterSpriteMap);};
-    this.spriteWalkFrames = function(){return (this.drawCanoe ? this.canoeSpriteFrames : this.characterSpriteFrames);};
+	this.getSpriteMap = function(){return (this.drawCanoe ? this.canoeSpriteMap : this.characterSpriteMap);};
+    this.getSpriteWalkFrames = function(){return (this.drawCanoe ? this.canoeSpriteFrames : this.characterSpriteFrames);};
     this.active = true;
     this.direction = Directions.Right;
 	this.key = true; // CHANGE ALL THESE BACK TO FALSE AFTER IMPLEMENTING METHOD TO OBTAIN
@@ -1771,7 +1771,7 @@ Player.prototype.teleportPlayer = function (map, gridX, gridY)
 };
 
 Player.prototype.getAnimationFrame = function (frames) {
-    let spriteDirectionWalkFrames = this.spriteWalkFrames[this.direction];
+    let spriteDirectionWalkFrames = this.getSpriteWalkFrames()[this.direction];
     let spriteAnimationState = {startX: 0, width: this.width};
     if(spriteDirectionWalkFrames.length > 0)
     {
@@ -1910,6 +1910,7 @@ function Bridge(image)
 {
     this.active = false;
     this.spriteMap = image;
+	this.getSpriteMap = function(){return this.spriteMap;};
     this.gridX = 152;
     this.gridY = 152;
 	this.width = 16;
@@ -1934,6 +1935,8 @@ function Ship(image, spriteWalkFrames)
 	this.followPlayer = false;
     this.spriteMap = image;
     this.spriteWalkFrames = spriteWalkFrames;
+	this.getSpriteMap = function(){return this.spriteMap;};
+    this.getSpriteWalkFrames = function(){return (this.spriteWalkFrames;};
     this.gridX = 0xD2;
     this.gridY = 0x99;
 	this.width = 16;
@@ -1970,7 +1973,7 @@ Ship.prototype.unboard = function(player, river)
 };
 
 Ship.prototype.getAnimationFrame = function (frames) {
-    let spriteDirectionWalkFrames = this.spriteWalkFrames[this.direction];
+    let spriteDirectionWalkFrames = this.getSpriteWalkFrames()[this.direction];
     let spriteAnimationState = {startX: 0, width: this.width};
     if(spriteDirectionWalkFrames.length > 0)
     {
@@ -1987,6 +1990,8 @@ function Airship(image, image2, spriteWalkFrames)
 	this.followPlayer = false;
     this.spriteMap = image;
     this.spriteWalkFrames = spriteWalkFrames;
+	this.getSpriteMap = function(){return this.spriteMap;};
+    this.getSpriteWalkFrames = function(){return (this.spriteWalkFrames;};
     this.gridX = 0xDD;
     this.gridY = 0xED;
 	this.width = 16;
@@ -2067,7 +2072,7 @@ Airship.prototype.updateElevation = function(player, delta)
 };
 
 Airship.prototype.getAnimationFrame = function (frames) {
-    let spriteDirectionWalkFrames = this.spriteWalkFrames[this.direction];
+    let spriteDirectionWalkFrames = this.getSpriteWalkFrames()[this.direction];
     let spriteAnimationState = {startX: 0, width: this.width};
     if(spriteDirectionWalkFrames.length > 0)
     {
@@ -2535,7 +2540,7 @@ Game._drawSprites = function (map) {
 					);
 				}
 				context.drawImage(
-					sprite.spriteMap, // image
+					sprite.getSpriteMap(), // image
 					spriteAnimationState.startX, // source x
 					0, // source y
 					spriteAnimationState.width, // source width
