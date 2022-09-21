@@ -2105,7 +2105,7 @@ Game.toggleShip = function(checkboxElement) {
 }
 
 Game.toggleAirship = function(checkboxElement) {
-	this.player.airship = checkboxElement.checked;
+	this.airship.active = checkboxElement.checked;
 	this._drawSprites(this.currentMap);
 }
 
@@ -2445,6 +2445,14 @@ Game._drawSprites = function (map) {
 		let sprite = spriteList[i];
 		if(sprite.active == true)
     	{
+			if(sprite.followPlayer)
+			{
+				sprite.gridX = Game.player.gridX;
+				sprite.gridY = Game.player.gridY;
+				sprite.offsetX = Game.player.offsetX;
+				sprite.offsetY = Game.player.offsetY;
+				sprite.direction = Game.player.direction;
+			}
 			let spriteAnimationState = sprite.getAnimationFrame(this.frames);
 			let x = (sprite.gridX - startCol) * displayTsize + offsetX + sprite.offsetX * this.camera.zoom;
 			let y = (sprite.gridY - startRow) * displayTsize + offsetY + sprite.offsetY * this.camera.zoom;
