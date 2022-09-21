@@ -2320,8 +2320,8 @@ Game.update = function (delta) {
     else if (Keyboard.isDown(Keyboard.RIGHT)) { direction = Directions.Right; }
     else if (Keyboard.isDown(Keyboard.UP)) { direction = Directions.Up; }
     else if (Keyboard.isDown(Keyboard.DOWN)) { direction = Directions.Down; }
-	if(Keyboard.isDown(Keyboard.action))
-		Game.handleActionButton();
+	if(Keyboard.isDown(Keyboard.action) && this.player.allowMovement)
+		this.handleActionButton();
     
     if (direction != -1)
         activeMovement = true;
