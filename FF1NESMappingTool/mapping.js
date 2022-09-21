@@ -2058,7 +2058,7 @@ Game.update = function (delta) {
 
 Game.checkForTeleport = function (tileX, tileY)
 {
-	let teleport = currentMap.getTileData(tileX, tileY).teleport;
+	let teleport = this.currentMap.getTileData(tileX, tileY).teleport;
 	if(teleport != null)
 	{
 		if(teleport.requirement == teleportEntryRequirement.Crown && this.player.crown == false)
