@@ -1633,14 +1633,14 @@ var dungeonMap = {
         return this.data[mapY * this.cells.rows * this.maxCol + row * this.maxCol + mapX * this.cells.cols + col];
     },
     getTileData: function (gridX, gridY) {
-		if(gridX >= maxCol)
-			gridX -= maxCol;
+		if(gridX >= this.maxCol)
+			gridX -= this.maxCol;
 		else if(gridX < 0)
-			gridX += maxCol;
-		if(gridY >= maxRow)
-			gridY -= maxRow;
+			gridX += this.maxCol;
+		if(gridY >= this.maxRow)
+			gridY -= this.maxRow;
 		else if(gridY < 0)
-			gridY += maxRow;
+			gridY += this.maxRow;
         return this.mapTileAtlas[this.data[gridY * this.cells.cols * this.cols + gridX]];
     }
 };
@@ -1668,14 +1668,14 @@ var overworldMap = {
         return this.data[mapY * this.cells.rows * this.maxCol + row * this.maxCol + mapX * this.cells.cols + col];
     },
     getTileData: function (gridX, gridY) {
-		if(gridX >= maxCol)
-			gridX -= maxCol;
+		if(gridX >= this.maxCol)
+			gridX -= this.maxCol;
 		else if(gridX < 0)
-			gridX += maxCol;
-		if(gridY >= maxRow)
-			gridY -= maxRow;
+			gridX += this.maxCol;
+		if(gridY >= this.maxRow)
+			gridY -= this.maxRow;
 		else if(gridY < 0)
-			gridY += maxRow;
+			gridY += this.maxRow;
         return this.mapTileAtlas[this.data[gridY * this.cells.cols * this.cols + gridX]];
     }
 };
