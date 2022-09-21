@@ -2129,7 +2129,7 @@ Game._loadCells = function (map) {
                         let tileRow = Math.floor(tile / 16);
                         let tileCol = tile % 16;
                         context.drawImage(
-                            map.tileAtlas, // image
+                            map.showRooms ? map.tileAtlasRoomImage : map.tileAtlasImage, // image
                             tileCol * map.cells.tsize, // source x
                             tileRow * map.cells.tsize, // source y
                             map.cells.tsize, // source width
