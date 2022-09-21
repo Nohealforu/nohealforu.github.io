@@ -1630,6 +1630,7 @@ var dungeonMap = {
 	loadRooms: true,
 	showRooms: false,
 	overworldMap: false,
+	name: null,
     getTile: function (mapX, mapY, col, row) {
         return this.data[mapY * this.cells.rows * this.maxCol + row * this.maxCol + mapX * this.cells.cols + col];
     },
@@ -1665,6 +1666,7 @@ var overworldMap = {
 	loadRooms: false,
 	showRooms: false,
 	overworldMap: true,
+	name: 'Overworld',
     getTile: function (mapX, mapY, col, row) {
         return this.data[mapY * this.cells.rows * this.maxCol + row * this.maxCol + mapX * this.cells.cols + col];
     },
@@ -1738,6 +1740,7 @@ function Player(map, startX, startY, width, height, image, spriteWalkFrames) {
 	this.fireOrb = true;
 	this.queueAirshipBoard = false;
 	this.queueAirshipUnboard = false;
+	this.mapName = 'Overworld';
 	this.getOrbs = function(){return this.earthOrb && this.waterOrb && this.airOrb && this.fireOrb;};
 	this.allowMovement = true;
     this.moveMethod = MoveMethod.Walk;
@@ -1754,6 +1757,7 @@ Player.prototype.teleportPlayer = function (map, gridX, gridY)
     this.offsetX = 0;
     this.offsetY = 0;
     this.direction = Directions.Down;
+	this.mapName = map.name;
 	let tileData = map.getTileData(gridX, gridY);
     this.moveMethod = tileData.canoe == true ? MoveMethod.Canoe : MoveMethod.Walk;
 };
@@ -1919,6 +1923,7 @@ function Bridge(image)
     this.ship = true;
 	this.offsetX = 0;
 	this.offsetY = 0;
+	this.mapName = 'Overworld';
     spriteList.push(this);
 }
 // Make generic sprite class to put Bridge/Misc under to prevent animation needs?
@@ -1941,6 +1946,7 @@ function Ship(image, spriteWalkFrames)
     this.direction = Directions.Right;
 	this.offsetX = 0;
 	this.offsetY = 0;
+	this.mapName = 'Overworld';
     spriteList.push(this);
 }
 
@@ -2018,6 +2024,7 @@ function Airship(image, image2, spriteWalkFrames)
 	this.takeoff = false;
 	this.offsetX = 0;
 	this.offsetY = 0;
+	this.mapName = 'Overworld';
     spriteList.push(this);
 }
 
@@ -2398,6 +2405,7 @@ Game.checkForTeleport = function (tileX, tileY)
 				dungeonMap.tileAtlasImage[1] = Loader.getImage(dungeonInfo.tileAtlasRoomImageName);
 				dungeonMap.data = Loader.getMapData(dungeonInfo.mapDataName);
 				dungeonMap.mapTileAtlas = dungeonInfo.mapTileAtlas;
+				dungeonMap.name = dungeonInfo.mapDataName;
 				this.currentMap = dungeonMap;
 				this._loadCells(dungeonMap);
 			}
@@ -2492,7 +2500,7 @@ Game._drawSprites = function (map) {
     
     for (let i = 0; i < spriteList.length ; i++) {
 		let sprite = spriteList[i];
-		if(sprite.active == true)
+		if(sprite.active == true && sprite.mapName == this.currentMap.name)
     	{
 			if(sprite.followPlayer)
 			{
