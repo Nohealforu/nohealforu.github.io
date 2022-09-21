@@ -1796,7 +1796,6 @@ Player.prototype.checkTargetTile = function (tileX, tileY)
         if(tileData.canoe == true && this.canoe == true)
         { // Need special treatment entering/leaving river tile itself, (doesn't count to encounters, don't display canoe unless sitting or moving fully inside river)
             this.moveMethod = MoveMethod.Canoe;
-			this.enteringRiver = true;
             return false;
         }
 		else if(Game.currentMap.overworldMap && Game.ship.active == true && Game.ship.gridX == tileX && Game.ship.gridY == tileY)
@@ -1826,7 +1825,6 @@ Player.prototype.checkTargetTile = function (tileX, tileY)
 		if(tileData.walk == true)
 		{
 			this.moveMethod = MoveMethod.Walk;
-			this.drawCanoe = false;
 			return false;
 		}
 		else if(Game.currentMap.overworldMap && Game.ship.active == true && Game.ship.gridX == tileX && Game.ship.gridY == tileY)
@@ -1868,7 +1866,13 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
         if(!active && Math.abs(this.offsetY) > Math.abs(this.height) || targetTileInaccessible)
             this.offsetY = 0;
 		if(polarity * this.offsetY > 1)
+		{
 			Game.checkForRoomFlags(this.gridX, this.gridY + polarity, this.key);
+			if(this.moveMethod == MoveMethod.Canoe && !this.drawCanoe)
+				this.enteringRiver = true;
+			else if(this.moveMethod == MoveMethod.Walk && this.drawCanoe)
+				this.drawCanoe = false;
+		}
         this.offsetY = this.offsetY % this.height;
     }
     else if(direction == Directions.Left || direction == Directions.Right)
@@ -1884,7 +1888,13 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
         if(!active && Math.abs(this.offsetX) > Math.abs(this.width) || targetTileInaccessible)
             this.offsetX = 0;
 		if(polarity * this.offsetX > 1)
+		{
 			Game.checkForRoomFlags(this.gridX + polarity, this.gridY, this.key);
+			if(this.moveMethod == MoveMethod.Canoe && !this.drawCanoe)
+				this.enteringRiver = true;
+			else if(this.moveMethod == MoveMethod.Walk && this.drawCanoe)
+				this.drawCanoe = false;
+		}
         this.offsetX = this.offsetX % this.width;
     }
 	
