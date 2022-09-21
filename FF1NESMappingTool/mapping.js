@@ -1725,7 +1725,6 @@ function Player(map, startX, startY, width, height, image, spriteWalkFrames) {
     this.spriteWalkFrames = spriteWalkFrames;
     this.active = true;
     this.direction = Directions.Down;
-    this.frame = 0;
 	this.key = false;
     this.canoe = false;
     this.ship = false;
@@ -1752,7 +1751,6 @@ Player.prototype.teleportPlayer = function (map, gridX, gridY)
     this.maxY = map.maxRow;
     this.offsetX = 0;
     this.offsetY = 0;
-    this.frame = 0;
     this.direction = Directions.Down;
 	let tileData = map.getTileData(gridX, gridY);
     this.moveMethod = tileData.canoe == true ? MoveMethod.Canoe : MoveMethod.Walk;
@@ -1856,11 +1854,11 @@ Player.prototype.move = function (delta, direction, active) {
         else if (this.gridY >= this.maxY)
             this.gridY -= this.maxY;
         let targetTileInaccessible = this.checkTargetTile(this.gridX, this.gridY + polarity);
-		if(polarity * this.offsetY > 1)
-			Game.checkForRoomFlags(this.gridX, this.gridY + polarity, this.key);
         // if sprite height or tile height is different, figure out how to use tile height
         if(!active && Math.abs(this.offsetY) > Math.abs(this.height) || targetTileInaccessible)
             this.offsetY = 0;
+		if(polarity * this.offsetY > 1)
+			Game.checkForRoomFlags(this.gridX, this.gridY + polarity, this.key);
         this.offsetY = this.offsetY % this.height;
     }
     else if(direction == Directions.Left || direction == Directions.Right)
@@ -1868,16 +1866,16 @@ Player.prototype.move = function (delta, direction, active) {
         let motion = polarity * speed * delta;
         this.offsetX += motion;
         this.gridX += polarity * Math.floor(Math.abs(this.offsetX / this.width));
-        let targetTileInaccessible = this.checkTargetTile(this.gridX + polarity, this.gridY);
-		if(polarity * this.offsetX > 1)
-			Game.checkForRoomFlags(this.gridX + polarity, this.gridY, this.key);
-        if(!active && Math.abs(this.offsetX) > Math.abs(this.width) || targetTileInaccessible)
-            this.offsetX = 0;
-        this.offsetX = this.offsetX % this.width;
         if(this.gridX < 0)
             this.gridX += this.maxX;
         else if (this.gridX >= this.maxX)
             this.gridX -= this.maxX;
+        let targetTileInaccessible = this.checkTargetTile(this.gridX + polarity, this.gridY);
+        if(!active && Math.abs(this.offsetX) > Math.abs(this.width) || targetTileInaccessible)
+            this.offsetX = 0;
+		if(polarity * this.offsetX > 1)
+			Game.checkForRoomFlags(this.gridX + polarity, this.gridY, this.key);
+        this.offsetX = this.offsetX % this.width;
     }
 	
 	if(this.gridX != previousGridX || this.gridY != previousGridY)
