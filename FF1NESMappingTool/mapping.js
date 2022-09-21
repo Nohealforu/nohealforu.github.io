@@ -2101,7 +2101,7 @@ Game.checkForTeleport = function (tileX, tileY)
 				dungeonMap.mapTileAtlas = dungeonInfo.mapTileAtlas;
 				this.currentMap = dungeonMap;
 			}
-			Player.teleportPlayer(this.currentMap, teleport.gridX, teleport.gridY);
+			this.player.teleportPlayer(this.currentMap, teleport.gridX, teleport.gridY);
 		}
 	}
 }
