@@ -1695,7 +1695,7 @@ function Camera(startX, startY, width, height, zoom) {
 
 Camera.prototype.followPlayer = function (map, player) {
     this.x = (player.gridX * map.cells.tsize + player.offsetX) * this.zoom;
-    this.y = (player.gridY * map.cells.tsize + player.offsetY) * this.zoom;
+    this.y = (player.gridY * map.cells.tsize + player.offsetY + Game.airship.elevation) * this.zoom;
 };
 
 const Directions = {
@@ -1727,17 +1727,16 @@ function Player(map, startX, startY, width, height, image, spriteWalkFrames) {
     this.direction = Directions.Down;
 	this.key = false;
     this.canoe = false;
-    this.ship = false;
-    this.airship = false;
 	this.crown = false;
 	this.cube = false;
 	this.chime = false;
+	this.floater = false;
 	this.earthOrb = false;
 	this.waterOrb = false;
 	this.airOrb = false;
 	this.fireOrb = false;
 	this.getOrbs = function(){return this.earthOrb && this.waterOrb && this.airOrb && this.fireOrb;};
-	
+	this.allowMovement = true;
     this.moveMethod = MoveMethod.Walk;
     console.log("Creating Player At: " + this.gridX + "," + this.gridY);
     spriteList.push(this);
@@ -1803,7 +1802,12 @@ Player.prototype.checkTargetTile = function (tileX, tileY)
         {
             this.moveMethod = MoveMethod.Canoe;
             return false;
-        } // Build out more scenarios to ride boat, etc.
+        }
+		else if(Game.ship.active == true && Game.ship.gridX == tileX && Game.ship.gridY == tileY)
+		{
+			Game.ship.board(this);
+			return false;
+		}
         else
             return true;
     }
@@ -1811,9 +1815,14 @@ Player.prototype.checkTargetTile = function (tileX, tileY)
     {
         if(tileData.canoe == true && this.canoe == true)
         {
-            this.moveMethod = MoveMethod.Canoe;
+			Game.ship.unboard(this, true);
             return false;
         } // Build out more scenarios to ride boat, etc.
+		else if(tileData.dockShip)
+		{
+			Game.ship.unboard(this, false);
+			return false;
+		}
         else
             return true;
     }
@@ -1823,19 +1832,25 @@ Player.prototype.checkTargetTile = function (tileX, tileY)
 		{
 			this.moveMethod = MoveMethod.Walk;
 			return false;
-		} // Build out scenario to get back on boat in water.
+		}
+		else if(Game.ship.active == true && Game.ship.gridX == tileX && Game.ship.gridY == tileY)
+		{
+			Game.ship.board(this);
+			return false;
+		}
 		else
 			return true;
 	}
     return false;
 }
 
-Player.SPEED = 320; // Raw Pixels Per Second (Unzoomed)
-Player.SEASPEED = 320;
+Player.SPEED = 200; // Raw Pixels Per Second (Unzoomed)
+Player.SEASPEED = 240;
 Player.AIRSPEED = 320;
 
 Player.prototype.move = function (delta, direction, active) {
-    // move camera
+	if(this.allowMovement == false)
+		return;
     let speed = this.airship ? Player.AIRSPEED : this.ship ? Player.SEASPEED : Player.SPEED;
 	let previousGridX = this.gridX;
 	let previousGridY = this.gridY;
@@ -1904,13 +1919,194 @@ Bridge.prototype.getAnimationFrame = function (frames) {
     return spriteAnimationState;
 }
 
+
+function Ship(image, spriteWalkFrames)
+{
+    this.active = false;
+	this.followPlayer = false;
+    this.spriteMap = image;
+    this.spriteWalkFrames = spriteWalkFrames;
+    this.gridX = 0xD2;
+    this.gridY = 0x99;
+	this.width = 16;
+	this.height = 16;
+    this.walk = true;
+    this.ship = true;
+    this.active = true;
+    this.direction = Directions.Right;
+	this.offsetX = 0;
+	this.offsetY = 0;
+    spriteList.push(this);
+}
+
+Ship.prototype.board = function(player)
+{
+	this.direction = player.direction;
+	player.active = false;
+	player.moveMethod = MoveMethod.Ship;
+	this.followPlayer = true;
+}
+
+Ship.prototype.unboard = function(player, river)
+{
+	this.direction = Directions.Right;
+	player.active = true;
+	player.moveMethod = (river ? MoveMethod.Canoe : MoveMethod.Walk);
+	this.followPlayer = false;
+}
+
+Ship.prototype.getAnimationFrame = function (frames) {
+    let spriteDirectionWalkFrames = [];
+    let spriteAnimationState = {startX: 0, width: this.width};
+    let offset = 0;
+    switch(this.direction)
+    {
+        case Directions.Down:
+            spriteDirectionWalkFrames = this.spriteWalkFrames['down'];
+            offset = this.offsetY;
+            break;
+        case Directions.Up:
+            spriteDirectionWalkFrames = this.spriteWalkFrames['up'];
+            offset = this.offsetY;
+            break;
+        case Directions.Left:
+            spriteDirectionWalkFrames = this.spriteWalkFrames['left'];
+            offset = this.offsetX;
+            break;
+        case Directions.Right:
+            spriteDirectionWalkFrames = this.spriteWalkFrames['right'];
+            offset = this.offsetX;
+            break;
+    }
+    if(spriteDirectionWalkFrames.length > 0)
+    {
+        let frameIndex = Math.floor(frames / 30) % spriteDirectionWalkFrames.length;
+        let frame = spriteDirectionWalkFrames[frameIndex];
+        spriteAnimationState.startX = frame * this.width;
+    }
+    return spriteAnimationState;
+}
+
+function Airship(image, image2, spriteWalkFrames)
+{
+    this.active = false;
+	this.followPlayer = false;
+    this.spriteMap = image;
+    this.spriteWalkFrames = spriteWalkFrames;
+    this.gridX = 0xD2;
+    this.gridY = 0x99;
+	this.width = 16;
+	this.height = 16;
+    this.walk = true;
+    this.ship = true;
+    this.active = true;
+    this.direction = Directions.Right;
+	this.elevation = 0;
+	this.maxElevation = 32;
+	this.shadowImage = image2;
+	this.landing = false;
+	this.takeoff = false;
+	this.offsetX = 0;
+	this.offsetY = 0;
+    spriteList.push(this);
+}
+
+Airship.prototype.board = function(player)
+{
+	this.direction = Directions.Right;
+	player.active = false;
+	player.allowMovement = false;
+	this.followPlayer = true;
+	this.takeoff = true;
+	this.landing = false;
+}
+
+Airship.prototype.unboard = function(player)
+{
+	this.direction = Directions.Right;
+	player.active = true;
+	player.allowMovement = false;
+	this.followPlayer = false;
+	this.landing = true;
+	this.takeoff = false;
+}
+
+Airship.prototype.updateElevation = function(player, delta)
+{
+	if(this.landing)
+	{
+		this.elevation = Math.max(this.elevation - delta * 32, 0);
+		let tileData = Game.currentMap.getTileData(this.gridX, this.gridY);
+		if((tileData == null || tileData.landAirship = false) && this.elevation < 8)
+			this.board(player);
+		if(this.elevation == 0)
+		{
+			player.allowMovement = true;
+			player.moveMethod = MoveMethod.Walk;
+			this.landing = false;
+		}
+	}
+	else if(this.takeoff)
+	{
+		this.elevation = Math.min(this.elevation + delta * 32, this.maxElevation);
+		if(this.elevation == this.maxElevation)
+		{
+			player.allowMovement = true;
+			player.moveMethod = MoveMethod.Airship;
+			this.takeoff = false;
+		}
+	}
+}
+
+Airship.prototype.getAnimationFrame = function (frames) {
+    let spriteDirectionWalkFrames = [];
+    let spriteAnimationState = {startX: 0, width: this.width};
+    let offset = 0;
+    switch(this.direction)
+    {
+        case Directions.Down:
+            spriteDirectionWalkFrames = this.spriteWalkFrames['down'];
+            offset = this.offsetY;
+            break;
+        case Directions.Up:
+            spriteDirectionWalkFrames = this.spriteWalkFrames['up'];
+            offset = this.offsetY;
+            break;
+        case Directions.Left:
+            spriteDirectionWalkFrames = this.spriteWalkFrames['left'];
+            offset = this.offsetX;
+            break;
+        case Directions.Right:
+            spriteDirectionWalkFrames = this.spriteWalkFrames['right'];
+            offset = this.offsetX;
+            break;
+    }
+    if(spriteDirectionWalkFrames.length > 0)
+    {
+        let frameIndex = Math.floor(frames / (this.takeoff || this.landing ? 4 : 2)) % spriteDirectionWalkFrames.length;
+        let frame = spriteDirectionWalkFrames[frameIndex];
+        spriteAnimationState.startX = frame * this.width;
+    }
+    return spriteAnimationState;
+}
+
 Game.toggleBridge = function(checkboxElement) {
 	this.bridge.active = checkboxElement.checked;
-        this._drawSprites(this.currentMap);
+	this._drawSprites(this.currentMap);
 }
 
 Game.toggleCanoe = function(checkboxElement) {
 	this.player.canoe = checkboxElement.checked;
+}
+
+Game.toggleShip = function(checkboxElement) {
+	this.ship.active = checkboxElement.checked;
+	this._drawSprites(this.currentMap);
+}
+
+Game.toggleAirship = function(checkboxElement) {
+	this.player.airship = checkboxElement.checked;
+	this._drawSprites(this.currentMap);
 }
 
 Game.load = function () {
@@ -1918,6 +2114,9 @@ Game.load = function () {
 		Loader.loadImage('overworld', 'Assets/Overworld.png'),
 		Loader.loadImage('fighter', 'Assets/Fighter.png'),
 		Loader.loadImage('bridge', 'Assets/Bridge.png'),
+		Loader.loadImage('airship', 'Assets/Airship.png'),
+		Loader.loadImage('airship_shadow', 'Assets/AirshipShadow.png'),
+		Loader.loadImage('ship', 'Assets/Ship.png'),
 		Loader.loadImage('tiles_bahamut', 'Assets/DungeonTiles/Bahamut2.png'),
 		Loader.loadImage('tiles_bahamutroom', 'Assets/DungeonTiles/Bahamut2Room.png'),
 		Loader.loadImage('tiles_cardia', 'Assets/DungeonTiles/Cardia.png'),
@@ -2038,6 +2237,8 @@ Game.init = function () {
     this.camera = new Camera(0, 0, defaultWidth, defaultHeight, 2);
     this.player = new Player(overworldMap, 153, 165, 16, 16, Loader.getImage('fighter'), {down:[0,7], up:[1,6], left:[2,3], right:[5,4]});
     this.bridge = new Bridge(Loader.getImage('bridge'));
+    this.ship = new Ship(Loader.getImage('ship'), {down:[0,1], up:[3,2], left:[6,7], right:[4,5]});
+    this.airship = new Airship(Loader.getImage('airship'), Loader.getImage('airship_shadow'), {down:[3,2], up:[1,0], left:[5,4], right:[7,6]});
     this.frames = 0;
     this.currentMap = overworldMap;
     this.camera.followPlayer(this.currentMap, this.player);
@@ -2087,6 +2288,9 @@ Game.update = function (delta) {
         this.camera.followPlayer(this.currentMap, this.player);
         this.hasScrolled = true;
     }
+	
+	if(this.airship.landing || this.airship.takeoff)
+		this.airship.updateElevation (this.player, delta);
 };
 
 Game.checkForRoomFlags = function (tileX, tileY, key)
@@ -2244,17 +2448,34 @@ Game._drawSprites = function (map) {
 			let spriteAnimationState = sprite.getAnimationFrame(this.frames);
 			let x = (sprite.gridX - startCol) * displayTsize + offsetX + sprite.offsetX * this.camera.zoom;
 			let y = (sprite.gridY - startRow) * displayTsize + offsetY + sprite.offsetY * this.camera.zoom;
-			context.drawImage(
-				sprite.spriteMap, // image
-				spriteAnimationState.startX, // source x
-				0, // source y
-				spriteAnimationState.width, // source width
-				sprite.height, // source height
-				Math.round(x),  // target x
-				Math.round(y), // target y
-				sprite.width * this.camera.zoom, // target width
-				sprite.height * this.camera.zoom // target height
-			);
+			if(x < defaultWidth && x + spriteAnimationState.width > 0 && y < defaultHeight && y + sprite.height > 0)
+			{
+				if(sprite.elevation > 0)
+				{
+					context.drawImage(
+					sprite.shadowImage, // image
+					0, // source x
+					0, // source y
+					12, // source width
+					3, // source height
+					Math.round(x + 4),  // target x
+					Math.round(y - elevation * 2), // target y
+					12 * this.camera.zoom, // target width
+					3 * this.camera.zoom // target height
+					);
+				}
+				context.drawImage(
+					sprite.spriteMap, // image
+					spriteAnimationState.startX, // source x
+					0, // source y
+					spriteAnimationState.width, // source width
+					sprite.height, // source height
+					Math.round(x),  // target x
+					Math.round(y), // target y
+					sprite.width * this.camera.zoom, // target width
+					sprite.height * this.camera.zoom // target height
+				);
+			}
     	}
     }
 };
