@@ -1527,7 +1527,7 @@ Keyboard.LEFT = 37;
 Keyboard.RIGHT = 39;
 Keyboard.UP = 38;
 Keyboard.DOWN = 40;
-Keyboard.action = 120;
+Keyboard.action = 88;
 
 Keyboard._keys = {};
 
