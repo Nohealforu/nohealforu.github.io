@@ -2108,44 +2108,34 @@ Game.checkForTeleport = function (tileX, tileY)
 }
 
 Game._loadCells = function (map) {
-    /*let displayTsize = map.tsize * this.camera.zoom;
-    let centerCol = Math.floor((this.camera.width / 2 + this.camera.x) / displayTsize);
-    let centerRow = Math.floor((this.camera.height / 2 + this.camera.y) / displayTsize);
-    
-    for(let mapX = centerCol - 2; mapX < centerCol + 3; mapX++){
-        for(let mapY = centerRow - 2; mapY < centerRow + 3; mapY++){*/
     for(let mapX = 0; mapX < map.cols; mapX++){
         for(let mapY = 0; mapY < map.rows; mapY++){
-            //let mapIndex = Math.floor(mapX < 0 ? map.cols - 1 : mapX) + Math.floor((mapY < 0 ? map.rows - 1 : mapY) * map.cols);
             let mapIndex = mapX + mapY * map.cols;
-            if(map.cells.bitmapData[mapIndex] == null)
-            {
-                let cellCanvas = document.createElement('canvas');
-                cellCanvas.width = map.cells.cols * map.cells.tsize;
-                cellCanvas.height = map.cells.rows * map.cells.tsize;
-                let context = cellCanvas.getContext('2d')
-                for (let c = 0; c <= map.cells.cols; c++) {
-                    for (let r = 0; r <= map.cells.rows; r++) {
-                        let tile = map.getTile(mapX, mapY, c, r);
-                        let x = c * map.cells.tsize;
-                        let y = r * map.cells.tsize;
-                        let tileRow = Math.floor(tile / 16);
-                        let tileCol = tile % 16;
-                        context.drawImage(
-                            map.showRooms ? map.tileAtlasRoomImage : map.tileAtlasImage, // image
-                            tileCol * map.cells.tsize, // source x
-                            tileRow * map.cells.tsize, // source y
-                            map.cells.tsize, // source width
-                            map.cells.tsize, // source height
-                            x,  // target x
-                            y, // target y
-                            map.cells.tsize, // target width
-                            map.cells.tsize // target height
-                        );
-                    }
-                }
-                map.cells.bitmapData[mapIndex] = cellCanvas;
-            }
+			let cellCanvas = document.createElement('canvas');
+			cellCanvas.width = map.cells.cols * map.cells.tsize;
+			cellCanvas.height = map.cells.rows * map.cells.tsize;
+			let context = cellCanvas.getContext('2d')
+			for (let c = 0; c <= map.cells.cols; c++) {
+				for (let r = 0; r <= map.cells.rows; r++) {
+					let tile = map.getTile(mapX, mapY, c, r);
+					let x = c * map.cells.tsize;
+					let y = r * map.cells.tsize;
+					let tileRow = Math.floor(tile / 16);
+					let tileCol = tile % 16;
+					context.drawImage(
+						map.showRooms ? map.tileAtlasRoomImage : map.tileAtlasImage, // image
+						tileCol * map.cells.tsize, // source x
+						tileRow * map.cells.tsize, // source y
+						map.cells.tsize, // source width
+						map.cells.tsize, // source height
+						x,  // target x
+						y, // target y
+						map.cells.tsize, // target width
+						map.cells.tsize // target height
+					);
+				}
+			}
+			map.cells.bitmapData[mapIndex] = cellCanvas;
         }
     }
 };
