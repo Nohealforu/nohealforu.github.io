@@ -1894,7 +1894,8 @@ Player.prototype.move = function (delta, direction, active) {
 	
 	if(this.gridX != previousGridX || this.gridY != previousGridY)
 	{
-		Game.checkForTeleport(this.gridX, this.gridY);
+		if(this.moveMethod == MoveMethod.Walk || this.moveMethod == MoveMethod.Canoe)
+			Game.checkForTeleport(this.gridX, this.gridY);
 		if(Game.ship.active == true && Game.ship.gridX == this.gridX && Game.ship.gridY == this.gridY)
 			Game.ship.board(this);
 	}
