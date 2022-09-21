@@ -1806,7 +1806,7 @@ Player.prototype.checkTargetTile = function (tileX, tileY)
             this.moveMethod = MoveMethod.Canoe;
             return false;
         }
-		else if(Game.ship.active == true && Game.ship.gridX == tileX && Game.ship.gridY == tileY)
+		else if(Game.currentMap.overworldMap && Game.ship.active == true && Game.ship.gridX == tileX && Game.ship.gridY == tileY)
 		{
 			return false;
 		}
@@ -1835,7 +1835,7 @@ Player.prototype.checkTargetTile = function (tileX, tileY)
 			this.moveMethod = MoveMethod.Walk;
 			return false;
 		}
-		else if(Game.ship.active == true && Game.ship.gridX == tileX && Game.ship.gridY == tileY)
+		else if(Game.currentMap.overworldMap && Game.ship.active == true && Game.ship.gridX == tileX && Game.ship.gridY == tileY)
 		{
 			return false;
 		}
@@ -1898,7 +1898,7 @@ Player.prototype.move = function (delta, direction, active) {
 	{
 		if(this.moveMethod == MoveMethod.Walk || this.moveMethod == MoveMethod.Canoe)
 			Game.checkForTeleport(this.gridX, this.gridY);
-		if(Game.ship.active == true && Game.ship.gridX == this.gridX && Game.ship.gridY == this.gridY)
+		if(Game.currentMap.overworldMap && Game.ship.active == true && Game.ship.gridX == this.gridX && Game.ship.gridY == this.gridY)
 			Game.ship.board(this);
 		if(this.queueAirshipBoard)
 			Game.airship.board(this);
@@ -2326,14 +2326,14 @@ Game.update = function (delta) {
 Game.handleActionButton = function()
 {
 	let incompleteMovement = (this.player.offsetX != 0 || this.player.offsetY != 0);
-	if(this.airship.active == true && this.player.gridX == this.airship.gridX && this.player.gridY == this.airship.gridY && this.player.moveMethod == MoveMethod.Walk)
+	if(Game.currentMap.overworldMap && this.airship.active == true && this.player.gridX == this.airship.gridX && this.player.gridY == this.airship.gridY && this.player.moveMethod == MoveMethod.Walk)
 	{
 		if(incompleteMovement && !this.airship.takeoff)
 			this.player.queueAirshipBoard = true;
 		else if(!incompleteMovement && this.player.queueAirshipBoard == false) // don't force a board if we're queueing a board
 			this.airship.board(this.player);
 	}
-	else if(this.airship.active == true && this.player.gridX == this.airship.gridX && this.player.gridY == this.airship.gridY && this.player.moveMethod == MoveMethod.Airship)
+	else if(Game.currentMap.overworldMap && this.airship.active == true && this.player.gridX == this.airship.gridX && this.player.gridY == this.airship.gridY && this.player.moveMethod == MoveMethod.Airship)
 	{
 		if(incompleteMovement && !this.airship.landing)
 			this.player.queueAirshipUnboard = true;
