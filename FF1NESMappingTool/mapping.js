@@ -1527,6 +1527,7 @@ Keyboard.LEFT = 37;
 Keyboard.RIGHT = 39;
 Keyboard.UP = 38;
 Keyboard.DOWN = 40;
+Keyboard.action = 120;
 
 Keyboard._keys = {};
 
@@ -2272,6 +2273,8 @@ Game.update = function (delta) {
     else if (Keyboard.isDown(Keyboard.RIGHT)) { direction = Directions.Right; }
     else if (Keyboard.isDown(Keyboard.UP)) { direction = Directions.Up; }
     else if (Keyboard.isDown(Keyboard.DOWN)) { direction = Directions.Down; }
+	if(Keyboard.isDown(Keyboard.action))
+		Game.handleActionButton();
     
     if (direction != -1)
         activeMovement = true;
@@ -2292,6 +2295,14 @@ Game.update = function (delta) {
 	if(this.airship.landing || this.airship.takeoff)
 		this.airship.updateElevation (this.player, delta);
 };
+
+Game.handleActionButton() = function()
+{
+	if(this.player.gridX == this.airship.gridX && this.player.gridY == this.airship.gridY && this.player.moveMethod = MoveMethod.Walk)
+		this.airship.board(this.player);
+	else if(this.player.gridX == this.airship.gridX && this.player.gridY == this.airship.gridY && this.player.moveMethod = MoveMethod.Airship)
+		this.airship.unboard(this.player);
+}
 
 Game.checkForRoomFlags = function (tileX, tileY, key)
 {
