@@ -1778,6 +1778,8 @@ Player.prototype.getAnimationFrame = function (frames) {
 Player.prototype.checkTargetTile = function (tileX, tileY)
 {
     let tileData = Game.currentMap.getTileData(tileX, tileY);
+	if(tileData == null)
+		return true;
 	if(this.key == false && tileData.room == roomOpening.Lock)
 		return true;
     if(this.moveMethod == MoveMethod.Walk && tileData.walk == false)
@@ -2083,7 +2085,10 @@ Game.checkForRoomFlags = function (tileX, tileY, key)
 
 Game.checkForTeleport = function (tileX, tileY)
 {
-	let teleport = this.currentMap.getTileData(tileX, tileY).teleport;
+	let tileData = this.currentMap.getTileData(tileX, tileY);
+	if(tileData == null)
+		return;
+	let teleport = tileData.teleport;
 	if(teleport != null)
 	{
 		if(teleport.requirement == teleportEntryRequirement.Crown && this.player.crown == false)
