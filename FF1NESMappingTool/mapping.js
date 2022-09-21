@@ -1329,9 +1329,10 @@ function DungeonInfo(label, mapTileAtlas, tileAtlasImageName, tileAtlasRoomImage
 	this.label = label;
 }
 
-DungeonInfo.prototype.storeWarpInformation = function (teleportEntry)
+DungeonInfo.prototype.storeWarpInformation = function (teleportEntry, roomState = null)
 {
 	this.warpInformation = teleportEntry;
+	this.warpRoomState = roomState;
 }
 
 const dungeonNames = [
@@ -2389,13 +2390,14 @@ Game.handleTeleport = function (warp, teleport, sourceX = 0, sourceY = 0)
 	{
 		let dungeonInfo = dungeons[teleport.targetMap];
 		if(!warp)
-			dungeonInfo.storeWarpInformation(new teleportEntry('StoredWarp', this.currentMap.overworldMap ? 'WorldMap' : this.currentDungeon.mapDataName, sourceX, sourceY));
+			dungeonInfo.storeWarpInformation(new teleportEntry('StoredWarp', this.currentMap.overworldMap ? 'WorldMap' : this.currentDungeon.mapDataName, sourceX, sourceY), this.currentMap.overworldMap ? null : this.currentMap.showRooms);
 		this.currentDungeon = dungeonInfo;
 		dungeonMap.tileAtlasImage[0] = Loader.getImage(dungeonInfo.tileAtlasImageName);
 		dungeonMap.tileAtlasImage[1] = Loader.getImage(dungeonInfo.tileAtlasRoomImageName);
 		dungeonMap.data = Loader.getMapData(dungeonInfo.mapDataName);
 		dungeonMap.mapTileAtlas = dungeonInfo.mapTileAtlas;
 		dungeonMap.name = dungeonInfo.mapDataName;
+		dungeonMap.showRooms = teleport.warpRoomState;
 		this.currentMap = dungeonMap;
 		this._loadCells(dungeonMap);
 	}
