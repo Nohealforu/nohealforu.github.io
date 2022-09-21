@@ -2241,7 +2241,7 @@ Game.load = function () {
 
 Game.init = function () {
     Keyboard.listenForEvents(
-        [Keyboard.LEFT, Keyboard.RIGHT, Keyboard.UP, Keyboard.DOWN, Keyboard.Action]);
+        [Keyboard.LEFT, Keyboard.RIGHT, Keyboard.UP, Keyboard.DOWN, Keyboard.action]);
     overworldMap.tileAtlasImage[0] = Loader.getImage('overworld');
     overworldMap.data = Loader.getMapData('overworld');
     console.log("INIT Overworldmap Data Length: " + overworldMap.data.length);
