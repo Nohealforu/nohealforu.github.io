@@ -1727,7 +1727,7 @@ function Player(map, startX, startY, width, height, image, spriteWalkFrames) {
     this.spriteMap = image;
     this.spriteWalkFrames = spriteWalkFrames;
     this.active = true;
-    this.direction = Directions.Down;
+    this.direction = Directions.Right;
 	this.key = true; // CHANGE ALL THESE BACK TO FALSE AFTER IMPLEMENTING METHOD TO OBTAIN
     this.canoe = false;
 	this.crown = true;
@@ -1756,7 +1756,7 @@ Player.prototype.teleportPlayer = function (map, gridX, gridY)
     this.maxY = map.maxRow;
     this.offsetX = 0;
     this.offsetY = 0;
-    this.direction = Directions.Down;
+    this.direction = (map.overworldMap ?  Directions.Right : Directions.Down);
 	this.mapName = map.name;
 	let tileData = map.getTileData(gridX, gridY);
     this.moveMethod = tileData.canoe == true ? MoveMethod.Canoe : MoveMethod.Walk;
