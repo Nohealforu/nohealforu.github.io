@@ -1736,6 +1736,8 @@ function Player(map, startX, startY, width, height, image, spriteWalkFrames) {
 	this.waterOrb = true;
 	this.airOrb = true;
 	this.fireOrb = true;
+	this.queueAirshipBoard = false;
+	this.queueAirshipUnboard = false;
 	this.getOrbs = function(){return this.earthOrb && this.waterOrb && this.airOrb && this.fireOrb;};
 	this.allowMovement = true;
     this.moveMethod = MoveMethod.Walk;
@@ -1898,6 +1900,10 @@ Player.prototype.move = function (delta, direction, active) {
 			Game.checkForTeleport(this.gridX, this.gridY);
 		if(Game.ship.active == true && Game.ship.gridX == this.gridX && Game.ship.gridY == this.gridY)
 			Game.ship.board(this);
+		if(this.queueAirshipBoard)
+			Game.airship.board(this);
+		else if(this.queueAirshipUnboard)
+			Game.airship.unboard(this);
 	}
 };
 
@@ -2027,6 +2033,7 @@ Airship.prototype.board = function(player)
 	this.offsetY = 0;
     this.gridX = player.gridX;
     this.gridY = player.gridY;
+	player.queueAirshipBoard = false;
 };
 
 Airship.prototype.unboard = function(player)
@@ -2039,6 +2046,7 @@ Airship.prototype.unboard = function(player)
 	this.offsetY = 0;
     this.gridX = player.gridX;
     this.gridY = player.gridY;
+	player.queueAirshipUnboard = false;
 };
 
 Airship.prototype.updateElevation = function(player, delta)
@@ -2313,10 +2321,10 @@ Game.update = function (delta) {
 
 Game.handleActionButton = function()
 {
-	if(this.player.gridX == this.airship.gridX && this.player.gridY == this.airship.gridY && this.player.moveMethod == MoveMethod.Walk)
-		this.airship.board(this.player);
-	else if(this.player.gridX == this.airship.gridX && this.player.gridY == this.airship.gridY && this.player.moveMethod == MoveMethod.Airship)
-		this.airship.unboard(this.player);
+	if(this.airship.active == true && this.player.gridX == this.airship.gridX && this.player.gridY == this.airship.gridY && this.player.moveMethod == MoveMethod.Walk)
+		this.player.queueAirshipBoard = true;
+	else if(this.airship.active == true && this.player.gridX == this.airship.gridX && this.player.gridY == this.airship.gridY && this.player.moveMethod == MoveMethod.Airship)
+		this.player.queueAirshipUnboard = true;
 };
 
 Game.checkForRoomFlags = function (tileX, tileY, key)
