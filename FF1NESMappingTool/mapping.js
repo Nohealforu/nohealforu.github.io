@@ -1786,8 +1786,8 @@ Player.prototype.checkTargetTile = function (tileX, tileY)
 		if(Game.bridge.active == true && Game.bridge.gridX == tileX && Game.bridge.gridY == tileY)
 			return false;
         if(tileData.canoe == true && this.canoe == true)
-        {
-            this.moveMethod = MoveMethod.Canoe;
+        { // Need special treatment entering/leaving river tile itself, (doesn't count to encounters, don't display canoe unless sitting or moving fully inside river)
+            this.moveMethod = MoveMethod.Canoe; 
             return false;
         }
 		else if(Game.currentMap.overworldMap && Game.ship.active == true && Game.ship.gridX == tileX && Game.ship.gridY == tileY)
@@ -1882,7 +1882,7 @@ Player.prototype.move = function (delta, direction, active) {
 	{
 		if(this.moveMethod == MoveMethod.Walk || this.moveMethod == MoveMethod.Canoe)
 			Game.checkForTeleport(this.gridX, this.gridY);
-		if(Game.currentMap.overworldMap && Game.ship.active == true && Game.ship.gridX == this.gridX && Game.ship.gridY == this.gridY)
+		if((this.moveMethod == MoveMethod.Walk || this.moveMethod == MoveMethod.Canoe) && Game.currentMap.overworldMap && Game.ship.active == true && Game.ship.gridX == this.gridX && Game.ship.gridY == this.gridY)
 			Game.ship.board(this);
 		if(this.queueAirshipBoard)
 			Game.airship.board(this);
