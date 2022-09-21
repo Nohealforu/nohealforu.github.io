@@ -1696,7 +1696,7 @@ function Camera(startX, startY, width, height, zoom) {
 
 Camera.prototype.followPlayer = function (map, player) {
     this.x = (player.gridX * map.cells.tsize + player.offsetX) * this.zoom;
-    this.y = (player.gridY * map.cells.tsize + player.offsetY + Game.airship.elevation) * this.zoom;
+    this.y = (player.gridY * map.cells.tsize + player.offsetY - Game.airship.elevation) * this.zoom;
 };
 
 const Directions = {
@@ -2492,7 +2492,7 @@ Game._drawSprites = function (map) {
 					12, // source width
 					3, // source height
 					Math.round(x + 4),  // target x
-					Math.round(y + (sprite.elevation + sprite.height / 2) * this.camera.zoom ), // target y
+					Math.round(y + ), // target y
 					12 * this.camera.zoom, // target width
 					3 * this.camera.zoom // target height
 					);
@@ -2504,7 +2504,7 @@ Game._drawSprites = function (map) {
 					spriteAnimationState.width, // source width
 					sprite.height, // source height
 					Math.round(x),  // target x
-					Math.round(y), // target y
+					Math.round(y - (sprite.elevation > 0 ? (sprite.elevation + sprite.height / 2) * this.camera.zoom : 0)), // target y
 					sprite.width * this.camera.zoom, // target width
 					sprite.height * this.camera.zoom // target height
 				);
