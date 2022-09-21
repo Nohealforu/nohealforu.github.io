@@ -1626,7 +1626,6 @@ var dungeonMap = {
     data: null,
     mapTileAtlas: null,
 	tileAtlasImage: null,
-	tileAtlasRoomImage: null,
 	loadRooms: true,
 	showRooms: false,
 	overworldMap: false,
@@ -2035,7 +2034,7 @@ Game.load = function () {
 Game.init = function () {
     Keyboard.listenForEvents(
         [Keyboard.LEFT, Keyboard.RIGHT, Keyboard.UP, Keyboard.DOWN]);
-    overworldMap.tileAtlasImage = Loader.getImage('overworld');
+    overworldMap.tileAtlasImage[0] = Loader.getImage('overworld');
     overworldMap.data = Loader.getMapData('overworld');
     console.log("INIT Overworldmap Data Length: " + overworldMap.data.length);
     this.camera = new Camera(0, 0, defaultWidth, defaultHeight, 2);
@@ -2144,8 +2143,8 @@ Game.checkForTeleport = function (tileX, tileY)
 				if(!warp)
 					dungeonInfo.storeWarpInformation(new teleportEntry('StoredWarp', this.currentMap.overworldMap ? 'WorldMap' : this.currentDungeon.mapDataName, tileX, tileY));
 				this.currentDungeon = dungeonInfo;
-				dungeonMap.tileAtlasImage = Loader.getImage(dungeonInfo.tileAtlasImageName);
-				dungeonMap.tileAtlasRoomImage = Loader.getImage(dungeonInfo.tileAtlasRoomImageName);
+				dungeonMap.tileAtlasImage[0] = Loader.getImage(dungeonInfo.tileAtlasImageName);
+				dungeonMap.tileAtlasImage[1] = Loader.getImage(dungeonInfo.tileAtlasRoomImageName);
 				dungeonMap.data = Loader.getMapData(dungeonInfo.mapDataName);
 				dungeonMap.mapTileAtlas = dungeonInfo.mapTileAtlas;
 				this.currentMap = dungeonMap;
@@ -2157,40 +2156,25 @@ Game.checkForTeleport = function (tileX, tileY)
 }
 
 Game._loadCells = function (map) {
-    for(let mapX = 0; mapX < map.cols; mapX++){
-        for(let mapY = 0; mapY < map.rows; mapY++){
-            let mapIndex = mapX + mapY * map.cols;
-			let cellCanvas = document.createElement('canvas');
-			cellCanvas.width = map.cells.cols * map.cells.tsize;
-			cellCanvas.height = map.cells.rows * map.cells.tsize;
-			let context = cellCanvas.getContext('2d')
-			let cellCanvasRooms;
-			for (let c = 0; c <= map.cells.cols; c++) {
-				for (let r = 0; r <= map.cells.rows; r++) {
-					let tile = map.getTile(mapX, mapY, c, r);
-					let x = c * map.cells.tsize;
-					let y = r * map.cells.tsize;
-					let tileRow = Math.floor(tile / 16);
-					let tileCol = tile % 16;
-					context.drawImage(
-						map.tileAtlasImage, // image
-						tileCol * map.cells.tsize, // source x
-						tileRow * map.cells.tsize, // source y
-						map.cells.tsize, // source width
-						map.cells.tsize, // source height
-						x,  // target x
-						y, // target y
-						map.cells.tsize, // target width
-						map.cells.tsize // target height
-					);
-					if(map.loadRooms)
-					{
-						cellCanvasRooms = document.createElement('canvas');
-						cellCanvasRooms.width = map.cells.cols * map.cells.tsize;
-						cellCanvasRooms.height = map.cells.rows * map.cells.tsize;
-						let contextRooms = cellCanvasRooms.getContext('2d')
-						contextRooms.drawImage(
-							map.tileAtlasRoomImage, // image
+	for(let mapVariants = 0; mapVariants < map.loadRooms ? 2 : 1; mapVariants++)
+	{
+		for(let mapX = 0; mapX < map.cols; mapX++){
+			for(let mapY = 0; mapY < map.rows; mapY++){
+				let mapIndex = mapX + mapY * map.cols + map.cols * map.rows * mapVariants;
+				let cellCanvas = document.createElement('canvas');
+				cellCanvas.width = map.cells.cols * map.cells.tsize;
+				cellCanvas.height = map.cells.rows * map.cells.tsize;
+				let context = cellCanvas.getContext('2d')
+				let cellCanvasRooms;
+				for (let c = 0; c <= map.cells.cols; c++) {
+					for (let r = 0; r <= map.cells.rows; r++) {
+						let tile = map.getTile(mapX, mapY, c, r);
+						let x = c * map.cells.tsize;
+						let y = r * map.cells.tsize;
+						let tileRow = Math.floor(tile / 16);
+						let tileCol = tile % 16;
+						context.drawImage(
+							map.tileAtlasImage[mapVariants]// image
 							tileCol * map.cells.tsize, // source x
 							tileRow * map.cells.tsize, // source y
 							map.cells.tsize, // source width
@@ -2202,12 +2186,10 @@ Game._loadCells = function (map) {
 						);
 					}
 				}
+				map.cells.bitmapData[mapIndex] = cellCanvas;
 			}
-			map.cells.bitmapData[mapIndex] = cellCanvas;
-			if(map.loadRooms)
-				map.cells.bitmapDataRooms[mapIndex] = cellCanvasRooms;
-        }
-    }
+		}
+	}
 };
 
 Game._drawMap = function (map) {
@@ -2226,9 +2208,9 @@ Game._drawMap = function (map) {
         for (let r = startRow; r <= endRow; r++) {
             let x = (c - startCol) * displayTsize + offsetX;
             let y = (r - startRow) * displayTsize + offsetY;
-            let mapIndex = (c < 0 ? c + map.cols : c >= map.cols ? c - map.cols : c) + (r < 0 ? r + map.rows : r >= map.rows ? r - map.rows : r) * map.cols;
+            let mapIndex = (c < 0 ? c + map.cols : c >= map.cols ? c - map.cols : c) + (r < 0 ? r + map.rows : r >= map.rows ? r - map.rows : r) * map.cols + (map.loadRooms && map.showRooms ? map.rows * map.cols: 0);
             context.drawImage(
-                map.loadRooms && map.showRooms ? map.cells.bitmapDataRooms[mapIndex] : map.cells.bitmapData[mapIndex], // image
+                map.cells.bitmapData[mapIndex], // image
                 0, // source x
                 0, // source y
                 map.tsize, // source width
