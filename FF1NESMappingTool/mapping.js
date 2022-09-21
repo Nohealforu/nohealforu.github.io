@@ -1935,6 +1935,7 @@ Game.load = function () {
 		Loader.loadImage('tiles_titan', 'Assets/DungeonTiles/Titan.png'),
 		Loader.loadImage('tiles_titanroom', 'Assets/DungeonTiles/TitanRoom.png'),
 		Loader.loadImage('tiles_town', 'Assets/DungeonTiles/Town.png'),
+		Loader.loadImage('tiles_townroom', 'Assets/DungeonTiles/Town.png'),
 		Loader.loadImage('tiles_volcano1', 'Assets/DungeonTiles/Volcano1.png'),
 		Loader.loadImage('tiles_volcano1room', 'Assets/DungeonTiles/Volcano1Room.png'),
 		Loader.loadImage('tiles_volcano2', 'Assets/DungeonTiles/Volcano2.png'),
