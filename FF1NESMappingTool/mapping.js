@@ -2144,7 +2144,7 @@ function Controller(controllerImage, effectImage)
 	this.context.addEventListener("touchend", this.touchHandler);
 }
 
-function Controller.prototype.touchHander = function(e)
+Controller.prototype.touchHandler = function(e)
 {
 	this.activeTouchedButtons = {[Keyboard.LEFT]: false, 
 								 [Keyboard.RIGHT]: false,
@@ -2172,7 +2172,7 @@ function Controller.prototype.touchHander = function(e)
 			}
 		}
 	}
-}
+};
 
 
 Controller.prototype.isDown = function (keyCode) {
