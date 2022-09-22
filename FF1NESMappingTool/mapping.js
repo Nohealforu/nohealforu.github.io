@@ -19,12 +19,13 @@ const teleportEntryRequirement = {
 	Orbs: 4
 };
 
-function teleportEntry(name, targetMap, x, y, requirement = teleportEntryRequirement.None){
+function teleportEntry(name, targetMap, x, y, requirement = teleportEntryRequirement.None, roomState){
 	this.name = name;
 	this.targetMap = targetMap;
 	this.gridX = x;
 	this.gridY = y;
 	this.requirement = requirement;
+	this.roomState = roomState;
 }
 
 function worldMapTile(walk = false, ship = false, canoe = false, teleport = null, fight = worldMapTileFight.None, landAirship = false, dockShip = false, caravan = false, raiseAirship = false){
@@ -1327,11 +1328,12 @@ function DungeonInfo(label, mapTileAtlas, tileAtlasImageName, tileAtlasRoomImage
 	this.mapDataName = mapDataName;
 	this.exitInformation = exitInformation;
 	this.label = label;
+	this.warpInformation = [];
 }
 
 DungeonInfo.prototype.storeWarpInformation = function (teleportEntry, roomState = null)
 {
-	this.warpInformation = teleportEntry;
+	this.warpInformation.push(teleportEntry);
 	this.warpRoomState = roomState;
 }
 
@@ -2117,7 +2119,7 @@ Game.handleWarp = function()
 {
 	if(this.currentMap.overworldMap)
 		return;
-	let teleport = this.currentDungeon.warpInformation;
+	let teleport = this.currentDungeon.warpInformation.pop();
 	let warp = true;
 	this.handleTeleport(warp, teleport);
     this.camera.followPlayer(this.currentMap, this.player);
@@ -2132,9 +2134,9 @@ Game.handleExit = function()
 	let warp = true;
 	let recursions = 0;
 	if(teleport.targetMap == 'WARP')
-		teleport = this.currentDungeon.warpInformation;
+		teleport = this.currentDungeon.warpInformation.pop();
 	while(teleport.targetMap != 'WorldMap' && recursions++ < 20)
-		teleport = dungeons[teleport.targetMap].warpInformation;
+		teleport = dungeons[teleport.targetMap].warpInformation.pop();
 	if(teleport.targetMap != 'WorldMap') // failed exit
 		return;
 	this.handleTeleport(warp, teleport);
@@ -2412,7 +2414,7 @@ Game.checkForTeleport = function (tileX, tileY)
 		{
 			let warp = teleport.targetMap == 'WARP';
 			if(warp)
-				teleport = this.currentDungeon.warpInformation;
+				teleport = this.currentDungeon.warpInformation.pop();
 			this.handleTeleport(warp, teleport, tileX, tileY);
 		}
 	}
@@ -2428,9 +2430,9 @@ Game.handleTeleport = function (warp, teleport, sourceX = 0, sourceY = 0)
 	{
 		let dungeonInfo = dungeons[teleport.targetMap];
 		if(!warp)
-			dungeonInfo.storeWarpInformation(new teleportEntry('StoredWarp', this.currentMap.overworldMap ? 'WorldMap' : this.currentDungeon.mapDataName, sourceX, sourceY), this.currentMap.overworldMap ? null : this.currentMap.showRooms);
+			dungeonInfo.storeWarpInformation(new teleportEntry('StoredWarp', this.currentMap.overworldMap ? 'WorldMap' : this.currentDungeon.mapDataName, sourceX, sourceY, teleportEntryRequirement.None, this.currentMap.overworldMap ? null : this.currentMap.showRooms));
 		else
-			dungeonMap.showRooms = this.currentDungeon.warpRoomState;
+			dungeonMap.showRooms = this.teleport.roomState;
 		this.currentDungeon = dungeonInfo;
 		dungeonMap.tileAtlasImage[0] = Loader.getImage(dungeonInfo.tileAtlasImageName);
 		dungeonMap.tileAtlasImage[1] = Loader.getImage(dungeonInfo.tileAtlasRoomImageName);
