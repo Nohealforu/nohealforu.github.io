@@ -2146,30 +2146,29 @@ function Controller(controllerImage, effectImage)
 
 Controller.prototype.touchHandler = function(e)
 {
-	this.activeTouchedButtons = {[Keyboard.LEFT]: false, 
+	Game.controller.activeTouchedButtons = {[Keyboard.LEFT]: false, 
 								 [Keyboard.RIGHT]: false,
 								 [Keyboard.UP]: false,
 								 [Keyboard.DOWN]: false,
 								 [Keyboard.action]: false,
 								};
-	this.activeTouchEvents = [];
+	Game.controller.activeTouchEvents = [];
 	if(e.touches)
 	{
-		this.canvas = document.getElementById('controller');
-		document.getElementById('touchTest').innerHTML = ('pageX: ' + e.touches[0].pageX + ', pageY: ' + e.touches[0].pageY + ', offsetX: ' + this.canvas.offsetLeft + ', offsetY: ' + this.canvas.offsetTop);
+		document.getElementById('touchTest').innerHTML = ('pageX: ' + e.touches[0].pageX + ', pageY: ' + e.touches[0].pageY + ', offsetX: ' + Game.controller.canvas.offsetLeft + ', offsetY: ' + Game.controller.canvas.offsetTop);
 		for(let i = 0; i < e.touches.length; i++)
 		{
 			let touch = e.touches[i];
-			let relX = touch.pageX - this.canvas.offsetLeft;
-			let relY = touch.pageY - this.canvas.offsetTop;
-			for(let j = 0; j < this.touchButtonBoxes.length; j++)
+			let relX = touch.pageX - Game.controller.canvas.offsetLeft;
+			let relY = touch.pageY - Game.controller.canvas.offsetTop;
+			for(let j = 0; j < Game.controller.touchButtonBoxes.length; j++)
 			{
-				let touchButtonBox = this.touchButtonBoxes[j];
+				let touchButtonBox = Game.controller.touchButtonBoxes[j];
 				if(touchButtonBox.x - touch.radiusX / 2 < relX && relX < touchButtonBox.x2 + touch.radiusX / 2 &&
 				   touchButtonBox.y - touch.radiusY / 2 < relY && relY < touchButtonBox.y2 + touch.radiusY / 2)
 				{
-					this.activeTouchedButtons[touchButtonBox.keyPress] = true;
-					this.activeTouchEvents.push(touch);
+					Game.controller.activeTouchedButtons[touchButtonBox.keyPress] = true;
+					Game.controller.activeTouchEvents.push(touch);
 				}
 			}
 		}
