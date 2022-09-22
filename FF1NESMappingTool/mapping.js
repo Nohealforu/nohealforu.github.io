@@ -2138,10 +2138,10 @@ function Controller(controllerImage, effectImage)
 		new touchButtonBox(Keyboard.DOWN, 80, 165, 120, 205), 
 		new touchButtonBox(Keyboard.action, 474, 144, 544, 213), 
 	];
-	window.addEventListener("touchstart", this.touchHandler);
-	window.addEventListener("touchmove", this.touchHandler);
-	window.addEventListener("touchcancel", this.touchHandler);
-	window.addEventListener("touchend", this.touchHandler);
+	document.addEventListener("touchstart", this.touchHandler);
+	document.addEventListener("touchmove", this.touchHandler);
+	document.addEventListener("touchcancel", this.touchHandler);
+	document.addEventListener("touchend", this.touchHandler);
 }
 
 Controller.prototype.touchHandler = function(e)
