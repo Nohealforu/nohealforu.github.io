@@ -2725,8 +2725,8 @@ Game._drawTransition = function(percentComplete)
 {
 	let transitionHeight = defaultHeight / 2 * percentComplete;
 	this.ctx.fillStyle = 'black';
-	this.ctx.fillRectange(0, 0, defaultWidth, transitionHeight);
-	this.ctx.fillRectange(0, defaultHeight - transitionHeight, defaultWidth, transitionHeight);
+	this.ctx.fillRect(0, 0, defaultWidth, transitionHeight);
+	this.ctx.fillRect(0, defaultHeight - transitionHeight, defaultWidth, transitionHeight);
 };
 
 Game.render = function () {
