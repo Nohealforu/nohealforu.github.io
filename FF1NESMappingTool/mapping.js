@@ -1700,8 +1700,8 @@ function Camera(startX, startY, width, height, zoom) {
 }
 
 Camera.prototype.followPlayer = function (map, player) {
-    this.x = (player.gridX * map.cells.tsize + player.offsetX) * this.zoom;
-    this.y = (player.gridY * map.cells.tsize + player.offsetY - Game.airship.elevation) * this.zoom;
+    this.x = (player.gridX * map.cells.tsize + player.offsetX + map.cells.tsize / 2) * this.zoom;
+    this.y = (player.gridY * map.cells.tsize + player.offsetY - Game.airship.elevation + map.cells.tsize / 2) * this.zoom;
 };
 
 const Directions = {
