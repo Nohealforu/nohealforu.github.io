@@ -2589,6 +2589,7 @@ Game.handleTeleport = function (warp, teleport, sourceX = 0, sourceY = 0)
 		dungeonMap.data = Loader.getMapData(dungeonInfo.mapDataName);
 		dungeonMap.mapTileAtlas = dungeonInfo.mapTileAtlas;
 		dungeonMap.name = dungeonInfo.mapDataName;
+		this.currentMap = dungeonMap;
 		this._loadCells(dungeonMap);
 	}
 	this.player.teleportPlayer(this.currentMap, teleport.gridX, teleport.gridY);
