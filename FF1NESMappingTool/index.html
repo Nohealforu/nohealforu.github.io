@@ -11,6 +11,9 @@
 		window.addEventListener('touchstart', function() {
 			document.body.classList.add('user-is-touching');
 });
+		window.addEventListener('touchend', function() {
+			document.body.classList.remove('user-is-touching');
+});
 	</script>
 	<style> 
             #mainbox{
