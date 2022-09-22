@@ -2579,6 +2579,7 @@ Game.handleTeleport = function (warp, teleport, sourceX = 0, sourceY = 0)
 	if(teleport.targetMap == 'WorldMap')
 	{
 		this.currentMap = overworldMap;
+		dungeonMap.showRooms = false;
 	}
 	else
 	{
