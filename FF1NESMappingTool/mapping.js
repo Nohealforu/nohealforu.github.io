@@ -2155,6 +2155,7 @@ Controller.prototype.touchHandler = function(e)
 	this.activeTouchEvents = [];
 	if(e.touches)
 	{
+		document.getElementById('touchTest').innerHTML = ('pageX: ' + e.touches[0].pageX + ', pageY: ' + e.touches[0].pageY);
 		for(let i = 0; i < e.touches.length; i++)
 		{
 			let touch = e.touches[i];
