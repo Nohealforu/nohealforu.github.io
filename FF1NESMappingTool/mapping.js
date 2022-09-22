@@ -3,6 +3,9 @@
 //
 const defaultWidth = 960;
 const defaultHeight = 640;
+const controllerWidth = 612;
+const controllerHeight = 252;
+
 
 const worldMapTileFight = {
 	None: 0,
@@ -1588,12 +1591,15 @@ Game.tick = function (elapsed) {
 
     // clear previous frame
     this.ctx.clearRect(0, 0, defaultWidth, defaultHeight);
+	
 
     // compute delta time in seconds -- also cap it
     var delta = (elapsed - this._previousElapsed) / 1000.0;
     delta = Math.min(delta, 0.05); // maximum delta of 50 ms
     this._previousElapsed = elapsed;
-
+	
+	this.controller.update(delta);
+	this.controller.render();
     this.update(delta);
     this.render();
 }.bind(Game);
@@ -2096,6 +2102,114 @@ Airship.prototype.getAnimationFrame = function (frames) {
     return spriteAnimationState;
 };
 
+function touchButtonBox(keyPress, x, y, x2, y2)
+{
+	this.keyPress = keyPress;
+	this.x = x;
+	this.y = y;
+	this.x2 = x2;
+	this.y2 = y2;
+}
+
+function Controller(controllerImage, effectImage)
+{
+	this.canvas = document.getElementById('controller')
+	this.context = this.canvas.getContext('2d');
+	this.controllerImage = controllerImage;
+	this.effectImage = effectImage;
+    this.controllerCanvas = document.createElement('canvas');
+    this.controllerCanvas.width = defaultWidth;
+    this.controllerCanvas.height = defaultHeight;
+	this.controllerCanvas.getContext('2d').drawImage(this.controllerImage,0,0);
+    this.effectsCanvas = document.createElement('canvas');
+    this.effectsCanvas.width = defaultWidth;
+    this.effectsCanvas.height = defaultHeight;
+	this.activeTouchedButtons = {[Keyboard.LEFT]: false, 
+								 [Keyboard.RIGHT]: false,
+								 [Keyboard.UP]: false,
+								 [Keyboard.DOWN]: false,
+								 [Keyboard.action]: false,
+								};
+	this.activeTouchEvents = [];
+	this.touchButtonBoxes = [
+		new touchButtonBox(Keyboard.LEFT, 45, 130, 85, 170), 
+		new touchButtonBox(Keyboard.RIGHT, 120, 130, 160, 170), 
+		new touchButtonBox(Keyboard.UP, 80, 90, 120, 130), 
+		new touchButtonBox(Keyboard.DOWN, 80, 165, 120, 205), 
+		new touchButtonBox(Keyboard.action, 474, 144, 544, 213), 
+	];
+	this.context.addEventListener("touchstart", this.touchHandler);
+	this.context.addEventListener("touchmove", this.touchHandler);
+	this.context.addEventListener("touchcancel", this.touchHandler);
+	this.context.addEventListener("touchend", this.touchHandler);
+}
+
+function Controller.prototype.touchHander = function(e)
+{
+	this.activeTouchedButtons = {[Keyboard.LEFT]: false, 
+								 [Keyboard.RIGHT]: false,
+								 [Keyboard.UP]: false,
+								 [Keyboard.DOWN]: false,
+								 [Keyboard.action]: false,
+								};
+	this.activeTouchEvents = [];
+	if(e.touches)
+	{
+		for(let i = 0; i < e.touches.length; i++)
+		{
+			let touch = e.touches[i];
+			let relX = touch.pageX - this.canvas.offsetLeft;
+			let relY = touch.pageY - this.canvas.offsetTop;
+			for(let j = 0; j < this.touchButtonBoxes.length; j++)
+			{
+				let touchButtonBox = this.touchButtonBoxes[j];
+				if(touchButtonBox.x - touch.radiusX / 2 > relX && relX < touchButtonBox.x2 + touch.radiusX / 2 &&
+				   touchButtonBox.y - touch.radiusY / 2 > relY && relY < touchButtonBox.y2 + touch.radiusY / 2)
+				{
+					this.activeTouchedButtons[touchButtonBox.keyPress] = true;
+					this.activeTouchEvents.push(touch);
+				}
+			}
+		}
+	}
+}
+
+
+Controller.prototype.isDown = function (keyCode) {
+    if (!keyCode in this.activeTouchedButtons) {
+        throw new Error('Keycode ' + keyCode + ' is not being listened to');
+    }
+    return this.activeTouchedButtons[keyCode];
+};
+
+
+Controller.prototype.update = function(delta)
+{
+	let context = this.effectsCanvas.getContext('2d');
+	context.clearRect(0, 0, defaultWidth, defaultHeight);
+	if(this.activeTouchEvents.length > 0)
+	{
+		for(let i = 0; i < this.activeTouchEvents.length; i++)
+		{
+			let touch = this.activeTouchEvents[i];
+			let relX = touch.pageX - this.canvas.offsetLeft;
+			let relY = touch.pageY - this.canvas.offsetTop;
+			context.globalAlpha = touch.force;
+			context.drawImage(this.effectImage,
+							 relX - 50,
+							 relY - 50);
+		}
+	}
+	
+};
+
+Controller.prototype.render = function()
+{
+	// draw the map layers into game context
+    this.context.drawImage(this.controllerCanvas, 0, 0);
+    this.context.drawImage(this.effectsCanvas, 0, 0);
+};
+
 Game.toggleBridge = function(checkboxElement) {
 	this.bridge.active = checkboxElement.checked;
 	this._drawSprites(this.currentMap);
@@ -2154,6 +2268,8 @@ Game.load = function () {
 		Loader.loadImage('airship', 'Assets/Airship.png'),
 		Loader.loadImage('airship_shadow', 'Assets/AirshipShadow.png'),
 		Loader.loadImage('ship', 'Assets/Ship.png'),
+		Loader.loadImage('controller', 'Assets/NesController.png'),
+		Loader.loadImage('controllerTouch', 'Assets/ControllerTouch.png'),
 		Loader.loadImage('tiles_bahamut', 'Assets/DungeonTiles/Bahamut2.png'),
 		Loader.loadImage('tiles_bahamutroom', 'Assets/DungeonTiles/Bahamut2Room.png'),
 		Loader.loadImage('tiles_cardia', 'Assets/DungeonTiles/Cardia.png'),
@@ -2279,6 +2395,7 @@ Game.init = function () {
     this.frames = 0;
     this.currentMap = overworldMap;
     this.camera.followPlayer(this.currentMap, this.player);
+	this.controller = new Controller(Loader.getImage('controller'), Loader.getImage('controllerTouch'));
     
     // create a canvas
     this.layerCanvas = document.createElement('canvas');
@@ -2306,10 +2423,10 @@ Game.update = function (delta) {
     let activeMovement = false;
     let incompleteMovement = false;
 	let keyHeld = false;
-    if (Keyboard.isDown(Keyboard.LEFT)) { direction = Directions.Left; }
-    else if (Keyboard.isDown(Keyboard.RIGHT)) { direction = Directions.Right; }
-    else if (Keyboard.isDown(Keyboard.UP)) { direction = Directions.Up; }
-    else if (Keyboard.isDown(Keyboard.DOWN)) { direction = Directions.Down; }
+    if (Keyboard.isDown(Keyboard.LEFT) || this.controller.isDown(Keyboard.LEFT)) { direction = Directions.Left; }
+    else if (Keyboard.isDown(Keyboard.RIGHT) || this.controller.isDown(Keyboard.RIGHT)) { direction = Directions.Right; }
+    else if (Keyboard.isDown(Keyboard.UP) || this.controller.isDown(Keyboard.UP)) { direction = Directions.Up; }
+    else if (Keyboard.isDown(Keyboard.DOWN) || this.controller.isDown(Keyboard.DOWN)) { direction = Directions.Down; }
     
     if (direction != -1)
 	{
@@ -2324,7 +2441,7 @@ Game.update = function (delta) {
             activeMovement = false;
     }
 	
-	if(Keyboard.isDown(Keyboard.action) && this.player.allowMovement)
+	if((Keyboard.isDown(Keyboard.action) || this.controller.isDown(Keyboard.action)) && this.player.allowMovement)
 		this.handleActionButton(incompleteMovement, activeMovement);
     
     
