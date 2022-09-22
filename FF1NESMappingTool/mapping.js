@@ -2485,9 +2485,13 @@ Game.update = function (delta) {
 	if(this.player.teleporting)
 	{
 		this.teleportDuration += delta;
-		if(this.player.teleporting && !this.teleportMidpoint && this.teleportDuration >= this.teleportMaxDuration / 2)
+		if(!this.teleportMidpoint && this.teleportDuration >= this.teleportMaxDuration / 2)
 		{
 			this.midTeleport(this.teleportParams.warp, this.teleportParams.teleport, this.teleportParams.tileX, this.teleportParams.tileY);
+		}
+		else if(this.teleportMidpoint && this.teleportDuration >= this.teleportMaxDuration)
+		{
+			this.completeTeleport();
 		}
 	}
 };
