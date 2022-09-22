@@ -2486,11 +2486,6 @@ Game.update = function (delta) {
 	{
 		this.midTeleport(this.teleportParams.warp, this.teleportParams.teleport, this.teleportParams.tileX, this.teleportParams.tileY);
 	}
-}
-
-Game.midTeleport = function(warp, teleport, tileX, tileY)
-	}
-		
 };
 
 Game.handleActionButton = function(incompleteMovement, activeMovement)
