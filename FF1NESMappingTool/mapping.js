@@ -2130,6 +2130,13 @@ Game.handleExit = function()
 		return;
 	let teleport = this.currentDungeon.exitInformation;
 	let warp = true;
+	let recursions = 0;
+	if(teleport.targetMap == 'WARP')
+		teleport = this.currentDungeon.warpInformation;
+	while(teleport.targetMap != 'WorldMap' && recursions++ < 20)
+		teleport = dungeons[teleport.targetMap].warpInformation;
+	if(teleport.targetMap != 'WorldMap') // failed exit
+		return;
 	this.handleTeleport(warp, teleport);
     this.camera.followPlayer(this.currentMap, this.player);
 	this._drawMap(this.currentMap);
