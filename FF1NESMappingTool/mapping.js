@@ -2113,7 +2113,7 @@ function touchButtonBox(keyPress, x, y, x2, y2)
 
 function Controller(controllerImage, effectImage)
 {
-	this.canvas = document.getElementById('controller')
+	this.canvas = document.getElementById('controller');
 	this.context = this.canvas.getContext('2d');
 	this.controllerImage = controllerImage;
 	this.effectImage = effectImage;
