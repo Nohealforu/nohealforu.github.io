@@ -2261,7 +2261,7 @@ Game.startTeleport = function(warp, teleport, tileX = 0, tileY = 0)
 	this.player.teleporting = true;
 	this.player.allowMovement = false;
 	this.teleportDuration = 0;	
-}
+};
 
 Game.midTeleport = function(warp, teleport, tileX, tileY)
 {
@@ -2271,14 +2271,14 @@ Game.midTeleport = function(warp, teleport, tileX, tileY)
 	this.teleportMidpoint = true;
 	this._drawMap(this.currentMap);
     this._drawSprites(this.currentMap);	
-}
+};
 
 Game.completeTeleport = function()
 {
 	this.player.teleporting = false;
 	this.player.allowMovement = true;
 	this.teleportMidpoint = false;
-}
+};
 
 Game.load = function () {
     return [
