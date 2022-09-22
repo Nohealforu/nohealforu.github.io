@@ -2422,13 +2422,14 @@ Game.handleTeleport = function (warp, teleport, sourceX = 0, sourceY = 0)
 		let dungeonInfo = dungeons[teleport.targetMap];
 		if(!warp)
 			dungeonInfo.storeWarpInformation(new teleportEntry('StoredWarp', this.currentMap.overworldMap ? 'WorldMap' : this.currentDungeon.mapDataName, sourceX, sourceY), this.currentMap.overworldMap ? null : this.currentMap.showRooms);
+		else
+			dungeonMap.showRooms = dungeonInfo.warpRoomState;
 		this.currentDungeon = dungeonInfo;
 		dungeonMap.tileAtlasImage[0] = Loader.getImage(dungeonInfo.tileAtlasImageName);
 		dungeonMap.tileAtlasImage[1] = Loader.getImage(dungeonInfo.tileAtlasRoomImageName);
 		dungeonMap.data = Loader.getMapData(dungeonInfo.mapDataName);
 		dungeonMap.mapTileAtlas = dungeonInfo.mapTileAtlas;
 		dungeonMap.name = dungeonInfo.mapDataName;
-		dungeonMap.showRooms = teleport.warpRoomState;
 		this.currentMap = dungeonMap;
 		this._loadCells(dungeonMap);
 	}
