@@ -1759,6 +1759,7 @@ function Player(map, startX, startY, width, height, image, canoeImage, spriteWal
 	this.mapName = 'Overworld';
 	this.getOrbs = function(){return this.earthOrb && this.waterOrb && this.airOrb && this.fireOrb;};
 	this.allowMovement = true;
+	this.teleporting = false;
     this.moveMethod = MoveMethod.Walk;
     console.log("Creating Player At: " + this.gridX + "," + this.gridY);
     spriteList.push(this);
@@ -2236,10 +2237,7 @@ Game.handleWarp = function()
 		return;
 	let teleport = this.currentDungeon.warpInformation.pop();
 	let warp = true;
-	this.handleTeleport(warp, teleport);
-    this.camera.followPlayer(this.currentMap, this.player);
-	this._drawMap(this.currentMap);
-    this._drawSprites(this.currentMap);
+	this.startTeleport(warp, teleport);
 };
 Game.handleExit = function() 
 {
@@ -2254,11 +2252,33 @@ Game.handleExit = function()
 		teleport = dungeons[teleport.targetMap].warpInformation.pop();
 	if(teleport.targetMap != 'WorldMap') // failed exit
 		return;
-	this.handleTeleport(warp, teleport);
-    this.camera.followPlayer(this.currentMap, this.player);
-	this._drawMap(this.currentMap);
-    this._drawSprites(this.currentMap);
+	this.startTeleport(warp, teleport);
 };
+
+Game.startTeleport = function(warp, teleport, tileX = 0, tileY = 0)
+{
+	this.teleportParams = {warp: warp, teleport: teleport, tileX: tileX, tileY: tileY};
+	this.player.teleporting = true;
+	this.player.allowMovement = false;
+	this.teleportDuration = 0;	
+}
+
+Game.midTeleport = function(warp, teleport, tileX, tileY)
+{
+	this.handleTeleport(warp, teleport, tileX, tileY);
+    this.camera.followPlayer(this.currentMap, this.player);
+	this._drawTransition(1);
+	this.teleportMidpoint = true;
+	this._drawMap(this.currentMap);
+    this._drawSprites(this.currentMap);	
+}
+
+Game.completeTeleport = function()
+{
+	this.player.teleporting = false;
+	this.player.allowMovement = true;
+	this.teleportMidpoint = false;
+}
 
 Game.load = function () {
     return [
@@ -2394,6 +2414,9 @@ Game.init = function () {
     this.airship = new Airship(Loader.getImage('airship'), Loader.getImage('airship_shadow'), {[Directions.Down]:[3,2], [Directions.Up]:[1,0], [Directions.Left]:[5,4], [Directions.Right]:[7,6]});
     this.player = new Player(overworldMap, 153, 165, 16, 16, Loader.getImage('fighter'), Loader.getImage('canoe'), {[Directions.Down]:[0,7], [Directions.Up]:[1,6], [Directions.Left]:[2,3], [Directions.Right]:[5,4]}, {[Directions.Down]:[0,1], [Directions.Up]:[0,1], [Directions.Left]:[4,5], [Directions.Right]:[2,3]});
     this.frames = 0;
+	this.teleportDuration = 0;
+	this.teleportMaxDuration = 0.8;
+	this.teleportMidpoint = false;
     this.currentMap = overworldMap;
     this.camera.followPlayer(this.currentMap, this.player);
 	this.controller = new Controller(Loader.getImage('controller'), Loader.getImage('controllerTouch'));
@@ -2458,6 +2481,16 @@ Game.update = function (delta) {
         this.camera.followPlayer(this.currentMap, this.player);
         this.hasScrolled = true;
 	}
+	
+	if(this.player.teleporting && !this.teleportMidpoint && this.teleportDuration >= this.teleportMaxDuration / 2)
+	{
+		this.midTeleport(this.teleportParams.warp, this.teleportParams.teleport, this.teleportParams.tileX, this.teleportParams.tileY);
+	}
+}
+
+Game.midTeleport = function(warp, teleport, tileX, tileY)
+	}
+		
 };
 
 Game.handleActionButton = function(incompleteMovement, activeMovement)
@@ -2533,7 +2566,7 @@ Game.checkForTeleport = function (tileX, tileY)
 			let warp = teleport.targetMap == 'WARP';
 			if(warp)
 				teleport = this.currentDungeon.warpInformation.pop();
-			this.handleTeleport(warp, teleport, tileX, tileY);
+			this.startTeleport(warp, teleport, tileX, tileY);
 		}
 	}
 };
@@ -2557,7 +2590,6 @@ Game.handleTeleport = function (warp, teleport, sourceX = 0, sourceY = 0)
 		dungeonMap.data = Loader.getMapData(dungeonInfo.mapDataName);
 		dungeonMap.mapTileAtlas = dungeonInfo.mapTileAtlas;
 		dungeonMap.name = dungeonInfo.mapDataName;
-		this.currentMap = dungeonMap;
 		this._loadCells(dungeonMap);
 	}
 	this.player.teleportPlayer(this.currentMap, teleport.gridX, teleport.gridY);
@@ -2694,6 +2726,14 @@ Game._drawSprites = function (map) {
     }
 };
 
+Game._drawTransition = function(percentComplete)
+{
+	let transitionHeight = defaultHeight / 2 * percentComplete;
+	this.ctx.fillStyle = 'black';
+	this.ctx.fillRectange(0, 0, defaultWidth, transitionHeight);
+	this.ctx.fillRectange(0, defaultHeight - transitionHeight, defaultWidth, transitionHeight);
+};
+
 Game.render = function () {
     // re-draw map if there has been scroll
     if (this.hasScrolled) {
@@ -2708,4 +2748,8 @@ Game.render = function () {
     // draw the map layers into game context
     this.ctx.drawImage(this.layerCanvas, 0, 0);
     this.ctx.drawImage(this.spriteCanvas, 0, 0);
+	if(this.player.teleporting)
+	{
+		this._drawTransition(Math.abs(this.teleportMaxDuration / 2 - this.teleportDuration));
+	}
 };
