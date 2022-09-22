@@ -2482,9 +2482,13 @@ Game.update = function (delta) {
         this.hasScrolled = true;
 	}
 	
-	if(this.player.teleporting && !this.teleportMidpoint && this.teleportDuration >= this.teleportMaxDuration / 2)
+	if(this.player.teleporting)
 	{
-		this.midTeleport(this.teleportParams.warp, this.teleportParams.teleport, this.teleportParams.tileX, this.teleportParams.tileY);
+		this.teleportDuration += delta;
+		if(this.player.teleporting && !this.teleportMidpoint && this.teleportDuration >= this.teleportMaxDuration / 2)
+		{
+			this.midTeleport(this.teleportParams.warp, this.teleportParams.teleport, this.teleportParams.tileX, this.teleportParams.tileY);
+		}
 	}
 };
 
@@ -2745,6 +2749,6 @@ Game.render = function () {
     this.ctx.drawImage(this.spriteCanvas, 0, 0);
 	if(this.player.teleporting)
 	{
-		this._drawTransition(Math.abs(this.teleportMaxDuration / 2 - this.teleportDuration));
+		this._drawTransition(1 - Math.abs(this.teleportMaxDuration / 2 - this.teleportDuration) / (this.teleportMaxDuration / 2));
 	}
 };
