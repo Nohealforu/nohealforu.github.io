@@ -2155,7 +2155,7 @@ Controller.prototype.touchHandler = function(e)
 	this.activeTouchEvents = [];
 	if(e.touches)
 	{
-		document.getElementById('touchTest').innerHTML = ('pageX: ' + e.touches[0].pageX + ', pageY: ' + e.touches[0].pageY);
+		document.getElementById('touchTest').innerHTML = ('pageX: ' + e.touches[0].pageX + ', pageY: ' + e.touches[0].pageY + ', offsetX: ' + this.canvas.offsetLeft + ', offsetY: ' + this.canvas.offsetTop);
 		for(let i = 0; i < e.touches.length; i++)
 		{
 			let touch = e.touches[i];
@@ -2164,8 +2164,8 @@ Controller.prototype.touchHandler = function(e)
 			for(let j = 0; j < this.touchButtonBoxes.length; j++)
 			{
 				let touchButtonBox = this.touchButtonBoxes[j];
-				if(touchButtonBox.x - touch.radiusX / 2 > relX && relX < touchButtonBox.x2 + touch.radiusX / 2 &&
-				   touchButtonBox.y - touch.radiusY / 2 > relY && relY < touchButtonBox.y2 + touch.radiusY / 2)
+				if(touchButtonBox.x - touch.radiusX / 2 < relX && relX < touchButtonBox.x2 + touch.radiusX / 2 &&
+				   touchButtonBox.y - touch.radiusY / 2 < relY && relY < touchButtonBox.y2 + touch.radiusY / 2)
 				{
 					this.activeTouchedButtons[touchButtonBox.keyPress] = true;
 					this.activeTouchEvents.push(touch);
