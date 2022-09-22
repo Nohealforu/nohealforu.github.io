@@ -2155,12 +2155,15 @@ Controller.prototype.touchHandler = function(e)
 	this.activeTouchEvents = [];
 	if(e.touches)
 	{
-		document.getElementById('touchTest').innerHTML = ('pageX: ' + e.touches[0].pageX + ', pageY: ' + e.touches[0].pageY + ', offsetX: ' + this.canvas.offsetLeft + ', offsetY: ' + this.canvas.offsetTop);
+		let rect = this.canvas.getBoundingClientRect();
+		let offsetLeft = rect.left + window.scrollX;
+		let offsetTop = rect.top + window.scrollY;
+		document.getElementById('touchTest').innerHTML = ('pageX: ' + e.touches[0].pageX + ', pageY: ' + e.touches[0].pageY + ', offsetX: ' + offsetLeft + ', offsetY: ' + offsetTop;
 		for(let i = 0; i < e.touches.length; i++)
 		{
 			let touch = e.touches[i];
-			let relX = touch.pageX - this.canvas.offsetLeft;
-			let relY = touch.pageY - this.canvas.offsetTop;
+			let relX = touch.pageX - offsetLeft;
+			let relY = touch.pageY - offsetTop;
 			for(let j = 0; j < this.touchButtonBoxes.length; j++)
 			{
 				let touchButtonBox = this.touchButtonBoxes[j];
