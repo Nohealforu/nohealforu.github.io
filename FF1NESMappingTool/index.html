@@ -17,7 +17,7 @@
                 width:25%;
             }
 		.main-footer{
-			float:left;
+			float:none;
 		}
         </style> 
 </head>
@@ -28,12 +28,12 @@
     <p>FF1 NES Mapping Tool 0.0.1</p>
 </header>
 
-<div class="main-wrapper">
+<div>
 	<div id="mainbox">
     	<canvas id="mapping" width="960" height="640"></canvas>
 		<canvas id="controller" width="612" height="252"></canvas>
 	</div>
-	<div id ="sidebox">
+	<div>
 		<div><button id="warpButton" onclick="Game.handleWarp();" type="button">Warp</button></div>
 		<div><button id="exitButton" onclick="Game.handleExit();" type="button">Exit</button></div>
 		<div>Bridge <input type="checkbox" id="bridgeCheckbox" onchange="Game.toggleBridge(this);"/></div>
