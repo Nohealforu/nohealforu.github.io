@@ -38,22 +38,21 @@
 </header>
 
 <div class="container">
-	<div class ="mainbox">
+	<div class ="mainElement">
     	<canvas id="mapping" width="960" height="640" style="min-width:960px"></canvas>
+		<canvas id="controller" width="612" height="252"></canvas>
+		<div>Controls: arrow keys move, "x" key is what I have mapped to the interacting with things at this time (enter/exit airship at this point).</div>
+		<div>If you can't move, make sure the browser window is in focus (click on it).  Customizable keybinds will be available in the future.</div>
+		<div>This controller image is also kind of touch enabled (not mouse)</div>
 	</div>
-	<div class="sidebox">
+	<div class="sideElement">
 		<div><button id="warpButton" onclick="Game.handleWarp();" type="button">Warp</button></div>
 		<div><button id="exitButton" onclick="Game.handleExit();" type="button">Exit</button></div>
 		<div>Bridge <input type="checkbox" id="bridgeCheckbox" onchange="Game.toggleBridge(this);"/></div>
 		<div>Canoe <input type="checkbox" id="canoeCheckbox" onchange="Game.toggleCanoe(this);"/></div>
 		<div>Ship <input type="checkbox" id="shipheckbox" onchange="Game.toggleShip(this);"/></div>
 		<div>Airship <input type="checkbox" id="airshipCheckbox" onchange="Game.toggleAirship(this);"/></div>
-		<div>Controls: arrow keys move, "x" key is what I have mapped to the interacting with things at this time (enter/exit airship at this point).</div>
-		<div>If you can't move, make sure the browser window is in focus (click on it).  Customizable keybinds will be available in the future.</div>
 		<div id="touchTest"><br/></div>
-	</div>
-	<div class="mainbox">
-		<canvas id="controller" width="612" height="252"></canvas>
 	</div>
     <footer class="main-footer">
         <div>Source code on <a href="https://github.com/Nohealforu/noealforu.github.io/" target="_top">the Github repository</a>.</div>
