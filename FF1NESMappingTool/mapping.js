@@ -2423,7 +2423,7 @@ Game.handleTeleport = function (warp, teleport, sourceX = 0, sourceY = 0)
 		if(!warp)
 			dungeonInfo.storeWarpInformation(new teleportEntry('StoredWarp', this.currentMap.overworldMap ? 'WorldMap' : this.currentDungeon.mapDataName, sourceX, sourceY), this.currentMap.overworldMap ? null : this.currentMap.showRooms);
 		else
-			dungeonMap.showRooms = dungeonInfo.warpRoomState;
+			dungeonMap.showRooms = this.currentDungeon.warpRoomState;
 		this.currentDungeon = dungeonInfo;
 		dungeonMap.tileAtlasImage[0] = Loader.getImage(dungeonInfo.tileAtlasImageName);
 		dungeonMap.tileAtlasImage[1] = Loader.getImage(dungeonInfo.tileAtlasRoomImageName);
