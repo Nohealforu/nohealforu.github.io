@@ -1721,6 +1721,7 @@ function Player(map, startX, startY, width, height, image, canoeImage, spriteWal
     this.gridY = startY;
     this.offsetX = 0;
     this.offsetY = 0;
+	this.gridOffsetY = 3;
     this.width = width;
     this.height = height;
     this.maxX = map.maxCol;
@@ -2556,7 +2557,7 @@ Game._drawSprites = function (map) {
 					spriteAnimationState.width, // source width
 					sprite.height, // source height
 					Math.round(x),  // target x
-					Math.round(y - (sprite.elevation > 0 ? (sprite.elevation) * this.camera.zoom : 0)), // target y
+					Math.round(y - (sprite.gridOffsetY != undefined ? sprite.gridOffsetY * this.camera.zoom : 0) - (sprite.elevation > 0 ? sprite.elevation * this.camera.zoom : 0)), // target y
 					sprite.width * this.camera.zoom, // target width
 					sprite.height * this.camera.zoom // target height
 				);
