@@ -15,12 +15,13 @@
 				padding-bottom:10px;
 				display:inline-block;
 			}
-            .mainElement{
+            .container > .mainElement{
                 float:left; 
                 width:75%;
             }
-            .sideElement{
+            .container > .sideElement{
                 float:left;
+    			min-width:200px;
                 width:25%;
             }
 		.main-footer{
@@ -38,7 +39,7 @@
 
 <div class="container">
 	<div class ="mainbox">
-    	<canvas id="mapping" width="960" height="640"></canvas>
+    	<canvas id="mapping" width="960" height="640" style="min-width:960px"></canvas>
 	</div>
 	<div class="sidebox">
 		<div><button id="warpButton" onclick="Game.handleWarp();" type="button">Warp</button></div>
