@@ -42,12 +42,13 @@
 			<div><br/></div>
 			<canvas id="controller" width="612" height="252" style="vertical-align: top;"></canvas>
 			<div class="sideElement">
+				<div>MoveSpeed <input type="range" min="0" default="0.25" max="1" onchange="Game.handleMovementSpeedChange(this);" /></div>
 				<div><button id="warpButton" onclick="Game.handleWarp();" type="button">Warp</button></div>
 				<div><button id="exitButton" onclick="Game.handleExit();" type="button">Exit</button></div>
-				<div>Bridge <input type="checkbox" id="bridgeCheckbox" onchange="Game.toggleBridge(this);"/></div>
-				<div>Canoe <input type="checkbox" id="canoeCheckbox" onchange="Game.toggleCanoe(this);"/></div>
-				<div>Ship <input type="checkbox" id="shipheckbox" onchange="Game.toggleShip(this);"/></div>
-				<div>Airship <input type="checkbox" id="airshipCheckbox" onchange="Game.toggleAirship(this);"/></div>
+				<div>Bridge <input type="checkbox" id="bridgeCheckbox" onchange="Game.toggleBridge(this);" /></div>
+				<div>Canoe <input type="checkbox" id="canoeCheckbox" onchange="Game.toggleCanoe(this);" /></div>
+				<div>Ship <input type="checkbox" id="shipheckbox" onchange="Game.toggleShip(this);" /></div>
+				<div>Airship <input type="checkbox" id="airshipCheckbox" onchange="Game.toggleAirship(this);" /></div>
 				<div id="touchTest"><br/></div>
 			</div>
 			<div id="encounterInformation" class="sideElement"></div>
