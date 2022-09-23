@@ -1946,10 +1946,15 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
 	if(movingChecks)
 	{
 		if(this.moveMethod == MoveMethod.Canoe && !this.drawCanoe)
+		{
 			this.enteringRiver = true;
+			this.ignoreEncounter = true;
+		}
 		else if(this.moveMethod == MoveMethod.Walk && this.drawCanoe)
+		{
 			this.drawCanoe = false;
-		this.ignoreEncounter
+			this.ignoreEncounter = true;
+		}
 	}
 	
 	if(this.gridX != previousGridX || this.gridY != previousGridY)
@@ -1957,7 +1962,10 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
 		if(this.moveMethod == MoveMethod.Walk || this.moveMethod == MoveMethod.Canoe)
 			Game.checkForTeleport(this.gridX, this.gridY);
 		if((this.moveMethod == MoveMethod.Walk || this.moveMethod == MoveMethod.Canoe) && Game.currentMap.overworldMap && Game.ship.active == true && Game.ship.gridX == this.gridX && Game.ship.gridY == this.gridY)
+		{
 			Game.ship.board(this);
+			this.ignoreEncounter = true;
+		}
 		if(this.queueAirshipBoard)
 			Game.airship.board(this);
 		else if(!keyHeld && this.queueAirshipUnboard)
@@ -1967,6 +1975,18 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
 			this.drawCanoe = true;
 			this.enteringRiver = false;
 		}
+		
+		if(!this.ignoreEncounter)
+		{
+			let tileData = Game.currentMap.getTileData(this.gridX, this.gridY);
+			if(this.moveMethod == MoveMethod.Walk && tileData.fight == worldMapTileFight.Fight)
+				Game.incrementStepCounter();
+			else if(this.moveMethod == MoveMethod.Canoe && tileData.fight == worldMapTileFight.FightRiver)
+				Game.incrementStepCounter();
+			else if(this.moveMethod == MoveMethod.Ship && tileData.fight == worldMapTileFight.FightOcean)
+				Game.incrementStepCounter();
+		}
+		this.ignoreEncounter = false;
 	}
 };
 
@@ -2463,6 +2483,9 @@ Game.init = function () {
 	this.teleportMidpoint = false;
 	this.stepCounter1 = 0xFF;
 	this.stepCounter2 = 0xFF;
+	this.encounterChance = 0x45;
+	this.encounterNumber = 0;
+	this.encounterGroup = 0;
     this.currentMap = overworldMap;
     this.camera.followPlayer(this.currentMap, this.player);
 	this.controller = new Controller(Loader.getImage('controller'), Loader.getImage('controllerTouch'));
@@ -2579,15 +2602,32 @@ Game.incrementStepCounter = function()
 	if(this.stepCounter2 < 0x80)
 		this.stepCounter1++;
 	else
-		this.step1--;
-	if(stepCounter1 < 0)
-		stepCounter1 += 0x100;
-	else if(stepCounter1 > 0xFF)
-		stepCounter1 -= 0x100;
-	if(stepCounter1 == 0)
-		stepCounter2 += 0xA0;
-	if(stepCounter2 > 0xFF)
-		stepCounter2 -= 0x100;
+		this.stepCounter1--;
+	if(this.stepCounter1 < 0)
+		this.stepCounter1 += 0x100;
+	else if(this.stepCounter1 > 0xFF)
+		this.stepCounter1 -= 0x100;
+	if(this.stepCounter1 == 0)
+		this.stepCounter2 += 0xA0;
+	if(this.stepCounter2 > 0xFF)
+		this.stepCounter2 -= 0x100;
+	this.encounterChance = encounterChanceTable[this.stepCounter1];
+	let encounterThreshold == (this.player.moveMethod == MoveMethod.Ship ? 3 : this.currentMap.encounterThreshold);
+	if(this.encounterChance < this.encounterThreshold)
+	{
+		this.encounterGroup = encounterGroupTable[this.encounterNumber];
+		this.encounterNumber++;
+		if(this.encounterNumber > 255)
+			this.encounterNumber -= 256;
+	}
+	document.getElementById('encounterInformation').innerHTML = 
+		('step1: ' + this.stepCounter1 + 
+		 '<br/>step2: ' + this.stepCounter2 + 
+		 '<br/>encounter: ' + this.encounterNumber + 
+		 '<br/>chance: ' + this.encounterChance + 
+		 '<br/>threshold: ' + this.encounterThreshold + 
+		 '<br/>encounterNumber: ' + this.encounterNumber
+		);
 };
 
 Game.checkForRoomFlags = function (tileX, tileY, key)
