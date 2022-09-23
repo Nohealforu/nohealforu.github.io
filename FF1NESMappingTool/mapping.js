@@ -1978,10 +1978,7 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
 			this.enteringRiver = false;
 		}
 		if((this.moveMethod == MoveMethod.Walk || this.moveMethod == MoveMethod.Canoe) && Game.currentMap.overworldMap && Game.ship.active == true && Game.ship.gridX == previousGridX && Game.ship.gridY == previousGridY)
-		{
-			Game.ship.board(this);
 			this.ignoreEncounter = true;
-		}
 		
 		if(!this.ignoreEncounter)
 		{
