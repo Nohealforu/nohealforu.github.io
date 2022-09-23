@@ -2625,7 +2625,7 @@ Game.incrementStepCounter = function()
 		 '<br/>step2: ' + this.stepCounter2 + 
 		 '<br/>encounter: ' + this.encounterNumber + 
 		 '<br/>chance: ' + this.encounterChance + 
-		 '<br/>threshold: ' + this.encounterThreshold + 
+		 '<br/>threshold: ' + encounterThreshold + 
 		 '<br/>encounterNumber: ' + this.encounterNumber
 		);
 };
