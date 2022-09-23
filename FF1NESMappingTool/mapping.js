@@ -1879,7 +1879,7 @@ Player.prototype.checkTargetTile = function (tileX, tileY, active)
 			this.moveMethod = MoveMethod.Walk;
 			return false;
 		}
-		else if(active && Game.currentMap.overworldMap && Game.ship.active == true && Game.ship.gridX == tileX && Game.ship.gridY == tileY)
+		else if(Game.currentMap.overworldMap && Game.ship.active == true && Game.ship.gridX == tileX && Game.ship.gridY == tileY)
 		{
 			return false;
 		}
