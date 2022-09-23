@@ -1834,7 +1834,7 @@ Player.prototype.getAnimationFrame = function (frames) {
     return spriteAnimationState;
 };
 
-Player.prototype.checkTargetTile = function (tileX, tileY)
+Player.prototype.checkTargetTile = function (tileX, tileY, active)
 {
     let tileData = Game.currentMap.getTileData(tileX, tileY);
 	if(tileData == null)
@@ -1845,7 +1845,7 @@ Player.prototype.checkTargetTile = function (tileX, tileY)
     {
 		if(Game.bridge.active == true && Game.bridge.gridX == tileX && Game.bridge.gridY == tileY)
 			return false;
-        if(tileData.canoe == true && this.canoe == true)
+        if(active && tileData.canoe == true && this.canoe == true)
         { // Need special treatment entering/leaving river tile itself, (doesn't count to encounters, don't display canoe unless sitting or moving fully inside river)
             this.moveMethod = MoveMethod.Canoe;
             return false;
@@ -1859,12 +1859,12 @@ Player.prototype.checkTargetTile = function (tileX, tileY)
     }
     else if(this.moveMethod == MoveMethod.Ship && tileData.ship == false)
     {
-        if(tileData.canoe == true && this.canoe == true)
+        if(active && tileData.canoe == true && this.canoe == true)
         {
 			Game.ship.unboard(this, true);
             return false;
         } // Build out more scenarios to ride boat, etc.
-		else if(tileData.dockShip)
+		else if(active && tileData.dockShip)
 		{
 			Game.ship.unboard(this, false);
 			return false;
@@ -1874,12 +1874,12 @@ Player.prototype.checkTargetTile = function (tileX, tileY)
     }
 	else if(this.moveMethod == MoveMethod.Canoe && tileData.canoe == false)
 	{
-		if(tileData.walk == true)
+		if(active && tileData.walk == true)
 		{
 			this.moveMethod = MoveMethod.Walk;
 			return false;
 		}
-		else if(Game.currentMap.overworldMap && Game.ship.active == true && Game.ship.gridX == tileX && Game.ship.gridY == tileY)
+		else if(active && Game.currentMap.overworldMap && Game.ship.active == true && Game.ship.gridX == tileX && Game.ship.gridY == tileY)
 		{
 			return false;
 		}
@@ -1914,7 +1914,7 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
             this.gridY += this.maxY;
         else if (this.gridY >= this.maxY)
             this.gridY -= this.maxY;
-        let targetTileInaccessible = this.checkTargetTile(this.gridX, this.gridY + polarity);
+        let targetTileInaccessible = this.checkTargetTile(this.gridX, this.gridY + polarity, active);
         // if sprite height or tile height is different, figure out how to use tile height
         if(!active && Math.abs(this.offsetY) > Math.abs(this.height) || targetTileInaccessible)
             this.offsetY = 0;
@@ -1935,7 +1935,7 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
         else if (this.gridX >= this.maxX)
             this.gridX -= this.maxX;
         let targetTileInaccessible = this.checkTargetTile(this.gridX + polarity, this.gridY);
-        if(!active && Math.abs(this.offsetX) > Math.abs(this.width) || targetTileInaccessible)
+        if(!active && Math.abs(this.offsetX) > Math.abs(this.width) || targetTileInaccessible, active)
             this.offsetX = 0;
 		if(polarity * this.offsetX > 1)
 		{
@@ -1963,7 +1963,7 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
 	{
 		if(this.moveMethod == MoveMethod.Walk || this.moveMethod == MoveMethod.Canoe)
 			Game.checkForTeleport(this.gridX, this.gridY);
-		if((this.moveMethod == MoveMethod.Walk || this.moveMethod == MoveMethod.Canoe) && Game.currentMap.overworldMap && Game.ship.active == true && Game.ship.gridX == this.gridX && Game.ship.gridY == this.gridY)
+		if(!Game.ship.unboardThisFrame && (this.moveMethod == MoveMethod.Walk || this.moveMethod == MoveMethod.Canoe) && Game.currentMap.overworldMap && Game.ship.active == true && Game.ship.gridX == this.gridX && Game.ship.gridY == this.gridY)
 		{
 			Game.ship.board(this);
 			this.ignoreEncounter = true;
@@ -1991,6 +1991,7 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
 				Game.incrementStepCounter();
 		}
 		this.ignoreEncounter = false;
+		Game.ship.unboardThisFrame = false;
 	}
 };
 
@@ -2033,6 +2034,7 @@ function Ship(image, spriteWalkFrames)
 	this.offsetX = 0;
 	this.offsetY = 0;
 	this.mapName = 'Overworld';
+	this.unboardThisFrame = false;
     spriteList.push(this);
 }
 
@@ -2058,6 +2060,7 @@ Ship.prototype.unboard = function(player, river)
 	this.offsetY = 0;
     this.gridX = player.gridX;
     this.gridY = player.gridY;
+	this.unboardThisFrame = true;
 };
 
 Ship.prototype.getAnimationFrame = function (frames) {
