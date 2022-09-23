@@ -1360,7 +1360,7 @@ new dungeonMapTile(true),
 new dungeonMapTile(true),
 ];
 
-function DungeonInfo(label, mapTileAtlas, tileAtlasImageName, tileAtlasRoomImageName, mapDataName, exitInformation)
+function DungeonInfo(label, mapTileAtlas, tileAtlasImageName, tileAtlasRoomImageName, mapDataName, exitInformation, encounterThreshold = 8)
 {
 	this.mapTileAtlas = mapTileAtlas;
 	this.tileAtlasImageName = tileAtlasImageName;
@@ -1369,6 +1369,7 @@ function DungeonInfo(label, mapTileAtlas, tileAtlasImageName, tileAtlasRoomImage
 	this.exitInformation = exitInformation;
 	this.label = label;
 	this.warpInformation = [];
+	this.encounterThreshold = encounterThreshold;
 }
 
 DungeonInfo.prototype.storeWarpInformation = function (teleportEntry, roomState = null)
@@ -1495,14 +1496,14 @@ var dungeons = {
 'SkyPalace2F': new DungeonInfo('SkyPalace2F', skyCastleMapTileAtlas, 'tiles_skycastle', 'tiles_skycastleroom', 'SkyPalace2F', new teleportEntry('SkyPalace2FExitTarget', 'WorldMap', 0xC2, 0x3B)),
 'SkyPalace3F': new DungeonInfo('SkyPalace3F', skyCastleMapTileAtlas, 'tiles_skycastle', 'tiles_skycastleroom', 'SkyPalace3F', new teleportEntry('SkyPalace3FExitTarget', 'WorldMap', 0xC2, 0x3B)),
 'SkyPalace4F': new DungeonInfo('SkyPalace4F', skyCastleMapTileAtlas, 'tiles_skycastle', 'tiles_skycastleroom', 'SkyPalace4F', new teleportEntry('SkyPalace4FExitTarget', 'WorldMap', 0xC2, 0x3B)),
-'SkyPalace5F': new DungeonInfo('SkyPalace5F', skyCastleMapTileAtlas, 'tiles_skycastle', 'tiles_skycastleroom', 'SkyPalace5F', new teleportEntry('SkyPalace5FExitTarget', 'WorldMap', 0xC2, 0x3B)),
+'SkyPalace5F': new DungeonInfo('SkyPalace5F', skyCastleMapTileAtlas, 'tiles_skycastle', 'tiles_skycastleroom', 'SkyPalace5F', new teleportEntry('SkyPalace5FExitTarget', 'WorldMap', 0xC2, 0x3B), 24),
 'FiendsTemple1F': new DungeonInfo('FiendsTemple1F', fiendsTempleMapTileAtlas, 'tiles_fiendsrevisited', 'tiles_fiendsrevisitedroom', 'FiendsTemple1F', new teleportEntry('FiendsTemple1FExitTarget', 'WARP', 0x0, 0x0)),
 'FiendsTemple2F': new DungeonInfo('FiendsTemple2F', fiendsTempleMapTileAtlas, 'tiles_fiendsrevisited', 'tiles_fiendsrevisitedroom', 'FiendsTemple2F', new teleportEntry('FiendsTemple2FExitTarget', 'WARP', 0x0, 0x0)),
 'FiendsTemple3F': new DungeonInfo('FiendsTemple3F', fiendsTempleMapTileAtlas, 'tiles_fiendsrevisited', 'tiles_fiendsrevisitedroom', 'FiendsTemple3F', new teleportEntry('FiendsTemple3FExitTarget', 'WARP', 0x0, 0x0)),
-'FiendsTempleEarth': new DungeonInfo('FiendsTempleEarth', fiendsTempleMapTileAtlas, 'tiles_fiendsrevisited', 'tiles_fiendsrevisitedroom', 'FiendsTempleEarth', new teleportEntry('FiendsTempleEarthExitTarget', 'WARP', 0x0, 0x0)),
-'FiendsTempleFire': new DungeonInfo('FiendsTempleFire', fiendsTempleMapTileAtlas, 'tiles_fiendsrevisited', 'tiles_fiendsrevisitedroom', 'FiendsTempleFire', new teleportEntry('FiendsTempleFireExitTarget', 'WARP', 0x0, 0x0)),
-'FiendsTempleWater': new DungeonInfo('FiendsTempleWater', fiendsTempleMapTileAtlas, 'tiles_fiendsrevisited', 'tiles_fiendsrevisitedroom', 'FiendsTempleWater', new teleportEntry('FiendsTempleWaterExitTarget', 'WARP', 0x0, 0x0)),
-'FiendsTempleAir': new DungeonInfo('FiendsTempleAir', fiendsTempleMapTileAtlas, 'tiles_fiendsrevisited', 'tiles_fiendsrevisitedroom', 'FiendsTempleAir', new teleportEntry('FiendsTempleAirExitTarget', 'WARP', 0x0, 0x0)),
+'FiendsTempleEarth': new DungeonInfo('FiendsTempleEarth', fiendsTempleMapTileAtlas, 'tiles_fiendsrevisited', 'tiles_fiendsrevisitedroom', 'FiendsTempleEarth', new teleportEntry('FiendsTempleEarthExitTarget', 'WARP', 0x0, 0x0), 9),
+'FiendsTempleFire': new DungeonInfo('FiendsTempleFire', fiendsTempleMapTileAtlas, 'tiles_fiendsrevisited', 'tiles_fiendsrevisitedroom', 'FiendsTempleFire', new teleportEntry('FiendsTempleFireExitTarget', 'WARP', 0x0, 0x0), 10),
+'FiendsTempleWater': new DungeonInfo('FiendsTempleWater', fiendsTempleMapTileAtlas, 'tiles_fiendsrevisited', 'tiles_fiendsrevisitedroom', 'FiendsTempleWater', new teleportEntry('FiendsTempleWaterExitTarget', 'WARP', 0x0, 0x0), 11),
+'FiendsTempleAir': new DungeonInfo('FiendsTempleAir', fiendsTempleMapTileAtlas, 'tiles_fiendsrevisited', 'tiles_fiendsrevisitedroom', 'FiendsTempleAir', new teleportEntry('FiendsTempleAirExitTarget', 'WARP', 0x0, 0x0), 12),
 'FiendsTempleChaos': new DungeonInfo('FiendsTempleChaos', fiendsTempleMapTileAtlas, 'tiles_fiendsrevisited', 'tiles_fiendsrevisitedroom', 'FiendsTempleChaos', new teleportEntry('FiendsTempleChaosExitTarget', 'WARP', 0x0, 0x0)),
 'TitanTunnel': new DungeonInfo('TitanTunnel', earthCaveMapTileAtlas, 'tiles_titan', 'tiles_titanroom', 'TitanTunnel', new teleportEntry('TitanTunnelExitTarget', 'WorldMap', 0x2A, 0xAE)),
 };
@@ -1975,6 +1976,11 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
 		{
 			this.drawCanoe = true;
 			this.enteringRiver = false;
+		}
+		if((this.moveMethod == MoveMethod.Walk || this.moveMethod == MoveMethod.Canoe) && Game.currentMap.overworldMap && Game.ship.active == true && Game.ship.gridX == previousGridX && Game.ship.gridY == previousGridY)
+		{
+			Game.ship.board(this);
+			this.ignoreEncounter = true;
 		}
 		
 		if(!this.ignoreEncounter)
@@ -2703,6 +2709,7 @@ Game.handleTeleport = function (warp, teleport, sourceX = 0, sourceY = 0)
 		dungeonMap.data = Loader.getMapData(dungeonInfo.mapDataName);
 		dungeonMap.mapTileAtlas = dungeonInfo.mapTileAtlas;
 		dungeonMap.name = dungeonInfo.mapDataName;
+		dungeonMap.encounterThreshold = dungeonInfo.encounterThreshold;
 		this.currentMap = dungeonMap;
 		this._loadCells(dungeonMap);
 	}
