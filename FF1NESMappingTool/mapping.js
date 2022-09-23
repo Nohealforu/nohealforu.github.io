@@ -1988,7 +1988,7 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
 				Game.incrementStepCounter();
 			else if(this.moveMethod == MoveMethod.Canoe && tileData.fight == worldMapTileFight.FightRiver)
 				Game.incrementStepCounter();
-			else if(this.moveMethod == MoveMethod.Ship && tileData.fight == worldMapTileFight.FightOcean)
+			else if((this.moveMethod == MoveMethod.Ship || Game.ship.unboardThisFrame) && tileData.fight == worldMapTileFight.FightOcean)
 				Game.incrementStepCounter();
 		}
 		this.ignoreEncounter = false;
