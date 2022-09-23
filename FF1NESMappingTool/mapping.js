@@ -1571,6 +1571,7 @@ Keyboard.RIGHT = 39;
 Keyboard.UP = 38;
 Keyboard.DOWN = 40;
 Keyboard.action = 88;
+Keyboard.altAction = 70;
 
 Keyboard._keys = {};
 
@@ -2473,7 +2474,7 @@ Game.load = function () {
 
 Game.init = function () {
     Keyboard.listenForEvents(
-        [Keyboard.LEFT, Keyboard.RIGHT, Keyboard.UP, Keyboard.DOWN, Keyboard.action]);
+        [Keyboard.LEFT, Keyboard.RIGHT, Keyboard.UP, Keyboard.DOWN, Keyboard.action, Keyboard.altAction]);
     overworldMap.tileAtlasImage[0] = Loader.getImage('overworld');
     overworldMap.data = Loader.getMapData('overworld');
     console.log("INIT Overworldmap Data Length: " + overworldMap.data.length);
@@ -2540,7 +2541,7 @@ Game.update = function (delta) {
             activeMovement = false;
     }
 	
-	if((Keyboard.isDown(Keyboard.action) || this.controller.isDown(Keyboard.action)) && this.player.allowMovement)
+	if((Keyboard.isDown(Keyboard.action) || Keyboard.isDown(Keyboard.altAction) || this.controller.isDown(Keyboard.action)) && this.player.allowMovement)
 		this.handleActionButton(incompleteMovement, activeMovement);
     
     
