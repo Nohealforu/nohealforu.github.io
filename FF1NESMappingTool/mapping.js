@@ -1888,13 +1888,13 @@ Player.prototype.checkTargetTile = function (tileX, tileY)
 };
 
 Player.SPEED = 200; // Raw Pixels Per Second (Unzoomed)
-Player.SEASPEED = 240;
-Player.AIRSPEED = 320;
+Player.SEASPEED = 600;
+Player.AIRSPEED = 1200;
 
 Player.prototype.move = function (delta, direction, active, keyHeld) {
 	if(this.allowMovement == false)
 		return;
-    let speed = (this.moveMethod == MoveMethod.Airship ? Player.AIRSPEED : (this.moveMethod == MoveMethod.Ship  ? Player.SEASPEED : Player.SPEED));
+    let speed = (this.moveMethod == MoveMethod.Airship ? Player.AIRSPEED : (this.moveMethod == MoveMethod.Ship  ? Player.SEASPEED : Player.SPEED)) * Game.movementSpeedFactor;
 	let previousGridX = this.gridX;
 	let previousGridY = this.gridY;
     if(active)
@@ -2295,6 +2295,11 @@ Game.toggleAirship = function(checkboxElement) {
 	this._drawSprites(this.currentMap);
 };
 
+Game.handleMovementSpeedChange = function(sliderElement)
+{
+	this.movementSpeedFactor = sliderElement.value;
+}
+
 Game.handleWarp = function() 
 {
 	if(this.currentMap.overworldMap)
@@ -2478,6 +2483,7 @@ Game.init = function () {
     this.airship = new Airship(Loader.getImage('airship'), Loader.getImage('airship_shadow'), {[Directions.Down]:[3,2], [Directions.Up]:[1,0], [Directions.Left]:[5,4], [Directions.Right]:[7,6]});
     this.player = new Player(overworldMap, 153, 165, 16, 16, Loader.getImage('fighter'), Loader.getImage('canoe'), {[Directions.Down]:[0,7], [Directions.Up]:[1,6], [Directions.Left]:[2,3], [Directions.Right]:[5,4]}, {[Directions.Down]:[0,1], [Directions.Up]:[0,1], [Directions.Left]:[4,5], [Directions.Right]:[2,3]});
     this.frames = 0;
+	this.movementSpeedFactor = 0.25;
 	this.teleportDuration = 0;
 	this.teleportMaxDuration = 0.8;
 	this.teleportMidpoint = false;
