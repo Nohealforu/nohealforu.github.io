@@ -2612,7 +2612,7 @@ Game.incrementStepCounter = function()
 	if(this.stepCounter2 > 0xFF)
 		this.stepCounter2 -= 0x100;
 	this.encounterChance = encounterChanceTable[this.stepCounter1];
-	let encounterThreshold == (this.player.moveMethod == MoveMethod.Ship ? 3 : this.currentMap.encounterThreshold);
+	let encounterThreshold = (this.player.moveMethod == MoveMethod.Ship ? 3 : this.currentMap.encounterThreshold);
 	if(this.encounterChance < this.encounterThreshold)
 	{
 		this.encounterGroup = encounterGroupTable[this.encounterNumber];
