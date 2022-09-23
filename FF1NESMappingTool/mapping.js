@@ -1888,13 +1888,13 @@ Player.prototype.checkTargetTile = function (tileX, tileY)
 };
 
 Player.SPEED = 300; // Raw Pixels Per Second (Unzoomed)
-Player.SEASPEED = 450;
+Player.SEASPEED = 500;
 Player.AIRSPEED = 800;
 
 Player.prototype.move = function (delta, direction, active, keyHeld) {
 	if(this.allowMovement == false)
 		return;
-    let speed = (this.moveMethod == MoveMethod.Airship ? Player.AIRSPEED * Math.min(Game.movementSpeedFactor * 2, 1) : (this.moveMethod == MoveMethod.Ship  ? Player.SEASPEED * Math.min(Game.movementSpeedFactor * 2, 1) : Player.SPEED * Game.movementSpeedFactor));
+    let speed = (this.moveMethod == MoveMethod.Airship ? Player.AIRSPEED * Math.min(Game.movementSpeedFactor * 1.5, 1) : (this.moveMethod == MoveMethod.Ship  ? Player.SEASPEED * Math.min(Game.movementSpeedFactor * 1.5, 1) : Player.SPEED * Game.movementSpeedFactor));
 	let previousGridX = this.gridX;
 	let previousGridY = this.gridY;
     if(active)
