@@ -1934,8 +1934,8 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
             this.gridX += this.maxX;
         else if (this.gridX >= this.maxX)
             this.gridX -= this.maxX;
-        let targetTileInaccessible = this.checkTargetTile(this.gridX + polarity, this.gridY);
-        if(!active && Math.abs(this.offsetX) > Math.abs(this.width) || targetTileInaccessible, active)
+        let targetTileInaccessible = this.checkTargetTile(this.gridX + polarity, this.gridY, active);
+        if(!active && Math.abs(this.offsetX) > Math.abs(this.width) || targetTileInaccessible)
             this.offsetX = 0;
 		if(polarity * this.offsetX > 1)
 		{
