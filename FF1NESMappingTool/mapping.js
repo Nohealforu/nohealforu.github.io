@@ -2029,7 +2029,7 @@ Player.prototype.checkTargetTile = function (tileX, tileY, active)
 		for(let i = 0; i < spriteMapList[Game.currentMap.name].length; i++)
 		{
 			let sprite = spriteMapList[Game.currentMap.name][i];
-			if(sprite.active && sprite.collision && sprite.gridX == tileX && sprite.gridY == tileY)
+			if(sprite.active && sprite.gridX == tileX && sprite.gridY == tileY)
 			{
 				return true;
 			}
