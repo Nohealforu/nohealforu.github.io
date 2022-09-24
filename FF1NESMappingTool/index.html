@@ -42,17 +42,13 @@
 			<div id="messageLog" style="height:300px;width:300px;border:1px solid #ccc;overflow:auto; float:right;">Message Log</div>
 			<div style="clear:both;"><br/></div>
 			<canvas id="controller" width="612" height="252" style="vertical-align: top;"></canvas>
-			<div class="sideElement" style="border:1px solid #ccc;">
+			<div class="sideElement" style="border:1px solid #ccc; vertical-align: top;">
 				<div>MoveSpeed <input type="range" min="10" default="25" max="100" onchange="Game.handleMovementSpeedChange(this);" /></div>
 				<div><button id="warpButton" onclick="Game.handleWarp();" type="button">Warp</button></div>
 				<div><button id="exitButton" onclick="Game.handleExit();" type="button">Exit</button></div>
-				<div>Bridge <input type="checkbox" id="bridgeCheckbox" onchange="Game.toggleBridge(this);" /></div>
-				<div>Canoe <input type="checkbox" id="canoeCheckbox" onchange="Game.toggleCanoe(this);" /></div>
-				<div>Ship <input type="checkbox" id="shipheckbox" onchange="Game.toggleShip(this);" /></div>
-				<div>Airship <input type="checkbox" id="airshipCheckbox" onchange="Game.toggleAirship(this);" /></div>
 				<div id="touchTest"><br/></div>
 			</div>
-			<div id="encounterInformation" class="sideElement" style="border:1px solid #ccc;"></div>
+			<div id="encounterInformation" class="sideElement" style="border:1px solid #ccc; vertical-align: top;"></div>
 		</div>
 		<div>Controls: arrow keys move, "x" key is what I have mapped to the interacting with things at this time (enter/exit airship at this point).</div>
 		<div>If you can't move, make sure the browser window is in focus (click on it).  Customizable keybinds will be available in the future.</div>
