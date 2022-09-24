@@ -2826,6 +2826,7 @@ Game.processEventTrigger = function (eventNumber, success)
 			let teleport = new teleportEntry('PrincessWarp', 'ConeriaCastle2F', 0xC, 0x7, teleportEntryRequirement.None, true);
 			let dungeonInfo = dungeons[teleport.targetMap];
 			dungeonInfo.storeWarpInformation(new teleportEntry('StoredWarp', 'ConeriaCastle1F', 0xC, 0x12, teleportEntryRequirement.None, false));
+			new Sprite('Rescued Princess', 'ConeriaCastle2F', 0xB, 0x5, true, 'princess', null, KeyItem.LUTE, null, false);
 			this.handleTeleport(true, teleport);
 		}
 		else if(eventNumber == EventTrigger.BRIDGE)
@@ -2870,7 +2871,10 @@ Game.handleActionButton = function(incompleteMovement, activeMovement)
 				if(results.eventTrigger != null)
 					this.processEventTrigger(results.eventTrigger, results.success);
 				if(results.success)
+				{
 					this._drawSprites(this.currentMap);
+					this.render();
+				}
 				break;
 			}
 		}
