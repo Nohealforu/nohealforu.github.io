@@ -2040,13 +2040,13 @@ Player.prototype.checkTargetTile = function (tileX, tileY, active)
 };
 
 Player.SPEED = 300; // Raw Pixels Per Second (Unzoomed)
-Player.SEASPEED = 500;
-Player.AIRSPEED = 800;
+Player.SEASPEED = 450;
+Player.AIRSPEED = 750;
 
 Player.prototype.move = function (delta, direction, active, keyHeld) {
 	if(this.allowMovement == false)
 		return;
-    let speed = (this.moveMethod == MoveMethod.Airship ? Player.AIRSPEED * Math.min(Game.movementSpeedFactor * 1.5, 1) : (this.moveMethod == MoveMethod.Ship  ? Player.SEASPEED * Math.min(Game.movementSpeedFactor * 1.5, 1) : Player.SPEED * Game.movementSpeedFactor));
+    let speed = (this.moveMethod == MoveMethod.Airship ? Player.AIRSPEED * Math.min(Game.movementSpeedFactor * 1.4, 1) : (this.moveMethod == MoveMethod.Ship  ? Player.SEASPEED * Math.min(Game.movementSpeedFactor * 1.4, 1) : Player.SPEED * Game.movementSpeedFactor));
 	let previousGridX = this.gridX;
 	let previousGridY = this.gridY;
     if(active)
@@ -2707,7 +2707,7 @@ Game.init = function () {
 		spriteMapList[dungeonNames[i]] = [];
 	this.loadSprites();
 	this.frames = 0;
-	this.movementSpeedFactor = 0.25;
+	this.movementSpeedFactor = 0.5;
 	this.teleportDuration = 0;
 	this.teleportMaxDuration = 0.8;
 	this.teleportMidpoint = false;
