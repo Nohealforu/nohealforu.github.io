@@ -126,18 +126,20 @@ const EventTrigger = {
 	PRINCESS: 0,
 	BRIDGE: 1,
 	PIRATES: 2,
-	CANAL: 3,
-	TRANSLATE: 4,
-	AIRSHIP: 5,
-	CLASSCHANGE: 6,
-	CUREELF: 7,
-	EXCALIBER: 8
+	SPAWNSHIP: 3,
+	CANAL: 4,
+	TRANSLATE: 5,
+	AIRSHIP: 6,
+	CLASSCHANGE: 7,
+	CUREELF: 8,
+	EXCALIBER: 9
 };
 
 const EventStrings = [
 	'PRINCESS',
 	'BRIDGE',
 	'PIRATES',
+	'SPAWNSHIP',
 	'CANAL',
 	'TRANSLATE',
 	'AIRSHIP',
@@ -146,7 +148,7 @@ const EventStrings = [
 	'EXCALIBER'
 ];
 
-const EventTriggerCount = 9;
+const EventTriggerCount = 10;
 
 function teleportEntry(name, targetMap, x, y, requirement = teleportEntryRequirement.None, roomState){
 	this.name = name;
@@ -2542,7 +2544,7 @@ Game.load = function () {
 		Loader.loadImage('fighter', 'Assets/Fighter.png'),
 		Loader.loadImage('canoe', 'Assets/Canoe.png'),
 		Loader.loadImage('bridge', 'Assets/Bridge.png'),
-		Loader.loadImage('bridge', 'Assets/Canal.png'),
+		Loader.loadImage('canal', 'Assets/Canal.png'),
 		Loader.loadImage('airship', 'Assets/Airship.png'),
 		Loader.loadImage('airship_shadow', 'Assets/AirshipShadow.png'),
 		Loader.loadImage('ship', 'Assets/Ship.png'),
@@ -2854,7 +2856,7 @@ Game.processEventTrigger = function (eventNumber, success)
 			let dungeonInfo = dungeons[teleport.targetMap];
 			dungeonInfo.storeWarpInformation(new teleportEntry('StoredWarp', 'ConeriaCastle1F', 0xC, 0x12, teleportEntryRequirement.None, false));
 			new Sprite('Rescued Princess', 'ConeriaCastle2F', 0xB, 0x5, true, 'princess', null, KeyItem.LUTE, null, false);
-			this.handleTeleport(true, teleport);
+			this.startTeleport(true, teleport);
 		}
 		else if(eventNumber == EventTrigger.CANAL)
 		{
@@ -2865,6 +2867,11 @@ Game.processEventTrigger = function (eventNumber, success)
 			this.bridge.active = true;
 		}
 		else if(eventNumber == EventTrigger.PIRATES)
+		{
+			new Sprite('Bikke', 'Provoka', 0x5, 0x7, false, 'bikke', 0x7e, null, EventTrigger.SPAWNSHIP, true);
+			this.ship.active = true;
+		}
+		else if(eventNumber == EventTrigger.SPAWNSHIP)
 		{
 			this.ship.active = true;
 		}
@@ -2905,10 +2912,7 @@ Game.handleActionButton = function(incompleteMovement, activeMovement)
 				if(results.eventTrigger != null)
 					this.processEventTrigger(results.eventTrigger, results.success);
 				if(results.success)
-				{
 					this._drawSprites(this.currentMap);
-					this.render();
-				}
 				break;
 			}
 		}
