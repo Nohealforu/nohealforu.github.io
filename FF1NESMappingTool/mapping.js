@@ -2861,6 +2861,9 @@ Game.handleActionButton = function(incompleteMovement, activeMovement)
 	{
 		let interactX = (this.player.direction == Directions.Left ? targetX - 1 : (this.player.direction == Directions.Right ? targetX + 1 : targetX));
 		let interactY = (this.player.direction == Directions.Up ? targetY - 1 : (this.player.direction == Directions.Down ? targetY + 1 : targetY));
+		let tileData = this.currentMap.getTileData(interactX, interactY);
+		if(tileData.loot != null && !this.player.keyItems[tileData.loot])
+			this.processItem(tileData.loot, true);
 		for(let i = 0; i < spriteMapList[this.currentMap.name].length; i++)
 		{
 			let sprite = spriteMapList[this.currentMap.name][i];
