@@ -2716,7 +2716,6 @@ Game.loadSprites = function() {
 	new Sprite('Orb of Wind', 'SkyPalace5F', 0x7, 0x5, true, 'airorb', 0x77, null, null, true);
 	new Sprite('Canoe Sage', 'CrescentLake', 0x2A, 0xA, false, 'sage', null, KeyItem.CANOE, null, false, KeyItem.EARTHORB);
 	new Sprite('Waterfall Robot', 'Waterfall', 0x11, 0x36, true, 'robot', null, KeyItem.CUBE, null, true);
-	new Sprite('Fairy', 'Gaia', 0x31, 0x13, false, 'fairy', null, KeyItem.OXYALE, null, true, KeyItem.BOTTLE);
 	new Sprite('Bahamut', 'BahamutB2', 0x15, 0x3, true, 'bahamut', null, null, EventTrigger.CLASSCHANGE, false, KeyItem.TAIL);
 	new Sprite('Submarine Engineer', 'Onrac', 0x2D, 0x1E, false, 'woman', null, null, null, true, KeyItem.OXYALE);
 	new Sprite('Dr. Unne', 'Melmond', 0x1A, 0x1, false, 'scholar', null, null, EventTrigger.TRANSLATE, false, KeyItem.SLAB);
@@ -2838,6 +2837,8 @@ Game.processItem = function (itemNumber, success)
 	{
 		this.player.keyItems[itemNumber] = true;
 		document.getElementById('messageLog').innerHTML += '<br/>Item come to hand: ' + KeyItemStrings[itemNumber];
+		if(itemNumber == KeyItem.BOTTLE)
+			new Sprite('Fairy', 'Gaia', 0x31, 0x13, false, 'fairy', null, KeyItem.OXYALE, null, true, KeyItem.BOTTLE);
 	}
 	else
 	{
