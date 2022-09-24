@@ -2145,6 +2145,8 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
 			Game.processEventTrigger(EventTrigger.AIRSHIP, true);
 		if(tileData.loot != null && !this.keyItems[tileData.loot])
 			Game.processItem(tileData.loot, true);
+		if(this.moveMethod == MoveMethod.Walk && tileData.caravan && !this.keyItems[KeyItem.BOTTLE])
+			Game.processItem(KeyItem.BOTTLE, true);
 	}
 };
 
