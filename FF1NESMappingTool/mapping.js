@@ -1982,12 +1982,15 @@ Player.prototype.checkTargetTile = function (tileX, tileY, active)
 		return true;
     if(this.moveMethod == MoveMethod.Walk && tileData.walk == false)
     {
-		for(let i = 0; i < spriteMapList[this.currentMap.name].length; i++)
+		if(!Game.currentMap.overworldMap)
 		{
-			let sprite = spriteMapList[this.currentMap.name][i];
-			if(sprite.active && sprite.collision && sprite.gridX == tileX && sprite.gridY == tileY)
+			for(let i = 0; i < spriteMapList[Game.currentMap.name].length; i++)
 			{
-				return true;
+				let sprite = spriteMapList[Game.currentMap.name][i];
+				if(sprite.active && sprite.collision && sprite.gridX == tileX && sprite.gridY == tileY)
+				{
+					return true;
+				}
 			}
 		}
 		if(Game.bridge.active == true && Game.bridge.gridX == tileX && Game.bridge.gridY == tileY)
