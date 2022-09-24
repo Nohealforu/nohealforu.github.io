@@ -1864,7 +1864,6 @@ function Sprite(name, mapName, startX, startY, room, imageName, fight, item, eve
 	this.mapName = mapName;
 	this.room = room;
 	this.triggered = false;
-	this.collision = true;
     spriteList.push(this);
 	spriteMapList[mapName].push(this);
 }
@@ -1987,10 +1986,8 @@ Player.prototype.checkTargetTile = function (tileX, tileY, active)
 			for(let i = 0; i < spriteMapList[Game.currentMap.name].length; i++)
 			{
 				let sprite = spriteMapList[Game.currentMap.name][i];
-				if(sprite.active && sprite.collision && sprite.gridX == tileX && sprite.gridY == tileY)
-				{
+				if(sprite.active && sprite.gridX == tileX && sprite.gridY == tileY)
 					return true;
-				}
 			}
 		}
 		if(Game.bridge.active == true && Game.bridge.gridX == tileX && Game.bridge.gridY == tileY)
