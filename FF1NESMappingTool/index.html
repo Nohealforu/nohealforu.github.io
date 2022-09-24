@@ -39,8 +39,8 @@
 	<div class="mainElement">
 		<div>
 			<canvas id="mapping" width="960" height="640"></canvas>
-			<div id="messageLog" class="sideElement" style="height:300px;width:300px;border:1px solid #ccc;overflow:auto;">Message Log</div>
-			<div><br/></div>
+			<div id="messageLog" style="height:300px;width:300px;border:1px solid #ccc;overflow:auto; float:right;">Message Log</div>
+			<div style="clear:both"><br/></div>
 			<canvas id="controller" width="612" height="252" style="vertical-align: top;"></canvas>
 			<div class="sideElement" style="border:1px solid #ccc;">
 				<div>MoveSpeed <input type="range" min="10" default="25" max="100" onchange="Game.handleMovementSpeedChange(this);" /></div>
