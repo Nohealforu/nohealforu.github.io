@@ -583,7 +583,7 @@ new dungeonMapTile(true, null, null, 0),//???
 new dungeonMapTile(true, null, null, dungeonMapTileFight.RNG),
 new dungeonMapTile(true, new teleportEntry('Ordeals1', 'OrdealsCastle2F', 12, 12, teleportEntryRequirement.Crown)),
 new dungeonMapTile(true, new teleportEntry('Ordeals3', 'OrdealsCastle1F', 2, 2, teleportEntryRequirement.Crown)),
-new dungeonMapTile(true, new teleportEntry('Ordeals3', 'OrdealsCastle1F', 2, 2, teleportEntryRequirement.Crown)),
+new dungeonMapTile(),
 new dungeonMapTile(),
 new dungeonMapTile(),
 new dungeonMapTile(false, null, KeyItem.TNT),
