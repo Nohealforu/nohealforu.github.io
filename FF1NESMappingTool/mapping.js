@@ -2716,11 +2716,11 @@ Game.loadSprites = function() {
 	new Sprite('Waterfall Robot', 'Waterfall', 0x11, 0x36, true, 'robot', null, KeyItem.CUBE, null, true);
 	new Sprite('Fairy', 'Gaia', 0x31, 0x13, false, 'fairy', null, KeyItem.OXYALE, null, true, KeyItem.BOTTLE);
 	new Sprite('Bahamut', 'BahamutB2', 0x15, 0x3, true, 'bahamut', null, null, EventTrigger.CLASSCHANGE, false, KeyItem.TAIL);
-	new Sprite('Submarine Engineer', 'Onrac', 0x2D, 0x1E, true, 'woman', null, null, null, true, KeyItem.OXYALE);
+	new Sprite('Submarine Engineer', 'Onrac', 0x2D, 0x1E, false, 'woman', null, null, null, true, KeyItem.OXYALE);
 	new Sprite('Dr. Unne', 'Melmond', 0x1A, 0x1, false, 'scholar', null, null, EventTrigger.TRANSLATE, false, KeyItem.SLAB);
 	new Sprite('Chime Guy', 'Leifen', 0x18, 0x15, false, 'chimeguy', null, KeyItem.CHIME, null, false, null, EventTrigger.TRANSLATE);
 	new Sprite('Fiends Plate', 'FiendsTemple3F', 0x14, 0x10, true, 'fiendplate', null, null, null, true, KeyItem.LUTE);
-	new Sprite('Chaos', 'FiendsTemple3F', 0x14, 0x10, true, 'garland', null, null, null, true, KeyItem.LUTE);
+	new Sprite('Chaos', 'FiendsTempleChaos', 0xF, 0x11, true, 'garland', 0x7b, null, null, true);
 };
 
 Game.init = function () {
