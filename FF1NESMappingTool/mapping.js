@@ -2940,7 +2940,7 @@ Game.incrementStepCounter = function()
 	document.getElementById('encounterInformation').innerHTML = 
 		('step1: ' + this.stepCounter1 + 
 		 '<br/>step2: ' + this.stepCounter2 + 
-		 '<br/>encounter: ' + this.encounterNumber + 
+		 '<br/>encounterGroup: ' + this.encounterGroup + 
 		 '<br/>chance: ' + this.encounterChance + 
 		 '<br/>threshold: ' + encounterThreshold + 
 		 '<br/>encounterNumber: ' + this.encounterNumber
