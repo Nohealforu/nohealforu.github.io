@@ -2673,6 +2673,21 @@ Game.handlePathReset = function()
 	this.currentStepPath.checkpoint.loadCheckpoint(this.player, ResetType.Path);
 };
 
+Game.handleSoftReset = function() 
+{
+	this.saveCheckpoint.loadCheckpoint(this.player, ResetType.Soft);
+};
+
+Game.handleHardReset = function() 
+{
+	this.saveCheckpoint.loadCheckpoint(this.player, ResetType.Hard);
+};
+
+Game.handleSave = function() 
+{
+	this.saveCheckpoint = Game.createCheckpoint(this.player);
+};
+
 Game.toggleBridge = function(checkboxElement) {
 	this.bridge.active = checkboxElement.checked;
 	this.player.eventsTriggered[EventTrigger.BRIDGE] = checkboxElement.checked;
@@ -2960,6 +2975,7 @@ Game.init = function () {
     this.camera.followPlayer(this.currentMap, this.player);
 	this.stepPaths = [];
 	this.currentStepPath = new StepPath(this.currentMap, Game.createCheckpoint(this.player));
+	this.saveCheckpoint = Game.createCheckpoint(this.player);
 	this.currentPathLocations = [new PathLocation(0x99, 0xA5)];
 	this.currentTileLocationEvents = [];
     
