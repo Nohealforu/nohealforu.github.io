@@ -1981,15 +1981,6 @@ Player.prototype.checkTargetTile = function (tileX, tileY, active)
 		return true;
     if(this.moveMethod == MoveMethod.Walk && tileData.walk == false)
     {
-		if(!Game.currentMap.overworldMap)
-		{
-			for(let i = 0; i < spriteMapList[Game.currentMap.name].length; i++)
-			{
-				let sprite = spriteMapList[Game.currentMap.name][i];
-				if(sprite.active && sprite.gridX == tileX && sprite.gridY == tileY)
-					return true;
-			}
-		}
 		if(Game.bridge.active == true && Game.bridge.gridX == tileX && Game.bridge.gridY == tileY)
 			return false;
         if(active && tileData.canoe == true && this.keyItems[KeyIte.CANOE] == true)
@@ -2032,6 +2023,18 @@ Player.prototype.checkTargetTile = function (tileX, tileY, active)
 		}
 		else
 			return true;
+	}
+	else if(this.moveMethod == MoveMethod.Walk && !Game.currentMap.overworldMap)
+	{
+		for(let i = 0; i < spriteMapList[Game.currentMap.name].length; i++)
+		{
+			let sprite = spriteMapList[Game.currentMap.name][i];
+			if(sprite.active && sprite.collision && sprite.gridX == tileX && sprite.gridY == tileY)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
     return false;
 };
