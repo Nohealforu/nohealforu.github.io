@@ -150,6 +150,19 @@ const EventStrings = [
 
 const EventTriggerCount = 10;
 
+const ResetType = {
+	Path: 1,
+	Soft: 2,
+	Hard: 3
+};
+
+const EventType = {
+	Fight: 1,
+	Item: 2,
+	Event: 3,
+	Reset: 4
+};
+
 function teleportEntry(name, targetMap, x, y, requirement = teleportEntryRequirement.None, roomState){
 	this.name = name;
 	this.targetMap = targetMap;
@@ -587,8 +600,8 @@ new dungeonMapTile(true, new teleportEntry('Ordeals1', 'OrdealsCastle2F', 12, 12
 new dungeonMapTile(true, new teleportEntry('Ordeals3', 'OrdealsCastle1F', 2, 2, teleportEntryRequirement.Crown)),
 new dungeonMapTile(),
 new dungeonMapTile(),
-new dungeonMapTile(),
 new dungeonMapTile(false, null, KeyItem.TNT),
+new dungeonMapTile(),
 new dungeonMapTile(),
 new dungeonMapTile(),
 new dungeonMapTile(),
@@ -1825,7 +1838,8 @@ var overworldMap = {
     }
 };
 
-var spriteList = [];
+var spriteNames = [];
+var spriteNameMap = {};
 var spriteMapList = {};
 
 function Camera(startX, startY, width, height, zoom) {
@@ -1868,7 +1882,8 @@ function Sprite(name, mapName, startX, startY, room, imageName, fight, item, eve
 	this.room = room;
 	this.triggered = false;
 	this.collision = true;
-    spriteList.push(this);
+    spriteNameMap[name] = this;
+	spriteNames.push(name);
 	spriteMapList[mapName].push(this);
 }
 
@@ -1938,11 +1953,10 @@ function Player(map, startX, startY, width, height, image, canoeImage, spriteWal
 	this.movementCooldown = 0;
 	this.collision = false;
     console.log("Creating Player At: " + this.gridX + "," + this.gridY);
-    spriteList.push(this);
-									   
+	spriteMapList['Overworld'].push(this);
 }
 
-Player.prototype.teleportPlayer = function (map, gridX, gridY)
+Player.prototype.teleportPlayer = function (map, gridX, gridY, moveMethod)
 {
 	this.gridX = gridX;
     this.gridY = gridY;
@@ -1953,7 +1967,7 @@ Player.prototype.teleportPlayer = function (map, gridX, gridY)
     this.direction = (map.overworldMap ?  Directions.Right : Directions.Down);
 	this.mapName = map.name;
 	let tileData = map.getTileData(gridX, gridY);
-    this.moveMethod = tileData.canoe == true ? MoveMethod.Canoe : MoveMethod.Walk;
+    this.moveMethod = moveMethod;
 	this.drawCanoe = tileData.canoe;
 };
 
@@ -1972,7 +1986,7 @@ Player.prototype.getAnimationFrame = function (frames) {
 Player.prototype.checkTargetTile = function (tileX, tileY, active)
 {
     let tileData = Game.currentMap.getTileData(tileX, tileY);
-	if(tileData == null)
+	if(tileData == null || this.movementCooldown > 0)
 		return true;
 	if(this.keyItems[KeyItem.KEY] == false && tileData.room == roomOpening.Lock)
 		return true;
@@ -2159,12 +2173,15 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
 			Game.processItem(tileData.loot, true);
 		if(this.moveMethod == MoveMethod.Walk && tileData.caravan && !this.keyItems[KeyItem.BOTTLE])
 			Game.processItem(KeyItem.BOTTLE, true);
+		
+		Game.logPathLocation(this.gridX, this.gridY);
 	}
 };
 
 function Bridge(image)
 {
     this.active = false;
+	this.name = 'Bridge';
     this.spriteMap = image;
 	this.getSpriteMap = function(){return this.spriteMap;};
     this.gridX = 152;
@@ -2178,7 +2195,8 @@ function Bridge(image)
 	this.mapName = 'Overworld';
 	this.room = false;
 	this.collision = false;
-    spriteList.push(this);
+    spriteNameMap[name] = this;
+	spriteNames.push(name);
 	spriteMapList['Overworld'].push(this);
 }
 // Make generic sprite class to put Bridge/Misc under to prevent animation needs?
@@ -2190,6 +2208,7 @@ Bridge.prototype.getAnimationFrame = function (frames) {
 function Canal(image)
 {
     this.active = true;
+	this.name = 'Canal';
     this.spriteMap = image;
 	this.getSpriteMap = function(){return this.spriteMap;};
     this.gridX = 0x66;
@@ -2203,7 +2222,8 @@ function Canal(image)
 	this.mapName = 'Overworld';
 	this.room = false;
 	this.collision = false;
-    spriteList.push(this);
+    spriteNameMap[name] = this;
+	spriteNames.push(name);
 	spriteMapList['Overworld'].push(this);
 }
 // Make generic sprite class to put Bridge/Misc under to prevent animation needs?
@@ -2216,6 +2236,7 @@ Canal.prototype.getAnimationFrame = function (frames) {
 function Ship(image, spriteWalkFrames)
 {
     this.active = false;
+	this.name = 'Ship';
 	this.followPlayer = false;
     this.spriteMap = image;
     this.spriteWalkFrames = spriteWalkFrames;
@@ -2232,7 +2253,8 @@ function Ship(image, spriteWalkFrames)
 	this.room = false;
 	this.unboardThisFrame = false;
 	this.collision = false;
-    spriteList.push(this);
+    spriteNameMap[name] = this;
+	spriteNames.push(name);
 	spriteMapList['Overworld'].push(this);
 }
 
@@ -2276,6 +2298,7 @@ Ship.prototype.getAnimationFrame = function (frames) {
 function Airship(image, image2, spriteWalkFrames)
 {
     this.active = false;
+	this.name = 'Airship';
 	this.followPlayer = false;
     this.spriteMap = image;
     this.spriteWalkFrames = spriteWalkFrames;
@@ -2296,7 +2319,8 @@ function Airship(image, image2, spriteWalkFrames)
 	this.mapName = 'Overworld';
 	this.room = false;
 	this.collision = false;
-    spriteList.push(this);
+    spriteNameMap[name] = this;
+	spriteNames.push(name);
 	spriteMapList['Overworld'].push(this);
 }
 
@@ -2484,6 +2508,171 @@ Controller.prototype.render = function()
     this.context.drawImage(this.effectsCanvas, 0, 0);
 };
 
+/*
+const ResetType = {
+	Path: 1,
+	Soft: 2,
+	Hard: 3
+};
+
+const EventType = {
+	Fight: 1,
+	Item: 2,
+	Event: 3
+	Reset: 4 
+};*/
+
+MapSaveData = function(mapName, room)
+{
+	this.name = mapName;
+	this.room = room;
+}
+
+PlayerSaveData = function(gridX, gridY, moveMethod, keyItems, eventsTriggered)
+{
+	this.gridX = gridX;
+	this.gridY = gridY;
+	this.moveMethod = moveMethod;
+	this.keyItems = [];
+	for(let i = 0; i < keyItems.length; i++)
+		this.keyItems[i] = keyItems[i];
+	for(let i = 0; i < eventsTriggered.length; i++)
+		this.eventsTriggered[i] = eventsTriggered[i];
+}
+
+SpriteSaveDatum = function(name, active, gridX, gridY, triggered, followPlayer)
+{
+	this.name = name;
+	this.active = active;
+	this.gridX = gridX;
+	this.gridY = gridY;
+	this.triggered = triggered;
+	this.followPlayer = followPlayer;
+}
+
+SpriteSaveData = function()
+{
+	this.spriteDataMap = {};
+	for(let i = 0; i < spriteNames.length; i++)
+	{
+		let sprite = spriteNameMap[spriteNames[i]];
+		spriteDataMap[sprite.name] = new SpriteSaveDatum(sprite.name, sprite.active, sprite.gridX, sprite.gridY, sprite.triggered, sprite.followPlayer);
+	}
+}
+
+GameSaveData = function(stepCounter1, stepCounter2, encounterGroup, encounterChance, encounterThreshold, encounterNumber)
+{
+	this.stepCounter1 = stepCounter1;
+	this.stepCounter2 = stepCounter2;
+	this.encounterGroup = encounterGroup;
+	this.encounterChance = encounterChance;
+	this.encounterThreshold = encounterThreshold;
+	this.encounterNumber = encounterNumber;
+}
+
+Checkpoint = function(mapSaveData, playerSaveData, spriteSaveData, gameSaveData)
+{
+	this.mapSaveData = mapSaveData;
+	this.playerSaveData = playerSaveData;
+	this.spriteSaveData = spriteSaveData;
+	this.gameSaveData = gameSaveData;
+}
+
+Checkpoint.prototype.loadCheckpoint = function(player, resetType)
+{
+	player.keyItems = playerSaveData.keyItems;
+	player.eventsTriggered = playerSaveData.eventsTriggered;
+	let teleport = new teleportEntry('CheckPointWarp' + resetType, this.mapSaveData.name, this.playerSaveData.gridX, this.playerSaveData.gridY, teleportEntryRequirement.None, this.mapSaveData.room, this.playerSaveData.moveMethod);
+	Game.startTeleport(true, teleport, player.gridX, player.gridY, this.playerSaveData.moveMethod);
+	
+	for(let i = 0; i < spriteNames.length; i++)
+	{
+		let sprite = spriteNameMap[spriteNames[i]];
+		spriteDataMap[sprite.name] = new SpriteSaveDatum(sprite.name, sprite.active, sprite.gridX, sprite.gridY, sprite.triggered, sprite.followPlayer);
+	}
+	
+	if(resetType == ResetType.Path)
+	{
+		Game.stepCounter1 = this.stepCounter1;
+		Game.stepCounter2 = this.stepCounter2;
+		Game.encounterGroup = this.encounterGroup;
+		Game.encounterChance = this.encounterChance;
+		Game.encounterThreshold = this.encounterThreshold;
+		Game.encounterNumber = this.encounterNumber;
+		document.getElementById('encounterInformation').innerHTML = 
+		('step1: ' + Game.stepCounter1 + 
+		 '<br/>step2: ' + Game.stepCounter2 + 
+		 '<br/>encounterGroup: ' + Game.encounterGroup + 
+		 '<br/>chance: ' + Game.encounterChance + 
+		 '<br/>threshold: ' + Game.encounterThreshold + 
+		 '<br/>encounterNumber: ' + Game.encounterNumber
+		);
+		Game.currentTileLocationEvents = [];
+		Game.currentPathLocations = [new PathLocation(this.playerSaveData.gridX, this.playerSaveData.gridY)];
+	}
+	else if(resetType == ResetType.Hard)
+	{
+		Game.stepCounter1 = 0xFF;
+		Game.stepCounter2 = 0xFF;
+		Game.encounterChance = 0x45;
+		Game.encounterNumber = 0;
+		Game.encounterGroup = 0;
+		Game.encounterThreshold = (Game.player.moveMethod == MoveMethod.Ship ? 3 : Game.currentMap.encounterThreshold);
+		document.getElementById('encounterInformation').innerHTML = 
+		('step1: ' + Game.stepCounter1 + 
+		 '<br/>step2: ' + Game.stepCounter2 + 
+		 '<br/>encounterGroup: ' + Game.encounterGroup + 
+		 '<br/>chance: ' + Game.encounterChance + 
+		 '<br/>threshold: ' + Game.encounterThreshold + 
+		 '<br/>encounterNumber: ' + Game.encounterNumber
+		);
+		Game.currentPathLocations.push(new LocationEvent(EventType.Reset, ResetType.Hard));
+	}
+	else
+		Game.currentPathLocations.push(new LocationEvent(EventType.Reset, ResetType.Soft));
+};
+
+StepPath = function(map, checkpoint)
+{
+	this.pathLocations = [];
+	this.map = map;
+	this.checkpoint = checkpoint;
+	this.stepCount = 0;
+}
+
+PathLocation = function(gridX, gridY, locationEvents)
+{
+	this.gridX = gridX;
+	this.gridY = gridY;
+	this.locationEvents = locationEvents;
+}
+
+LocationEvent = function(eventType, eventIndex)
+{
+	this.eventType = eventType;
+	this.eventIndex = eventIndex;
+}
+
+Game.createCheckpoint = function(player)
+{
+	let checkpoint = new Checkpoint(new MapSaveData(this.currentMap.name, room),
+									new PlayerSaveData(player.gridX, player.gridY, player.moveMethod, player.keyItems, player.eventsTriggered), 
+									new SpriteSaveData(), 
+									new GameSaveData(this.stepCounter1, this.stepCounter2, this.encounterGroup, this.encounterChance, this.encounterThreshold, this.encounterNumber));
+	return checkpoint;
+};
+
+Game.logPathLocation = function (gridX, gridY)
+{
+	Game.currentPathLocations.push(new PathLocation(gridX, gridY, Game.currentTileLocationEvents));
+	Game.currentTileLocationEvents = [];
+};
+
+Game.handlePathReset = function() 
+{
+	this.currentStepPath.checkpoint.loadCheckpoint(this.player, ResetType.Path);
+};
+
 Game.toggleBridge = function(checkboxElement) {
 	this.bridge.active = checkboxElement.checked;
 	this.player.eventsTriggered[EventTrigger.BRIDGE] = checkboxElement.checked;
@@ -2509,7 +2698,7 @@ Game.toggleAirship = function(checkboxElement) {
 Game.handleMovementSpeedChange = function(sliderElement)
 {
 	this.movementSpeedFactor = sliderElement.value / 100;
-}
+};
 
 Game.handleWarp = function() 
 {
@@ -2535,17 +2724,17 @@ Game.handleExit = function()
 	this.startTeleport(warp, teleport);
 };
 
-Game.startTeleport = function(warp, teleport, tileX = 0, tileY = 0)
+Game.startTeleport = function(warp, teleport, tileX = 0, tileY = 0, moveMethod = MoveMethod.Walk)
 {
-	this.teleportParams = {warp: warp, teleport: teleport, tileX: tileX, tileY: tileY};
+	this.teleportParams = {warp: warp, teleport: teleport, tileX: tileX, tileY: tileY, moveMethod: moveMethod};
 	this.player.teleporting = true;
 	this.player.allowMovement = false;
 	this.teleportDuration = 0;	
 };
 
-Game.midTeleport = function(warp, teleport, tileX, tileY)
+Game.midTeleport = function(warp, teleport, tileX, tileY, moveMethod = MoveMethod.Walk)
 {
-	this.handleTeleport(warp, teleport, tileX, tileY);
+	this.handleTeleport(warp, teleport, tileX, tileY, moveMethod);
     this.camera.followPlayer(this.currentMap, this.player);
 	this._drawTransition(1);
 	this.teleportMidpoint = true;
@@ -2742,6 +2931,10 @@ Game.loadSprites = function() {
 	new Sprite('Chime Guy', 'Leifen', 0x18, 0x15, false, 'chimeguy', null, KeyItem.CHIME, null, false, null, EventTrigger.TRANSLATE);
 	new Sprite('Fiends Plate', 'FiendsTemple3F', 0x14, 0x10, true, 'fiendplate', null, null, null, true, KeyItem.LUTE);
 	new Sprite('Chaos', 'FiendsTempleChaos', 0xF, 0x11, true, 'garland', 0x7b, null, null, true);
+	new Sprite('Fairy', 'Gaia', 0x31, 0x13, false, 'fairy', null, KeyItem.OXYALE, null, true, KeyItem.BOTTLE).active = false;
+	new Sprite('Rescued Princess', 'ConeriaCastle2F', 0xB, 0x5, true, 'princess', null, KeyItem.LUTE, null, false).active = false;
+	new Sprite('Bikke2', 'Provoka', 0x5, 0x7, false, 'bikke', null, null, EventTrigger.SPAWNSHIP, true).active = false;
+	this.controller = new Controller(Loader.getImage('controller'), Loader.getImage('controllerTouch'));
 };
 
 Game.init = function () {
@@ -2765,7 +2958,10 @@ Game.init = function () {
 	this.encounterGroup = 0;
     this.currentMap = overworldMap;
     this.camera.followPlayer(this.currentMap, this.player);
-	this.controller = new Controller(Loader.getImage('controller'), Loader.getImage('controllerTouch'));
+	this.stepPaths = [];
+	this.currentStepPath = new StepPath(this.currentMap, Game.createCheckpoint(this.player));
+	this.currentPathLocations = [new PathLocation(0x99, 0xA5)];
+	this.currentTileLocationEvents = [];
     
     // create a canvas
     this.layerCanvas = document.createElement('canvas');
@@ -2837,7 +3033,7 @@ Game.update = function (delta) {
 		this.teleportDuration += delta;
 		if(!this.teleportMidpoint && this.teleportDuration >= this.teleportMaxDuration / 2)
 		{
-			this.midTeleport(this.teleportParams.warp, this.teleportParams.teleport, this.teleportParams.tileX, this.teleportParams.tileY);
+			this.midTeleport(this.teleportParams.warp, this.teleportParams.teleport, this.teleportParams.tileX, this.teleportParams.tileY, this.teleportParams.moveMethod);
 		}
 		else if(this.teleportMidpoint && this.teleportDuration >= this.teleportMaxDuration)
 		{
@@ -2848,6 +3044,7 @@ Game.update = function (delta) {
 
 Game.processFight = function (fightNumber, success)
 {
+	Game.currentPathLocations.push(new LocationEvent(EventType.Fight, fightNumber));
 	document.getElementById('messageLog').innerHTML += '<br/>Fight: ' + fightNumber;
 };
 
@@ -2856,9 +3053,10 @@ Game.processItem = function (itemNumber, success)
 	if(success)
 	{
 		this.player.keyItems[itemNumber] = true;
+		Game.currentPathLocations.push(new LocationEvent(EventType.Item, itemNumber));
 		document.getElementById('messageLog').innerHTML += '<br/>Item come to hand: ' + KeyItemStrings[itemNumber];
 		if(itemNumber == KeyItem.BOTTLE)
-			new Sprite('Fairy', 'Gaia', 0x31, 0x13, false, 'fairy', null, KeyItem.OXYALE, null, true, KeyItem.BOTTLE);
+			spriteNameMap['Fairy'].active = true;
 	}
 	else
 	{
@@ -2871,6 +3069,7 @@ Game.processEventTrigger = function (eventNumber, success)
 	if(success)
 	{
 		this.player.eventsTriggered[eventNumber] = true;
+		Game.currentPathLocations.push(new LocationEvent(EventType.Event, eventNumber));
 		if(eventNumber == EventTrigger.PRINCESS)
 		{
 			// clear exit info for later
@@ -2878,7 +3077,7 @@ Game.processEventTrigger = function (eventNumber, success)
 			let teleport = new teleportEntry('PrincessWarp', 'ConeriaCastle2F', 0xC, 0x7, teleportEntryRequirement.None, true);
 			let dungeonInfo = dungeons[teleport.targetMap];
 			dungeonInfo.storeWarpInformation(new teleportEntry('StoredWarp', 'ConeriaCastle1F', 0xC, 0x12, teleportEntryRequirement.None, false));
-			new Sprite('Rescued Princess', 'ConeriaCastle2F', 0xB, 0x5, true, 'princess', null, KeyItem.LUTE, null, false);
+			spriteNameMap['Rescued Princess'].active = true;
 			this.startTeleport(true, teleport);
 		}
 		else if(eventNumber == EventTrigger.CANAL)
@@ -2891,7 +3090,7 @@ Game.processEventTrigger = function (eventNumber, success)
 		}
 		else if(eventNumber == EventTrigger.PIRATES)
 		{
-			new Sprite('Bikke2', 'Provoka', 0x5, 0x7, false, 'bikke', null, null, EventTrigger.SPAWNSHIP, true);
+			spriteNameMap['Bikke2'].active = true;
 			this.ship.active = true;
 		}
 		else if(eventNumber == EventTrigger.SPAWNSHIP)
@@ -2984,14 +3183,13 @@ Game.incrementStepCounter = function()
 	if(this.stepCounter2 > 0xFF)
 		this.stepCounter2 -= 0x100;
 	this.encounterChance = encounterChanceTable[this.stepCounter1];
-	let encounterThreshold = (this.player.moveMethod == MoveMethod.Ship ? 3 : this.currentMap.encounterThreshold);
-	if(this.encounterChance < encounterThreshold)
+	this.encounterThreshold = (this.player.moveMethod == MoveMethod.Ship ? 3 : this.currentMap.encounterThreshold);
+	if(this.encounterChance < this.encounterThreshold)
 	{
-		 
 		this.encounterGroup = encounterGroupTable[this.encounterNumber];
 		this.player.movementCooldown = 0.5;
 		this.player.offsetX = 0;
-		this.player.offsetY = 0;
+		this.player.offsetY = 0;			   
 		this.encounterNumber++;
 		if(this.encounterNumber > 255)
 			this.encounterNumber -= 256;
@@ -3001,7 +3199,7 @@ Game.incrementStepCounter = function()
 		 '<br/>step2: ' + this.stepCounter2 + 
 		 '<br/>encounterGroup: ' + this.encounterGroup + 
 		 '<br/>chance: ' + this.encounterChance + 
-		 '<br/>threshold: ' + encounterThreshold + 
+		 '<br/>threshold: ' + this.encounterThreshold + 
 		 '<br/>encounterNumber: ' + this.encounterNumber
 		);
 };
@@ -3047,12 +3245,12 @@ Game.checkForTeleport = function (tileX, tileY)
 			let warp = teleport.targetMap == 'WARP';
 			if(warp)
 				teleport = this.currentDungeon.warpInformation.pop();
-			this.startTeleport(warp, teleport, tileX, tileY);
+			this.startTeleport(warp, teleport, tileX, tileY, this.player.moveMethod);
 		}
 	}
 };
 
-Game.handleTeleport = function (warp, teleport, sourceX = 0, sourceY = 0)
+Game.handleTeleport = function (warp, teleport, sourceX = 0, sourceY = 0, moveMethod = MoveMethod.Walk)
 {
 	if(teleport.targetMap == 'WorldMap')
 	{
@@ -3063,7 +3261,7 @@ Game.handleTeleport = function (warp, teleport, sourceX = 0, sourceY = 0)
 	{
 		let dungeonInfo = dungeons[teleport.targetMap];
 		if(!warp)
-			dungeonInfo.storeWarpInformation(new teleportEntry('StoredWarp', this.currentMap.overworldMap ? 'WorldMap' : this.currentDungeon.mapDataName, sourceX, sourceY, teleportEntryRequirement.None, this.currentMap.overworldMap ? null : this.currentMap.showRooms));
+			dungeonInfo.storeWarpInformation(new teleportEntry('StoredWarp', this.currentMap.overworldMap ? 'WorldMap' : this.currentDungeon.mapDataName, sourceX, sourceY, teleportEntryRequirement.None, (this.currentMap.overworldMap ? null : this.currentMap.showRooms), this.player.moveMethod));
 		else
 			dungeonMap.showRooms = teleport.roomState;
 		this.currentDungeon = dungeonInfo;
@@ -3076,7 +3274,16 @@ Game.handleTeleport = function (warp, teleport, sourceX = 0, sourceY = 0)
 		this.currentMap = dungeonMap;
 		this._loadCells(dungeonMap);
 	}
-	this.player.teleportPlayer(this.currentMap, teleport.gridX, teleport.gridY);
+	this.player.teleportPlayer(this.currentMap, teleport.gridX, teleport.gridY, moveMethod);
+	
+	if(teleport.name != 'CheckPointWarp' + ResetType.Path)
+	{
+		Game.currentStepPath.pathLocations = Game.currentPathLocations;
+		Game.stepPaths.push(Game.currentStepPath);
+		Game.currentStepPath = new StepPath(this.currentMap, Game.createCheckpoint(this.player));
+		Game.currentPathLocations.push(new PathLocation(teleport.gridX, teleport.gridY));
+		Game.currentTileLocationEvents = [];
+	}
 };
 
 Game._loadCells = function (map) {
