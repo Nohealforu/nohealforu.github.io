@@ -1983,7 +1983,7 @@ Player.prototype.checkTargetTile = function (tileX, tileY, active)
     {
 		if(Game.bridge.active == true && Game.bridge.gridX == tileX && Game.bridge.gridY == tileY)
 			return false;
-        if(active && tileData.canoe == true && this.keyItems[KeyIte.CANOE] == true)
+        if(active && tileData.canoe == true && this.keyItems[KeyItem.CANOE] == true)
         { // Need special treatment entering/leaving river tile itself, (doesn't count to encounters, don't display canoe unless sitting or moving fully inside river)
             this.moveMethod = MoveMethod.Canoe;
             return false;
@@ -1997,7 +1997,7 @@ Player.prototype.checkTargetTile = function (tileX, tileY, active)
     }
     else if(this.moveMethod == MoveMethod.Ship && tileData.ship == false)
     {
-        if(active && tileData.canoe == true && this.keyItems[KeyIte.CANOE] == true)
+        if(active && tileData.canoe == true && this.keyItems[KeyItem.CANOE] == true)
         {
 			Game.ship.unboard(this, true);
             return false;
