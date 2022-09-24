@@ -2142,6 +2142,12 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
 				Game.incrementStepCounter();
 			else if((this.moveMethod == MoveMethod.Ship || Game.ship.unboardThisFrame) && tileData.fight == worldMapTileFight.FightOcean)
 				Game.incrementStepCounter();
+			else if(!Game.currentMap.overworldMap && this.moveMethod == MoveMethod.Walk && tileData.fight > dungeonMapTileFight.None)
+			{
+				this.allowMovement = false;
+				this.movementCooldown = 0.3;
+				Game.processFight(tileData.fight, true);
+			}
 		}
 		this.ignoreEncounter = false;
 		Game.ship.unboardThisFrame = false;
