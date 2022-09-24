@@ -2649,7 +2649,6 @@ Game.load = function () {
 		Loader.loadImage('waterorb', 'Assets/waterorb.png'),
 		Loader.loadImage('fireorb', 'Assets/fireorb.png'),
 		Loader.loadImage('airorb', 'Assets/airorb.png'),
-		Loader.loadImage('chaos', 'Assets/chaos.png'),
     ];
 };
 
