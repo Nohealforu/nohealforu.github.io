@@ -1992,6 +1992,10 @@ Player.prototype.checkTargetTile = function (tileX, tileY, active)
 		{
 			return false;
 		}
+		else if(Game.currentMap.overworldMap && Game.canal.active == true && Game.canal.gridX == tileX && Game.canal.gridY == tileY)
+		{
+			return false;
+		}
         else
             return true;
     }
@@ -2036,6 +2040,8 @@ Player.prototype.checkTargetTile = function (tileX, tileY, active)
 		}
 		return false;
 	}
+	else if(this.moveMethod == MoveMethod.Ship && Game.currentMap.overworldMap && Game.canal.active == true && Game.canal.gridX == tileX && Game.canal.gridY == tileY)
+		return true;
     return false;
 };
 
@@ -2169,6 +2175,29 @@ function Bridge(image)
 }
 // Make generic sprite class to put Bridge/Misc under to prevent animation needs?
 Bridge.prototype.getAnimationFrame = function (frames) {
+    let spriteAnimationState = {startX: 0, width: this.width};
+    return spriteAnimationState;
+};
+
+function Canal(image)
+{
+    this.active = true;
+    this.spriteMap = image;
+	this.getSpriteMap = function(){return this.spriteMap;};
+    this.gridX = 0x66;
+    this.gridY = 0xa4;
+	this.width = 16;
+	this.height = 16;
+    this.walk = true;
+    this.ship = false;
+	this.offsetX = 0;
+	this.offsetY = 0;
+	this.mapName = 'Overworld';
+	this.room = false;
+    spriteList.push(this);
+}
+// Make generic sprite class to put Bridge/Misc under to prevent animation needs?
+Canal.prototype.getAnimationFrame = function (frames) {
     let spriteAnimationState = {startX: 0, width: this.width};
     return spriteAnimationState;
 };
@@ -2523,6 +2552,7 @@ Game.load = function () {
 		Loader.loadImage('fighter', 'Assets/Fighter.png'),
 		Loader.loadImage('canoe', 'Assets/Canoe.png'),
 		Loader.loadImage('bridge', 'Assets/Bridge.png'),
+		Loader.loadImage('bridge', 'Assets/Canal.png'),
 		Loader.loadImage('airship', 'Assets/Airship.png'),
 		Loader.loadImage('airship_shadow', 'Assets/AirshipShadow.png'),
 		Loader.loadImage('ship', 'Assets/Ship.png'),
@@ -2667,6 +2697,7 @@ Game.load = function () {
 Game.loadSprites = function() {
     this.ship = new Ship(Loader.getImage('ship'), {[Directions.Down]:[0,1], [Directions.Up]:[3,2], [Directions.Left]:[6,7], [Directions.Right]:[4,5]});
     this.bridge = new Bridge(Loader.getImage('bridge')); 
+    this.canal = new Canal(Loader.getImage('canal')); 
     this.airship = new Airship(Loader.getImage('airship'), Loader.getImage('airship_shadow'), {[Directions.Down]:[3,2], [Directions.Up]:[1,0], [Directions.Left]:[5,4], [Directions.Right]:[7,6]});
     this.player = new Player(overworldMap, 153, 165, 16, 16, Loader.getImage('fighter'), Loader.getImage('canoe'), {[Directions.Down]:[0,7], [Directions.Up]:[1,6], [Directions.Left]:[2,3], [Directions.Right]:[5,4]}, {[Directions.Down]:[0,1], [Directions.Up]:[0,1], [Directions.Left]:[4,5], [Directions.Right]:[2,3]});
     new Sprite('Garland', 'FiendsTemple', 0x14, 0x15, true, 'garland', 0x7f, null, null, true);
@@ -2831,6 +2862,10 @@ Game.processEventTrigger = function (eventNumber, success)
 			dungeonInfo.storeWarpInformation(new teleportEntry('StoredWarp', 'ConeriaCastle1F', 0xC, 0x12, teleportEntryRequirement.None, false));
 			new Sprite('Rescued Princess', 'ConeriaCastle2F', 0xB, 0x5, true, 'princess', null, KeyItem.LUTE, null, false);
 			this.handleTeleport(true, teleport);
+		}
+		else if(eventNumber == EventTrigger.CANAL)
+		{
+			this.canal.active = false;
 		}
 		else if(eventNumber == EventTrigger.BRIDGE)
 		{
@@ -3104,8 +3139,10 @@ Game._drawSprites = function (map) {
     let offsetX = -this.camera.x + this.camera.width / 2 + startCol * displayTsize;
     let offsetY = -this.camera.y + this.camera.height / 2 + startRow * displayTsize;
     
+	// possibly redo this to use only spriteMapList for performance
+	// will have to change how ship/canal/bridge/etc. sprites work vs. other ones that have collision/other events.
     for (let i = 0; i < spriteList.length ; i++) {
-		let sprite = spriteList[i];
+		let sprite = spriteList[i]; 
 		if(sprite.active == true && sprite.mapName == this.currentMap.name && (sprite.room == 'Ignore' || this.currentMap.showRooms == sprite.room))
     	{
 			if(sprite.followPlayer)
