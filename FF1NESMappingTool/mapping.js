@@ -2673,7 +2673,7 @@ Game.loadSprites = function() {
 	new Sprite('Kidnapped Princess', 'FiendsTemple', 0x14, 0x12, true, 'princess', null, null, EventTrigger.PRINCESS, true);
 	new Sprite('King of Coneria', 'ConeriaCastle2F', 0xC, 0x4, true, 'king', null, null, EventTrigger.BRIDGE, false, null, EventTrigger.PRINCESS);
 	new Sprite('Bikke', 'Provoka', 0x5, 0x7, false, 'bikke', 0x7e, null, EventTrigger.PIRATES, true);
-	new Sprite('Astos', 'ElflandCastle', 0x10, 0x6, true, 'astos', 0x7d, KeyItem.CRYSTAL, null, true, KeyItem.CROWN);
+	new Sprite('Astos', 'NorthwestCastle', 0x10, 0x6, true, 'astos', 0x7d, KeyItem.CRYSTAL, null, true, KeyItem.CROWN);
 	new Sprite('Matoya', 'MatoyaCave', 0x8, 0x1, true, 'matoya', null, KeyItem.HERB, null, false, KeyItem.CRYSTAL);
 	new Sprite('Elf Doctor', 'ElflandCastle', 0x9, 0x5, true, 'femaleelf', null, null, EventTrigger.CUREELF, false, KeyItem.HERB);
 	new Sprite('Elf Prince', 'ElflandCastle', 0x8, 0x6, true, 'elfprince', null, KeyItem.KEY, null, false, null, EventTrigger.CUREELF);
