@@ -1531,6 +1531,7 @@ const dungeonNames = [
 'FiendsTempleAir',
 'FiendsTempleChaos',
 'TitanTunnel',
+'Overworld'
 ];
 
 
@@ -2741,7 +2742,6 @@ Game.init = function () {
     overworldMap.tileAtlasImage[0] = Loader.getImage('overworld');
     overworldMap.data = Loader.getMapData('overworld');
     this.camera = new Camera(0, 0, defaultWidth, defaultHeight, 2);
-	spriteMapList['Overworld'] = [];
 	for(let i = 0; i < dungeonNames.length; i++)
 		spriteMapList[dungeonNames[i]] = [];
 	this.loadSprites();
