@@ -1938,7 +1938,6 @@ function Player(map, startX, startY, width, height, image, canoeImage, spriteWal
 	this.collision = false;
     console.log("Creating Player At: " + this.gridX + "," + this.gridY);
     spriteList.push(this);
-	spriteMapList['Overworld'].push(this);
 }
 
 Player.prototype.teleportPlayer = function (map, gridX, gridY)
@@ -3153,8 +3152,8 @@ Game._drawSprites = function (map) {
     
 	// possibly redo this to use only spriteMapList for performance
 	// will have to change how ship/canal/bridge/etc. sprites work vs. other ones that have collision/other events.
-    for (let i = 0; i < spriteMapList[map.name].length ; i++) {
-		let sprite = spriteMapList[map.name][i]; 
+    for (let i = 0; i < spriteMapList[map.name].length + 1; i++) {
+		let sprite = (i == spriteMapList[map.name].length ? this.player : spriteMapList[map.name][i]); 
 		if(sprite.active == true && (sprite.room == 'Ignore' || this.currentMap.showRooms == sprite.room))
     	{
 			if(sprite.followPlayer)
