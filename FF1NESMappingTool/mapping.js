@@ -2047,7 +2047,7 @@ Player.SEASPEED = 450;
 Player.AIRSPEED = 750;
 
 Player.prototype.move = function (delta, direction, active, keyHeld) {
-	if(this.allowMovement == false)
+	if(this.allowMovement == false || this.movementCooldown > 0)
 		return;
     let speed = (this.moveMethod == MoveMethod.Airship ? Player.AIRSPEED * Math.min(Game.movementSpeedFactor * 1.4, 1) : (this.moveMethod == MoveMethod.Ship  ? Player.SEASPEED * Math.min(Game.movementSpeedFactor * 1.4, 1) : Player.SPEED * Game.movementSpeedFactor));
 	let previousGridX = this.gridX;
@@ -2144,7 +2144,6 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
 				Game.incrementStepCounter();
 			else if(!Game.currentMap.overworldMap && this.moveMethod == MoveMethod.Walk && tileData.fight > dungeonMapTileFight.None)
 			{
-				this.allowMovement = false;
 				this.movementCooldown = 0.3;
 				Game.processFight(tileData.fight, true);
 			}
@@ -2818,9 +2817,6 @@ Game.update = function (delta) {
 		this.handleActionButton(incompleteMovement, activeMovement);
 	}
     
-	if(!this.player.allowMovement && this.player.movementCooldown < 0)
-		this.player.allowMovement = true;
-    
     if (activeMovement == true || incompleteMovement == true) {
         this.player.move(delta, direction, activeMovement, keyHeld);
         this.camera.followPlayer(this.currentMap, this.player);
@@ -2991,7 +2987,6 @@ Game.incrementStepCounter = function()
 	{
 		 
 		this.encounterGroup = encounterGroupTable[this.encounterNumber];
-		this.player.allowMovement = false;
 		this.player.movementCooldown = 0.3;
 		this.encounterNumber++;
 		if(this.encounterNumber > 255)
