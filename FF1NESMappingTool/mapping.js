@@ -2991,8 +2991,8 @@ Game.incrementStepCounter = function()
 	{
 		 
 		this.encounterGroup = encounterGroupTable[this.encounterNumber];
-		player.allowMovement = false;
-		player.movementCooldown = 0.3;
+		this.player.allowMovement = false;
+		this.player.movementCooldown = 0.3;
 		this.encounterNumber++;
 		if(this.encounterNumber > 255)
 			this.encounterNumber -= 256;
