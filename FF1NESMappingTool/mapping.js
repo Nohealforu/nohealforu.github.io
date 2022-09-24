@@ -2690,8 +2690,9 @@ Game.init = function () {
         [Keyboard.LEFT, Keyboard.RIGHT, Keyboard.UP, Keyboard.DOWN, Keyboard.action, Keyboard.altAction]);
     overworldMap.tileAtlasImage[0] = Loader.getImage('overworld');
     overworldMap.data = Loader.getMapData('overworld');
-    console.log("INIT Overworldmap Data Length: " + overworldMap.data.length);
     this.camera = new Camera(0, 0, defaultWidth, defaultHeight, 2);
+	for(let i = 0; i < dungeonNames.length; i++)
+		spriteMapList[dungeonName[i]] = [];
 	this.loadSprites();
 	this.frames = 0;
 	this.movementSpeedFactor = 0.25;
@@ -2706,8 +2707,6 @@ Game.init = function () {
     this.currentMap = overworldMap;
     this.camera.followPlayer(this.currentMap, this.player);
 	this.controller = new Controller(Loader.getImage('controller'), Loader.getImage('controllerTouch'));
-	for(let i = 0; i < dungeonNames.length; i++)
-		spriteMapList[dungeonName[i]] = [];
     
     // create a canvas
     this.layerCanvas = document.createElement('canvas');
