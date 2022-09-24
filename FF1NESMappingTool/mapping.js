@@ -58,6 +58,95 @@ const teleportEntryRequirement = {
 	Chime: 3,
 	Orbs: 4
 };
+const Directions = {
+    Down: 0,
+    Up: 1,
+    Left: 2,
+    Right: 3
+};
+
+const MoveMethod = {
+    Walk: 0,
+    Ship: 1,
+    Canoe: 2,
+    Airship: 3
+};
+
+const KeyItem = {
+	LUTE: 0,
+	CROWN: 1,
+	CRYSTAL: 2,
+	HERB: 3,
+	KEY: 4,
+	TNT: 5,
+	RUBY: 6,
+	SLAB: 7,
+	ADAMANT: 8, 
+	ROD: 9,
+	FLOATER: 10,
+	CHIME: 11,
+	TAIL: 12,
+	CUBE: 13,
+	BOTTLE: 14,
+	OXYALE: 15,
+	CANOE: 16,
+	EARTHORB: 17,
+	FIREORB: 18,
+	WATERORB: 19,
+	AIRORB: 20
+};
+
+const KeyItemStrings = [
+	'LUTE',
+	'CROWN',
+	'CRYSTAL',
+	'HERB',
+	'KEY',
+	'TNT',
+	'RUBY',
+	'SLAB',
+	'ADAMANT', 
+	'ROD',
+	'FLOATER',
+	'CHIME',
+	'TAIL',
+	'CUBE',
+	'BOTTLE',
+	'OXYALE',
+	'CANOE',
+	'EARTHORB',
+	'FIREORB',
+	'WATERORB',
+	'AIRORB'
+];
+
+const KeyItemCount = 21;
+
+const EventTrigger = {
+	PRINCESS: 0,
+	BRIDGE: 1,
+	PIRATES: 2,
+	CANAL: 3,
+	TRANSLATE: 4,
+	AIRSHIP: 5,
+	CLASSCHANGE: 6,
+	CUREELF: 7,
+	EXCALIBER: 8
+};
+
+const EventStrings = [
+	'PRINCESS',
+	'BRIDGE',
+	'PIRATES',
+	'CANAL',
+	'TRANSLATE',
+	'AIRSHIP',
+	'CLASSCHANGE',
+	'CUREELF',
+	'EXCALIBER'
+];
+
+const EventTriggerCount = 9;
 
 function teleportEntry(name, targetMap, x, y, requirement = teleportEntryRequirement.None, roomState){
 	this.name = name;
@@ -497,7 +586,7 @@ new dungeonMapTile(true, new teleportEntry('Ordeals3', 'OrdealsCastle1F', 2, 2, 
 new dungeonMapTile(true, new teleportEntry('Ordeals3', 'OrdealsCastle1F', 2, 2, teleportEntryRequirement.Crown)),
 new dungeonMapTile(),
 new dungeonMapTile(),
-new dungeonMapTile(false, null, 'TNT'),
+new dungeonMapTile(false, null, KeyItem.TNT),
 new dungeonMapTile(),
 new dungeonMapTile(),
 new dungeonMapTile(),
@@ -516,7 +605,7 @@ new dungeonMapTile(),
 new dungeonMapTile(),
 new dungeonMapTile(),
 new dungeonMapTile(),
-new dungeonMapTile(false, null, 'TAIL'),
+new dungeonMapTile(false, null, KeyItem.TAIL),
 new dungeonMapTile(true),
 new dungeonMapTile(true),
 new dungeonMapTile(true),
@@ -548,7 +637,7 @@ new dungeonMapTile(true, new teleportEntry('ExitSeaShrine', 'WorldMap', 0x3e, 0x
 new dungeonMapTile(),
 new dungeonMapTile(),
 new dungeonMapTile(),
-new dungeonMapTile(true, null, 'WATERORB'),
+new dungeonMapTile(true, null, KeyItem.WATERORB),
 new dungeonMapTile(),
 new dungeonMapTile(),
 new dungeonMapTile(true),
@@ -658,7 +747,7 @@ new dungeonMapTile(),
 new dungeonMapTile(),
 new dungeonMapTile(),
 new dungeonMapTile(),
-new dungeonMapTile(false, null, 'SLAB'),
+new dungeonMapTile(false, null, KeyItem.SLAB),
 new dungeonMapTile(true),
 new dungeonMapTile(true),
 new dungeonMapTile(true),
@@ -681,7 +770,7 @@ new dungeonMapTile(true),
 new dungeonMapTile(true),
 new dungeonMapTile(true),
 new dungeonMapTile(),
-new dungeonMapTile(true, null, 'EARTHORB'),
+new dungeonMapTile(true, null, KeyItem.EARTHORB),
 new dungeonMapTile(true, new teleportEntry('ExitEarthCave', 'WorldMap', 0x41, 0xBB)),
 // Row 2
 new dungeonMapTile(),
@@ -691,7 +780,7 @@ new dungeonMapTile(),
 new dungeonMapTile(),
 new dungeonMapTile(true, new teleportEntry('ExitTitanE', 'WorldMap', 0x2a, 0xae)),
 new dungeonMapTile(true, new teleportEntry('ExitTitanW', 'WorldMap', 0x1e, 0xaf)),
-new dungeonMapTile(true, null, 'FIREORB'),
+new dungeonMapTile(true, null, KeyItem.FIREORB),
 new dungeonMapTile(true, new teleportEntry('EarthCaveWarp', 'WARP', 0, 0)),
 new dungeonMapTile(true, new teleportEntry('Volcano4', 'VolcanoB3', 0x2e, 0x17)),
 new dungeonMapTile(true),
@@ -753,7 +842,7 @@ new dungeonMapTile(),
 new dungeonMapTile(),
 // Row 6
 new dungeonMapTile(),
-new dungeonMapTile(false, null, 'RUBY'),
+new dungeonMapTile(false, null, KeyItem.RUBY),
 new dungeonMapTile(),
 new dungeonMapTile(),
 new dungeonMapTile(),
@@ -906,7 +995,7 @@ new dungeonMapTile(),
 new dungeonMapTile(),
 new dungeonMapTile(),
 new dungeonMapTile(),
-new dungeonMapTile(false, null, 'FLOATER'),
+new dungeonMapTile(false, null, KeyItem.FLOATER),
 // Row 7
 new dungeonMapTile(),
 new dungeonMapTile(),
@@ -1022,7 +1111,7 @@ new dungeonMapTile(),
 new dungeonMapTile(),
 new dungeonMapTile(),
 new dungeonMapTile(),
-new dungeonMapTile(false, null, 'CROWN'),
+new dungeonMapTile(false, null, KeyItem.CROWN),
 new dungeonMapTile(),
 new dungeonMapTile(),
 new dungeonMapTile(),
@@ -1097,7 +1186,7 @@ new dungeonMapTile(true),
 new dungeonMapTile(true, new teleportEntry('ExitSkyCastle', 'WorldMap', 0xC2, 0x3B)),
 new dungeonMapTile(true),
 new dungeonMapTile(),
-new dungeonMapTile(true, null, 'AIRORB'),
+new dungeonMapTile(true, null, KeyItem.AIRORB),
 new dungeonMapTile(),
 new dungeonMapTile(),
 // Row 2
@@ -1734,6 +1823,7 @@ var overworldMap = {
 };
 
 var spriteList = [];
+var spriteMapList = {};
 
 function Camera(startX, startY, width, height, zoom) {
     this.x = startX * zoom;
@@ -1751,18 +1841,61 @@ Camera.prototype.followPlayer = function (map, player) {
     this.y = (player.gridY * map.cells.tsize + player.offsetY - Game.airship.elevation + map.cells.tsize / 2) * this.zoom;
 };
 
-const Directions = {
-    Down: 0,
-    Up: 1,
-    Left: 2,
-    Right: 3
+function Sprite(name, mapName, startX, startY, room, imageName, fight, item, eventTrigger, selfDestruct, needKeyItem = null, needEventTrigger = null)
+{
+	this.name = name;
+    this.active = true;
+	this.followPlayer = false;
+    this.spriteMap = Loader.getImage(imageName);
+	this.getSpriteMap = function(){return this.spriteMap;};
+    this.gridX = startX;
+    this.gridY = startY;
+	this.fight = fight;
+	this.item = item;
+	this.selfDestruct = selfDestruct;
+	this.eventTrigger = eventTrigger;
+	this.needKeyItem = needKeyItem;
+	this.needEventTrigger = needEventTrigger;
+	this.width = 16;
+	this.height = 16;
+    this.direction = Directions.Down;
+	this.offsetX = 0;
+	this.offsetY = 0;
+	this.mapName = mapName;
+	this.room = room;
+	this.triggered = false;
+    spriteList.push(this);
+	spriteMapList[mapName].push(this);
+}
+
+Sprite.prototype.playerInteraction = function (player)
+{
+	result = {fight: null, item: null, eventTrigger: null, success: false};
+	if(this.needKeyItem != null && player.keyItem[this.needKeyItem] != true)
+	{
+		result.item = this.needKeyItem;
+	}
+	else if(this.needEventTrigger != null && player.eventsTriggered[this.needEventTrigger] != true)
+	{
+		result.eventTrigger = this.needEventTrigger;
+	}
+	else
+		result.success = true
+	
+	if(!result.success)
+		return result;
+	
+	result.fight = this.fight;
+	result.item = this.item;
+	result.eventTrigger = this.eventTrigger;
+	if(this.selfDestruct)
+		this.active = false;
+	this.triggered = true;
+	return result;
 };
 
-const MoveMethod = {
-    Walk: 0,
-    Ship: 1,
-    Canoe: 2,
-    Airship: 3
+Sprite.prototype.getAnimationFrame = function (frames) {
+    return {startX: 0, width: this.width};
 };
 
 function Player(map, startX, startY, width, height, image, canoeImage, spriteWalkFrames, canoeSpriteFrames) {
@@ -1784,6 +1917,8 @@ function Player(map, startX, startY, width, height, image, canoeImage, spriteWal
     this.getSpriteWalkFrames = function(){return (this.drawCanoe ? this.canoeSpriteFrames : this.characterSpriteFrames);};
     this.active = true;
     this.direction = Directions.Right;
+	this.keyItems = new Array(KeyItemCount).fill(false);
+	this.eventsTriggered = new Array(EventTriggerCount).fill(false);
 	this.key = true; // CHANGE ALL THESE BACK TO FALSE AFTER IMPLEMENTING METHOD TO OBTAIN
     this.canoe = false;
 	this.crown = true;
@@ -1804,6 +1939,8 @@ function Player(map, startX, startY, width, height, image, canoeImage, spriteWal
 	this.allowMovement = true;
 	this.teleporting = false;
     this.moveMethod = MoveMethod.Walk;
+	this.room = 'Ignore';
+	this.actionCooldown = 0;
     console.log("Creating Player At: " + this.gridX + "," + this.gridY);
     spriteList.push(this);
 }
@@ -1840,13 +1977,13 @@ Player.prototype.checkTargetTile = function (tileX, tileY, active)
     let tileData = Game.currentMap.getTileData(tileX, tileY);
 	if(tileData == null)
 		return true;
-	if(this.key == false && tileData.room == roomOpening.Lock)
+	if(this.keyItems[KeyItem.KEY] == false && tileData.room == roomOpening.Lock)
 		return true;
     if(this.moveMethod == MoveMethod.Walk && tileData.walk == false)
     {
 		if(Game.bridge.active == true && Game.bridge.gridX == tileX && Game.bridge.gridY == tileY)
 			return false;
-        if(active && tileData.canoe == true && this.canoe == true)
+        if(active && tileData.canoe == true && this.keyItems[KeyIte.CANOE] == true)
         { // Need special treatment entering/leaving river tile itself, (doesn't count to encounters, don't display canoe unless sitting or moving fully inside river)
             this.moveMethod = MoveMethod.Canoe;
             return false;
@@ -1860,7 +1997,7 @@ Player.prototype.checkTargetTile = function (tileX, tileY, active)
     }
     else if(this.moveMethod == MoveMethod.Ship && tileData.ship == false)
     {
-        if(active && tileData.canoe == true && this.canoe == true)
+        if(active && tileData.canoe == true && this.keyItems[KeyIte.CANOE] == true)
         {
 			Game.ship.unboard(this, true);
             return false;
@@ -1921,7 +2058,7 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
             this.offsetY = 0;
 		if(polarity * this.offsetY > 1)
 		{
-			Game.checkForRoomFlags(this.gridX, this.gridY + polarity, this.key);
+			Game.checkForRoomFlags(this.gridX, this.gridY + polarity, this.keyItems[KeyItem.KEY]);
 			movingChecks = true;
 		}
         this.offsetY = this.offsetY % this.height;
@@ -1940,7 +2077,7 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
             this.offsetX = 0;
 		if(polarity * this.offsetX > 1)
 		{
-			Game.checkForRoomFlags(this.gridX + polarity, this.gridY, this.key);
+			Game.checkForRoomFlags(this.gridX + polarity, this.gridY, this.keyItems[KeyItem.KEY]);
 			movingChecks = true;
 		}
         this.offsetX = this.offsetX % this.width;
@@ -1981,9 +2118,9 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
 		if((this.moveMethod == MoveMethod.Walk || this.moveMethod == MoveMethod.Canoe) && Game.currentMap.overworldMap && Game.ship.active == true && Game.ship.gridX == previousGridX && Game.ship.gridY == previousGridY)
 			this.ignoreEncounter = true;
 		
+		let tileData = Game.currentMap.getTileData(this.gridX, this.gridY);
 		if(!this.ignoreEncounter)
 		{
-			let tileData = Game.currentMap.getTileData(this.gridX, this.gridY);
 			if(this.moveMethod == MoveMethod.Walk && tileData.fight == worldMapTileFight.Fight)
 				Game.incrementStepCounter();
 			else if(this.moveMethod == MoveMethod.Canoe && tileData.fight == worldMapTileFight.FightRiver)
@@ -1993,6 +2130,11 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
 		}
 		this.ignoreEncounter = false;
 		Game.ship.unboardThisFrame = false;
+		
+		if(tileData.raiseAirship && !this.eventsTriggered[EventTrigger.AIRSHIP] && this.keyItems[KeyItem.FLOATER])
+			Game.processEventTrigger(EventTrigger.AIRSHIP, true);
+		if(tileData.loot != null && !this.keyItems[tileData.loot])
+			Game.processItem(tileData.loot, true);
 	}
 };
 
@@ -2010,6 +2152,7 @@ function Bridge(image)
 	this.offsetX = 0;
 	this.offsetY = 0;
 	this.mapName = 'Overworld';
+	this.room = false;
     spriteList.push(this);
 }
 // Make generic sprite class to put Bridge/Misc under to prevent animation needs?
@@ -2035,6 +2178,7 @@ function Ship(image, spriteWalkFrames)
 	this.offsetX = 0;
 	this.offsetY = 0;
 	this.mapName = 'Overworld';
+	this.room = false;
 	this.unboardThisFrame = false;
     spriteList.push(this);
 }
@@ -2097,6 +2241,7 @@ function Airship(image, image2, spriteWalkFrames)
 	this.offsetX = 0;
 	this.offsetY = 0;
 	this.mapName = 'Overworld';
+	this.room = false;
     spriteList.push(this);
 }
 
@@ -2286,20 +2431,23 @@ Controller.prototype.render = function()
 
 Game.toggleBridge = function(checkboxElement) {
 	this.bridge.active = checkboxElement.checked;
+	this.player.eventsTriggered[EventTrigger.BRIDGE] = checkboxElement.checked;
 	this._drawSprites(this.currentMap);
 };
 
 Game.toggleCanoe = function(checkboxElement) {
-	this.player.canoe = checkboxElement.checked;
+	this.player.keyItems[KeyIte.CANOE] = checkboxElement.checked;
 };
 
 Game.toggleShip = function(checkboxElement) {
 	this.ship.active = checkboxElement.checked;
+	this.player.eventsTriggered[EventTrigger.PIRATES] = checkboxElement.checked;
 	this._drawSprites(this.currentMap);
 };
 
 Game.toggleAirship = function(checkboxElement) {
 	this.airship.active = checkboxElement.checked;
+	this.player.eventsTriggered[EventTrigger.AIRSHIP] = checkboxElement.checked;
 	this._drawSprites(this.currentMap);
 };
 
@@ -2476,6 +2624,32 @@ Game.load = function () {
 		Loader.loadMapData('FiendsTemple', 'Assets/Temple%20of%20Fiends%20Map.ffh'),
 		Loader.loadMapData('TitanTunnel', 'Assets/Titan%27s%20Tunnel%20Map.ffh'),
 		Loader.loadMapData('Waterfall', 'Assets/Waterfall%20Map.ffh'),
+		Loader.loadImage('garland', 'Assets/garland.png'),
+		Loader.loadImage('princess', 'Assets/princess.png'),
+		Loader.loadImage('king', 'Assets/king.png'),
+		Loader.loadImage('dwarf', 'Assets/dwarf.png'),
+		Loader.loadImage('robot', 'Assets/robot.png'),
+		Loader.loadImage('sage', 'Assets/sage.png'),
+		Loader.loadImage('bikke', 'Assets/bikke.png'),
+		Loader.loadImage('femaleelf', 'Assets/femaleelf.png'),
+		Loader.loadImage('elfprince', 'Assets/elfprince.png'),
+		Loader.loadImage('matoya', 'Assets/matoya.png'),
+		Loader.loadImage('sarda', 'Assets/sarda.png'),
+		Loader.loadImage('vampire', 'Assets/vampire.png'),
+		Loader.loadImage('plate', 'Assets/plate.png'),
+		Loader.loadImage('fiendplate', 'Assets/fiendplate.png'),
+		Loader.loadImage('fairy', 'Assets/fairy.png'),
+		Loader.loadImage('scholar', 'Assets/scholar.png'),
+		Loader.loadImage('chimeguy', 'Assets/chimeguy.png'),
+		Loader.loadImage('titan', 'Assets/titan.png'),
+		Loader.loadImage('astos', 'Assets/astos.png'),
+		Loader.loadImage('bahamut', 'Assets/bahamut.png'),
+		Loader.loadImage('woman', 'Assets/woman.png'),
+		Loader.loadImage('earthorb', 'Assets/earthorb.png'),
+		Loader.loadImage('waterorb', 'Assets/waterorb.png'),
+		Loader.loadImage('fireorb', 'Assets/fireorb.png'),
+		Loader.loadImage('airorb', 'Assets/airorb.png'),
+		Loader.loadImage('chaos', 'Assets/chaos.png'),
     ];
 };
 
@@ -2486,11 +2660,7 @@ Game.init = function () {
     overworldMap.data = Loader.getMapData('overworld');
     console.log("INIT Overworldmap Data Length: " + overworldMap.data.length);
     this.camera = new Camera(0, 0, defaultWidth, defaultHeight, 2);
-    this.ship = new Ship(Loader.getImage('ship'), {[Directions.Down]:[0,1], [Directions.Up]:[3,2], [Directions.Left]:[6,7], [Directions.Right]:[4,5]});
-    this.bridge = new Bridge(Loader.getImage('bridge')); 
-    this.airship = new Airship(Loader.getImage('airship'), Loader.getImage('airship_shadow'), {[Directions.Down]:[3,2], [Directions.Up]:[1,0], [Directions.Left]:[5,4], [Directions.Right]:[7,6]});
-    this.player = new Player(overworldMap, 153, 165, 16, 16, Loader.getImage('fighter'), Loader.getImage('canoe'), {[Directions.Down]:[0,7], [Directions.Up]:[1,6], [Directions.Left]:[2,3], [Directions.Right]:[5,4]}, {[Directions.Down]:[0,1], [Directions.Up]:[0,1], [Directions.Left]:[4,5], [Directions.Right]:[2,3]});
-    this.frames = 0;
+	this.frames = 0;
 	this.movementSpeedFactor = 0.25;
 	this.teleportDuration = 0;
 	this.teleportMaxDuration = 0.8;
@@ -2503,6 +2673,8 @@ Game.init = function () {
     this.currentMap = overworldMap;
     this.camera.followPlayer(this.currentMap, this.player);
 	this.controller = new Controller(Loader.getImage('controller'), Loader.getImage('controllerTouch'));
+	for(let i = 0; i < dungeonNames.length; i++)
+		spriteMapList[dungeonName[i]] = [];
     
     // create a canvas
     this.layerCanvas = document.createElement('canvas');
@@ -2525,6 +2697,7 @@ Game.init = function () {
 Game.update = function (delta) {
     this.hasScrolled = false;
     this.frames = this.frames + delta * 60;
+	this.player.actionCooldown -= delta;
     // handle camera movement with arrow keys
     let direction = -1;
     let activeMovement = false;
@@ -2548,8 +2721,11 @@ Game.update = function (delta) {
             activeMovement = false;
     }
 	
-	if((Keyboard.isDown(Keyboard.action) || Keyboard.isDown(Keyboard.altAction) || this.controller.isDown(Keyboard.action)) && this.player.allowMovement)
+	if((Keyboard.isDown(Keyboard.action) || Keyboard.isDown(Keyboard.altAction) || this.controller.isDown(Keyboard.action)) && this.player.allowMovement && this.player.actionCooldown < 0)
+	{
+		this.player.actionCooldown = 0.25;
 		this.handleActionButton(incompleteMovement, activeMovement);
+	}
     
     
     if (activeMovement == true || incompleteMovement == true) {
@@ -2579,10 +2755,85 @@ Game.update = function (delta) {
 	}
 };
 
+Game.processFight = function (fightNumber, success)
+{
+	Document.getElementById('Messagelog').innerHTML += '<br/>Fight: ' + fightNumber;
+};
+
+Game.processItem = function (itemNumber, success)
+{
+	if(success)
+	{
+		this.player.keyItems[itemNumber] = true;
+		Document.getElementById('Messagelog').innerHTML += '<br/>Item come to hand: ' + KeyItemStrings[itemNumber];
+	}
+	else
+	{
+		Document.getElementById('Messagelog').innerHTML += '<br/>You need: ' + KeyItemStrings[itemNumber];
+	}
+};
+
+Game.processEventTrigger = function (eventNumber, success)
+{
+	if(success)
+	{
+		this.player.eventsTriggered[eventNumber] = true;
+		if(eventNumber == EventTrigger.PRINCESS)
+		{
+			// clear exit info for later
+			this.currentDungeon.warpInformation.pop();
+			let teleport = new teleportEntry('PrincessWarp', 'ConeriaCastle2F', 0xC, 0x7, teleportEntryRequirement.None, true);
+			let dungeonInfo = dungeons[teleport.targetMap];
+			dungeonInfo.storeWarpInformation(new teleportEntry('StoredWarp', 'ConeriaCastle1F', 0xC, 0x12, teleportEntryRequirement.None, false));
+			this.handleTeleport(true, teleport);
+		}
+		else if(eventNumber == EventTrigger.BRIDGE)
+		{
+			this.bridge.active = true;
+		}
+		else if(eventNumber == EventTrigger.PIRATES)
+		{
+			this.ship.active = true;
+		}
+		else if(eventNumber == EventTrigger.AIRSHIP)
+		{
+			this.airship.active = true;
+		}
+		Document.getElementById('Messagelog').innerHTML += '<br/>Event Triggered: ' + EventStrings[eventNumber];
+	}
+	else
+	{
+		Document.getElementById('Messagelog').innerHTML += '<br/>Missing Requirement: ' + EventStrings[eventNumber];
+	}
+};
+
 Game.handleActionButton = function(incompleteMovement, activeMovement)
 {
 	let targetX = this.player.gridX;
 	let targetY = this.player.gridY;
+	
+	if(!this.currentMap.overworldMap)
+	{
+		let interactX = (this.player.direction == Directions.Left ? targetX - 1 : (this.player.direction == Directions.Right ? targetX + 1 : targetX));
+		let interactY = (this.player.direction == Directions.Up ? targetY - 1 : (this.player.direction == Directions.Down ? targetY + 1 : targetY));
+		for(let i = 0; i < spriteMapList[this.currentMap.name].length; i++)
+		{
+			let sprite = spriteMapList[this.currentMap.name][i];
+			if(sprite.active && sprite.triggered == false && sprite.gridX == interactX && sprite.gridY == interactY)
+			{
+				let results = sprite.playerInteraction(this.player);
+				if(results.fight != null)
+					this.processFight(results.fight, results.success);
+				if(results.item != null)
+					this.processItem(results.item, results.success);
+				if(results.eventTrigger != null)
+					this.processEventTrigger(results.eventTrigger, results.success);
+				if(results.success)
+					this._drawSprites(this.currentMap);
+				break;
+			}
+		}
+	}
 	if(incompleteMovement)
 	{
 		if(this.player.offsetX > 0)
@@ -2595,7 +2846,7 @@ Game.handleActionButton = function(incompleteMovement, activeMovement)
 			targetY--;
 			
 	}
-	if(Game.currentMap.overworldMap && this.airship.active == true && targetX == this.airship.gridX && targetY == this.airship.gridY && this.player.moveMethod == MoveMethod.Walk)
+	if(this.currentMap.overworldMap && this.airship.active == true && targetX == this.airship.gridX && targetY == this.airship.gridY && this.player.moveMethod == MoveMethod.Walk)
 	{
 		if(incompleteMovement && !this.airship.takeoff)
 			this.player.queueAirshipBoard = true;
@@ -2606,9 +2857,10 @@ Game.handleActionButton = function(incompleteMovement, activeMovement)
 	{
 		if(incompleteMovement && !this.airship.landing)
 			this.player.queueAirshipUnboard = true;
-		else if(!incompleteMovement && this.player.queueAirshipUnboard == false) // don't force a board if we're queueing an unboard
+		else if(!incompleteMovement && this.player.queueAirshipUnboard == false) // don't force a unboard if we're queueing an unboard
 			this.airship.unboard(this.player);
 	}
+	
 };
 
 Game.incrementStepCounter = function()
@@ -2803,7 +3055,7 @@ Game._drawSprites = function (map) {
     
     for (let i = 0; i < spriteList.length ; i++) {
 		let sprite = spriteList[i];
-		if(sprite.active == true && sprite.mapName == this.currentMap.name)
+		if(sprite.active == true && sprite.mapName == this.currentMap.name && (sprite.room == 'Ignore' || this.currentMap.showRooms == sprite.room))
     	{
 			if(sprite.followPlayer)
 			{
