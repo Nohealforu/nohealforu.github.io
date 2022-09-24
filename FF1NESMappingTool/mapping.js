@@ -2144,7 +2144,9 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
 				Game.incrementStepCounter();
 			else if(!Game.currentMap.overworldMap && this.moveMethod == MoveMethod.Walk && tileData.fight > dungeonMapTileFight.None)
 			{
-				this.movementCooldown = 0.3;
+				this.movementCooldown = 0.5;
+				this.offsetX = 0;
+				this.offsetY = 0;
 				Game.processFight(tileData.fight, true);
 			}
 		}
@@ -2987,7 +2989,9 @@ Game.incrementStepCounter = function()
 	{
 		 
 		this.encounterGroup = encounterGroupTable[this.encounterNumber];
-		this.player.movementCooldown = 0.3;
+		this.player.movementCooldown = 0.5;
+		this.player.offsetX = 0;
+		this.player.offsetY = 0;
 		this.encounterNumber++;
 		if(this.encounterNumber > 255)
 			this.encounterNumber -= 256;
