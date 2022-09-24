@@ -1866,6 +1866,7 @@ function Sprite(name, mapName, startX, startY, room, imageName, fight, item, eve
 	this.mapName = mapName;
 	this.room = room;
 	this.triggered = false;
+	this.collision = true;
     spriteList.push(this);
 	spriteMapList[mapName].push(this);
 }
@@ -1933,8 +1934,10 @@ function Player(map, startX, startY, width, height, image, canoeImage, spriteWal
     this.moveMethod = MoveMethod.Walk;
 	this.room = 'Ignore';
 	this.actionCooldown = 0;
+	this.collision = false;
     console.log("Creating Player At: " + this.gridX + "," + this.gridY);
     spriteList.push(this);
+	spriteMapList['Overworld'].push(this);
 }
 
 Player.prototype.teleportPlayer = function (map, gridX, gridY)
@@ -2025,7 +2028,7 @@ Player.prototype.checkTargetTile = function (tileX, tileY, active)
 		for(let i = 0; i < spriteMapList[Game.currentMap.name].length; i++)
 		{
 			let sprite = spriteMapList[Game.currentMap.name][i];
-			if(sprite.active && sprite.gridX == tileX && sprite.gridY == tileY)
+			if(sprite.active && sprite.collision == true && sprite.gridX == tileX && sprite.gridY == tileY)
 			{
 				return true;
 			}
@@ -2165,7 +2168,9 @@ function Bridge(image)
 	this.offsetY = 0;
 	this.mapName = 'Overworld';
 	this.room = false;
+	this.collision = false;
     spriteList.push(this);
+	spriteMapList['Overworld'].push(this);
 }
 // Make generic sprite class to put Bridge/Misc under to prevent animation needs?
 Bridge.prototype.getAnimationFrame = function (frames) {
@@ -2188,7 +2193,9 @@ function Canal(image)
 	this.offsetY = 0;
 	this.mapName = 'Overworld';
 	this.room = false;
+	this.collision = false;
     spriteList.push(this);
+	spriteMapList['Overworld'].push(this);
 }
 // Make generic sprite class to put Bridge/Misc under to prevent animation needs?
 Canal.prototype.getAnimationFrame = function (frames) {
@@ -2215,7 +2222,9 @@ function Ship(image, spriteWalkFrames)
 	this.mapName = 'Overworld';
 	this.room = false;
 	this.unboardThisFrame = false;
+	this.collision = false;
     spriteList.push(this);
+	spriteMapList['Overworld'].push(this);
 }
 
 Ship.prototype.board = function(player)
@@ -2277,7 +2286,9 @@ function Airship(image, image2, spriteWalkFrames)
 	this.offsetY = 0;
 	this.mapName = 'Overworld';
 	this.room = false;
+	this.collision = false;
     spriteList.push(this);
+	spriteMapList['Overworld'].push(this);
 }
 
 Airship.prototype.board = function(player)
@@ -2730,6 +2741,7 @@ Game.init = function () {
     overworldMap.tileAtlasImage[0] = Loader.getImage('overworld');
     overworldMap.data = Loader.getMapData('overworld');
     this.camera = new Camera(0, 0, defaultWidth, defaultHeight, 2);
+	spriteMapList['Overworld'] = [];
 	for(let i = 0; i < dungeonNames.length; i++)
 		spriteMapList[dungeonNames[i]] = [];
 	this.loadSprites();
@@ -3141,9 +3153,9 @@ Game._drawSprites = function (map) {
     
 	// possibly redo this to use only spriteMapList for performance
 	// will have to change how ship/canal/bridge/etc. sprites work vs. other ones that have collision/other events.
-    for (let i = 0; i < spriteList.length ; i++) {
-		let sprite = spriteList[i]; 
-		if(sprite.active == true && sprite.mapName == this.currentMap.name && (sprite.room == 'Ignore' || this.currentMap.showRooms == sprite.room))
+    for (let i = 0; i < spriteMapList[map.name].length ; i++) {
+		let sprite = spriteMapList[map.name][i]; 
+		if(sprite.active == true && (sprite.room == 'Ignore' || this.currentMap.showRooms == sprite.room))
     	{
 			if(sprite.followPlayer)
 			{
