@@ -2652,6 +2652,39 @@ Game.load = function () {
     ];
 };
 
+Game.loadSprites = function() {
+    this.ship = new Ship(Loader.getImage('ship'), {[Directions.Down]:[0,1], [Directions.Up]:[3,2], [Directions.Left]:[6,7], [Directions.Right]:[4,5]});
+    this.bridge = new Bridge(Loader.getImage('bridge')); 
+    this.airship = new Airship(Loader.getImage('airship'), Loader.getImage('airship_shadow'), {[Directions.Down]:[3,2], [Directions.Up]:[1,0], [Directions.Left]:[5,4], [Directions.Right]:[7,6]});
+    this.player = new Player(overworldMap, 153, 165, 16, 16, Loader.getImage('fighter'), Loader.getImage('canoe'), {[Directions.Down]:[0,7], [Directions.Up]:[1,6], [Directions.Left]:[2,3], [Directions.Right]:[5,4]}, {[Directions.Down]:[0,1], [Directions.Up]:[0,1], [Directions.Left]:[4,5], [Directions.Right]:[2,3]});
+    new Sprite('Garland', 'FiendsTemple', 0x14, 0x15, true, 'garland', 0x7f, null, null, true);
+	new Sprite('Kidnapped Princess', 'FiendsTemple', 0x14, 0x12, true, 'princess', null, null, EventTrigger.PRINCESS, true);
+	new Sprite('King of Coneria', 'ConeriaCastle2F', 0xC, 0x4, true, 'king', null, null, EventTrigger.BRIDGE, false, null, EventTrigger.PRINCESS);
+	new Sprite('Bikke', 'Provoka', 0x5, 0x7, false, 'bikke', 0x7e, null, EventTrigger.PIRATES, true);
+	new Sprite('Astos', 'ElflandCastle', 0x10, 0x6, true, 'astos', 0x7d, KeyItem.CRYSTAL, null, true, KeyItem.CROWN);
+	new Sprite('Matoya', 'MatoyaCave', 0x8, 0x1, true, 'matoya', null, KeyItem.HERB, null, false, KeyItem.CRYSTAL);
+	new Sprite('Elf Doctor', 'ElflandCastle', 0x9, 0x5, true, 'femaleelf', null, null, EventTrigger.CUREELF, false, KeyItem.HERB);
+	new Sprite('Elf Prince', 'ElflandCastle', 0x8, 0x6, true, 'elfprince', null, KeyItem.KEY, null, false, null, EventTrigger.CUREELF);
+	new Sprite('Nerrick', 'DwarfCave', 0x10, 0x2d, false, 'dwarf', null, null, EventTrigger.CANAL, true, KeyItem.TNT);
+	new Sprite('Dwarf Blacksmith', 'DwarfCave', 0x7, 0x2, true, 'dwarf', null, null, EventTrigger.EXCALIBER, false, KeyItem.ADAMANT);
+	new Sprite('Vampire', 'EarthCaveB3', 0x1A, 0x26, true, 'vampire', 0x7c, null, null, true);
+	new Sprite('Titan', 'TitanTunnel', 0x8, 0x7, false, 'titan', null, null, null, true, KeyItem.RUBY);
+	new Sprite('Sarda', 'SardaCave', 0x2, 0x2, true, 'sarda', null, KeyItem.ROD, null, false);
+	new Sprite('Earth Plate', 'EarthCaveB3', 0x1A, 0x1B, false, 'plate', null, null, null, true, KeyItem.ROD);
+	new Sprite('Orb of the Earth', 'EarthCaveB5', 0xC, 0x2A, true, 'earthorb', 0x7a, null, null, true);
+	new Sprite('Orb of Water', 'SeaShrineB5', 0xC, 0x8, true, 'waterorb', 0x78, null, null, true);
+	new Sprite('Orb of Fire', 'VolcanoB5', 0x7, 0x37, true, 'fireorb', 0x79, null, null, true);
+	new Sprite('Orb of Wind', 'SkyPalace5F', 0x7, 0x5, true, 'airorb', 0x77, null, null, true);
+	new Sprite('Canoe Sage', 'CrescentLake', 0x2A, 0xA, false, 'sage', null, KeyItem.CANOE, null, false, KeyItem.EARTHORB);
+	new Sprite('Waterfall Robot', 'Waterfall', 0x11, 0x36, true, 'robot', null, KeyItem.CUBE, null, true);
+	new Sprite('Fairy', 'Gaia', 0x31, 0x13, false, 'fairy', null, KeyItem.OXYALE, null, true, KeyItem.BOTTLE);
+	new Sprite('Bahamut', 'BahamutB2', 0x15, 0x3, true, 'bahamut', null, null, EventTrigger.CLASSCHANGE, false, KeyItem.TAIL);
+	new Sprite('Submarine Engineer', 'Onrac', 0x2D, 0x1E, true, 'woman', null, null, null, true, KeyItem.OXYALE);
+	new Sprite('Dr. Unne', 'Melmond', 0x1A, 0x1, false, 'scholar', null, null, EventTrigger.TRANSLATE, false, KeyItem.SLAB);
+	new Sprite('Chime Guy', 'Leifen', 0x18, 0x15, false, 'chimeguy', null, KeyItem.CHIME, null, false, null, EventTrigger.TRANSLATE);
+	new Sprite('Fiends Plate', 'FiendsTemple3F', 0x14, 0x10, true, 'fiendplate', null, null, null, true, KeyItem.LUTE);
+};
+
 Game.init = function () {
     Keyboard.listenForEvents(
         [Keyboard.LEFT, Keyboard.RIGHT, Keyboard.UP, Keyboard.DOWN, Keyboard.action, Keyboard.altAction]);
@@ -2659,6 +2692,7 @@ Game.init = function () {
     overworldMap.data = Loader.getMapData('overworld');
     console.log("INIT Overworldmap Data Length: " + overworldMap.data.length);
     this.camera = new Camera(0, 0, defaultWidth, defaultHeight, 2);
+	this.loadSprites();
 	this.frames = 0;
 	this.movementSpeedFactor = 0.25;
 	this.teleportDuration = 0;
