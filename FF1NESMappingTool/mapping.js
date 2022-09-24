@@ -2798,7 +2798,7 @@ Game.update = function (delta) {
 
 Game.processFight = function (fightNumber, success)
 {
-	Document.getElementById('Messagelog').innerHTML += '<br/>Fight: ' + fightNumber;
+	document.getElementById('Messagelog').innerHTML += '<br/>Fight: ' + fightNumber;
 };
 
 Game.processItem = function (itemNumber, success)
@@ -2806,11 +2806,11 @@ Game.processItem = function (itemNumber, success)
 	if(success)
 	{
 		this.player.keyItems[itemNumber] = true;
-		Document.getElementById('Messagelog').innerHTML += '<br/>Item come to hand: ' + KeyItemStrings[itemNumber];
+		document.getElementById('Messagelog').innerHTML += '<br/>Item come to hand: ' + KeyItemStrings[itemNumber];
 	}
 	else
 	{
-		Document.getElementById('Messagelog').innerHTML += '<br/>You need: ' + KeyItemStrings[itemNumber];
+		document.getElementById('Messagelog').innerHTML += '<br/>You need: ' + KeyItemStrings[itemNumber];
 	}
 };
 
@@ -2841,11 +2841,11 @@ Game.processEventTrigger = function (eventNumber, success)
 		{
 			this.airship.active = true;
 		}
-		Document.getElementById('Messagelog').innerHTML += '<br/>Event Triggered: ' + EventStrings[eventNumber];
+		document.getElementById('Messagelog').innerHTML += '<br/>Event Triggered: ' + EventStrings[eventNumber];
 	}
 	else
 	{
-		Document.getElementById('Messagelog').innerHTML += '<br/>Missing Requirement: ' + EventStrings[eventNumber];
+		document.getElementById('Messagelog').innerHTML += '<br/>Missing Requirement: ' + EventStrings[eventNumber];
 	}
 };
 
