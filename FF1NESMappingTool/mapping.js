@@ -45,10 +45,10 @@ const encounterGroupTable = [
 ];
 
 const worldMapTileFight = {
-	None: 0,
-	Fight: 1,
-	FightRiver: 2,
-	FightOcean: 3
+	None: -1,
+	Fight: -2,
+	FightRiver: -3,
+	FightOcean: -4
 };	
 
 const teleportEntryRequirement = {
@@ -311,8 +311,8 @@ new worldMapTile(),
 ];
 
 const dungeonMapTileFight = {
-	None: 0,
-	RNG: 1 // set encounter store number of fight 
+	None: -1,
+	RNG: -2 // set encounter store number of fight 
 };
 
 const roomOpening = {
@@ -1871,7 +1871,7 @@ function Sprite(name, mapName, startX, startY, room, imageName, fight, item, eve
 Sprite.prototype.playerInteraction = function (player)
 {
 	result = {fight: null, item: null, eventTrigger: null, success: false};
-	if(this.needKeyItem != null && player.keyItems[this.needKeyItem] != true)
+	if(this.needKeyItem != null && (this.needKeyItem == -255 ? player.getOrbs() == true : player.keyItems[this.needKeyItem] != true))
 	{
 		result.item = this.needKeyItem;
 	}
@@ -1919,23 +1919,13 @@ function Player(map, startX, startY, width, height, image, canoeImage, spriteWal
     this.direction = Directions.Right;
 	this.keyItems = new Array(KeyItemCount).fill(false);
 	this.eventsTriggered = new Array(EventTriggerCount).fill(false);
-	this.key = true; // CHANGE ALL THESE BACK TO FALSE AFTER IMPLEMENTING METHOD TO OBTAIN
-    this.canoe = false;
-	this.crown = true;
-	this.cube = true;
-	this.chime = true;
-	this.floater = true;
-	this.earthOrb = true;
-	this.waterOrb = true;
-	this.airOrb = true;
-	this.fireOrb = true;
 	this.queueAirshipBoard = false;
 	this.queueAirshipUnboard = false;
 	this.drawCanoe = false;
 	this.enteringRiver = false;
 	this.ignoreEncounter = false;
 	this.mapName = 'Overworld';
-	this.getOrbs = function(){return this.earthOrb && this.waterOrb && this.airOrb && this.fireOrb;};
+	this.getOrbs = function(){return this.keyItems[KeyItem.EARTHORB] && this.keyItems[KeyItem.WATERORB] && this.keyItems[KeyItem.AIRORB] && this.keyItems[KeyItem.FIREORB];};
 	this.allowMovement = true;
 	this.teleporting = false;
     this.moveMethod = MoveMethod.Walk;
@@ -2691,6 +2681,7 @@ Game.load = function () {
 		Loader.loadImage('waterorb', 'Assets/waterorb.png'),
 		Loader.loadImage('fireorb', 'Assets/fireorb.png'),
 		Loader.loadImage('airorb', 'Assets/airorb.png'),
+		Loader.loadImage('blackorb', 'Assets/blackorb.png'),
     ];
 };
 
@@ -2702,6 +2693,7 @@ Game.loadSprites = function() {
     this.player = new Player(overworldMap, 153, 165, 16, 16, Loader.getImage('fighter'), Loader.getImage('canoe'), {[Directions.Down]:[0,7], [Directions.Up]:[1,6], [Directions.Left]:[2,3], [Directions.Right]:[5,4]}, {[Directions.Down]:[0,1], [Directions.Up]:[0,1], [Directions.Left]:[4,5], [Directions.Right]:[2,3]});
     new Sprite('Garland', 'FiendsTemple', 0x14, 0x15, true, 'garland', 0x7f, null, null, true);
 	new Sprite('Kidnapped Princess', 'FiendsTemple', 0x14, 0x12, true, 'princess', null, null, EventTrigger.PRINCESS, true);
+	new Sprite('Black Orb', 'FiendsTemple', 0x14, 0x11, true, 'blackorb', null, null, null, true, -255);
 	new Sprite('King of Coneria', 'ConeriaCastle2F', 0xC, 0x4, true, 'king', null, null, EventTrigger.BRIDGE, false, null, EventTrigger.PRINCESS);
 	new Sprite('Bikke', 'Provoka', 0x5, 0x7, false, 'bikke', 0x7e, null, EventTrigger.PIRATES, true);
 	new Sprite('Astos', 'NorthwestCastle', 0x10, 0x6, true, 'astos', 0x7d, KeyItem.CRYSTAL, null, true, KeyItem.CROWN);
@@ -2726,6 +2718,7 @@ Game.loadSprites = function() {
 	new Sprite('Dr. Unne', 'Melmond', 0x1A, 0x1, false, 'scholar', null, null, EventTrigger.TRANSLATE, false, KeyItem.SLAB);
 	new Sprite('Chime Guy', 'Leifen', 0x18, 0x15, false, 'chimeguy', null, KeyItem.CHIME, null, false, null, EventTrigger.TRANSLATE);
 	new Sprite('Fiends Plate', 'FiendsTemple3F', 0x14, 0x10, true, 'fiendplate', null, null, null, true, KeyItem.LUTE);
+	new Sprite('Chaos', 'FiendsTemple3F', 0x14, 0x10, true, 'garland', null, null, null, true, KeyItem.LUTE);
 };
 
 Game.init = function () {
@@ -3002,21 +2995,21 @@ Game.checkForTeleport = function (tileX, tileY)
 	let teleport = tileData.teleport;
 	if(teleport != null)
 	{
-		if(teleport.requirement == teleportEntryRequirement.Crown && this.player.crown == false)
+		if(teleport.requirement == teleportEntryRequirement.Crown && this.player.keyItems[KeyItem.CROWN] == false)
 		{
-			console.log('No Crown :(');	
+			document.getElementById('messageLog').innerHTML += '<br/>No Crown :(';	
 		}
-		else if(teleport.requirement == teleportEntryRequirement.Cube && this.player.cube == false)
+		else if(teleport.requirement == teleportEntryRequirement.Cube && this.player.keyItems[KeyItem.CUBE] == false)
 		{
-			console.log('No Cube :(');	
+			document.getElementById('messageLog').innerHTML += '<br/>No Cube :(';	
 		}
-		else if(teleport.requirement == teleportEntryRequirement.Chime && this.player.chime == false)
+		else if(teleport.requirement == teleportEntryRequirement.Chime && this.player.keyItems[KeyItem.CHIME] == false)
 		{
-			console.log('No Chime :(');	
+			document.getElementById('messageLog').innerHTML += '<br/>No Chime :(';	
 		}
 		else if(teleport.requirement == teleportEntryRequirement.Orbs && this.player.getOrbs() == false)
 		{
-			console.log('Not enough orbs noob');	
+			document.getElementById('messageLog').innerHTML += '<br/>Not enough orbs noob';
 		}
 		else //teleport
 		{
