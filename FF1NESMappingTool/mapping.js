@@ -2692,7 +2692,7 @@ Game.init = function () {
     overworldMap.data = Loader.getMapData('overworld');
     this.camera = new Camera(0, 0, defaultWidth, defaultHeight, 2);
 	for(let i = 0; i < dungeonNames.length; i++)
-		spriteMapList[dungeonName[i]] = [];
+		spriteMapList[dungeonNames[i]] = [];
 	this.loadSprites();
 	this.frames = 0;
 	this.movementSpeedFactor = 0.25;
