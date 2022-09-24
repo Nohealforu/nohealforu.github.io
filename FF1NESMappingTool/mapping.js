@@ -1935,9 +1935,11 @@ function Player(map, startX, startY, width, height, image, canoeImage, spriteWal
     this.moveMethod = MoveMethod.Walk;
 	this.room = 'Ignore';
 	this.actionCooldown = 0;
+	this.movementCooldown = 0;
 	this.collision = false;
     console.log("Creating Player At: " + this.gridX + "," + this.gridY);
     spriteList.push(this);
+									   
 }
 
 Player.prototype.teleportPlayer = function (map, gridX, gridY)
@@ -2780,6 +2782,7 @@ Game.update = function (delta) {
     this.hasScrolled = false;
     this.frames = this.frames + delta * 60;
 	this.player.actionCooldown -= delta;
+	this.player.movementCooldown -= delta;
     // handle camera movement with arrow keys
     let direction = -1;
     let activeMovement = false;
@@ -2809,6 +2812,8 @@ Game.update = function (delta) {
 		this.handleActionButton(incompleteMovement, activeMovement);
 	}
     
+	if(!this.player.allowMovement && this.player.movementCooldown < 0)
+		this.player.allowMovement = true;
     
     if (activeMovement == true || incompleteMovement == true) {
         this.player.move(delta, direction, activeMovement, keyHeld);
@@ -2882,7 +2887,7 @@ Game.processEventTrigger = function (eventNumber, success)
 		}
 		else if(eventNumber == EventTrigger.PIRATES)
 		{
-			new Sprite('Bikke', 'Provoka', 0x5, 0x7, false, 'bikke', null, null, EventTrigger.SPAWNSHIP, true);
+			new Sprite('Bikke2', 'Provoka', 0x5, 0x7, false, 'bikke', null, null, EventTrigger.SPAWNSHIP, true);
 			this.ship.active = true;
 		}
 		else if(eventNumber == EventTrigger.SPAWNSHIP)
@@ -2978,7 +2983,10 @@ Game.incrementStepCounter = function()
 	let encounterThreshold = (this.player.moveMethod == MoveMethod.Ship ? 3 : this.currentMap.encounterThreshold);
 	if(this.encounterChance < encounterThreshold)
 	{
+		 
 		this.encounterGroup = encounterGroupTable[this.encounterNumber];
+		player.allowMovement = false;
+		player.movementCooldown = 0.3;
 		this.encounterNumber++;
 		if(this.encounterNumber > 255)
 			this.encounterNumber -= 256;
