@@ -2587,7 +2587,7 @@ Game.load = function () {
 		Loader.loadImage('tiles_seashrine2', 'Assets/DungeonTiles/SeaShrine2.png'),
 		Loader.loadImage('tiles_seashrine2room', 'Assets/DungeonTiles/SeaShrine2Room.png'),
 		Loader.loadImage('tiles_skycastle', 'Assets/DungeonTiles/SkyCastle.png'),
-		Loader.loadImage('tiles_skycastlerooms', 'Assets/DungeonTiles/SkyCastleRoom.png'),
+		Loader.loadImage('tiles_skycastleroom', 'Assets/DungeonTiles/SkyCastleRoom.png'),
 		Loader.loadImage('tiles_titan', 'Assets/DungeonTiles/Titan.png'),
 		Loader.loadImage('tiles_titanroom', 'Assets/DungeonTiles/TitanRoom.png'),
 		Loader.loadImage('tiles_town', 'Assets/DungeonTiles/Town.png'),
