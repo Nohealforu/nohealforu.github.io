@@ -163,7 +163,7 @@ const EventType = {
 	Reset: 4
 };
 
-function teleportEntry(name, targetMap, x, y, requirement = teleportEntryRequirement.None, roomState){
+function teleportEntry(name, targetMap, x, y, requirement = teleportEntryRequirement.None, roomState = null){
 	this.name = name;
 	this.targetMap = targetMap;
 	this.gridX = x;
@@ -2655,7 +2655,7 @@ LocationEvent = function(eventType, eventIndex)
 
 Game.createCheckpoint = function(player)
 {
-	let checkpoint = new Checkpoint(new MapSaveData(this.currentMap.name, room),
+	let checkpoint = new Checkpoint(new MapSaveData(this.currentMap.name, this.currentMap.showRooms),
 									new PlayerSaveData(player.gridX, player.gridY, player.moveMethod, player.keyItems, player.eventsTriggered), 
 									new SpriteSaveData(), 
 									new GameSaveData(this.stepCounter1, this.stepCounter2, this.encounterGroup, this.encounterChance, this.encounterThreshold, this.encounterNumber));
