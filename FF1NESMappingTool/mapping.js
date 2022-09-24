@@ -2534,6 +2534,7 @@ PlayerSaveData = function(gridX, gridY, moveMethod, keyItems, eventsTriggered)
 	this.gridY = gridY;
 	this.moveMethod = moveMethod;
 	this.keyItems = [];
+	this.eventsTriggered = [];
 	for(let i = 0; i < keyItems.length; i++)
 		this.keyItems[i] = keyItems[i];
 	for(let i = 0; i < eventsTriggered.length; i++)
