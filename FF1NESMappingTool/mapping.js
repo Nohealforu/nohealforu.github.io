@@ -2868,7 +2868,7 @@ Game.processEventTrigger = function (eventNumber, success)
 		}
 		else if(eventNumber == EventTrigger.PIRATES)
 		{
-			new Sprite('Bikke', 'Provoka', 0x5, 0x7, false, 'bikke', 0x7e, null, EventTrigger.SPAWNSHIP, true);
+			new Sprite('Bikke', 'Provoka', 0x5, 0x7, false, 'bikke', null, null, EventTrigger.SPAWNSHIP, true);
 			this.ship.active = true;
 		}
 		else if(eventNumber == EventTrigger.SPAWNSHIP)
