@@ -2557,7 +2557,7 @@ SpriteSaveData = function()
 	for(let i = 0; i < spriteNames.length; i++)
 	{
 		let sprite = spriteNameMap[spriteNames[i]];
-		spriteDataMap[sprite.name] = new SpriteSaveDatum(sprite.name, sprite.active, sprite.gridX, sprite.gridY, sprite.triggered, sprite.followPlayer);
+		this.spriteDataMap[sprite.name] = new SpriteSaveDatum(sprite.name, sprite.active, sprite.gridX, sprite.gridY, sprite.triggered, sprite.followPlayer);
 	}
 }
 
