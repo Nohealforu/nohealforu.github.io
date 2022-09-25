@@ -3348,7 +3348,7 @@ Game.handleTeleport = function (warp, teleport, sourceX = 0, sourceY = 0, moveMe
 					   this.currentPathLocations[i].locationEvents.length > 0)
 						eventFound = true;
 				}
-				if(eventFound)
+				if(!eventFound)
 					townskip = true;
 			}
 		}
