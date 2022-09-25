@@ -2677,6 +2677,8 @@ Game.createCheckpoint = function(player, useExitCoordinates = false)
 
 Game.returnToPreviousPath = function()
 {
+	if(this.stepPaths.length == 0)
+		return;
 	this.currentStepPath = this.stepPaths.pop();
 	this.currentPathLocations = this.currentStepPath.pathLocations;
 	this.currentTileLocationEvents = [];
