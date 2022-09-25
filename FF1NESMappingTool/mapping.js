@@ -2531,8 +2531,9 @@ MapSaveData = function(mapName, room)
 	this.room = room;
 }
 
-PlayerSaveData = function(gridX, gridY, moveMethod, keyItems, eventsTriggered)
+PlayerSaveData = function(active, gridX, gridY, moveMethod, keyItems, eventsTriggered)
 {
+	this.active = active;
 	this.gridX = gridX;
 	this.gridY = gridY;
 	this.moveMethod = moveMethod;
@@ -2588,6 +2589,7 @@ Checkpoint.prototype.loadCheckpoint = function(player, resetType)
 	player.eventsTriggered = this.playerSaveData.eventsTriggered;
 	let teleport = new teleportEntry('CheckPointWarp', this.mapSaveData.name, this.playerSaveData.gridX, this.playerSaveData.gridY, teleportEntryRequirement.None, this.mapSaveData.room, this.playerSaveData.moveMethod);
 	Game.startTeleport(true, teleport, player.gridX, player.gridY, this.playerSaveData.moveMethod);
+	player.active = this.playerSaveData.active;
 	
 	for(let i = 0; i < spriteNames.length; i++)
 	{
@@ -2667,7 +2669,7 @@ Game.createCheckpoint = function(player, useExitCoordinates = false)
 {
 	let exitInformation = (useExitCoordinates ? this.getExitTeleport(true): null);
 	let checkpoint = new Checkpoint(new MapSaveData((useExitCoordinates ? 'WorldMap' : this.currentMap.name), (useExitCoordinates ? false : this.currentMap.showRooms)),
-									new PlayerSaveData((useExitCoordinates ? exitInformation.gridX : player.gridX), (useExitCoordinates ? exitInformation.gridY : player.gridY), player.moveMethod, player.keyItems, player.eventsTriggered), 
+									new PlayerSaveData(player.active, (useExitCoordinates ? exitInformation.gridX : player.gridX), (useExitCoordinates ? exitInformation.gridY : player.gridY), player.moveMethod, player.keyItems, player.eventsTriggered), 
 									new SpriteSaveData(), 
 									new GameSaveData(this.stepCounter1, this.stepCounter2, this.encounterGroup, this.encounterChance, this.encounterThreshold, this.encounterNumber));
 	return checkpoint;
