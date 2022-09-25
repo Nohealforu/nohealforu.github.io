@@ -2636,10 +2636,10 @@ Checkpoint.prototype.loadCheckpoint = function(player, resetType)
 		 '<br/>threshold: ' + Game.encounterThreshold + 
 		 '<br/>encounterNumber: ' + Game.encounterNumber
 		);
-		Game.currentPathLocations.push(new LocationEvent(EventType.Reset, ResetType.Hard));
+		Game.currentTileLocationEvents.push(new LocationEvent(EventType.Reset, ResetType.Hard));
 	}
 	else
-		Game.currentPathLocations.push(new LocationEvent(EventType.Reset, ResetType.Soft));
+		Game.currentTileLocationEvents.push(new LocationEvent(EventType.Reset, ResetType.Soft));
 };
 
 StepPath = function(map, checkpoint)
@@ -3099,7 +3099,7 @@ Game.update = function (delta) {
 
 Game.processFight = function (fightNumber, success)
 {
-	Game.currentPathLocations.push(new LocationEvent(EventType.Fight, fightNumber));
+	Game.currentTileLocationEvents.push(new LocationEvent(EventType.Fight, fightNumber));
 	document.getElementById('messageLog').innerHTML += '<br/>Fight: ' + fightNumber;
 };
 
@@ -3108,7 +3108,7 @@ Game.processItem = function (itemNumber, success)
 	if(success)
 	{
 		this.player.keyItems[itemNumber] = true;
-		Game.currentPathLocations.push(new LocationEvent(EventType.Item, itemNumber));
+		Game.currentTileLocationEvents.push(new LocationEvent(EventType.Item, itemNumber));
 		document.getElementById('messageLog').innerHTML += '<br/>Item come to hand: ' + KeyItemStrings[itemNumber];
 		if(itemNumber == KeyItem.BOTTLE)
 			spriteNameMap['Fairy'].active = true;
@@ -3124,7 +3124,7 @@ Game.processEventTrigger = function (eventNumber, success)
 	if(success)
 	{
 		this.player.eventsTriggered[eventNumber] = true;
-		Game.currentPathLocations.push(new LocationEvent(EventType.Event, eventNumber));
+		Game.currentTileLocationEvents.push(new LocationEvent(EventType.Event, eventNumber));
 		if(eventNumber == EventTrigger.PRINCESS)
 		{
 			// clear exit info for later
@@ -3344,8 +3344,8 @@ Game.handleTeleport = function (warp, teleport, sourceX = 0, sourceY = 0, moveMe
 				let eventFound = false;
 				for(let i = 0; i < this.currentPathLocations.length; i++)
 				{
-					if(this.currentPathLocations[i].currentTileLocationEvents != null && 
-					   this.currentPathLocations[i].currentTileLocationEvents.length > 0)
+					if(this.currentPathLocations[i].locationEvents != null && 
+					   this.currentPathLocations[i].locationEvents.length > 0)
 						eventFound = true;
 				}
 				if(eventFound)
