@@ -163,6 +163,15 @@ const EventType = {
 	Reset: 4
 };
 
+const NewPathType = 
+{
+	Teleport: 1,
+	ShipStart: 2,
+	ShipEnd: 3,
+	AirshipStart: 4,
+	AirshipEnd: 5
+};
+
 function teleportEntry(name, targetMap, x, y, requirement = teleportEntryRequirement.None, roomState = null){
 	this.name = name;
 	this.targetMap = targetMap;
@@ -2177,7 +2186,8 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
 		if(tileData.shop != null && tileData.shop.includes('INN'))
 			Game.saveINN();
 		
-		Game.logPathLocation(this.gridX, this.gridY);
+		if(this.moveMethod != MoveMethod.Airship)
+			Game.logPathLocation(this.gridX, this.gridY);
 	}
 };
 
@@ -2271,6 +2281,7 @@ Ship.prototype.board = function(player)
 	this.offsetY = 0;
     this.gridX = player.gridX;
     this.gridY = player.gridY;
+	Game.handleNewPath(player.gridX, player.gridY, 'WorldMap', NewPathType.ShipStart);
 };
 
 Ship.prototype.unboard = function(player, river)
@@ -2284,6 +2295,7 @@ Ship.prototype.unboard = function(player, river)
     this.gridX = player.gridX;
     this.gridY = player.gridY;
 	this.unboardThisFrame = true;
+	Game.handleNewPath(player.gridX, player.gridY, 'WorldMap', NewPathType.ShipEnd);
 };
 
 Ship.prototype.getAnimationFrame = function (frames) {
@@ -2343,6 +2355,7 @@ Airship.prototype.board = function(player)
 	player.offsetX = 0;
 	player.offsetY = 0;
 	player.queueAirshipBoard = false;
+	Game.handleNewPath(player.gridX, player.gridY, 'WorldMap', NewPathType.AirshipStart);
 };
 
 Airship.prototype.unboard = function(player)
@@ -2359,6 +2372,7 @@ Airship.prototype.unboard = function(player)
 	player.offsetX = 0;
 	player.offsetY = 0;
 	player.queueAirshipUnboard = false;
+	Game.handleNewPath(player.gridX, player.gridY, 'WorldMap', NewPathType.AirshipEnd);
 };
 
 Airship.prototype.updateElevation = function(player, delta)
@@ -2630,12 +2644,12 @@ Checkpoint.prototype.loadCheckpoint = function(player, resetType)
 		Game.currentTileLocationEvents.push(new LocationEvent(EventType.Reset, ResetType.Soft));
 };
 
-StepPath = function(map, checkpoint)
+StepPath = function(map, checkpoint, airship = false)
 {
 	this.pathLocations = [];
 	this.map = map;
 	this.checkpoint = checkpoint;
-	this.stepCount = 0;
+	this.airship = airship;
 }
 
 PathLocation = function(gridX, gridY, locationEvents)
@@ -3330,40 +3344,53 @@ Game.handleTeleport = function (warp, teleport, sourceX = 0, sourceY = 0, moveMe
 	this.player.teleportPlayer(this.currentMap, teleport.gridX, teleport.gridY, moveMethod);
 	
 	if(teleport.targetMap != priorMapName)
+		Game.handleNewPath(teleport.gridX, teleport.gridY, teleport.targetMap, NewPathType.Teleport);
+	
+};
+
+Game.handleNewPath = function(gridX, gridY, targetMap, newPathType)
+{
+	let combineRoute = false;
+	let eventFound = true;
+	if(targetMap == 'WorldMap' && newPathType == NewPathType.Teleport)
 	{
-		let townSkip = false;
-		let eventFound = true;
-		if(teleport.targetMap == 'WorldMap')
+		if(this.currentPathLocations.length == 2)
+			combineRoute = true;
+		else if(this.currentPathLocations.length > 2 && this.currentPathLocations.length < 5)
 		{
-			if(this.currentPathLocations.length == 2)
-				townSkip = true;
-			else if(this.currentPathLocations.length > 2 && this.currentPathLocations.length < 5)
+			let eventFound = false;
+			for(let i = 0; i < this.currentPathLocations.length; i++)
 			{
-				let eventFound = false;
-				for(let i = 0; i < this.currentPathLocations.length; i++)
-				{
-					if(this.currentPathLocations[i].locationEvents != null && 
-					   this.currentPathLocations[i].locationEvents.length > 0)
-						eventFound = true;
-				}
-				if(!eventFound)
-					townskip = true;
+				if(this.currentPathLocations[i].locationEvents != null && 
+				   this.currentPathLocations[i].locationEvents.length > 0)
+					eventFound = true;
 			}
+			if(!eventFound)
+				combineRoute = true;
 		}
-		if(townSkip)
-		{
-			this.currentStepPath = this.stepPaths.pop();
-			this.currentPathLocations = this.currentStepPath.pathLocations;
-			this.currentTileLocationEvents = [];
-		}
-		else
-		{
-			this.currentStepPath.pathLocations = this.currentPathLocations;
-			this.stepPaths.push(this.currentStepPath);
-			this.currentStepPath = new StepPath(this.currentMap, this.createCheckpoint(this.player));
-			this.currentPathLocations = [new PathLocation(teleport.gridX, teleport.gridY)];
-			this.currentTileLocationEvents = [];
-		}
+	}
+	else if(newPathType == NewPathType.ShipEnd)
+	{
+		if(this.currentPathLocations.length < 32)
+			combineRoute = true;
+	}
+	if(combineRoute)
+	{
+		this.currentStepPath = this.stepPaths.pop();
+		this.currentPathLocations = this.currentStepPath.pathLocations;
+		this.currentTileLocationEvents = [];
+	}
+	else
+	{
+		let airship = (newPathType == NewPathType.AirshipStart);
+		if(newPathType == NewPathType.AirshipStart)
+			this.currentPathLocations.push(new PathLocation(gridX, gridY));
+		this.currentStepPath.pathLocations = this.currentPathLocations;
+		this.stepPaths.push(this.currentStepPath);
+		this.currentStepPath = new StepPath(this.currentMap, this.createCheckpoint(this.player), airship);
+		//if(newPathType != NewPathType.ShipEnd)
+			this.currentPathLocations = [new PathLocation(gridX, gridY)];
+		this.currentTileLocationEvents = [];
 	}
 };
 
