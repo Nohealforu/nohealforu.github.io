@@ -2583,7 +2583,7 @@ Checkpoint.prototype.loadCheckpoint = function(player, resetType)
 {
 	player.keyItems = this.playerSaveData.keyItems;
 	player.eventsTriggered = this.playerSaveData.eventsTriggered;
-	let teleport = new teleportEntry('CheckPointWarp' + resetType, this.mapSaveData.name, this.playerSaveData.gridX, this.playerSaveData.gridY, teleportEntryRequirement.None, this.mapSaveData.room, this.playerSaveData.moveMethod);
+	let teleport = new teleportEntry('CheckPointWarp', this.mapSaveData.name, this.playerSaveData.gridX, this.playerSaveData.gridY, teleportEntryRequirement.None, this.mapSaveData.room, this.playerSaveData.moveMethod);
 	Game.startTeleport(true, teleport, player.gridX, player.gridY, this.playerSaveData.moveMethod);
 	
 	for(let i = 0; i < spriteNames.length; i++)
@@ -3298,7 +3298,7 @@ Game.handleTeleport = function (warp, teleport, sourceX = 0, sourceY = 0, moveMe
 	}
 	this.player.teleportPlayer(this.currentMap, teleport.gridX, teleport.gridY, moveMethod);
 	
-	if(teleport.name != 'CheckPointWarp' + ResetType.Path)
+	if(teleport.name != 'CheckPointWarp' || teleport.targetMap != this.currentMap.name)
 	{
 		Game.currentStepPath.pathLocations = Game.currentPathLocations;
 		Game.stepPaths.push(Game.currentStepPath);
