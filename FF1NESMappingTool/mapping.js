@@ -2581,8 +2581,8 @@ Checkpoint = function(mapSaveData, playerSaveData, spriteSaveData, gameSaveData)
 
 Checkpoint.prototype.loadCheckpoint = function(player, resetType)
 {
-	player.keyItems = playerSaveData.keyItems;
-	player.eventsTriggered = playerSaveData.eventsTriggered;
+	player.keyItems = this.playerSaveData.keyItems;
+	player.eventsTriggered = this.playerSaveData.eventsTriggered;
 	let teleport = new teleportEntry('CheckPointWarp' + resetType, this.mapSaveData.name, this.playerSaveData.gridX, this.playerSaveData.gridY, teleportEntryRequirement.None, this.mapSaveData.room, this.playerSaveData.moveMethod);
 	Game.startTeleport(true, teleport, player.gridX, player.gridY, this.playerSaveData.moveMethod);
 	
