@@ -2511,20 +2511,6 @@ Controller.prototype.render = function()
     this.context.drawImage(this.effectsCanvas, 0, 0);
 };
 
-/*
-const ResetType = {
-	Path: 1,
-	Soft: 2,
-	Hard: 3
-};
-
-const EventType = {
-	Fight: 1,
-	Item: 2,
-	Event: 3
-	Reset: 4 
-};*/
-
 MapSaveData = function(mapName, room)
 {
 	this.name = mapName;
@@ -2674,6 +2660,14 @@ Game.createCheckpoint = function(player, useExitCoordinates = false)
 									new GameSaveData(this.stepCounter1, this.stepCounter2, this.encounterGroup, this.encounterChance, this.encounterThreshold, this.encounterNumber));
 	return checkpoint;
 };
+
+Game.returnToPreviousPath = function()
+{
+	this.currentStepPath = this.stepPaths.pop();
+	this.currentPathLocations = this.currentStepPath.pathLocations;
+	this.currentTileLocationEvents = [];
+	this.currentStepPath.checkpoint.loadCheckpoint(this.player, ResetType.Path);
+}
 
 Game.logPathLocation = function (gridX, gridY)
 {
