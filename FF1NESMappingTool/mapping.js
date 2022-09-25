@@ -2600,12 +2600,12 @@ Checkpoint.prototype.loadCheckpoint = function(player, resetType)
 	
 	if(resetType == ResetType.Path)
 	{
-		Game.stepCounter1 = this.stepCounter1;
-		Game.stepCounter2 = this.stepCounter2;
-		Game.encounterGroup = this.encounterGroup;
-		Game.encounterChance = this.encounterChance;
-		Game.encounterThreshold = this.encounterThreshold;
-		Game.encounterNumber = this.encounterNumber;
+		Game.stepCounter1 = this.gameSaveData.stepCounter1;
+		Game.stepCounter2 = this.gameSaveData.stepCounter2;
+		Game.encounterGroup = this.gameSaveData.encounterGroup;
+		Game.encounterChance = this.gameSaveData.encounterChance;
+		Game.encounterThreshold = this.gameSaveData.encounterThreshold;
+		Game.encounterNumber = this.gameSaveData.encounterNumber;
 		document.getElementById('encounterInformation').innerHTML = 
 		('step1: ' + Game.stepCounter1 + 
 		 '<br/>step2: ' + Game.stepCounter2 + 
