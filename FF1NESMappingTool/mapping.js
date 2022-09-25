@@ -2733,6 +2733,15 @@ Game.handleMovementSpeedChange = function(sliderElement)
 	this.movementSpeedFactor = sliderElement.value / 100;
 };
 
+Game.handleColorChange = function (colorElement)
+{
+	if(colorElement.id == 'pathMain')
+		this.pathMainColor = colorElement.value;
+	else if(colorElement.id == 'pathShadow')
+		this.pathShadowColor = colorElement.value;
+	this._drawPath(this.currentMap);
+}
+
 Game.handleWarp = function() 
 {
 	if(this.currentMap.overworldMap)
@@ -3010,6 +3019,11 @@ Game.init = function () {
     this.spriteCanvas = document.createElement('canvas');
     this.spriteCanvas.width = defaultWidth;
     this.spriteCanvas.height = defaultHeight;
+	this.pathCanvas = document.createElement('canvas');
+    this.pathCanvas.width = defaultWidth;
+    this.pathCanvas.height = defaultHeight;
+	this.pathMainColor = '#6000D0';
+	this.pathShadowColor = '#222222';
 
     // initial draw of the map
     console.log("Intial Map Loading...");
@@ -3426,6 +3440,47 @@ Game._drawMap = function (map) {
     }
 };
 
+Game._drawPath = function (map) {
+    let context = this.layerCanvas.getContext('2d');
+    context.imageSmoothingEnabled = false;
+    context.clearRect(0, 0, defaultWidth, defaultHeight);
+	if(Game.currentPathLocations.length > 0)
+	{
+		context.lineWidth = 8;
+		context.lineJoin = 'round';
+		context.lineCap = 'round';
+		context.strokeStyle = this.pathMainColor;
+		context.shadowOffsetX = 2;
+		context.shadowOffsetY = 2;
+		context.shadowBlur = 2;
+		context.shadowColor = this.pathShadowColor;
+		let displayTsize = map.cells.tsize * this.camera.zoom;
+		let startCol = Math.floor((this.camera.x - this.camera.width / 2) / displayTsize);
+		let endCol = startCol + (this.camera.width * this.camera.zoom) / displayTsize;
+		let startRow = Math.floor((this.camera.y - this.camera.height / 2) / displayTsize);
+		let endRow = startRow + (this.camera.height * this.camera.zoom) / displayTsize;
+		let offsetX = -this.camera.x + this.camera.width / 2 + startCol * displayTsize;
+		let offsetY = -this.camera.y + this.camera.height / 2 + startRow * displayTsize;
+		
+		let previousPathLocation = null;
+		context.beginPath();
+		for (let i = 0; i < Game.currentPathLocations.length; i++) {
+			let pathLocation = currentPathLocations[i];
+			
+			let x = (pathLocation.gridX - startCol) * displayTsize + offsetX;
+			let y = (pathLocation.gridY - startRow) * displayTsize + offsetY;
+			if(x < defaultWidth && x + displayTsize > 0 && y < defaultHeight && y + displayTsize > 0)
+			{
+				if(previousPathLocation == null || (Math.abs(previousPathLocation.gridX - pathLocation.gridX) + Math.abs(previousPathLocation.gridY - pathLocation.gridY) > 1)) // locations aren't adjacent, i.e. resets
+					context.moveTo(x, y);
+				else
+					context.lineTo(x, y);
+			}
+		}
+		context.stroke();
+	}
+};
+
 Game._drawSprites = function (map) {
     let context = this.spriteCanvas.getContext('2d');
     context.imageSmoothingEnabled = false;
@@ -3499,6 +3554,7 @@ Game.render = function () {
     // re-draw map if there has been scroll
     if (this.hasScrolled) {
         this._drawMap(this.currentMap);
+		this._drawPath(this.currentMap);
         this._drawSprites(this.currentMap);
     }
 	// keep animating airship
@@ -3508,6 +3564,7 @@ Game.render = function () {
 
     // draw the map layers into game context
     this.ctx.drawImage(this.layerCanvas, 0, 0);
+    this.ctx.drawImage(this.pathCanvas, 0, 0);
     this.ctx.drawImage(this.spriteCanvas, 0, 0);
 	if(this.player.teleporting)
 	{
