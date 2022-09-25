@@ -3298,7 +3298,7 @@ Game.handleTeleport = function (warp, teleport, sourceX = 0, sourceY = 0, moveMe
 	}
 	this.player.teleportPlayer(this.currentMap, teleport.gridX, teleport.gridY, moveMethod);
 	
-	if(teleport.name != 'CheckPointWarp' || teleport.targetMap != this.currentMap.name)
+	if(teleport.targetMap != this.currentMap.name)
 	{
 		Game.currentStepPath.pathLocations = Game.currentPathLocations;
 		Game.stepPaths.push(Game.currentStepPath);
