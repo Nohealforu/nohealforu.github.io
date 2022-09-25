@@ -3464,8 +3464,8 @@ Game._drawPath = function (map) {
 		
 		let previousPathLocation = null;
 		context.beginPath();
-		for (let i = 0; i < Game.currentPathLocations.length; i++) {
-			let pathLocation = currentPathLocations[i];
+		for (let i = 0; i < this.currentPathLocations.length; i++) {
+			let pathLocation = this.currentPathLocations[i];
 			
 			let x = (pathLocation.gridX - startCol) * displayTsize + offsetX;
 			let y = (pathLocation.gridY - startRow) * displayTsize + offsetY;
@@ -3476,6 +3476,7 @@ Game._drawPath = function (map) {
 				else
 					context.lineTo(x, y);
 			}
+			previousPathLocation = pathLocation;
 		}
 		context.stroke();
 	}
