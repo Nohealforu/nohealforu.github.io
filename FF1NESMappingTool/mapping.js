@@ -2589,7 +2589,7 @@ Checkpoint.prototype.loadCheckpoint = function(player, resetType)
 	for(let i = 0; i < spriteNames.length; i++)
 	{
 		let sprite = spriteNameMap[spriteNames[i]];
-		let savedSprite = this.spriteDataMap[sprite.name];
+		let savedSprite = this.spriteSaveData.spriteDataMap[sprite.name];
 		sprite.name = savedSprite.name;
 		sprite.active = savedSprite.active;
 		sprite.gridX = savedSprite.gridX;
