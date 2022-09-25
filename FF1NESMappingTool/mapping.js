@@ -3441,8 +3441,7 @@ Game._drawMap = function (map) {
 };
 
 Game._drawPath = function (map) {
-    let context = this.layerCanvas.getContext('2d');
-    context.imageSmoothingEnabled = false;
+    let context = this.pathCanvas.getContext('2d');
     context.clearRect(0, 0, defaultWidth, defaultHeight);
 	if(Game.currentPathLocations.length > 0)
 	{
