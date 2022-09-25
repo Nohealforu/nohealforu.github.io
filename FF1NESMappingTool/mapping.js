@@ -1544,7 +1544,7 @@ const dungeonNames = [
 'FiendsTempleAir',
 'FiendsTempleChaos',
 'TitanTunnel',
-'Overworld'
+'WorldMap'
 ];
 
 
