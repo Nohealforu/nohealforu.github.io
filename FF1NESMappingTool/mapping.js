@@ -2787,6 +2787,7 @@ Game.midTeleport = function(warp, teleport, tileX, tileY, moveMethod = MoveMetho
 	this._drawTransition(1);
 	this.teleportMidpoint = true;
 	this._drawMap(this.currentMap);
+	this._drawPath(this.currentMap);
     this._drawSprites(this.currentMap);	
 };
 
@@ -3458,23 +3459,66 @@ Game._drawPath = function (map) {
 		let endCol = startCol + (this.camera.width * this.camera.zoom) / displayTsize;
 		let startRow = Math.floor((this.camera.y - this.camera.height / 2) / displayTsize);
 		let endRow = startRow + (this.camera.height * this.camera.zoom) / displayTsize;
-		let offsetX = -this.camera.x + this.camera.width / 2 + startCol * displayTsize;
-		let offsetY = -this.camera.y + this.camera.height / 2 + startRow * displayTsize;
+		let offsetX = -this.camera.x + this.camera.width / 2 + startCol * displayTsize + displayTsize / 2;
+		let offsetY = -this.camera.y + this.camera.height / 2 + startRow * displayTsize + displayTsize / 2;
 		
 		let previousPathLocation = null;
+		let newSubPath = true;
 		context.beginPath();
 		for (let i = 0; i < this.currentPathLocations.length; i++) {
 			let pathLocation = this.currentPathLocations[i];
 			
 			let x = (pathLocation.gridX - startCol) * displayTsize + offsetX;
 			let y = (pathLocation.gridY - startRow) * displayTsize + offsetY;
-			if(x < defaultWidth && x + displayTsize > 0 && y < defaultHeight && y + displayTsize > 0)
-			{
+			//if(x < defaultWidth && x + displayTsize > 0 && y < defaultHeight && y + displayTsize > 0)
+			//{
 				if(previousPathLocation == null || (Math.abs(previousPathLocation.gridX - pathLocation.gridX) + Math.abs(previousPathLocation.gridY - pathLocation.gridY) > 1)) // locations aren't adjacent, i.e. resets
-					context.moveTo(x, y);
+				{
+					context.ellipse(x, y, 8, 8, 0, 0, Math.PI * 2);
+					newSubPath = true;
+				}	
 				else
-					context.lineTo(x, y);
-			}
+				{
+					let targetStartX = null;
+					let targetStartY = null;
+					let targetEndX = null;
+					let targetEndY = null;
+					if(previousPathLocation.gridX < pathLocation.gridX)
+					{ // move right
+						targetStartX = x - displayTsize + 8;
+						targetEndX = x - 8;
+						targetStartY = y + 8;
+						targetEndY = y + 8;
+					}
+					else if(previousPathLocation.gridX > pathLocation.gridX)
+					{ //move left
+						targetStartX = x + displayTsize - 8;
+						targetEndX = x + 8;
+						targetStartY = y - 8;
+						targetEndY = y - 8;
+					}
+					else if(previousPathLocation.gridY < pathLocation.gridY)
+					{ // move down
+						targetStartX = x - 8;
+						targetEndX = x - 8;
+						targetStartY = y - displayTsize + 8;
+						targetEndY = y - 8;
+					}
+					else if(previousPathLocation.gridY > pathLocation.gridY)
+					{ // move up
+						targetStartX = x + 8;
+						targetEndX = x + 8;
+						targetStartY = y + displayTsize - 8;
+						targetEndY = y + 8;
+					}
+					if(newSubPath)
+						context.moveTo(targetStartX, targetStartY);
+					else
+						context.lineTo(targetStartX, targetStartY);
+					context.lineTo(targetEndX, targetEndY);
+					newSubPath = false;
+				}
+			//}
 			previousPathLocation = pathLocation;
 		}
 		context.stroke();
