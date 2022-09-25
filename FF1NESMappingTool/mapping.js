@@ -1820,7 +1820,7 @@ var overworldMap = {
 	loadRooms: false,
 	showRooms: false,
 	overworldMap: true,
-	name: 'Overworld',
+	name: 'WorldMap',
 	encounterThreshold: 10,
     getTile: function (mapX, mapY, col, row) {
         return this.data[mapY * this.cells.rows * this.maxCol + row * this.maxCol + mapX * this.cells.cols + col];
@@ -1943,7 +1943,7 @@ function Player(map, startX, startY, width, height, image, canoeImage, spriteWal
 	this.drawCanoe = false;
 	this.enteringRiver = false;
 	this.ignoreEncounter = false;
-	this.mapName = 'Overworld';
+	this.mapName = 'WorldMap';
 	this.getOrbs = function(){return this.keyItems[KeyItem.EARTHORB] && this.keyItems[KeyItem.WATERORB] && this.keyItems[KeyItem.AIRORB] && this.keyItems[KeyItem.FIREORB];};
 	this.allowMovement = true;
 	this.teleporting = false;
@@ -1953,7 +1953,7 @@ function Player(map, startX, startY, width, height, image, canoeImage, spriteWal
 	this.movementCooldown = 0;
 	this.collision = false;
     console.log("Creating Player At: " + this.gridX + "," + this.gridY);
-	spriteMapList['Overworld'].push(this);
+	spriteMapList['WorldMap'].push(this);
 }
 
 Player.prototype.teleportPlayer = function (map, gridX, gridY, moveMethod)
@@ -2192,12 +2192,12 @@ function Bridge(image)
     this.ship = true;
 	this.offsetX = 0;
 	this.offsetY = 0;
-	this.mapName = 'Overworld';
+	this.mapName = 'WorldMap';
 	this.room = false;
 	this.collision = false;
     spriteNameMap[name] = this;
 	spriteNames.push(name);
-	spriteMapList['Overworld'].push(this);
+	spriteMapList['WorldMap'].push(this);
 }
 // Make generic sprite class to put Bridge/Misc under to prevent animation needs?
 Bridge.prototype.getAnimationFrame = function (frames) {
@@ -2219,12 +2219,12 @@ function Canal(image)
     this.ship = false;
 	this.offsetX = 0;
 	this.offsetY = 0;
-	this.mapName = 'Overworld';
+	this.mapName = 'WorldMap';
 	this.room = false;
 	this.collision = false;
     spriteNameMap[name] = this;
 	spriteNames.push(name);
-	spriteMapList['Overworld'].push(this);
+	spriteMapList['WorldMap'].push(this);
 }
 // Make generic sprite class to put Bridge/Misc under to prevent animation needs?
 Canal.prototype.getAnimationFrame = function (frames) {
@@ -2249,13 +2249,13 @@ function Ship(image, spriteWalkFrames)
     this.direction = Directions.Right;
 	this.offsetX = 0;
 	this.offsetY = 0;
-	this.mapName = 'Overworld';
+	this.mapName = 'WorldMap';
 	this.room = false;
 	this.unboardThisFrame = false;
 	this.collision = false;
     spriteNameMap[name] = this;
 	spriteNames.push(name);
-	spriteMapList['Overworld'].push(this);
+	spriteMapList['WorldMap'].push(this);
 }
 
 Ship.prototype.board = function(player)
@@ -2316,12 +2316,12 @@ function Airship(image, image2, spriteWalkFrames)
 	this.takeoff = false;
 	this.offsetX = 0;
 	this.offsetY = 0;
-	this.mapName = 'Overworld';
+	this.mapName = 'WorldMap';
 	this.room = false;
 	this.collision = false;
     spriteNameMap[name] = this;
 	spriteNames.push(name);
-	spriteMapList['Overworld'].push(this);
+	spriteMapList['WorldMap'].push(this);
 }
 
 Airship.prototype.board = function(player)
