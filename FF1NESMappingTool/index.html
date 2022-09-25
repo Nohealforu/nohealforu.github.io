@@ -52,6 +52,7 @@
 				<div><button id="tentButton" onclick="Game.handleSave();" type="button">Tent</button></div>
 				<div><button id="warpButton" onclick="Game.handleWarp();" type="button">Warp</button></div>
 				<div><button id="exitButton" onclick="Game.handleExit();" type="button">Exit</button></div>
+				<div><button id="pathDeleteButton" onclick="if(confirm('This will return you to start of previous path.') == true ) Game.returnToPreviousPath();" type="button">Delete Path</button></div>
 				<div id="touchTest"><br/></div>
 			</div>
 			<div id="encounterInformation" class="sideElement" style="border:1px solid #ccc; vertical-align: top;"></div>
