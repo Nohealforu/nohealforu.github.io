@@ -3352,12 +3352,13 @@ Game.handleTeleport = function (warp, teleport, sourceX = 0, sourceY = 0, moveMe
 
 Game.handleNewPath = function(gridX, gridY, targetMap, newPathType)
 {
+	let townSkip = false;
 	let combineRoute = false;
 	let eventFound = true;
 	if(targetMap == 'WorldMap' && newPathType == NewPathType.Teleport)
 	{
 		if(this.currentPathLocations.length == 2)
-			combineRoute = true;
+			townSkip = true;
 		else if(this.currentPathLocations.length > 2 && this.currentPathLocations.length < 5)
 		{
 			let eventFound = false;
@@ -3368,7 +3369,7 @@ Game.handleNewPath = function(gridX, gridY, targetMap, newPathType)
 					eventFound = true;
 			}
 			if(!eventFound)
-				combineRoute = true;
+				townSkip = true;
 		}
 	}
 	else if(newPathType == NewPathType.ShipEnd)
@@ -3376,10 +3377,16 @@ Game.handleNewPath = function(gridX, gridY, targetMap, newPathType)
 		if(this.currentPathLocations.length < 32)
 			combineRoute = true;
 	}
-	if(combineRoute)
+	if(townSkip)
 	{
 		this.currentStepPath = this.stepPaths.pop();
 		this.currentPathLocations = this.currentStepPath.pathLocations;
+		this.currentTileLocationEvents = [];
+	}
+	else if(combineRoute)
+	{
+		this.currentStepPath = this.stepPaths.pop();
+		this.currentPathLocations = this.currentStepPath.pathLocations.concat(this.currentPathLocations);
 		this.currentTileLocationEvents = [];
 	}
 	else
