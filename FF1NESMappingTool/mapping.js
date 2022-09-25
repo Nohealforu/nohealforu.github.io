@@ -3397,7 +3397,9 @@ Game.handleNewPath = function(gridX, gridY, targetMap, newPathType)
 		this.currentStepPath.pathLocations = this.currentPathLocations;
 		this.stepPaths.push(this.currentStepPath);
 		this.currentStepPath = new StepPath(this.currentMap, this.createCheckpoint(this.player), airship);
-		if(newPathType != NewPathType.ShipStart)
+		if(newPathType == NewPathType.ShipStart || newPathType == NewPathType.ShipEnd)
+			this.currentPathLocations = [];
+		else
 			this.currentPathLocations = [new PathLocation(gridX, gridY)];
 		this.currentTileLocationEvents = [];
 	}
@@ -3496,76 +3498,90 @@ Game._drawPath = function (map) {
 		let offsetX = -this.camera.x + this.camera.width / 2 + startCol * displayTsize + displayTsize / 2;
 		let offsetY = -this.camera.y + this.camera.height / 2 + startRow * displayTsize + displayTsize / 2;
 		
-		let previousPathLocation = null;
+		let previousX = null;
+		let previousY = null;
 		let newSubPath = false;
+		let wrapX = (startCol < 0 ? Directions.Left : (endCol > map.maxCol ? Directions.Right : null));
+		let wrapY = (startRow < 0 ? Directions.Up : (endRow > map.maxRow ? Directions.Down : null));
+		map.maxCol;
+		map.maxRow;
 		context.beginPath();
 		for (let i = 0; i < this.currentPathLocations.length; i++) {
 			let pathLocation = this.currentPathLocations[i];
 			
-			let x = (pathLocation.gridX - startCol) * displayTsize + offsetX;
-			let y = (pathLocation.gridY - startRow) * displayTsize + offsetY;
-			//if(x < defaultWidth && x + displayTsize > 0 && y < defaultHeight && y + displayTsize > 0)
-			//{
-				if(previousPathLocation == null)
+			let gridX = pathLocation.gridX;
+			if(wrapX == Directions.Left && gridX > map.maxCol / 2)
+				gridX -= map.maxCol;
+			else if(wrapX == Directions.Right && gridX < map.maxCol / 2)
+				gridX += map.maxCol;
+			
+			let gridY = pathLocation.gridY;
+			if(wrapY == Directions.Up && gridY > map.maxRow / 2)
+				gridY -= map.maxRow;
+			else if(wrapY == Directions.Down && gridY < map.maxRow / 2)
+				gridY += map.maxRow;
+			
+			let x = (gridX - startCol) * displayTsize + offsetX;
+			let y = (gridY - startRow) * displayTsize + offsetY;
+			
+			if(previousX == null)
+			{
+				context.ellipse(x, y, 8, 8, 0, 0, Math.PI * 2);
+			}	
+			else
+			{
+				let targetStartX = null;
+				let targetStartY = null;
+				let targetEndX = null;
+				let targetEndY = null;
+				if((Math.abs(previousX - gridX) + Math.abs(previousY - gridY) > 1))
 				{
-					context.ellipse(x, y, 8, 8, 0, 0, Math.PI * 2);
-				}	
+					// we jumped, need to look at last tent location in path?
+					// to cover possibility of multiple tents, etc.
+					newSubPath = true;
+				}
+				if(previousX < gridX)
+				{ // move right
+					targetStartX = x - displayTsize + 8;
+					targetEndX = x - 8;
+					targetStartY = y + 8;
+					targetEndY = y + 8;
+				}
+				else if(previousX > gridX)
+				{ //move left
+					targetStartX = x + displayTsize - 8;
+					targetEndX = x + 8;
+					targetStartY = y - 8;
+					targetEndY = y - 8;
+				}
+				else if(previousY < gridY)
+				{ // move down
+					targetStartX = x - 8;
+					targetEndX = x - 8;
+					targetStartY = y - displayTsize + 8;
+					targetEndY = y - 8;
+				}
+				else if(previousY > gridY)
+				{ // move up
+					targetStartX = x + 8;
+					targetEndX = x + 8;
+					targetStartY = y + displayTsize - 8;
+					targetEndY = y + 8;
+				}
+				if(newSubPath)
+				{
+					context.moveTo(targetStartX, targetStartY);
+					//context.ellipse((previousX - startCol) * displayTsize + offsetX, (previousY - startRow) * displayTsize + offsetY, 8, 8, 0, 0, Math.PI * 2);
+				}
 				else
 				{
-					let previousX = previousPathLocation.gridX;
-					let previousY = previousPathLocation.gridY;
-					let targetStartX = null;
-					let targetStartY = null;
-					let targetEndX = null;
-					let targetEndY = null;
-					if((Math.abs(previousX - pathLocation.gridX) + Math.abs(previousY - pathLocation.gridY) > 1))
-					{
-						// we jumped, need to look at last tent location in path?
-						// to cover possibility of multiple tents, etc.
-						newSubPath = true;
-					}
-					if(previousX < pathLocation.gridX)
-					{ // move right
-						targetStartX = x - displayTsize + 8;
-						targetEndX = x - 8;
-						targetStartY = y + 8;
-						targetEndY = y + 8;
-					}
-					else if(previousX > pathLocation.gridX)
-					{ //move left
-						targetStartX = x + displayTsize - 8;
-						targetEndX = x + 8;
-						targetStartY = y - 8;
-						targetEndY = y - 8;
-					}
-					else if(previousY < pathLocation.gridY)
-					{ // move down
-						targetStartX = x - 8;
-						targetEndX = x - 8;
-						targetStartY = y - displayTsize + 8;
-						targetEndY = y - 8;
-					}
-					else if(previousY > pathLocation.gridY)
-					{ // move up
-						targetStartX = x + 8;
-						targetEndX = x + 8;
-						targetStartY = y + displayTsize - 8;
-						targetEndY = y + 8;
-					}
-					if(newSubPath)
-					{
-						context.moveTo(targetStartX, targetStartY);
-						//context.ellipse((previousX - startCol) * displayTsize + offsetX, (previousY - startRow) * displayTsize + offsetY, 8, 8, 0, 0, Math.PI * 2);
-					}
-					else
-					{
-						context.lineTo(targetStartX, targetStartY);
-					}
-					context.lineTo(targetEndX, targetEndY);
-					newSubPath = false;
+					context.lineTo(targetStartX, targetStartY);
 				}
-			//}
-			previousPathLocation = pathLocation;
+				context.lineTo(targetEndX, targetEndY);
+				newSubPath = false;
+			}
+			previousX = gridX;
+			previousY = gridY;
 		}
 		context.stroke();
 	}
