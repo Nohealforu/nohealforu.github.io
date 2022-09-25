@@ -2665,7 +2665,7 @@ LocationEvent = function(eventType, eventIndex)
 
 Game.createCheckpoint = function(player, useExitCoordinates = false)
 {
-	let exitInformation = (useExitCoordinates ? this.getExitTeleport(): null);
+	let exitInformation = (useExitCoordinates ? this.getExitTeleport(true): null);
 	let checkpoint = new Checkpoint(new MapSaveData((useExitCoordinates ? 'WorldMap' : this.currentMap.name), (useExitCoordinates ? false : this.currentMap.showRooms)),
 									new PlayerSaveData((useExitCoordinates ? exitInformation.gridX : player.gridX), (useExitCoordinates ? exitInformation.gridY : player.gridY), player.moveMethod, player.keyItems, player.eventsTriggered), 
 									new SpriteSaveData(), 
@@ -2761,11 +2761,13 @@ Game.handleExit = function()
 	this.startTeleport(warp, teleport);
 };
 
-Game.getExitTeleport = function()
+Game.getExitTeleport = function(innCheckpoint = false)
 {
 	let teleport = this.currentDungeon.exitInformation;
 	let recursions = 0;
-	if(teleport.targetMap == 'WARP')
+	if(teleport.targetMap == 'WARP' && innCheckpoint)
+		teleport = this.currentDungeon.warpInformation.slice(-1)[0];
+	else if(teleport.targetMap == 'WARP')
 		teleport = this.currentDungeon.warpInformation.pop();
 	while(teleport.targetMap != 'WorldMap' && recursions++ < 20)
 		teleport = dungeons[teleport.targetMap].warpInformation.pop();
