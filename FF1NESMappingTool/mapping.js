@@ -3318,11 +3318,39 @@ Game.handleTeleport = function (warp, teleport, sourceX = 0, sourceY = 0, moveMe
 	
 	if(teleport.targetMap != priorMapName)
 	{
-		Game.currentStepPath.pathLocations = Game.currentPathLocations;
-		Game.stepPaths.push(Game.currentStepPath);
-		Game.currentStepPath = new StepPath(this.currentMap, Game.createCheckpoint(this.player));
-		Game.currentPathLocations.push(new PathLocation(teleport.gridX, teleport.gridY));
-		Game.currentTileLocationEvents = [];
+		let townSkip = false;
+		let eventFound = true;
+		if(teleport.targetMap == 'WorldMap')
+		{
+			if(this.currentPathLocations.length == 2)
+				townSkip = true;
+			else if(this.currentPathLocations.length > 2 && this.currentPathLocations.length < 5)
+			{
+				let eventFound = false;
+				for(let i = 0; i < this.currentPathLocations.length; i++)
+				{
+					if(this.currentPathLocations[i].currentTileLocationEvents != null && 
+					   this.currentPathLocations[i].currentTileLocationEvents.length > 0)
+						eventFound = true;
+				}
+				if(eventFound)
+					townskip = true;
+			}
+		}
+		if(townSkip)
+		{
+			this.currentStepPath = this.stepPaths.pop();
+			this.currentPathLocations = this.currentStepPath.pathLocations;
+			this.currentTileLocationEvents = [];
+		}
+		else
+		{
+			this.currentStepPath.pathLocations = this.currentPathLocations;
+			this.stepPaths.push(this.currentStepPath);
+			this.currentStepPath = new StepPath(this.currentMap, this.createCheckpoint(this.player));
+			this.currentPathLocations = [new PathLocation(teleport.gridX, teleport.gridY)];
+			this.currentTileLocationEvents = [];
+		}
 	}
 };
 
