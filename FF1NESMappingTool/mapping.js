@@ -2195,8 +2195,8 @@ function Bridge(image)
 	this.mapName = 'WorldMap';
 	this.room = false;
 	this.collision = false;
-    spriteNameMap[name] = this;
-	spriteNames.push(name);
+    spriteNameMap[this.name] = this;
+	spriteNames.push(this.name);
 	spriteMapList['WorldMap'].push(this);
 }
 // Make generic sprite class to put Bridge/Misc under to prevent animation needs?
@@ -2222,8 +2222,8 @@ function Canal(image)
 	this.mapName = 'WorldMap';
 	this.room = false;
 	this.collision = false;
-    spriteNameMap[name] = this;
-	spriteNames.push(name);
+    spriteNameMap[this.name] = this;
+	spriteNames.push(this.name);
 	spriteMapList['WorldMap'].push(this);
 }
 // Make generic sprite class to put Bridge/Misc under to prevent animation needs?
@@ -2253,8 +2253,8 @@ function Ship(image, spriteWalkFrames)
 	this.room = false;
 	this.unboardThisFrame = false;
 	this.collision = false;
-    spriteNameMap[name] = this;
-	spriteNames.push(name);
+    spriteNameMap[this.name] = this;
+	spriteNames.push(this.name);
 	spriteMapList['WorldMap'].push(this);
 }
 
@@ -2319,8 +2319,8 @@ function Airship(image, image2, spriteWalkFrames)
 	this.mapName = 'WorldMap';
 	this.room = false;
 	this.collision = false;
-    spriteNameMap[name] = this;
-	spriteNames.push(name);
+    spriteNameMap[this.name] = this;
+	spriteNames.push(this.name);
 	spriteMapList['WorldMap'].push(this);
 }
 
@@ -3114,7 +3114,6 @@ Game.processEventTrigger = function (eventNumber, success)
 		else if(eventNumber == EventTrigger.PIRATES)
 		{
 			spriteNameMap['Bikke2'].active = true;
-			this.ship.active = true;
 		}
 		else if(eventNumber == EventTrigger.SPAWNSHIP)
 		{
