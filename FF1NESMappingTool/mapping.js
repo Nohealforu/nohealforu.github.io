@@ -184,6 +184,7 @@ function worldMapTile(walk = false, ship = false, canoe = false, teleport = null
 	this.raiseAirship = raiseAirship;
 	this.room = 0;
 	this.loot = null;
+	this.shop = null;
 }
 
 var worldMapTileAtlas = [
@@ -2173,6 +2174,8 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
 			Game.processItem(tileData.loot, true);
 		if(this.moveMethod == MoveMethod.Walk && tileData.caravan && !this.keyItems[KeyItem.BOTTLE])
 			Game.processItem(KeyItem.BOTTLE, true);
+		if(tileData.shop != null && tileData.shop.includes('INN'))
+			Game.saveINN();
 		
 		Game.logPathLocation(this.gridX, this.gridY);
 	}
@@ -2660,10 +2663,11 @@ LocationEvent = function(eventType, eventIndex)
 	this.eventIndex = eventIndex;
 }
 
-Game.createCheckpoint = function(player)
+Game.createCheckpoint = function(player, useExitCoordinates = false)
 {
-	let checkpoint = new Checkpoint(new MapSaveData(this.currentMap.name, this.currentMap.showRooms),
-									new PlayerSaveData(player.gridX, player.gridY, player.moveMethod, player.keyItems, player.eventsTriggered), 
+	let exitInformation = (useExitCoordinates ? this.getExitTeleport(): null);
+	let checkpoint = new Checkpoint(new MapSaveData((useExitCoordinates ? 'WorldMap' : this.currentMap.name), (useExitCoordinates ? false : this.currentMap.showRooms)),
+									new PlayerSaveData((useExitCoordinates ? exitInformation.gridX : player.gridX), (useExitCoordinates ? exitInformation.gridY : player.gridY), player.moveMethod, player.keyItems, player.eventsTriggered), 
 									new SpriteSaveData(), 
 									new GameSaveData(this.stepCounter1, this.stepCounter2, this.encounterGroup, this.encounterChance, this.encounterThreshold, this.encounterNumber));
 	return checkpoint;
@@ -2690,10 +2694,17 @@ Game.handleHardReset = function()
 	this.saveCheckpoint.loadCheckpoint(this.player, ResetType.Hard);
 };
 
-Game.handleSave = function() 
+Game.handleSave = function() //tent function
 {
+	if(!this.currentMap.overworldMap)
+		return;
 	this.saveCheckpoint = Game.createCheckpoint(this.player);
 };
+
+Game.saveINN = function ()
+{
+	this.saveCheckpoint = Game.createCheckpoint(this.player, true);
+}
 
 Game.toggleBridge = function(checkboxElement) {
 	this.bridge.active = checkboxElement.checked;
@@ -2734,16 +2745,22 @@ Game.handleExit = function()
 {
 	if(this.currentMap.overworldMap)
 		return;
-	let teleport = this.currentDungeon.exitInformation;
 	let warp = true;
+	let teleport = this.getExitTeleport();
+	if(teleport.targetMap != 'WorldMap') // failed exit
+		return;
+	this.startTeleport(warp, teleport);
+};
+
+Game.getExitTeleport = function()
+{
+	let teleport = this.currentDungeon.exitInformation;
 	let recursions = 0;
 	if(teleport.targetMap == 'WARP')
 		teleport = this.currentDungeon.warpInformation.pop();
 	while(teleport.targetMap != 'WorldMap' && recursions++ < 20)
 		teleport = dungeons[teleport.targetMap].warpInformation.pop();
-	if(teleport.targetMap != 'WorldMap') // failed exit
-		return;
-	this.startTeleport(warp, teleport);
+	return teleport;
 };
 
 Game.startTeleport = function(warp, teleport, tileX = 0, tileY = 0, moveMethod = MoveMethod.Walk)
@@ -3274,6 +3291,7 @@ Game.checkForTeleport = function (tileX, tileY)
 
 Game.handleTeleport = function (warp, teleport, sourceX = 0, sourceY = 0, moveMethod = MoveMethod.Walk)
 {
+	let priorMapName = this.currentMap.name;
 	if(teleport.targetMap == 'WorldMap')
 	{
 		this.currentMap = overworldMap;
@@ -3298,7 +3316,7 @@ Game.handleTeleport = function (warp, teleport, sourceX = 0, sourceY = 0, moveMe
 	}
 	this.player.teleportPlayer(this.currentMap, teleport.gridX, teleport.gridY, moveMethod);
 	
-	if(teleport.targetMap != this.currentMap.name)
+	if(teleport.targetMap != priorMapName)
 	{
 		Game.currentStepPath.pathLocations = Game.currentPathLocations;
 		Game.stepPaths.push(Game.currentStepPath);
