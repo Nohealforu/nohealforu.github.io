@@ -2723,9 +2723,9 @@ Game.refreshPathList = function()
 	let output = [];
 	for(let i = 0; i < this.stepPaths.length; i++)
 	{
-		output[i] = '<div>' + i + ':' + this.stepPaths[i].map.name + '<button id="stepPath' + i + '" onclick="Game.generatePathImage(this);" type="button">Open Image</button></div>';
+		output[i] = '<div>' + i + ':' + this.stepPaths[i].mapName + '<button id="stepPath' + i + '" onclick="Game.generatePathImage(this);" type="button">Open Image</button></div>';
 	}
-	output.push('<div>current:' + this.currentStepPath.map.name + '<button id="currentPath" onclick="Game.generatePathImage(this);" type="button">Open Image</button></div>');
+	output.push('<div>current:' + this.currentStepPath.mapName + '<button id="currentPath" onclick="Game.generatePathImage(this);" type="button">Open Image</button></div>');
 	document.getElementById('pathContainer').innerHTML = output.join('');
 };
 
