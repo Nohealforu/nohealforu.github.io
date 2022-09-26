@@ -2648,6 +2648,7 @@ StepPath = function(map, checkpoint, airship = false)
 {
 	this.pathLocations = [];
 	this.map = map;
+	this.mapName = mapName;
 	this.checkpoint = checkpoint;
 	this.airship = airship;
 }
@@ -2723,9 +2724,9 @@ Game.refreshPathList = function()
 	let output = [];
 	for(let i = 0; i < this.stepPaths.length; i++)
 	{
-		output[i] = '<div>' + i + ':' + stepPaths[i].map.name + '<button id="stepPath' + i + '" onclick="Game.generatePathImage(this);" type="button">Open Image</button></div>';
+		output[i] = '<div>' + i + ':' + this.stepPaths[i].map.name + '<button id="stepPath' + i + '" onclick="Game.generatePathImage(this);" type="button">Open Image</button></div>';
 	}
-	output.push('<div>' + i + ':' + currentStepPath.map.name + '<button id="currentPath" onclick="Game.generatePathImage(this);" type="button">Open Image</button></div>');
+	output.push('<div>current:' + this.currentStepPath.map.name + '<button id="currentPath" onclick="Game.generatePathImage(this);" type="button">Open Image</button></div>');
 	document.getElementById('pathContainer').innerHTML = output.join('');
 };
 
@@ -3418,11 +3419,8 @@ Game.handleNewPath = function(gridX, gridY, targetMap, newPathType)
 };
 
 Game._loadCells = function (map) {
-	console.log(map.loadRooms);
 	for(let mapVariants = 0; mapVariants < (map.loadRooms ? 2 : 1); mapVariants++)
 	{
-		console.log(mapVariants);
-		console.log(map.tileAtlasImage[mapVariants]);
 		for(let mapX = 0; mapX < map.cols; mapX++){
 			for(let mapY = 0; mapY < map.rows; mapY++){
 				let mapIndex = mapX + mapY * map.cols + map.cols * map.rows * mapVariants;
@@ -3430,7 +3428,6 @@ Game._loadCells = function (map) {
 				cellCanvas.width = map.cells.cols * map.cells.tsize;
 				cellCanvas.height = map.cells.rows * map.cells.tsize;
 				let context = cellCanvas.getContext('2d')
-				let cellCanvasRooms;
 				for (let c = 0; c <= map.cells.cols; c++) {
 					for (let r = 0; r <= map.cells.rows; r++) {
 						let tile = map.getTile(mapX, mapY, c, r);
@@ -3718,4 +3715,71 @@ Game.render = function () {
 	{
 		this._drawTransition(1 - Math.abs(this.teleportMaxDuration / 2 - this.teleportDuration) / (this.teleportMaxDuration / 2));
 	}
+};
+
+PathImageMap = function(name, cols, rows, overworldMap, data, tileAtlasImage){
+    this.name = name;
+	this.cols = cols;
+    this.rows = rows;
+    this.tsize = 16;
+    this.data = data;
+	this.tileAtlasImage = tileAtlasImage;
+	this.showRooms = (!overworldMap);
+	this.overworldMap = overworldMap;
+};
+
+PathImageMap.prototype.getTile = function(col, row)
+{
+	return this.data[this.cols * row + col];
+}
+
+Game.generatePathImage = function(pathElement)
+{
+	let currentPath = null;
+	if(pathElement.Id == 'currentPath')
+		currentPath = this.currentStepPath;
+	else
+		currentPath = this.stepPaths[pathElement.Id.replace('stepPath','')];
+	let mapName = currentPath.mapName;
+	let pathImageMap = null;
+	
+	if(mapName == 'WorldMap')
+	{
+		pathImageMap = new PathImageMap('WorldMap', 256, 256, true, overworldMap.data, overworldMap.tileAtlasImage[0]);
+	}
+	else
+	{
+		let dungeonInfo = dungeons[mapName];
+		pathImageMap = new PathImageMap(mapName, 64, 64, false, Loader.getMapData(dungeonInfo.mapDataName), Loader.getImage(dungeonInfo.tileAtlasRoomImageName));
+	}
+	
+	
+    let pathImageCanvas = document.createElement('canvas');
+    let pathImageCanvas.width = pathImageMap.cols * pathImageMap.tsize;
+    let pathImageCanvas.height = pathImageMap.rows * pathImageMap.tsize;
+	
+	let context = cellCanvas.getContext('2d')
+	for (let c = 0; c <= pathImageMap.cols; c++) {
+		for (let r = 0; r <= pathImageMap.rows; r++) {
+			let tile = map.getTile(c, r);
+			let x = c * map.cells.tsize;
+			let y = r * map.cells.tsize;
+			let tileRow = Math.floor(tile / 16);
+			let tileCol = tile % 16;
+			context.drawImage(
+				map.tileAtlasImage,// image
+				tileCol * pathImageMap.tsize, // source x
+				tileRow * pathImageMap.tsize, // source y
+				pathImageMap.tsize, // source width
+				pathImageMap.tsize, // source height
+				x,  // target x
+				y, // target y
+				pathImageMap.tsize, // target width
+				pathImageMap.tsize // target height
+			);
+		}
+	}
+	
+	let outputImage = pathImageCanvas.toDataURL('image/png');
+	document.write('<img src="' + outputImage + '"/>');
 };
