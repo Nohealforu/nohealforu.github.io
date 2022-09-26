@@ -3736,10 +3736,10 @@ PathImageMap.prototype.getTile = function(col, row)
 Game.generatePathImage = function(pathElement)
 {
 	let currentPath = null;
-	if(pathElement.Id == 'currentPath')
+	if(pathElement.id == 'currentPath')
 		currentPath = this.currentStepPath;
 	else
-		currentPath = this.stepPaths[pathElement.Id.replace('stepPath','')];
+		currentPath = this.stepPaths[pathElement.id.replace('stepPath','')];
 	let mapName = currentPath.mapName;
 	let pathImageMap = null;
 	
@@ -3758,16 +3758,16 @@ Game.generatePathImage = function(pathElement)
     pathImageCanvas.width = pathImageMap.cols * pathImageMap.tsize;
     pathImageCanvas.height = pathImageMap.rows * pathImageMap.tsize;
 	
-	let context = cellCanvas.getContext('2d')
+	let context = pathImageCanvas.getContext('2d')
 	for (let c = 0; c <= pathImageMap.cols; c++) {
 		for (let r = 0; r <= pathImageMap.rows; r++) {
-			let tile = map.getTile(c, r);
-			let x = c * map.cells.tsize;
-			let y = r * map.cells.tsize;
+			let tile = pathImageMap.getTile(c, r);
+			let x = c * pathImageMap.tsize;
+			let y = r * pathImageMap.tsize;
 			let tileRow = Math.floor(tile / 16);
 			let tileCol = tile % 16;
 			context.drawImage(
-				map.tileAtlasImage,// image
+				pathImageMap.tileAtlasImage,// image
 				tileCol * pathImageMap.tsize, // source x
 				tileRow * pathImageMap.tsize, // source y
 				pathImageMap.tsize, // source width
