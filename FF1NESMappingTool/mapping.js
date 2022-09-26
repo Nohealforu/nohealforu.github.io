@@ -3781,5 +3781,5 @@ Game.generatePathImage = function(pathElement)
 	}
 	
 	let outputImage = pathImageCanvas.toDataURL('image/png');
-	document.write('<img src="' + outputImage + '"/>');
+	document.getElementById('pathExportOutput').src = outputImage;
 };
