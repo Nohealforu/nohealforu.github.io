@@ -2718,6 +2718,17 @@ Game.saveINN = function ()
 	this.saveCheckpoint = Game.createCheckpoint(this.player, true);
 }
 
+Game.refreshPathList = function()
+{
+	let output = [];
+	for(let i = 0; i < this.stepPaths.length; i++)
+	{
+		output[i] = '<div>' + i + ':' + stepPaths[i].map.name + '<button id="stepPath' + i + '" onclick="Game.generatePathImage(this);" type="button">Open Image</button></div>';
+	}
+	output.push('<div>' + i + ':' + currentStepPath.map.name + '<button id="currentPath" onclick="Game.generatePathImage(this);" type="button">Open Image</button></div>');
+	document.getElementById('pathContainer').innerHTML = output.join('');
+};
+
 Game.toggleBridge = function(checkboxElement) {
 	this.bridge.active = checkboxElement.checked;
 	this.player.eventsTriggered[EventTrigger.BRIDGE] = checkboxElement.checked;
