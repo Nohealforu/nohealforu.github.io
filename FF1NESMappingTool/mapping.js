@@ -2648,7 +2648,7 @@ StepPath = function(map, checkpoint, airship = false)
 {
 	this.pathLocations = [];
 	this.map = map;
-	this.mapName = mapName;
+	this.mapName = map.name;
 	this.checkpoint = checkpoint;
 	this.airship = airship;
 }
