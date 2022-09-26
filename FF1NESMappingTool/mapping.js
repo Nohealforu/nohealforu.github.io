@@ -3735,10 +3735,17 @@ PathImageMap.prototype.getTile = function(col, row)
 Game.generatePathImage = function(pathElement)
 {
 	let currentPath = null;
+	let pathLocations = null
 	if(pathElement.id == 'currentPath')
+	{
 		currentPath = this.currentStepPath;
+		pathLocations = this.currentPathLocations
+	}
 	else
+	{
 		currentPath = this.stepPaths[pathElement.id.replace('stepPath','')];
+		pathLocations = currentPath.pathLocations;
+	}
 	let mapName = currentPath.mapName;
 	let pathImageMap = null;
 	
@@ -3792,8 +3799,8 @@ Game.generatePathImage = function(pathElement)
 	let newSubPath = false;
 	context.beginPath();
 	let rectangleArray = [];
-	for (let i = 0; i < currentPath.pathLocations.length; i++) {
-		let pathLocation = currentPath.pathLocations[i];
+	for (let i = 0; i < pathLocations.length; i++) {
+		let pathLocation = pathLocations[i];
 		let pathLocationEvents = pathLocation.locationEvents;
 		let gridX = pathLocation.gridX;		
 		let gridY = pathLocation.gridY;
