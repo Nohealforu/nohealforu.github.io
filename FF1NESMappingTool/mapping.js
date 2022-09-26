@@ -2687,8 +2687,8 @@ Game.returnToPreviousPath = function()
 
 Game.logPathLocation = function (gridX, gridY)
 {
-	Game.currentPathLocations.push(new PathLocation(gridX, gridY, Game.currentTileLocationEvents));
-	Game.currentTileLocationEvents = [];
+	this.currentPathLocations.push(new PathLocation(gridX, gridY, this.currentTileLocationEvents));
+	this.currentTileLocationEvents = [];
 };
 
 Game.handlePathReset = function() 
@@ -3113,7 +3113,7 @@ Game.update = function (delta) {
 
 Game.processFight = function (fightNumber, success)
 {
-	Game.currentTileLocationEvents.push(new LocationEvent(EventType.Fight, fightNumber));
+	this.currentTileLocationEvents.push(new LocationEvent(EventType.Fight, fightNumber));
 	document.getElementById('messageLog').innerHTML += '<br/>Fight: ' + fightNumber;
 };
 
@@ -3122,7 +3122,7 @@ Game.processItem = function (itemNumber, success)
 	if(success)
 	{
 		this.player.keyItems[itemNumber] = true;
-		Game.currentTileLocationEvents.push(new LocationEvent(EventType.Item, itemNumber));
+		this.currentTileLocationEvents.push(new LocationEvent(EventType.Item, itemNumber));
 		document.getElementById('messageLog').innerHTML += '<br/>Item come to hand: ' + KeyItemStrings[itemNumber];
 		if(itemNumber == KeyItem.BOTTLE)
 			spriteNameMap['Fairy'].active = true;
@@ -3138,7 +3138,7 @@ Game.processEventTrigger = function (eventNumber, success)
 	if(success)
 	{
 		this.player.eventsTriggered[eventNumber] = true;
-		Game.currentTileLocationEvents.push(new LocationEvent(EventType.Event, eventNumber));
+		this.currentTileLocationEvents.push(new LocationEvent(EventType.Event, eventNumber));
 		if(eventNumber == EventTrigger.PRINCESS)
 		{
 			// clear exit info for later
@@ -3257,7 +3257,8 @@ Game.incrementStepCounter = function()
 		this.encounterGroup = encounterGroupTable[this.encounterNumber];
 		this.player.movementCooldown = 0.5;
 		this.player.offsetX = 0;
-		this.player.offsetY = 0;			   
+		this.player.offsetY = 0;
+		this.processFight(this.encounterGroup, true);
 		this.encounterNumber++;
 		if(this.encounterNumber > 255)
 			this.encounterNumber -= 256;
@@ -3477,17 +3478,25 @@ Game._drawMap = function (map) {
     }
 };
 
+EventRectangle = function(x, y, w, h)
+{
+	this.x = x;
+	this.y = y;
+	this.w = w;
+	this.h = h;
+}
+
 Game._drawPath = function (map) {
     let context = this.pathCanvas.getContext('2d');
     context.clearRect(0, 0, defaultWidth, defaultHeight);
-	if(Game.currentPathLocations.length > 0)
+	if(this.currentPathLocations.length > 0)
 	{
 		context.lineWidth = 8;
 		context.lineJoin = 'round';
 		context.lineCap = 'round';
 		context.strokeStyle = this.pathMainColor;
-		context.shadowOffsetX = 2;
-		context.shadowOffsetY = 2;
+		context.shadowOffsetX = 4;
+		context.shadowOffsetY = 4;
 		context.shadowBlur = 2;
 		context.shadowColor = this.pathShadowColor;
 		let displayTsize = map.cells.tsize * this.camera.zoom;
@@ -3503,22 +3512,22 @@ Game._drawPath = function (map) {
 		let newSubPath = false;
 		let wrapX = (startCol < 0 ? Directions.Left : (endCol > map.maxCol ? Directions.Right : null));
 		let wrapY = (startRow < 0 ? Directions.Up : (endRow > map.maxRow ? Directions.Down : null));
-		map.maxCol;
-		map.maxRow;
 		context.beginPath();
+		let rectangleArray = [];
 		for (let i = 0; i < this.currentPathLocations.length; i++) {
 			let pathLocation = this.currentPathLocations[i];
-			
+			let pathLocationEvents = pathLocation.locationEvents;
+				
 			let gridX = pathLocation.gridX;
-			if(wrapX == Directions.Left && gridX > map.maxCol / 2)
+			if(wrapX == Directions.Left && gridX > endCol + 1)
 				gridX -= map.maxCol;
-			else if(wrapX == Directions.Right && gridX < map.maxCol / 2)
+			else if(wrapX == Directions.Right && gridX < startCol - 1)
 				gridX += map.maxCol;
 			
 			let gridY = pathLocation.gridY;
-			if(wrapY == Directions.Up && gridY > map.maxRow / 2)
+			if(wrapY == Directions.Up && gridY > endRow + 1)
 				gridY -= map.maxRow;
-			else if(wrapY == Directions.Down && gridY < map.maxRow / 2)
+			else if(wrapY == Directions.Down && gridY < startRow - 1)
 				gridY += map.maxRow;
 			
 			let x = (gridX - startCol) * displayTsize + offsetX;
@@ -3568,6 +3577,20 @@ Game._drawPath = function (map) {
 					targetStartY = y + displayTsize - 8;
 					targetEndY = y + 8;
 				}
+				if(pathLocationEvents != null && pathLocationEvents.length != undefined && pathLocationEvents.length > 0)
+				{
+					let fightFound = false;
+					for(let j = 0; j < pathLocationEvents.length; j++)
+					{
+						if(pathLocationEvents[j].eventType == EventType.Fight)
+						{
+							fightFound = true;
+							break;
+						}
+					}
+					if(fightFound)
+						rectangleArray.push(new EventRectangle(x - 16, y - 16, 32, 32));
+				}
 				if(newSubPath)
 				{
 					context.moveTo(targetStartX, targetStartY);
@@ -3584,6 +3607,14 @@ Game._drawPath = function (map) {
 			previousY = gridY;
 		}
 		context.stroke();
+		if(rectangleArray.length > 0)
+		{
+			context.beginPath();
+			for(let i = 0; i < rectangleArray.length; i++)
+				context.rect(rectangleArray[i].x, rectangleArray[i].y, rectangleArray[i].w, rectangleArray[i].h)
+			context.stroke();
+		}
+		
 	}
 };
 
