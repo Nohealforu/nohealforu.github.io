@@ -2644,11 +2644,10 @@ Checkpoint.prototype.loadCheckpoint = function(player, resetType)
 		Game.currentTileLocationEvents.push(new LocationEvent(EventType.Reset, ResetType.Soft));
 };
 
-StepPath = function(map, checkpoint, airship = false)
+StepPath = function(mapName, checkpoint, airship = false)
 {
 	this.pathLocations = [];
-	this.map = map;
-	this.mapName = map.name;
+	this.mapName = mapName;
 	this.checkpoint = checkpoint;
 	this.airship = airship;
 }
@@ -3034,7 +3033,7 @@ Game.init = function () {
     this.currentMap = overworldMap;
     this.camera.followPlayer(this.currentMap, this.player);
 	this.stepPaths = [];
-	this.currentStepPath = new StepPath(this.currentMap, Game.createCheckpoint(this.player));
+	this.currentStepPath = new StepPath(this.currentMap.name, Game.createCheckpoint(this.player));
 	this.saveCheckpoint = Game.createCheckpoint(this.player);
 	this.currentPathLocations = [new PathLocation(0x99, 0xA5)];
 	this.currentTileLocationEvents = [];
