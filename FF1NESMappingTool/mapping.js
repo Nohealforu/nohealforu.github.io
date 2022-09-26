@@ -3778,6 +3778,109 @@ Game.generatePathImage = function(pathElement)
 			);
 		}
 	}
+	context.lineWidth = 4;
+	context.lineJoin = 'round';
+	context.lineCap = 'round';
+	context.strokeStyle = this.pathMainColor;
+	context.shadowOffsetX = 2;
+	context.shadowOffsetY = 2;
+	context.shadowBlur = 1;
+	context.shadowColor = this.pathShadowColor;
+	
+	let previousX = null;
+	let previousY = null;
+	let newSubPath = false;
+	context.beginPath();
+	let rectangleArray = [];
+	for (let i = 0; i < currentPath.pathLocations.length; i++) {
+		let pathLocation = currentPath.pathLocations[i];
+		let pathLocationEvents = pathLocation.locationEvents;
+		let gridX = pathLocation.gridX;		
+		let gridY = pathLocation.gridY;
+		let x = gridX * pathImageMap.tsize;
+		let y = gridY * pathImageMap.tsize;
+		
+		if(previousX == null)
+		{
+			context.ellipse(x, y, 4, 4, 0, 0, Math.PI * 2);
+		}	
+		else
+		{
+			let targetStartX = null;
+			let targetStartY = null;
+			let targetEndX = null;
+			let targetEndY = null;
+			if((Math.abs(previousX - gridX) + Math.abs(previousY - gridY) > 1))
+			{
+				// we jumped, need to look at last tent location in path?
+				// to cover possibility of multiple tents, etc.
+				newSubPath = true;
+			}
+			if(previousX < gridX)
+			{ // move right
+				targetStartX = x - pathImageMap.tsize + 4;
+				targetEndX = x - 4;
+				targetStartY = y + 4;
+				targetEndY = y + 4;
+			}
+			else if(previousX > gridX)
+			{ //move left
+				targetStartX = x + pathImageMap.tsize - 4;
+				targetEndX = x + 4;
+				targetStartY = y - 4;
+				targetEndY = y - 4;
+			}
+			else if(previousY < gridY)
+			{ // move down
+				targetStartX = x - 4;
+				targetEndX = x - 4;
+				targetStartY = y - pathImageMap.tsize + 4;
+				targetEndY = y - 4;
+			}
+			else if(previousY > gridY)
+			{ // move up
+				targetStartX = x + 4;
+				targetEndX = x + 4;
+				targetStartY = y + pathImageMap.tsize - 4;
+				targetEndY = y + 4;
+			}
+			if(pathLocationEvents != null && pathLocationEvents.length != undefined && pathLocationEvents.length > 0)
+			{
+				let fightFound = false;
+				for(let j = 0; j < pathLocationEvents.length; j++)
+				{
+					if(pathLocationEvents[j].eventType == EventType.Fight)
+					{
+						fightFound = true;
+						break;
+					}
+				}
+				if(fightFound)
+					rectangleArray.push(new EventRectangle(x - 8, y - 8, 16, 16));
+			}
+			if(newSubPath)
+			{
+				context.moveTo(targetStartX, targetStartY);
+				//context.ellipse((previousX - startCol) * pathImageMap.tsize + offsetX, (previousY - startRow) * pathImageMap.tsize + offsetY, 8, 8, 0, 0, Math.PI * 2);
+			}
+			else
+			{
+				context.lineTo(targetStartX, targetStartY);
+			}
+			context.lineTo(targetEndX, targetEndY);
+			newSubPath = false;
+		}
+		previousX = gridX;
+		previousY = gridY;
+	}
+	context.stroke();
+	if(rectangleArray.length > 0)
+	{
+		context.beginPath();
+		for(let i = 0; i < rectangleArray.length; i++)
+			context.rect(rectangleArray[i].x, rectangleArray[i].y, rectangleArray[i].w, rectangleArray[i].h)
+		context.stroke();
+	}
 	
 	let outputImage = pathImageCanvas.toDataURL('image/png');
 	document.getElementById('pathExportOutput').src = outputImage;
