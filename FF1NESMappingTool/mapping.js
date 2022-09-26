@@ -3755,8 +3755,8 @@ Game.generatePathImage = function(pathElement)
 	
 	
     let pathImageCanvas = document.createElement('canvas');
-    let pathImageCanvas.width = pathImageMap.cols * pathImageMap.tsize;
-    let pathImageCanvas.height = pathImageMap.rows * pathImageMap.tsize;
+    pathImageCanvas.width = pathImageMap.cols * pathImageMap.tsize;
+    pathImageCanvas.height = pathImageMap.rows * pathImageMap.tsize;
 	
 	let context = cellCanvas.getContext('2d')
 	for (let c = 0; c <= pathImageMap.cols; c++) {
