@@ -3408,7 +3408,7 @@ Game.handleNewPath = function(gridX, gridY, targetMap, newPathType)
 			this.currentPathLocations.push(new PathLocation(gridX, gridY));
 		this.currentStepPath.pathLocations = this.currentPathLocations;
 		this.stepPaths.push(this.currentStepPath);
-		this.currentStepPath = new StepPath(this.currentMap, this.createCheckpoint(this.player), airship);
+		this.currentStepPath = new StepPath(this.currentMap.name, this.createCheckpoint(this.player), airship);
 		if(newPathType == NewPathType.ShipStart || newPathType == NewPathType.ShipEnd)
 			this.currentPathLocations = [];
 		else
