@@ -3866,8 +3866,8 @@ Game.generatePathImage = function(pathElement)
 		let pathLocationEvents = pathLocation.locationEvents;
 		let gridX = pathLocation.relativeX - (minRelativeX - relativeMinPaddingX);		
 		let gridY = pathLocation.relativeY - (minRelativeY - relativeMinPaddingY);
-		let x = gridX * pathImageMap.tsize;
-		let y = gridY * pathImageMap.tsize;
+		let x = gridX * pathImageMap.tsize + pathImageMap.tsize / 2;
+		let y = gridY * pathImageMap.tsize + pathImageMap.tsize / 2;
 		
 		if(previousX == null)
 		{
