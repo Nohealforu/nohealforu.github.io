@@ -3734,6 +3734,17 @@ Game.render = function () {
 	}
 };
 
+PathImageMap = function(name, cols, rows, overworldMap, data, tileAtlasImage){
+    this.name = name;
+	this.cols = cols;
+    this.rows = rows;
+    this.tsize = 16;
+    this.data = data;
+	this.tileAtlasImage = tileAtlasImage;
+	this.showRooms = (!overworldMap);
+	this.overworldMap = overworldMap;
+};
+
 PathImageMap.prototype.getTile = function(col, row)
 {
 	col = col % this.cols;
@@ -3863,7 +3874,7 @@ Game.generatePathImage = function(pathElement)
 	context.lineWidth = 4;
 	context.lineJoin = 'round';
 	context.lineCap = 'round';
-	pathMainColor = new HSLColor(this.pathMainColor);
+	let pathMainColor = new HSLColor(this.pathMainColor);
 	context.strokeStyle = pathMainColor.getHSLString();
 	context.shadowOffsetX = 2;
 	context.shadowOffsetY = 2;
@@ -3981,7 +3992,7 @@ Game.generatePathImage = function(pathElement)
 
 HSLColor = function(color)
 {
-	this.conversion = this.HexToHSL(color);
+	let conversion = this.HexToHSL(color);
 	this.h = conversion.h;
 	this.s = conversion.s;
 	this.l = conversion.l;
