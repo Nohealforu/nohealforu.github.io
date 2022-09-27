@@ -3729,6 +3729,14 @@ PathImageMap = function(name, cols, rows, overworldMap, data, tileAtlasImage){
 
 PathImageMap.prototype.getTile = function(col, row)
 {
+	if(col >= this.cols)
+		col -= this.cols;
+	else if(col < 0)
+		col += this.cols;
+	if(row >= this.rows)
+		row -= this.rows;
+	else if(row < 0)
+		row += this.rows;
 	return this.data[this.cols * row + col];
 }
 
@@ -3749,14 +3757,68 @@ Game.generatePathImage = function(pathElement)
 	let mapName = currentPath.mapName;
 	let pathImageMap = null;
 	
+	let mapCols = (mapName == 'WorldMap' ? 256 : 64);
+	let mapRows = (mapName == 'WorldMap' ? 256 : 64);
+	
+	let absoluteStartX = pathLocations[0].gridX;
+	let absoluteStartY = pathLocations[0].gridY;
+	let maxRelativeX = 0;
+	let maxRelativeY = 0;
+	let minRelativeX = 0;
+	let minRelativeY = 0;
+	let previousAbsoluteX = absoluteStartX;
+	let previousAbsoluteY = absoluteStartY;
+	for (let i = 0; i < pathLocations.length; i++) 
+	{
+		let pathLocation = pathLocations[i];
+		let relativeX = pathLocation.gridX - previousAbsoluteX;
+		let relativeY = pathLocation.gridY - previousAbsoluteY;
+		if(relativeX > mapCols / 2)
+			relativeX -= mapCols;
+		else if(relativeX < 0 - mapCols / 2)
+			relativeX += mapCols;
+		if(relativeY > mapRows / 2)
+			relativeY -= mapRows;
+		else if(relativeY < 0 - mapRows / 2)
+			relativeY += mapRows;
+		minRelativeX = Math.min(minRelativeX, relativeX);
+		minRelativeY = Math.min(minRelativeY, relativeY);
+		maxRelativeX = Math.max(maxRelativeX, relativeX);
+		maxRelativeY = Math.max(maxRelativeY, relativeY);
+		pathLocation.relativeX = relativeX;
+		pathLocation.relativeY = relativeY;
+		previousAbsoluteX = previousAbsoluteX;
+		previousAbsoluteY = previousAbsoluteY;
+	}
+	
+	let relativeMinPaddingX = 4;
+	let relativeMaxPaddingX = 4;
+	let relativeWidth = maxRelativeX - minRelativeX + relativeMinPaddingX + relativeMaxPaddingX;
+	if(relativeWidth > mapCols)
+	{
+		relativeMinPaddingX -= Math.floor(relativeWidth - mapCols / 2);
+		relativeMaxPaddingX -= Math.ceil(relativeWidth - mapCols / 2);
+	}
+	relativeWidth = maxRelativeX - minRelativeX + relativeMinPaddingX + relativeMaxPaddingX;
+	
+	let relativeMinPaddingY = 4;
+	let relativeMaxPaddingY = 4;
+	let relativeHeight = maxRelativeY - minRelativeY + relativeMinPaddingY + relativeMaxPaddingY;
+	if(relativeHeight > mapRows)
+	{
+		relativeMinPaddingY -= Math.floor(relativeHeight - mapRows / 2);
+		relativeMaxPaddingY -= Math.ceil(relativeHeight - mapRows / 2);
+	}
+	relativeHeight = maxRelativeY - minRelativeY + relativeMinPaddingY + relativeMaxPaddingY;
+	
 	if(mapName == 'WorldMap')
 	{
-		pathImageMap = new PathImageMap('WorldMap', 256, 256, true, overworldMap.data, overworldMap.tileAtlasImage[0]);
+		pathImageMap = new PathImageMap('WorldMap', mapCols, mapRows, true, overworldMap.data, overworldMap.tileAtlasImage[0]);
 	}
 	else
 	{
 		let dungeonInfo = dungeons[mapName];
-		pathImageMap = new PathImageMap(mapName, 64, 64, false, Loader.getMapData(dungeonInfo.mapDataName), Loader.getImage(dungeonInfo.tileAtlasRoomImageName));
+		pathImageMap = new PathImageMap(mapName, mapCols, mapRows, false, Loader.getMapData(dungeonInfo.mapDataName), Loader.getImage(dungeonInfo.tileAtlasRoomImageName));
 	}
 	
 	
@@ -3765,11 +3827,11 @@ Game.generatePathImage = function(pathElement)
     pathImageCanvas.height = pathImageMap.rows * pathImageMap.tsize;
 	
 	let context = pathImageCanvas.getContext('2d')
-	for (let c = 0; c <= pathImageMap.cols; c++) {
-		for (let r = 0; r <= pathImageMap.rows; r++) {
+	for (let c = minRelativeX - relativeMinPaddingX; c <= relativeWidth; c++) {
+		for (let r = minRelativeY - relativeMinPaddingY; r <= relativeHeight; r++) {
 			let tile = pathImageMap.getTile(c, r);
-			let x = c * pathImageMap.tsize;
-			let y = r * pathImageMap.tsize;
+			let x = (c - (minRelativeX - relativeMinPaddingX)) * pathImageMap.tsize;
+			let y = (r - (minRelativeY - relativeMinPaddingY)) * pathImageMap.tsize;
 			let tileRow = Math.floor(tile / 16);
 			let tileCol = tile % 16;
 			context.drawImage(
@@ -3802,8 +3864,8 @@ Game.generatePathImage = function(pathElement)
 	for (let i = 0; i < pathLocations.length; i++) {
 		let pathLocation = pathLocations[i];
 		let pathLocationEvents = pathLocation.locationEvents;
-		let gridX = pathLocation.gridX;		
-		let gridY = pathLocation.gridY;
+		let gridX = pathLocation.relativeX;		
+		let gridY = pathLocation.relativeY;
 		let x = gridX * pathImageMap.tsize;
 		let y = gridY * pathImageMap.tsize;
 		
