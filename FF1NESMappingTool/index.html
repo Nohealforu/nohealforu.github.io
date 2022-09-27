@@ -40,7 +40,6 @@
 			<canvas id="mapping" width="960" height="640"></canvas>
 			<div id="messageLog" style="height:300px;width:300px;border:1px solid #ccc;overflow:auto; float:right;">Message Log</div>
 			<div id="pathGetContainer" style="height:300px;width:300px;border:1px solid #ccc;overflow:auto; float:right;">
-				<div><button id="manualPathButton" onclick="Game.handleManualPath();" type="button">New Path</button></div>
 				<div><button id="pathResetButton" onclick="Game.refreshPathList();" type="button">Get Paths</button></div>
 				<div id="pathContainer">...</div>
 			</div>
@@ -53,6 +52,7 @@
 				<div><button id="pathResetButton" onclick="Game.handlePathReset();" type="button">Reset Path</button></div>
 				<div><button id="softResetButton" onclick="Game.handleSoftReset();" type="button">Soft Reset</button></div>
 				<div><button id="hardResetButton" onclick="Game.handleHardReset();" type="button">Hard Reset</button></div>
+				<div><button id="manualPathButton" onclick="Game.handleManualPath();" type="button">New Path</button></div>
 				<div><button id="tentButton" onclick="Game.handleSave();" type="button">Tent</button></div>
 				<div><button id="warpButton" onclick="Game.handleWarp();" type="button">Warp</button></div>
 				<div><button id="exitButton" onclick="Game.handleExit();" type="button">Exit</button></div>
