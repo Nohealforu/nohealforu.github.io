@@ -3766,6 +3766,8 @@ Game.generatePathImage = function(pathElement)
 	let maxRelativeY = 0;
 	let minRelativeX = 0;
 	let minRelativeY = 0;
+	let previousRelativeX = 0;
+	let previousRelativeY = 0;
 	let previousAbsoluteX = absoluteStartX;
 	let previousAbsoluteY = absoluteStartY;
 	for (let i = 0; i < pathLocations.length; i++) 
@@ -3781,14 +3783,18 @@ Game.generatePathImage = function(pathElement)
 			relativeY -= mapRows;
 		else if(relativeY < 0 - mapRows / 2)
 			relativeY += mapRows;
+		relativeX += previousRelativeX;
+		relativeY += previousRelativeY;
 		minRelativeX = Math.min(minRelativeX, relativeX);
 		minRelativeY = Math.min(minRelativeY, relativeY);
 		maxRelativeX = Math.max(maxRelativeX, relativeX);
 		maxRelativeY = Math.max(maxRelativeY, relativeY);
 		pathLocation.relativeX = relativeX;
 		pathLocation.relativeY = relativeY;
-		previousAbsoluteX = previousAbsoluteX;
-		previousAbsoluteY = previousAbsoluteY;
+		previousRelativeX = relativeX;
+		previousRelativeY = relativeY;
+		previousAbsoluteX = pathLocation.gridX;
+		previousAbsoluteY = pathLocation.gridY;
 	}
 	
 	let relativeMinPaddingX = 4;
@@ -3796,8 +3802,8 @@ Game.generatePathImage = function(pathElement)
 	let relativeWidth = maxRelativeX - minRelativeX + relativeMinPaddingX + relativeMaxPaddingX;
 	if(relativeWidth > mapCols)
 	{
-		relativeMinPaddingX -= Math.floor(relativeWidth - mapCols / 2);
-		relativeMaxPaddingX -= Math.ceil(relativeWidth - mapCols / 2);
+		relativeMinPaddingX -= Math.floor((relativeWidth - mapCols) / 2);
+		relativeMaxPaddingX -= Math.ceil((relativeWidth - mapCols) / 2);
 	}
 	relativeWidth = maxRelativeX - minRelativeX + relativeMinPaddingX + relativeMaxPaddingX;
 	
@@ -3806,8 +3812,8 @@ Game.generatePathImage = function(pathElement)
 	let relativeHeight = maxRelativeY - minRelativeY + relativeMinPaddingY + relativeMaxPaddingY;
 	if(relativeHeight > mapRows)
 	{
-		relativeMinPaddingY -= Math.floor(relativeHeight - mapRows / 2);
-		relativeMaxPaddingY -= Math.ceil(relativeHeight - mapRows / 2);
+		relativeMinPaddingY -= Math.floor((relativeHeight - mapRows) / 2);
+		relativeMaxPaddingY -= Math.ceil((relativeHeight - mapRows) / 2);
 	}
 	relativeHeight = maxRelativeY - minRelativeY + relativeMinPaddingY + relativeMaxPaddingY;
 	
@@ -3820,7 +3826,6 @@ Game.generatePathImage = function(pathElement)
 		let dungeonInfo = dungeons[mapName];
 		pathImageMap = new PathImageMap(mapName, mapCols, mapRows, false, Loader.getMapData(dungeonInfo.mapDataName), Loader.getImage(dungeonInfo.tileAtlasRoomImageName));
 	}
-	
 	
     let pathImageCanvas = document.createElement('canvas');
     pathImageCanvas.width = relativeWidth * pathImageMap.tsize;
