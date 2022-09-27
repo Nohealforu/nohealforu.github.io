@@ -3404,7 +3404,7 @@ Game.handleNewPath = function(gridX, gridY, targetMap, newPathType)
 	else
 	{
 		let airship = (newPathType == NewPathType.AirshipStart);
-		if(newPathType == NewPathType.AirshipStart)
+		if(newPathType == NewPathType.AirshipEnd)
 			this.currentPathLocations.push(new PathLocation(gridX, gridY));
 		this.currentStepPath.pathLocations = this.currentPathLocations;
 		this.stepPaths.push(this.currentStepPath);
@@ -3830,9 +3830,6 @@ Game.generatePathImage = function(pathElement)
     let pathImageCanvas = document.createElement('canvas');
     pathImageCanvas.width = relativeWidth * pathImageMap.tsize;
     pathImageCanvas.height = relativeHeight * pathImageMap.tsize;
-
-	console.log(minRelativeX);
-	console.log(relativeWidth);
 	
 	let context = pathImageCanvas.getContext('2d')
 	for (let c = minRelativeX - relativeMinPaddingX; c <= relativeWidth; c++) {
@@ -3887,7 +3884,7 @@ Game.generatePathImage = function(pathElement)
 			let targetStartY = null;
 			let targetEndX = null;
 			let targetEndY = null;
-			if((Math.abs(previousX - gridX) + Math.abs(previousY - gridY) > 1))
+			if(!currentPath.airship && (Math.abs(previousX - gridX) + Math.abs(previousY - gridY) > 1))
 			{
 				// we jumped, need to look at last tent location in path?
 				// to cover possibility of multiple tents, etc.
