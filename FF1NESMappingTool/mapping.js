@@ -169,7 +169,8 @@ const NewPathType =
 	ShipStart: 2,
 	ShipEnd: 3,
 	AirshipStart: 4,
-	AirshipEnd: 5
+	AirshipEnd: 5,
+	Manual: 6
 };
 
 function teleportEntry(name, targetMap, x, y, requirement = teleportEntryRequirement.None, roomState = null){
@@ -2784,6 +2785,11 @@ Game.handleExit = function()
 	this.startTeleport(warp, teleport);
 };
 
+Game.handleManualPath = function()
+{
+	this.handleNewPath(this.player.gridX, this.player.gridY, this.currentMap.name, NewPathType.Manual);
+};
+
 Game.getExitTeleport = function(innCheckpoint = false)
 {
 	let teleport = this.currentDungeon.exitInformation;
@@ -3716,26 +3722,13 @@ Game.render = function () {
 	}
 };
 
-PathImageMap = function(name, cols, rows, overworldMap, data, tileAtlasImage){
-    this.name = name;
-	this.cols = cols;
-    this.rows = rows;
-    this.tsize = 16;
-    this.data = data;
-	this.tileAtlasImage = tileAtlasImage;
-	this.showRooms = (!overworldMap);
-	this.overworldMap = overworldMap;
-};
-
 PathImageMap.prototype.getTile = function(col, row)
 {
-	if(col >= this.cols)
-		col -= this.cols;
-	else if(col < 0)
+	col = col % this.cols;
+	row = row % this.rows;
+	if(col < 0)
 		col += this.cols;
-	if(row >= this.rows)
-		row -= this.rows;
-	else if(row < 0)
+	if(row < 0)
 		row += this.rows;
 	return this.data[this.cols * row + col];
 }
@@ -3826,14 +3819,17 @@ Game.generatePathImage = function(pathElement)
 		let dungeonInfo = dungeons[mapName];
 		pathImageMap = new PathImageMap(mapName, mapCols, mapRows, false, Loader.getMapData(dungeonInfo.mapDataName), Loader.getImage(dungeonInfo.tileAtlasRoomImageName));
 	}
+
+	let startCol = minRelativeX - relativeMinPaddingX;
+	let startRow = minRelativeY - relativeMinPaddingY;
 	
     let pathImageCanvas = document.createElement('canvas');
     pathImageCanvas.width = relativeWidth * pathImageMap.tsize;
     pathImageCanvas.height = relativeHeight * pathImageMap.tsize;
-	
+
 	let context = pathImageCanvas.getContext('2d')
-	for (let c = minRelativeX - relativeMinPaddingX; c <= relativeWidth; c++) {
-		for (let r = minRelativeY - relativeMinPaddingY; r <= relativeHeight; r++) {
+	for (let c = startCol; c <= startCol + relativeWidth; c++) {
+		for (let r = startRow; r <= startRow + relativeHeight; r++) {
 			let tile = pathImageMap.getTile(c + absoluteStartX, r + absoluteStartY);
 			let x = (c - (minRelativeX - relativeMinPaddingX)) * pathImageMap.tsize;
 			let y = (r - (minRelativeY - relativeMinPaddingY)) * pathImageMap.tsize;
@@ -3863,16 +3859,24 @@ Game.generatePathImage = function(pathElement)
 	
 	let previousX = null;
 	let previousY = null;
+	let previousDrawX = null;
+	let previousDrawY = null;
 	let newSubPath = false;
 	context.beginPath();
 	let rectangleArray = [];
 	for (let i = 0; i < pathLocations.length; i++) {
 		let pathLocation = pathLocations[i];
 		let pathLocationEvents = pathLocation.locationEvents;
-		let gridX = pathLocation.relativeX - (minRelativeX - relativeMinPaddingX);		
-		let gridY = pathLocation.relativeY - (minRelativeY - relativeMinPaddingY);
-		let x = gridX * pathImageMap.tsize + pathImageMap.tsize / 2;
-		let y = gridY * pathImageMap.tsize + pathImageMap.tsize / 2;
+		let gridX = pathLocation.relativeX;		
+		let gridY = pathLocation.relativeY;
+		let drawX = (pathLocation.relativeX - startCol) % pathImageMap.cols;		
+		let drawY = (pathLocation.relativeY - startRow) % pathImageMap.rows;
+		if(drawX < 0)
+			drawX += pathImageMap.cols;
+		if(drawY < 0)
+			drawY += pathImageMap.rows;
+		let x = drawX * pathImageMap.tsize + pathImageMap.tsize / 2;
+		let y = drawY * pathImageMap.tsize + pathImageMap.tsize / 2;
 		
 		if(previousX == null)
 		{
@@ -3884,7 +3888,7 @@ Game.generatePathImage = function(pathElement)
 			let targetStartY = null;
 			let targetEndX = null;
 			let targetEndY = null;
-			if(!currentPath.airship && (Math.abs(previousX - gridX) + Math.abs(previousY - gridY) > 1))
+			if(!currentPath.airship && (Math.abs(previousDrawX - drawX) + Math.abs(previousDrawY - drawY) > 1))
 			{
 				// we jumped, need to look at last tent location in path?
 				// to cover possibility of multiple tents, etc.
@@ -3946,6 +3950,8 @@ Game.generatePathImage = function(pathElement)
 		}
 		previousX = gridX;
 		previousY = gridY;
+		previousDrawX = drawX;
+		previousDrawY = drawY;
 	}
 	context.stroke();
 	if(rectangleArray.length > 0)
