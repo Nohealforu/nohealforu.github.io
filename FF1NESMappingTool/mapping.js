@@ -3591,9 +3591,10 @@ Game._drawPath = function (map) {
 					targetStartY = y + displayTsize - 8;
 					targetEndY = y + 8;
 				}
+				let fightFound = false;
+				let itemFound = false;
 				if(pathLocationEvents != null && pathLocationEvents.length != undefined && pathLocationEvents.length > 0)
 				{
-					let fightFound = false;
 					for(let j = 0; j < pathLocationEvents.length; j++)
 					{
 						if(pathLocationEvents[j].eventType == EventType.Fight)
@@ -3601,13 +3602,10 @@ Game._drawPath = function (map) {
 							fightFound = true;
 							break;
 						}
-					}
-					if(fightFound)
-					{
-						context.stroke();
-						pathMainColor.h += 15;
-						context.strokeStyle = pathMainColor.getHSLString();
-						rectangleArray.push(new EventRectangle(x - 16, y - 16, 32, 32));
+						if(pathLocationEvents[j].eventType == EventType.Item)
+						{
+							itemFound = true;
+						}
 					}
 				}
 				if(newSubPath)
@@ -3620,6 +3618,16 @@ Game._drawPath = function (map) {
 					context.lineTo(targetStartX, targetStartY);
 				}
 				context.lineTo(targetEndX, targetEndY);
+				if(fightFound || itemFound)
+				{
+					context.stroke();
+					context.beginPath();
+					pathMainColor.h += 15;
+					context.strokeStyle = pathMainColor.getHSLString();
+					if(fightFound)
+						rectangleArray.push(new EventRectangle(x - 16, y - 16, 32, 32));
+					context.moveTo(targetEndX, targetEndY);
+				}
 				newSubPath = false;
 			}
 			previousX = gridX;
@@ -3635,6 +3643,7 @@ Game._drawPath = function (map) {
 			{	
 				context.rect(rectangleArray[i].x, rectangleArray[i].y, rectangleArray[i].w, rectangleArray[i].h)
 				context.stroke();
+				context.beginPath();
 				pathMainColor.h += 15;
 				context.strokeStyle = pathMainColor.getHSLString();
 			}
@@ -3946,9 +3955,10 @@ Game.generatePathImage = function(pathElement)
 				targetStartY = y + pathImageMap.tsize - 4;
 				targetEndY = y + 4;
 			}
+			let fightFound = false;
+			let itemFound = false;
 			if(pathLocationEvents != null && pathLocationEvents.length != undefined && pathLocationEvents.length > 0)
 			{
-				let fightFound = false;
 				for(let j = 0; j < pathLocationEvents.length; j++)
 				{
 					if(pathLocationEvents[j].eventType == EventType.Fight)
@@ -3956,20 +3966,32 @@ Game.generatePathImage = function(pathElement)
 						fightFound = true;
 						break;
 					}
+					if(pathLocationEvents[j].eventType == EventType.Item)
+					{
+						itemFound = true;
+					}
 				}
-				if(fightFound)
-					rectangleArray.push(new EventRectangle(x - 8, y - 8, 16, 16));
 			}
 			if(newSubPath)
 			{
 				context.moveTo(targetStartX, targetStartY);
-				//context.ellipse((previousX - startCol) * pathImageMap.tsize + offsetX, (previousY - startRow) * pathImageMap.tsize + offsetY, 8, 8, 0, 0, Math.PI * 2);
+				//context.ellipse((previousX - startCol) * displayTsize + offsetX, (previousY - startRow) * displayTsize + offsetY, 8, 8, 0, 0, Math.PI * 2);
 			}
 			else
 			{
 				context.lineTo(targetStartX, targetStartY);
 			}
 			context.lineTo(targetEndX, targetEndY);
+			if(fightFound || itemFound)
+			{
+				context.stroke();
+				context.beginPath();
+				pathMainColor.h += 15;
+				context.strokeStyle = pathMainColor.getHSLString();
+				if(fightFound)
+					rectangleArray.push(new EventRectangle(x - 8, y - 8, 16, 16));
+				context.moveTo(targetEndX, targetEndY);
+			}
 			newSubPath = false;
 		}
 		previousX = gridX;
@@ -3981,9 +4003,16 @@ Game.generatePathImage = function(pathElement)
 	if(rectangleArray.length > 0)
 	{
 		context.beginPath();
+		pathMainColor = new HSLColor(this.pathMainColor);
+		context.strokeStyle = pathMainColor.getHSLString();
 		for(let i = 0; i < rectangleArray.length; i++)
+		{	
 			context.rect(rectangleArray[i].x, rectangleArray[i].y, rectangleArray[i].w, rectangleArray[i].h)
-		context.stroke();
+			context.stroke();
+			context.beginPath();
+			pathMainColor.h += 15;
+			context.strokeStyle = pathMainColor.getHSLString();
+		}
 	}
 	
 	let outputImage = pathImageCanvas.toDataURL('image/png');
