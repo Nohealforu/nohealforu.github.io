@@ -3799,23 +3799,23 @@ Game.generatePathImage = function(pathElement)
 	
 	let relativeMinPaddingX = 4;
 	let relativeMaxPaddingX = 4;
-	let relativeWidth = maxRelativeX - minRelativeX + relativeMinPaddingX + relativeMaxPaddingX;
+	let relativeWidth = maxRelativeX - minRelativeX + relativeMinPaddingX + relativeMaxPaddingX + 1;
 	if(relativeWidth > mapCols)
 	{
 		relativeMinPaddingX -= Math.floor((relativeWidth - mapCols) / 2);
 		relativeMaxPaddingX -= Math.ceil((relativeWidth - mapCols) / 2);
 	}
-	relativeWidth = maxRelativeX - minRelativeX + relativeMinPaddingX + relativeMaxPaddingX;
+	relativeWidth = maxRelativeX - minRelativeX + relativeMinPaddingX + relativeMaxPaddingX + 1;
 	
 	let relativeMinPaddingY = 4;
 	let relativeMaxPaddingY = 4;
-	let relativeHeight = maxRelativeY - minRelativeY + relativeMinPaddingY + relativeMaxPaddingY;
+	let relativeHeight = maxRelativeY - minRelativeY + relativeMinPaddingY + relativeMaxPaddingY + 1;
 	if(relativeHeight > mapRows)
 	{
 		relativeMinPaddingY -= Math.floor((relativeHeight - mapRows) / 2);
 		relativeMaxPaddingY -= Math.ceil((relativeHeight - mapRows) / 2);
 	}
-	relativeHeight = maxRelativeY - minRelativeY + relativeMinPaddingY + relativeMaxPaddingY;
+	relativeHeight = maxRelativeY - minRelativeY + relativeMinPaddingY + relativeMaxPaddingY + 1;
 	
 	if(mapName == 'WorldMap')
 	{
@@ -3830,6 +3830,9 @@ Game.generatePathImage = function(pathElement)
     let pathImageCanvas = document.createElement('canvas');
     pathImageCanvas.width = relativeWidth * pathImageMap.tsize;
     pathImageCanvas.height = relativeHeight * pathImageMap.tsize;
+
+	console.log(minRelativeX);
+	console.log(relativeWidth);
 	
 	let context = pathImageCanvas.getContext('2d')
 	for (let c = minRelativeX - relativeMinPaddingX; c <= relativeWidth; c++) {
