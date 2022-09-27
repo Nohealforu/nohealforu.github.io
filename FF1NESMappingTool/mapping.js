@@ -3507,7 +3507,8 @@ Game._drawPath = function (map) {
 		context.lineWidth = 8;
 		context.lineJoin = 'round';
 		context.lineCap = 'round';
-		context.strokeStyle = this.pathMainColor;
+		pathMainColor = new HSLColor(this.pathMainColor);
+		context.strokeStyle = pathMainColor.getHSLString();
 		context.shadowOffsetX = 4;
 		context.shadowOffsetY = 4;
 		context.shadowBlur = 2;
@@ -3602,7 +3603,12 @@ Game._drawPath = function (map) {
 						}
 					}
 					if(fightFound)
+					{
+						context.stroke();
+						pathMainColor.h += 15;
+						context.strokeStyle = pathMainColor.getHSLString();
 						rectangleArray.push(new EventRectangle(x - 16, y - 16, 32, 32));
+					}
 				}
 				if(newSubPath)
 				{
@@ -3623,9 +3629,15 @@ Game._drawPath = function (map) {
 		if(rectangleArray.length > 0)
 		{
 			context.beginPath();
+			pathMainColor = new HSLColor(this.pathMainColor);
+			context.strokeStyle = pathMainColor.getHSLString();
 			for(let i = 0; i < rectangleArray.length; i++)
+			{	
 				context.rect(rectangleArray[i].x, rectangleArray[i].y, rectangleArray[i].w, rectangleArray[i].h)
-			context.stroke();
+				context.stroke();
+				pathMainColor.h += 15;
+				context.strokeStyle = pathMainColor.getHSLString();
+			}
 		}
 		
 	}
@@ -3851,7 +3863,8 @@ Game.generatePathImage = function(pathElement)
 	context.lineWidth = 4;
 	context.lineJoin = 'round';
 	context.lineCap = 'round';
-	context.strokeStyle = this.pathMainColor;
+	pathMainColor = new HSLColor(this.pathMainColor);
+	context.strokeStyle = pathMainColor.getHSLString();
 	context.shadowOffsetX = 2;
 	context.shadowOffsetY = 2;
 	context.shadowBlur = 1;
@@ -3964,4 +3977,51 @@ Game.generatePathImage = function(pathElement)
 	
 	let outputImage = pathImageCanvas.toDataURL('image/png');
 	document.getElementById('pathExportOutput').src = outputImage;
+};
+
+HSLColor = function(color)
+{
+	this.conversion = this.HexToHSL(color);
+	this.h = conversion.h;
+	this.s = conversion.s;
+	this.l = conversion.l;
+}
+
+HSLColor.prototype.getHSLString = function()
+{
+	return 'hsl(' + this.h + ', ' + this.s + '%, ' + this.l + '%)';
+};
+
+HSLColor.prototype.HexToHSL = function(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+
+    var r = parseInt(result[1], 16);
+    var g = parseInt(result[2], 16);
+    var b = parseInt(result[3], 16);
+
+    r /= 255, g /= 255, b /= 255;
+    var max = Math.max(r, g, b), min = Math.min(r, g, b);
+    var h, s, l = (max + min) / 2;
+
+    if(max == min){
+        h = s = 0; // achromatic
+    } else {
+        var d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch(max) {
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            case b: h = (r - g) / d + 4; break;
+        }
+        
+        h /= 6;
+    }
+
+    s = s*100;
+    s = Math.round(s);
+    l = l*100;
+    l = Math.round(l);
+    h = Math.round(360*h);
+
+    return {h, s, l};
 };
