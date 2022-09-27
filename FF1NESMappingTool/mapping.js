@@ -3823,13 +3823,13 @@ Game.generatePathImage = function(pathElement)
 	
 	
     let pathImageCanvas = document.createElement('canvas');
-    pathImageCanvas.width = pathImageMap.cols * pathImageMap.tsize;
-    pathImageCanvas.height = pathImageMap.rows * pathImageMap.tsize;
+    pathImageCanvas.width = relativeWidth * pathImageMap.tsize;
+    pathImageCanvas.height = relativeHeight * pathImageMap.tsize;
 	
 	let context = pathImageCanvas.getContext('2d')
 	for (let c = minRelativeX - relativeMinPaddingX; c <= relativeWidth; c++) {
 		for (let r = minRelativeY - relativeMinPaddingY; r <= relativeHeight; r++) {
-			let tile = pathImageMap.getTile(c, r);
+			let tile = pathImageMap.getTile(c + absoluteStartX, r + absoluteStartY);
 			let x = (c - (minRelativeX - relativeMinPaddingX)) * pathImageMap.tsize;
 			let y = (r - (minRelativeY - relativeMinPaddingY)) * pathImageMap.tsize;
 			let tileRow = Math.floor(tile / 16);
@@ -3864,8 +3864,8 @@ Game.generatePathImage = function(pathElement)
 	for (let i = 0; i < pathLocations.length; i++) {
 		let pathLocation = pathLocations[i];
 		let pathLocationEvents = pathLocation.locationEvents;
-		let gridX = pathLocation.relativeX;		
-		let gridY = pathLocation.relativeY;
+		let gridX = pathLocation.relativeX - (minRelativeX - relativeMinPaddingX);		
+		let gridY = pathLocation.relativeY - (minRelativeY - relativeMinPaddingY);
 		let x = gridX * pathImageMap.tsize;
 		let y = gridY * pathImageMap.tsize;
 		
