@@ -3622,7 +3622,7 @@ Game._drawPath = function (map) {
 				{
 					context.stroke();
 					context.beginPath();
-					pathMainColor.h += 15;
+					pathMainColor.h += 25;
 					context.strokeStyle = pathMainColor.getHSLString();
 					if(fightFound)
 						rectangleArray.push(new EventRectangle(x - 16, y - 16, 32, 32));
@@ -3644,7 +3644,7 @@ Game._drawPath = function (map) {
 				context.rect(rectangleArray[i].x, rectangleArray[i].y, rectangleArray[i].w, rectangleArray[i].h)
 				context.stroke();
 				context.beginPath();
-				pathMainColor.h += 15;
+				pathMainColor.h += 25;
 				context.strokeStyle = pathMainColor.getHSLString();
 			}
 		}
@@ -3986,7 +3986,7 @@ Game.generatePathImage = function(pathElement)
 			{
 				context.stroke();
 				context.beginPath();
-				pathMainColor.h += 15;
+				pathMainColor.h += 25;
 				context.strokeStyle = pathMainColor.getHSLString();
 				if(fightFound)
 					rectangleArray.push(new EventRectangle(x - 8, y - 8, 16, 16));
@@ -4010,7 +4010,7 @@ Game.generatePathImage = function(pathElement)
 			context.rect(rectangleArray[i].x, rectangleArray[i].y, rectangleArray[i].w, rectangleArray[i].h)
 			context.stroke();
 			context.beginPath();
-			pathMainColor.h += 15;
+			pathMainColor.h += 25;
 			context.strokeStyle = pathMainColor.getHSLString();
 		}
 	}
