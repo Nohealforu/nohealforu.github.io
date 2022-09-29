@@ -48,7 +48,7 @@
 			<div class="sideElement" style="border:1px solid #ccc; vertical-align: top;">
 				<div><input type="color" id="pathMain" name="pathMain" value="#6000D0" onchange="Game.handleColorChange(this);" ><label for="pathMain">Path Main</label></div>
 				<div><input type="color" id="pathShadow" name="pathShadow" value="#222222" onchange="Game.handleColorChange(this);" ><label for="head">Path Shadow</label></div>
-<div>Color Rotation<input type="range" min="5" default="30" max="55" onchange="Game.handleColorRotation(this);" /></div>
+<div>Color Rotation<input type="range" min="5" default="30" max="55" step="1" onchange="Game.handleColorRotation(this);" /></div>
 				<div>MoveSpeed <input type="range" min="10" default="50" max="100" onchange="Game.handleMovementSpeedChange(this);" /></div>
 				<div><button id="pathResetButton" onclick="Game.handlePathReset();" type="button">Reset Path</button></div>
 				<div><button id="softResetButton" onclick="Game.handleSoftReset();" type="button">Soft Reset</button></div>
