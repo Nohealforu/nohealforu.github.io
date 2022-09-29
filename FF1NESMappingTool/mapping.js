@@ -2768,7 +2768,7 @@ Game.handleColorChange = function (colorElement)
 
 Game.handleColorRotation = function (rotationElement)
 {
-this.colorRotation = rotationElement.value;
+this.colorRotation = Integer.valueOf(rotationElement.value);
 this._drawPath(this.currentMap)
 };
 
