@@ -2766,6 +2766,12 @@ Game.handleColorChange = function (colorElement)
 	this._drawPath(this.currentMap);
 }
 
+Game.handleColorRotation = function (rotationElement)
+{
+this.colorRotation = rotationElement.value;
+this._drawPath(this.currentMap)
+};
+
 Game.handleWarp = function() 
 {
 	if(this.currentMap.overworldMap)
@@ -3056,7 +3062,7 @@ Game.init = function () {
     this.pathCanvas.height = defaultHeight;
 	this.pathMainColor = '#6000D0';
 	this.pathShadowColor = '#222222';
-
+this.colorRotation = 30;
     // initial draw of the map
     console.log("Intial Map Loading...");
     this._loadCells(this.currentMap);
@@ -3622,7 +3628,7 @@ Game._drawPath = function (map) {
 				{
 					context.stroke();
 					context.beginPath();
-					pathMainColor.h += 25;
+					pathMainColor.h += this.colorRotation;
 					context.strokeStyle = pathMainColor.getHSLString();
 					if(fightFound)
 						rectangleArray.push(new EventRectangle(x - 16, y - 16, 32, 32));
@@ -3644,7 +3650,7 @@ Game._drawPath = function (map) {
 				context.rect(rectangleArray[i].x, rectangleArray[i].y, rectangleArray[i].w, rectangleArray[i].h)
 				context.stroke();
 				context.beginPath();
-				pathMainColor.h += 25;
+				pathMainColor.h += this.colorRotation;
 				context.strokeStyle = pathMainColor.getHSLString();
 			}
 		}
@@ -3986,7 +3992,7 @@ Game.generatePathImage = function(pathElement)
 			{
 				context.stroke();
 				context.beginPath();
-				pathMainColor.h += 25;
+				pathMainColor.h += this.colorRotation;
 				context.strokeStyle = pathMainColor.getHSLString();
 				if(fightFound)
 					rectangleArray.push(new EventRectangle(x - 8, y - 8, 16, 16));
@@ -4010,7 +4016,7 @@ Game.generatePathImage = function(pathElement)
 			context.rect(rectangleArray[i].x, rectangleArray[i].y, rectangleArray[i].w, rectangleArray[i].h)
 			context.stroke();
 			context.beginPath();
-			pathMainColor.h += 25;
+			pathMainColor.h += this.colorRotation;
 			context.strokeStyle = pathMainColor.getHSLString();
 		}
 	}
