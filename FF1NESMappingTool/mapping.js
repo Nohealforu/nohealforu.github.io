@@ -1901,7 +1901,7 @@ function Sprite(name, mapName, startX, startY, room, imageName, fight, item, eve
 Sprite.prototype.playerInteraction = function (player)
 {
 	result = {fight: null, item: null, eventTrigger: null, success: false};
-	if(this.needKeyItem != null && (this.needKeyItem == -255 ? player.getOrbs() == true : player.keyItems[this.needKeyItem] != true))
+	if(this.needKeyItem != null && (this.needKeyItem == -255 ? player.getOrbs() != true : player.keyItems[this.needKeyItem] != true))
 	{
 		result.item = this.needKeyItem;
 	}
