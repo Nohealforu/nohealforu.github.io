@@ -2479,7 +2479,7 @@ function Player(map, startX, startY, width, height, image, canoeImage, spriteWal
 
 Player.prototype.getDomain = function()
 {
-	return this.gridX % 32 + (this.gridY % 32) * 8; 
+	return Math.floor(this.gridX / 32) + Math.floor(this.gridY / 32) * 8; 
 };
 
 Player.prototype.teleportPlayer = function (map, gridX, gridY, moveMethod)
