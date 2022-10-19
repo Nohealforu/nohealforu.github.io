@@ -1659,7 +1659,7 @@ function EncounterInfo(formation, runnable, surprise, slot1 = new EncounterSlot(
 EncounterInfo.prototype.getSlotInfo = function(slot)
 {
 	let encounterSlot = this[slot];
-	return encounterSlot.minimum + '-' + encounterSlot.maximum + ' ' + encounterSlot.enemy.name + '(' + encounterSlot.enemy.hp + ' hp)';
+	return (encounterSlot.minimum == encounterSlot.maximum ? encounterSlot.minimum : encounterSlot.minimum + '-' + encounterSlot.maximum) + ' ' + encounterSlot.enemy.name + '(' + encounterSlot.enemy.hp + ' hp)';
 };
 
 const encounters = {
