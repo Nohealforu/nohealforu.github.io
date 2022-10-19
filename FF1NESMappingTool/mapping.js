@@ -2709,7 +2709,7 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
 		if(tileData.shop != null && tileData.shop.includes('INN'))
 			Game.saveINN();
 		
-		document.getElementById('messageLog').innerHTML = 'Message Log' + this.messageLog;
+		document.getElementById('messageLog').innerHTML = 'Message Log' + Game.messageLog;
 		
 		if(Game.currentMap.overworldMap)
 			this.currentDomain = this.getDomain();
