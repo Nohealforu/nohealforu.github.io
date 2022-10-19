@@ -2709,6 +2709,8 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
 		if(tileData.shop != null && tileData.shop.includes('INN'))
 			Game.saveINN();
 		
+		document.getElementById('messageLog').innerHTML = 'Message Log' + this.messageLog;
+		
 		if(Game.currentMap.overworldMap)
 			this.currentDomain = this.getDomain();
 		
@@ -3567,6 +3569,7 @@ Game.init = function () {
 	this.encounterChance = 0x45;
 	this.encounterNumber = 0;
 	this.encounterGroup = 0;
+	this.messageLog = '';
     this.currentMap = overworldMap;
     this.camera.followPlayer(this.currentMap, this.player);
 	this.stepPaths = [];
@@ -3668,8 +3671,8 @@ Game.processFight = function (fightNumber, success)
 					   (encounter.slot3.maximum > 0 ? ', ' + encounter.getSlotInfo('slot3') : '') + 
 					   (encounter.slot4.maximum > 0 ? ', ' + encounter.getSlotInfo('slot4') : '');
 	if(fightNumber > 127)
-		fightNumber = (fightNumber - 128) + '(f2)';
-	document.getElementById('messageLog').innerHTML += '<br/>Fight: ' + fightNumber + ' surprise(' + encounter.surprise +') can run(' + encounter.runnable + '): ' + fightDetails;
+		fightNumber = (fightNumber - 128) + '-2';
+	this.messageLog = '<br/>Fight: ' + fightNumber + ' surprise(' + encounter.surprise +') can run(' + encounter.runnable + '): ' + fightDetails + this.messageLog;
 };
 
 Game.processItem = function (itemNumber, success)
@@ -3678,13 +3681,13 @@ Game.processItem = function (itemNumber, success)
 	{
 		this.player.keyItems[itemNumber] = true;
 		this.currentTileLocationEvents.push(new LocationEvent(EventType.Item, itemNumber));
-		document.getElementById('messageLog').innerHTML += '<br/>Item come to hand: ' + KeyItemStrings[itemNumber];
+		this.messageLog = '<br/>Item come to hand: ' + KeyItemStrings[itemNumber] + this.messageLog;
 		if(itemNumber == KeyItem.BOTTLE)
 			spriteNameMap['Fairy'].active = true;
 	}
 	else
 	{
-		document.getElementById('messageLog').innerHTML += '<br/>You need: ' + KeyItemStrings[itemNumber];
+		this.messageLog = '<br/>You need: ' + KeyItemStrings[itemNumber] + this.messageLog;
 	}
 };
 
@@ -3724,11 +3727,11 @@ Game.processEventTrigger = function (eventNumber, success)
 		{
 			this.airship.active = true;
 		}
-		document.getElementById('messageLog').innerHTML += '<br/>Event Triggered: ' + EventStrings[eventNumber];
+		this.messageLog = '<br/>Event Triggered: ' + EventStrings[eventNumber] + this.messageLog;
 	}
 	else
 	{
-		document.getElementById('messageLog').innerHTML += '<br/>Missing Requirement: ' + EventStrings[eventNumber];
+		this.messageLog = '<br/>Missing Requirement: ' + EventStrings[eventNumber] + this.messageLog;
 	}
 };
 
@@ -3758,6 +3761,7 @@ Game.handleActionButton = function(incompleteMovement, activeMovement)
 					this.processEventTrigger(results.eventTrigger, results.success);
 				if(results.success)
 					this._drawSprites(this.currentMap);
+				document.getElementById('messageLog').innerHTML = 'Message Log' + this.messageLog;
 				break;
 			}
 		}
@@ -3869,19 +3873,19 @@ Game.checkForTeleport = function (tileX, tileY)
 	{
 		if(teleport.requirement == teleportEntryRequirement.Crown && this.player.keyItems[KeyItem.CROWN] == false)
 		{
-			document.getElementById('messageLog').innerHTML += '<br/>No Crown :(';	
+			this.messageLog = '<br/>No Crown :(' + this.messageLog;
 		}
 		else if(teleport.requirement == teleportEntryRequirement.Cube && this.player.keyItems[KeyItem.CUBE] == false)
 		{
-			document.getElementById('messageLog').innerHTML += '<br/>No Cube :(';	
+			this.messageLog = '<br/>No Cube :(' + this.messageLog;
 		}
 		else if(teleport.requirement == teleportEntryRequirement.Chime && this.player.keyItems[KeyItem.CHIME] == false)
 		{
-			document.getElementById('messageLog').innerHTML += '<br/>No Chime :(';	
+			this.messageLog = '<br/>No Chime :(' + this.messageLog;
 		}
 		else if(teleport.requirement == teleportEntryRequirement.Orbs && this.player.getOrbs() == false)
 		{
-			document.getElementById('messageLog').innerHTML += '<br/>Not enough orbs noob';
+			this.messageLog = '<br/>Not enough orbs noob' + this.messageLog;
 		}
 		else //teleport
 		{
