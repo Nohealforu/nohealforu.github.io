@@ -1475,7 +1475,515 @@ new dungeonMapTile(true),
 new dungeonMapTile(true),
 ];
 
-function DungeonInfo(label, mapTileAtlas, tileAtlasImageName, tileAtlasRoomImageName, mapDataName, exitInformation, encounterThreshold = 8)
+const Formation = {
+	small: 0,
+	large: 1,
+	mix: 2,
+	fiend: 3,
+	chaos: 4,
+};
+
+function EnemyInfo(name, hp, gold, exp, attack, crit, hits, hit, absorb, evade, mdef, morale, size = Formation.small, resistances = 0, weaknesses = 0, attackEffects = 0, abilityChance = 0, abilityList = [], magicChance = 0, magicList = [])
+{
+	this.name = name;
+	this.hp = hp;
+	this.gold = gold;
+	this.exp = exp;
+	this.attack = attack;
+	this.crit = crit;
+	this.hits = hits;
+	this.hit = hit;
+	this.absorb = absorb;
+	this.evade = evade;
+	this.mdef = mdef;
+	this.morale = morale;
+	this.size = size;
+	this.attackEffects = attackEffects;
+	this.weaknesses = weaknesses;
+	this.resistances = resistances;
+	this.magicChance = magicChance;
+	this.abilityChance = abilityChance;
+	this.magicList = magicList;
+	this.abilityList = abilityList;
+}
+
+var enemies = {
+	'Imp': new EnemyInfo('Imp', 8, 6, 6, 4, 1, 1, 2, 4, 6, 16, 106),
+	'GrImp': new EnemyInfo('GrImp', 16, 18, 18, 8, 1, 1, 4, 6, 9, 23, 120),
+	'Wolf': new EnemyInfo('Wolf', 20, 6, 24, 8, 1, 1, 5, 0, 36, 28, 105),
+	'GrWolf': new EnemyInfo('GrWolf', 72, 22, 93, 14, 1, 1, 18, 0, 54, 46, 108),
+	'WrWolf': new EnemyInfo('WrWolf', 68, 67, 135, 14, 1, 1, 17, 6, 42, 45, 120),
+	'FrWolf': new EnemyInfo('FrWolf', 92, 200, 402, 25, 1, 1, 23, 0, 54, 55, 200),
+	'Iguana': new EnemyInfo('Iguana', 92, 50, 153, 18, 10, 1, 23, 12, 24, 55, 134),
+	'Agama': new EnemyInfo('Agama', 296, 1200, 2472, 31, 1, 2, 74, 18, 36, 143, 200),
+	'Sauria': new EnemyInfo('Sauria', 196, 658, 1977, 30, 1, 1, 54, 20, 24, 91, 200),
+	'Giant': new EnemyInfo('Giant', 240, 879, 879, 38, 1, 1, 60, 12, 48, 120, 136),
+	'FrGiant': new EnemyInfo('FrGiant', 336, 1752, 1752, 60, 1, 1, 78, 16, 48, 150, 200),
+	'R.Giant': new EnemyInfo('R.Giant', 300, 1506, 1506, 73, 1, 1, 83, 20, 48, 135, 200),
+	'Sahag': new EnemyInfo('Sahag', 28, 30, 30, 10, 1, 1, 7, 4, 72, 28, 110),
+	'R.Sahag': new EnemyInfo('R.Sahag', 64, 105, 105, 15, 1, 1, 16, 8, 78, 46, 142),
+	'WzSahag': new EnemyInfo('WzSahag', 204, 882, 882, 47, 1, 1, 51, 20, 96, 101, 200),
+	'Pirate': new EnemyInfo('Pirate', 6, 40, 40, 8, 1, 1, 2, 0, 12, 15, 255),
+	'Kyzoku': new EnemyInfo('Kyzoku', 50, 120, 60, 14, 1, 1, 13, 6, 24, 37, 106),
+	'Shark': new EnemyInfo('Shark', 120, 66, 267, 22, 1, 1, 30, 0, 72, 70, 121),
+	'GrShark': new EnemyInfo('GrShark', 344, 600, 2361, 50, 1, 1, 86, 8, 72, 170, 200),
+	'OddEye': new EnemyInfo('OddEye', 10, 10, 42, 4, 1, 1, 2, 0, 84, 14, 110),
+	'BigEye': new EnemyInfo('BigEye', 304, 3591, 3591, 30, 1, 2, 76, 16, 24, 156, 200),
+	'Bone': new EnemyInfo('Bone', 10, 3, 9, 10, 1, 1, 2, 0, 12, 17, 124),
+	'R.Bone': new EnemyInfo('R.Bone', 144, 378, 378, 26, 1, 1, 36, 12, 42, 76, 156),
+	'Creep': new EnemyInfo('Creep', 56, 15, 63, 17, 1, 1, 14, 8, 24, 40, 104),
+	'Crawl': new EnemyInfo('Crawl', 84, 200, 186, 1, 1, 8, 21, 8, 42, 51, 106),
+	'Hyena': new EnemyInfo('Hyena', 120, 72, 288, 22, 1, 1, 30, 4, 48, 76, 122),
+	'Cerebus': new EnemyInfo('Cerebus', 192, 600, 1182, 30, 1, 1, 48, 8, 48, 103, 146),
+	'Ogre': new EnemyInfo('Ogre', 100, 195, 195, 18, 1, 1, 25, 10, 18, 65, 116),
+	'GrOgre': new EnemyInfo('GrOgre', 132, 300, 282, 23, 1, 1, 33, 14, 30, 71, 126),
+	'WzOgre': new EnemyInfo('WzOgre', 144, 723, 723, 23, 1, 1, 36, 10, 54, 80, 134),
+	'Asp': new EnemyInfo('Asp', 56, 50, 123, 6, 1, 1, 14, 6, 30, 46, 107),
+	'Cobra': new EnemyInfo('Cobra', 80, 50, 165, 22, 31, 1, 20, 10, 36, 56, 110),
+	'SeaSnake': new EnemyInfo('SeaSnake', 224, 600, 957, 35, 0, 1, 56, 12, 48, 116, 200),
+	'Scorpion': new EnemyInfo('Scorpion', 84, 70, 225, 22, 1, 2, 21, 10, 54, 55, 112),
+	'Lobster': new EnemyInfo('Lobster', 148, 300, 639, 35, 1, 3, 37, 18, 60, 85, 200),
+	'Bull': new EnemyInfo('Bull', 164, 489, 489, 22, 1, 2, 41, 4, 48, 95, 124),
+	'ZomBull': new EnemyInfo('ZomBull', 224, 1050, 1050, 40, 1, 1, 56, 14, 36, 116, 136),
+	'Troll': new EnemyInfo('Troll', 184, 621, 621, 24, 1, 3, 46, 12, 48, 100, 136),
+	'SeaTroll': new EnemyInfo('SeaTroll', 216, 852, 852, 40, 1, 1, 54, 20, 48, 110, 200),
+	'Shadow': new EnemyInfo('Shadow', 50, 45, 90, 10, 1, 1, 13, 0, 36, 37, 124),
+	'Image': new EnemyInfo('Image', 86, 231, 231, 22, 1, 1, 22, 4, 90, 52, 160),
+	'Wraith': new EnemyInfo('Wraith', 114, 432, 432, 40, 1, 1, 29, 12, 108, 67, 160),
+	'Ghost': new EnemyInfo('Ghost', 180, 990, 990, 93, 1, 1, 45, 30, 36, 85, 184),
+	'Zombie': new EnemyInfo('Zombie', 20, 12, 24, 10, 1, 1, 5, 0, 6, 25, 120),
+	'Ghoul': new EnemyInfo('Ghoul', 48, 50, 93, 8, 1, 3, 12, 6, 12, 36, 124),
+	'Geist': new EnemyInfo('Geist', 56, 117, 117, 8, 1, 3, 14, 10, 46, 40, 160),
+	'Specter': new EnemyInfo('Specter', 52, 150, 150, 20, 1, 1, 13, 12, 42, 45, 160),
+	'Worm': new EnemyInfo('Worm', 448, 1000, 4344, 65, 10, 1, 112, 10, 36, 200, 200),
+	'Sand W': new EnemyInfo('Sand W', 200, 900, 2683, 46, 1, 1, 50, 14, 62, 103, 124),
+	'Grey W': new EnemyInfo('Grey W', 280, 400, 1671, 50, 1, 1, 70, 31, 4, 143, 200),
+	'Eye': new EnemyInfo('Eye', 162, 3225, 3225, 30, 1, 1, 42, 30, 12, 92, 200),
+	'Phantom': new EnemyInfo('Phantom', 360, 1, 1, 120, 40, 1, 150, 60, 24, 160, 200),
+	'Medusa': new EnemyInfo('Medusa', 68, 699, 699, 20, 1, 1, 17, 10, 36, 55, 150),
+	'GrMedusa': new EnemyInfo('GrMedusa', 96, 1218, 1218, 11, 1, 10, 24, 12, 72, 70, 200),
+	'Catman': new EnemyInfo('Catman', 160, 780, 780, 30, 1, 2, 40, 16, 48, 93, 148),
+	'Mancat': new EnemyInfo('Mancat', 110, 800, 603, 20, 1, 3, 28, 30, 60, 62, 150),
+	'Pede': new EnemyInfo('Pede', 222, 300, 1194, 39, 1, 1, 56, 20, 48, 116, 111),
+	'GrPede': new EnemyInfo('GrPede', 320, 1000, 2244, 73, 1, 1, 80, 24, 48, 185, 176),
+	'Tiger': new EnemyInfo('Tiger', 132, 108, 438, 22, 25, 2, 33, 8, 48, 85, 116),
+	'Saber T': new EnemyInfo('Saber T', 200, 500, 843, 24, 70, 2, 50, 8, 42, 106, 180),
+	'Vampire': new EnemyInfo('Vampire', 156, 2000, 1200, 76, 1, 1, 39, 24, 72, 75, 200),
+	'WzVamp': new EnemyInfo('WzVamp', 300, 3000, 2385, 90, 1, 1, 42, 28, 72, 84, 200),
+	'Gargoyle': new EnemyInfo('Gargoyle', 80, 80, 132, 12, 1, 4, 20, 8, 45, 53, 132),
+	'R.Goyle': new EnemyInfo('R.Goyle', 94, 387, 387, 10, 1, 4, 24, 32, 72, 127, 134),
+	'Earth': new EnemyInfo('Earth', 288, 768, 1536, 66, 1, 1, 72, 20, 18, 130, 200),
+	'Fire': new EnemyInfo('Fire', 276, 800, 1620, 50, 1, 1, 69, 20, 42, 130, 200),
+	'Frost D': new EnemyInfo('Frost D', 200, 2000, 1701, 53, 1, 1, 50, 8, 120, 196, 200),
+	'Red D': new EnemyInfo('Red D', 248, 4000, 2904, 75, 1, 1, 62, 30, 96, 200, 200),
+	'ZombieD': new EnemyInfo('ZombieD', 268, 999, 2331, 56, 1, 1, 67, 30, 24, 135, 200),
+	'Scum': new EnemyInfo('Scum', 24, 20, 84, 1, 1, 1, 1, 255, 0, 36, 124),
+	'Muck': new EnemyInfo('Muck', 76, 70, 255, 30, 1, 1, 19, 7, 4, 55, 152),
+	'Ooze': new EnemyInfo('Ooze', 76, 70, 252, 32, 1, 1, 19, 6, 6, 55, 144),
+	'Slime': new EnemyInfo('Slime', 156, 900, 1101, 49, 1, 1, 39, 255, 24, 85, 200),
+	'Spider': new EnemyInfo('Spider', 28, 8, 30, 10, 1, 1, 7, 0, 30, 28, 109),
+	'Arachnid': new EnemyInfo('Arachnid', 64, 50, 141, 5, 1, 1, 16, 12, 24, 46, 111),
+	'Manticor': new EnemyInfo('Manticor', 164, 650, 1317, 22, 1, 2, 41, 8, 72, 95, 150),
+	'Sphinx': new EnemyInfo('Sphinx', 228, 1160, 1160, 23, 1, 3, 57, 12, 120, 115, 132),
+	'R.Ankylo': new EnemyInfo('R.Ankylo', 256, 300, 1428, 60, 1, 3, 64, 38, 56, 130, 146),
+	'Ankylo': new EnemyInfo('Ankylo', 352, 1, 2610, 98, 1, 1, 88, 48, 48, 156, 144),
+	'Mummy': new EnemyInfo('Mummy', 80, 300, 300, 30, 1, 1, 20, 20, 24, 60, 172),
+	'WzMummy': new EnemyInfo('WzMummy', 188, 1000, 984, 43, 1, 1, 47, 24, 24, 95, 148),
+	'Coctrice': new EnemyInfo('Coctrice', 50, 200, 186, 1, 1, 1, 10, 4, 72, 47, 124),
+	'Perilisk': new EnemyInfo('Perilisk', 44, 500, 423, 20, 1, 1, 11, 4, 72, 45, 124),
+	'Wyvern': new EnemyInfo('Wyvern', 212, 50, 1173, 30, 1, 1, 53, 12, 96, 115, 150),
+	'Wyrm': new EnemyInfo('Wyrm', 260, 502, 1218, 40, 1, 1, 65, 22, 60, 131, 150),
+	'Tyro': new EnemyInfo('Tyro', 480, 502, 3387, 65, 1, 1, 133, 10, 60, 200, 144),
+	'T Rex': new EnemyInfo('T Rex', 600, 600, 7200, 115, 30, 1, 144, 10, 60, 200, 150),
+	'Caribe': new EnemyInfo('Caribe', 92, 20, 240, 22, 1, 1, 23, 0, 72, 68, 138),
+	'R.Caribe': new EnemyInfo('R.Caribe', 172, 46, 546, 37, 1, 1, 43, 20, 72, 83, 142),
+	'Gator': new EnemyInfo('Gator', 184, 900, 816, 42, 1, 2, 46, 16, 48, 103, 138),
+	'FrGator': new EnemyInfo('FrGator', 288, 2000, 1890, 56, 1, 2, 72, 20, 48, 143, 142),
+	'Ocho': new EnemyInfo('Ocho', 208, 102, 1224, 20, 1, 3, 52, 24, 24, 116, 176),
+	'Naocho': new EnemyInfo('Naocho', 344, 500, 3189, 35, 1, 3, 86, 32, 24, 170, 200),
+	'Hyrda': new EnemyInfo('Hyrda', 212, 150, 915, 30, 1, 3, 53, 14, 36, 116, 138),
+	'R.Hydra': new EnemyInfo('R.Hydra', 182, 400, 1215, 20, 1, 3, 46, 14, 36, 103, 152),
+	'Guard': new EnemyInfo('Guard', 200, 400, 1224, 25, 1, 2, 50, 40, 72, 110, 200),
+	'Sentry': new EnemyInfo('Sentry', 400, 2000, 4000, 102, 1, 1, 90, 48, 96, 160, 150),
+	'Water': new EnemyInfo('Water', 300, 800, 1962, 69, 1, 1, 68, 20, 72, 130, 200),
+	'Air': new EnemyInfo('Air', 358, 807, 1614, 53, 1, 1, 62, 4, 144, 130, 200),
+	'Naga': new EnemyInfo('Naga', 356, 2355, 2355, 9, 1, 1, 71, 8, 72, 116, 200),
+	'GrNaga': new EnemyInfo('GrNaga', 420, 4000, 3489, 7, 1, 1, 88, 16, 48, 143, 154),
+	'Chimera': new EnemyInfo('Chimera', 300, 2500, 2064, 30, 1, 4, 60, 20, 72, 130, 200),
+	'Jimera': new EnemyInfo('Jimera', 350, 5000, 4584, 40, 1, 4, 70, 18, 60, 143, 200),
+	'Wizard': new EnemyInfo('Wizard', 84, 300, 276, 30, 1, 2, 21, 16, 66, 98, 126),
+	'Sorcerer': new EnemyInfo('Sorcerer', 112, 999, 822, 1, 1, 3, 28, 12, 48, 187, 130),
+	'Garland': new EnemyInfo('Garland', 106, 250, 130, 15, 1, 1, 27, 10, 12, 64, 255),
+	'Gas D': new EnemyInfo('Gas D', 352, 5000, 4068, 72, 1, 1, 68, 16, 96, 200, 200),
+	'Blue D': new EnemyInfo('Blue D', 454, 2000, 3274, 92, 1, 1, 86, 20, 96, 200, 200),
+	'MudGol': new EnemyInfo('MudGol', 176, 800, 1257, 64, 1, 1, 44, 7, 28, 93, 200),
+	'RockGol': new EnemyInfo('RockGol', 200, 1000, 2385, 70, 1, 1, 50, 16, 24, 110, 200),
+	'IronGol': new EnemyInfo('IronGol', 304, 3000, 6717, 93, 1, 1, 76, 100, 24, 143, 200),
+	'BadMan': new EnemyInfo('BadMan', 260, 1800, 1263, 44, 1, 2, 65, 38, 36, 135, 200),
+	'EvilMan': new EnemyInfo('EvilMan', 190, 3000, 2700, 55, 1, 1, 48, 32, 42, 173, 200),
+	'Astos': new EnemyInfo('Astos', 168, 2000, 2250, 26, 1, 1, 42, 40, 78, 170, 255),
+	'Mage': new EnemyInfo('Mage', 105, 1095, 1095, 26, 1, 1, 27, 40, 78, 170, 200),
+	'Fighter': new EnemyInfo('Fighter', 200, 3420, 3420, 40, 1, 1, 45, 38, 90, 186, 158),
+	'Madpony': new EnemyInfo('Madpony', 64, 15, 63, 10, 1, 2, 16, 2, 22, 40, 106),
+	'Nitemare': new EnemyInfo('Nitemare', 200, 700, 1272, 30, 1, 3, 50, 24, 132, 100, 200),
+	'WarMech': new EnemyInfo('WarMech', 1000, 32000, 32000, 128, 1, 2, 200, 80, 96, 200, 200),
+	'Lich': new EnemyInfo('Lich', 400, 3000, 2200, 40, 1, 1, 49, 40, 24, 120, 255),
+	'Lich2': new EnemyInfo('Lich2', 500, 1, 2000, 50, 1, 1, 64, 50, 48, 140, 255),
+	'Kary': new EnemyInfo('Kary', 600, 3000, 2475, 40, 1, 6, 63, 50, 48, 183, 255),
+	'Kary2': new EnemyInfo('Kary2', 700, 1, 2000, 60, 1, 6, 63, 60, 60, 183, 255),
+	'Kraken': new EnemyInfo('Kraken', 800, 5000, 4245, 50, 1, 8, 90, 60, 84, 160, 255),
+	'Kraken2': new EnemyInfo('Kraken2', 900, 1, 2000, 70, 1, 8, 114, 70, 98, 200, 255),
+	'Tiamat': new EnemyInfo('Tiamat', 1000, 6000, 5496, 49, 1, 4, 80, 80, 72, 200, 255),
+	'Tiamat2': new EnemyInfo('Tiamat2', 1100, 1, 2000, 75, 1, 4, 85, 90, 90, 200, 255),
+	'CHAOS': new EnemyInfo('CHAOS', 2000, 0, 0, 100, 1, 2, 200, 100, 100, 200, 255)
+};
+
+function EncounterSlot(enemy = enemies.Imp, minimum = 0, maximum = 0)
+{
+	this.enemy = enemy;
+	this.minimum = minimum;
+	this.maximum = maximum;
+}
+
+function EncounterInfo(formation, runnable, surprise, slot1 = new EncounterSlot(), slot2 = new EncounterSlot(), slot3 = new EncounterSlot(), slot4 = new EncounterSlot())
+{
+	this.formation = formation;
+	this.runnable = runnable;
+	this.surprise = surprise;
+	this.slot1 = slot1;
+	this.slot2 = slot2;
+	this.slot3 = slot3;
+	this.slot4 = slot4;
+}
+
+const encounters = {
+	0x00: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Imp, 3, 5)),
+	0x80: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Imp, 3, 6), new EncounterSlot(enemies.GrImp, 0, 4)),
+	0x01: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Bone, 2, 4)),
+	0x81: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Bone, 3, 5), new EncounterSlot(enemies.Crawl, 0, 2)),
+	0x02: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.GrImp, 1, 3), new EncounterSlot(enemies.Wolf, 0, 2), new EncounterSlot(enemies.GrWolf, 0, 2), new EncounterSlot(enemies.Imp, 0, 2)),
+	0x82: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.GrImp, 1, 3)),
+	0x03: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Wolf, 1, 2)),
+	0x83: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Wolf, 4, 6), new EncounterSlot(enemies.GrWolf, 0, 1)),
+	0x04: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Zombie, 2, 4)),
+	0x84: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Zombie, 2, 3), new EncounterSlot(enemies.Ghoul, 2, 4)),
+	0x05: new EncounterInfo(Formation.small, true, 55, new EncounterSlot(enemies.Spider, 1, 2)),
+	0x85: new EncounterInfo(Formation.small, true, 55, new EncounterSlot(enemies.Scum, 2, 4)),
+	0x06: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Madpony, 1, 1)),
+	0x86: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Madpony, 2, 4)),
+	0x07: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.Creep, 1, 2)),
+	0x87: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.Creep, 1, 3), new EncounterSlot(enemies.Ogre, 1, 1)),
+	0x08: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Ghoul, 1, 1)),
+	0x88: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Ghoul, 2, 5), new EncounterSlot(enemies.Geist, 0, 4)),
+	0x09: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Iguana, 1, 1)),
+	0x89: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Giant, 1, 3), new EncounterSlot(enemies.Iguana, 0, 2)),
+	0x0A: new EncounterInfo(Formation.small, true, 90, new EncounterSlot(enemies.Shadow, 2, 4)),
+	0x8A: new EncounterInfo(Formation.small, true, 90, new EncounterSlot(enemies.Shadow, 3, 7)),
+	0x0B: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.GrWolf, 2, 5), new EncounterSlot(enemies.Wolf, 0, 3)),
+	0x8B: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.GrWolf, 4, 8)),
+	0x0C: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Ogre, 1, 2)),
+	0x8C: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Ogre, 1, 3), new EncounterSlot(enemies.Hyena, 0, 2)),
+	0x0D: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Asp, 1, 2)),
+	0x8D: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Asp, 3, 7)),
+	0x0E: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.GrImp, 0, 5), new EncounterSlot(enemies.WrWolf, 1, 3), new EncounterSlot(enemies.Giant, 0, 2)),
+	0x8E: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.GrImp, 2, 5), new EncounterSlot(enemies.WrWolf, 0, 2)),
+	0x0F: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Geist, 1, 4)),
+	0x8F: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Specter, 2, 5), new EncounterSlot(enemies.Geist, 2, 5)),
+	0x10: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Gargoyle, 2, 3)),
+	0x90: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Gargoyle, 3, 8)),
+	0x11: new EncounterInfo(Formation.small, true, 33, new EncounterSlot(enemies.WrWolf, 3, 6)),
+	0x91: new EncounterInfo(Formation.small, true, 33, new EncounterSlot(enemies.WrWolf, 2, 5), new EncounterSlot(enemies.GrWolf, 0, 5)),
+	0x12: new EncounterInfo(Formation.small, true, 55, new EncounterSlot(enemies.Arachnid, 1, 4)),
+	0x92: new EncounterInfo(Formation.small, true, 55, new EncounterSlot(enemies.Ooze, 2, 5), new EncounterSlot(enemies.Arachnid, 0, 5)),
+	0x13: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.GrOgre, 1, 1), new EncounterSlot(enemies.Ogre, 1, 2)),
+	0x93: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.GrOgre, 1, 4), new EncounterSlot(enemies.Ogre, 0, 2)),
+	0x14: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Arachnid, 1, 2)),
+	0x94: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Arachnid, 4, 8)),
+	0x15: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Cobra, 2, 6)),
+	0x95: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Cobra, 2, 6), new EncounterSlot(enemies.Scorpion, 0, 4)),
+	0x16: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Coctrice, 2, 6)),
+	0x96: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Coctrice, 2, 6), new EncounterSlot(enemies.Mummy, 1, 5)),
+	0x17: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Pede, 1, 4)),
+	0x97: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Pede, 1, 6)),
+	0x18: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Image, 2, 6)),
+	0x98: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Image, 2, 6), new EncounterSlot(enemies.Wraith, 0, 4)),
+	0x19: new EncounterInfo(Formation.large, true, 27, new EncounterSlot(enemies.Tiger, 1, 3)),
+	0x99: new EncounterInfo(Formation.large, true, 27, new EncounterSlot(enemies['Saber T'], 1, 3), new EncounterSlot(enemies.Tiger, 0, 2)),
+	0x1A: new EncounterInfo(Formation.mix, true, 27, new EncounterSlot(enemies.Scorpion, 2, 4)),
+	0x9A: new EncounterInfo(Formation.mix, true, 27, new EncounterSlot(enemies.Scorpion, 2, 6), new EncounterSlot(enemies.Bull, 1, 2)),
+	0x1B: new EncounterInfo(Formation.large, true, 27, new EncounterSlot(enemies.Troll, 1, 2), new EncounterSlot(enemies.Bull, 0, 1)),
+	0x9B: new EncounterInfo(Formation.large, true, 27, new EncounterSlot(enemies.Troll, 1, 2), new EncounterSlot(enemies.Bull, 0, 2)),
+	0x1C: new EncounterInfo(Formation.small, false, 33, new EncounterSlot(enemies.Wizard, 2, 4)),
+	0x9C: new EncounterInfo(Formation.small, false, 33, new EncounterSlot(enemies.Wizard, 3, 7)),
+	0x1D: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Mummy, 2, 5)),
+	0x9D: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Mummy, 3, 7), new EncounterSlot(enemies.WzMummy, 1, 1)),
+	0x1E: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Giant, 1, 2)),
+	0x9E: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Giant, 2, 4)),
+	0x1F: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Giant, 1, 2), new EncounterSlot(enemies.Iguana, 0, 3)),
+	0x9F: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Giant, 1, 4), new EncounterSlot(enemies.Iguana, 1, 1)),
+	0x20: new EncounterInfo(Formation.mix, true, 27, new EncounterSlot(enemies.Hydra, 1, 2)),
+	0xA0: new EncounterInfo(Formation.mix, true, 27, new EncounterSlot(enemies.Hydra, 1, 4), new EncounterSlot(enemies.Gator, 0, 3)),
+	0x21: new EncounterInfo(Formation.large, false, 4, new EncounterSlot(enemies.Earth, 1, 1)),
+	0xA1: new EncounterInfo(Formation.large, false, 4, new EncounterSlot(enemies.Earth, 2, 4)),
+	0x22: new EncounterInfo(Formation.large, false, 55, new EncounterSlot(enemies.Cerebus, 0, 1), new EncounterSlot(enemies.WzOgre, 1, 2)),
+	0xA2: new EncounterInfo(Formation.large, false, 55, new EncounterSlot(enemies.Cerebus, 1, 3), new EncounterSlot(enemies.WzOgre, 0, 2)),
+	0x23: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Perilisk, 2, 5)),
+	0xA3: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Perilisk, 4, 8)),
+	0x24: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies['R.Hyrda'], 1, 1)),
+	0xA4: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies['R.Hyrda'], 4, 4)),
+	0x25: new EncounterInfo(Formation.mix, true, 33, new EncounterSlot(enemies.Ocho, 1, 3)),
+	0xA5: new EncounterInfo(Formation.mix, true, 33, new EncounterSlot(enemies.Ocho, 1, 1), new EncounterSlot(enemies.Caribe, 0, 2)),
+	0x26: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies['R.Giant'], 1, 2)),
+	0xA6: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies['R.Giant'], 1, 1), new EncounterSlot(enemies.Agama, 1, 3)),
+	0x27: new EncounterInfo(Formation.large, false, 4, new EncounterSlot(enemies.Fire, 1, 2)),
+	0xA7: new EncounterInfo(Formation.large, false, 4, new EncounterSlot(enemies.Fire, 3, 4)),
+	0x28: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies['Grey W'], 1, 1)),
+	0xA8: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies['Grey W'], 2, 4)),
+	0x29: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Agama, 1, 1)),
+	0xA9: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Agama, 2, 4)),
+	0x2A: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies['Red D'], 1, 1)),
+	0xAA: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies['Red D'], 2, 4)),
+	0x2B: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies['R.Bone'], 1, 1), new EncounterSlot(enemies.Bone, 2, 4), new EncounterSlot(enemies.Crawl, 1, 1)),
+	0xAB: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies['R.Bone'], 3, 6)),
+	0x2C: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Wraith, 1, 5), new EncounterSlot(enemies.Image, 0, 3), new EncounterSlot(enemies.Specter, 0, 3), new EncounterSlot(enemies.Geist, 0, 3)),
+	0xAC: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Wraith, 2, 6)),
+	0x2D: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.FrWolf, 3, 7)),
+	0xAD: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.FrWolf, 4, 7)),
+	0x2E: new EncounterInfo(Formation.mix, false, 4, new EncounterSlot(enemies.FrGiant, 1, 1), new EncounterSlot(enemies.FrWolf, 0, 2)),
+	0xAE: new EncounterInfo(Formation.mix, false, 4, new EncounterSlot(enemies.FrGiant, 2, 2), new EncounterSlot(enemies.FrWolf, 2, 6)),
+	0x2F: new EncounterInfo(Formation.small, true, 75, new EncounterSlot(enemies.Mage, 1, 4)),
+	0xAF: new EncounterInfo(Formation.small, true, 75, new EncounterSlot(enemies.Mage, 2, 3), new EncounterSlot(enemies.Fighter, 1, 1)),
+	0x30: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies['Frost D'], 1, 2)),
+	0xB0: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies['Frost D'], 3, 4)),
+	0x31: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.GrPede, 1, 1)),
+	0xB1: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.GrPede, 1, 2)),
+	0x32: new EncounterInfo(Formation.large, false, 4, new EncounterSlot(enemies.ZomBull, 1, 3)),
+	0xB2: new EncounterInfo(Formation.large, false, 4, new EncounterSlot(enemies.ZomBull, 1, 4), new EncounterSlot(enemies.Troll, 0, 2)),
+	0x33: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Mancat, 3, 5)),
+	0xB3: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Mancat, 3, 7), new EncounterSlot(enemies.Medusa, 0, 5)),
+	0x34: new EncounterInfo(Formation.mix, true, 27, new EncounterSlot(enemies.Medusa, 2, 5)),
+	0xB4: new EncounterInfo(Formation.mix, true, 27, new EncounterSlot(enemies.Medusa, 3, 6), new EncounterSlot(enemies['Saber T'], 1, 2)),
+	0x35: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.Sorcerer, 2, 5)),
+	0xB5: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.Sorcerer, 1, 6), new EncounterSlot(enemies.MudGol, 1, 2)),
+	0x36: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Manticor, 1, 3)),
+	0xB6: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Manticor, 3, 4)),
+	0x37: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Wyrm, 1, 3)),
+	0xB7: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Wyrm, 1, 3)),
+	0x38: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies['R.Ankylo'], 1, 3)),
+	0xB8: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies['R.Ankylo'], 1, 4)),
+	0x39: new EncounterInfo(Formation.mix, true, 27, new EncounterSlot(enemies.Catman, 2, 4)),
+	0xB9: new EncounterInfo(Formation.mix, true, 27, new EncounterSlot(enemies.Catman, 3, 6), new EncounterSlot(enemies['Saber T'], 1, 2)),
+	0x3A: new EncounterInfo(Formation.large, true, 27, new EncounterSlot(enemies.Sauria, 1, 2)),
+	0xBA: new EncounterInfo(Formation.large, true, 27, new EncounterSlot(enemies.Sauria, 2, 4)),
+	0x3B: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Chimera, 1, 3)),
+	0xBB: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Chimera, 3, 4)),
+	0x3C: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies['Sand W'], 1, 1)),
+	0xBC: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies['Sand W'], 1, 2)),
+	0x3D: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Tyro, 1, 1)),
+	0xBD: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Tyro, 1, 1), new EncounterSlot(enemies.Wyvern, 0, 1)),
+	0x3E: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies['T Rex'], 1, 1)),
+	0xBE: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Wyvern, 1, 3), new EncounterSlot(enemies.Wyrm, 0, 5)),
+	0x3F: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.MudGol, 1, 3)),
+	0xBF: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.MudGol, 1, 4), new EncounterSlot(enemies.RockGol, 1, 3)),
+	0x40: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.GrMedusa, 1, 4)),
+	0xC0: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.GrMedusa, 4, 7)),
+	0x41: new EncounterInfo(Formation.large, true, 33, new EncounterSlot(enemies.Naocho, 1, 1)),
+	0xC1: new EncounterInfo(Formation.large, true, 33, new EncounterSlot(enemies.Naocho, 1, 2)),
+	0x42: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.SeaTroll, 1, 2), new EncounterSlot(enemies.Lobster, 1, 3)),
+	0xC2: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.SeaTroll, 1, 2), new EncounterSlot(enemies.Lobster, 1, 4)),
+	0x43: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Lobster, 2, 6)),
+	0xC3: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Lobster, 3, 7)),
+	0x44: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.Lobster, 1, 6), new EncounterSlot(enemies.SeaSnake, 2, 5), new EncounterSlot(enemies.SeaTroll, 2, 2)),
+	0xC4: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.Lobster, 1, 5), new EncounterSlot(enemies.SeaSnake, 0, 3)),
+	0x45: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.WzSahag, 0, 1), new EncounterSlot(enemies.GrShark, 1, 2)),
+	0xC5: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.WzSahag, 3, 6), new EncounterSlot(enemies.GrShark, 2, 2)),
+	0x46: new EncounterInfo(Formation.mix, false, 4, new EncounterSlot(enemies.Phantom, 1, 1)),
+	0xC6: new EncounterInfo(Formation.mix, false, 4, new EncounterSlot(enemies.Ghost, 2, 5)),
+	0x47: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.Naga, 1, 1), new EncounterSlot(enemies.Water, 0, 1)),
+	0xC7: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.Naga, 1, 2), new EncounterSlot(enemies.Water, 3, 6)),
+	0x48: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.GrShark, 1, 1), new EncounterSlot(enemies.BigEye, 0, 1)),
+	0xC8: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.GrShark, 1, 2), new EncounterSlot(enemies.BigEye, 1, 2)),
+	0x49: new EncounterInfo(Formation.small, false, 4, new EncounterSlot(enemies.Water, 1, 3)),
+	0xC9: new EncounterInfo(Formation.small, false, 4, new EncounterSlot(enemies.Water, 3, 6)),
+	0x4A: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.WzMummy, 1, 5), new EncounterSlot(enemies.Mummy, 0, 8), new EncounterSlot(enemies.Coctrice, 0, 8), new EncounterSlot(enemies.Perilisk, 0, 8)),
+	0xCA: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.WzMummy, 1, 2), new EncounterSlot(enemies.Mummy, 1, 6)),
+	0x4B: new EncounterInfo(Formation.large, false, 4, new EncounterSlot(enemies.ZombieD, 1, 2)),
+	0xCB: new EncounterInfo(Formation.large, false, 4, new EncounterSlot(enemies.ZombieD, 2, 4)),
+	0x4C: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Guard, 2, 5)),
+	0xCC: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Guard, 0, 1), new EncounterSlot(enemies.Sentry, 1, 1)),
+	0x4D: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.BadMan, 2, 5)),
+	0xCD: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.BadMan, 5, 9)),
+	0x4E: new EncounterInfo(Formation.large, false, 4, new EncounterSlot(enemies['Blue D'], 1, 1)),
+	0xCE: new EncounterInfo(Formation.large, false, 4, new EncounterSlot(enemies['Blue D'], 2, 3)),
+	0x4F: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.Nitemare, 1, 3)),
+	0xCF: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.Nitemare, 1, 2), new EncounterSlot(enemies.BadMan, 1, 2)),
+	0x50: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Slime, 3, 6)),
+	0xD0: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Slime, 4, 8)),
+	0x51: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Air, 2, 4)),
+	0xD1: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Air, 3, 6)),
+	0x52: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.GrNaga, 1, 1)),
+	0xD2: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.Air, 1, 3)),
+	0x53: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.WzVamp, 1, 3)),
+	0xD3: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.WzVamp, 1, 3), new EncounterSlot(enemies.ZombieD, 1, 2)),
+	0x54: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.EvilMan, 1, 1), new EncounterSlot(enemies.Nitemare, 1, 2)),
+	0xD4: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.EvilMan, 1, 2), new EncounterSlot(enemies.Nitemare, 1, 2)),
+	0x55: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Chimera, 1, 2), new EncounterSlot(enemies.Jimera, 1, 2)),
+	0xD5: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Chimera, 1, 1)),
+	0x56: new EncounterInfo(Formation.mix, true, 75, new EncounterSlot(enemies.WarMech, 1, 1)),
+	0xD6: new EncounterInfo(Formation.mix, true, 75, new EncounterSlot(enemies.Fighter, 1, 2)),
+	0x57: new EncounterInfo(Formation.large, false, 4, new EncounterSlot(enemies.Worm, 1, 2)),
+	0xD7: new EncounterInfo(Formation.large, false, 4, new EncounterSlot(enemies.Worm, 3, 4)),
+	0x58: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.RockGol, 1, 2)),
+	0xD8: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.RockGol, 2, 4)),
+	0x59: new EncounterInfo(Formation.large, false, 4, new EncounterSlot(enemies['Gas D'], 1, 1)),
+	0xD9: new EncounterInfo(Formation.large, false, 4, new EncounterSlot(enemies['Gas D'], 2, 4)),
+	0x5A: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.GrShark, 1, 2), new EncounterSlot(enemies.Shark, 0, 1)),
+	0xDA: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.GrShark, 1, 2), new EncounterSlot(enemies.Shark, 0, 1)),
+	0x5B: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.Sahag, 0, 6), new EncounterSlot(enemies.OddEye, 1, 2)),
+	0xDB: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.Sahag, 3, 7), new EncounterSlot(enemies['R.Sahag'], 0, 2)),
+	0x5C: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.Kyzoku, 1, 5)),
+	0xDC: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.Shark, 1, 1)),
+	0x5D: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.Shark, 1, 2), new EncounterSlot(enemies.Sahag, 0, 2)),
+	0xDD: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.Sahag, 4, 6)),
+	0x5E: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.Shark, 1, 1), new EncounterSlot(enemies['R.Sahag'], 0, 1)),
+	0xDE: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.Shark, 1, 2), new EncounterSlot(enemies['R.Sahag'], 0, 3)),
+	0x5F: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Caribe, 2, 6)),
+	0xDF: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Caribe, 3, 8)),
+	0x60: new EncounterInfo(Formation.large, true, 33, new EncounterSlot(enemies.Hydra, 1, 2), new EncounterSlot(enemies.Ocho, 0, 2)),
+	0xE0: new EncounterInfo(Formation.large, true, 33, new EncounterSlot(enemies.Hydra, 1, 1), new EncounterSlot(enemies.Ocho, 0, 1)),
+	0x61: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.SeaTroll, 1, 2), new EncounterSlot(enemies.SeaSnake, 0, 2), new EncounterSlot(enemies.Lobster, 0, 2)),
+	0xE1: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.SeaTroll, 1, 1), new EncounterSlot(enemies.SeaSnake, 0, 3)),
+	0x62: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.FrGator, 1, 2), new EncounterSlot(enemies['R.Caribe'], 0, 3)),
+	0xE2: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.FrGator, 1, 1), new EncounterSlot(enemies['R.Caribe'], 1, 4)),
+	0x63: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Troll, 1, 2)),
+	0xE3: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Troll, 2, 4)),
+	0x64: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Bull, 1, 2)),
+	0xE4: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Bull, 2, 4)),
+	0x65: new EncounterInfo(Formation.mix, true, 30, new EncounterSlot(enemies.Caribe, 0, 2), new EncounterSlot(enemies.Gator, 0, 2), new EncounterSlot(enemies.Ocho, 1, 1)),
+	0xE5: new EncounterInfo(Formation.mix, true, 30, new EncounterSlot(enemies.Caribe, 2, 4), new EncounterSlot(enemies.Gator, 0, 2)),
+	0x66: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Arachnid, 1, 2), new EncounterSlot(enemies.Spider, 0, 2)),
+	0xE6: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Arachnid, 3, 6), new EncounterSlot(enemies.Spider, 0, 2)),
+	0x67: new EncounterInfo(Formation.mix, true, 27, new EncounterSlot(enemies.Catman, 1, 3), new EncounterSlot(enemies['Saber T'], 0, 2)),
+	0xE7: new EncounterInfo(Formation.mix, true, 27, new EncounterSlot(enemies.Catman, 4, 7)),
+	0x68: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Vampire, 2, 5)),
+	0xE8: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.WzVamp, 1, 1), new EncounterSlot(enemies.Vampire, 3, 6)),
+	0x69: new EncounterInfo(Formation.large, false, 4, new EncounterSlot(enemies.Eye, 1, 1)),
+	0xE9: new EncounterInfo(Formation.large, false, 4, new EncounterSlot(enemies.Eye, 2, 3)),
+	0x6A: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies['R.Goyle'], 2, 5)),
+	0xEA: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies['R.Goyle'], 3, 7)),
+	0x6B: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Muck, 1, 3)),
+	0xEB: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Muck, 4, 7)),
+	0x6C: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Sorcerer, 1, 3)),
+	0xEC: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Sorcerer, 3, 7)),
+	0x6D: new EncounterInfo(Formation.large, true, 55, new EncounterSlot(enemies.Cerebus, 1, 2)),
+	0xED: new EncounterInfo(Formation.large, true, 55, new EncounterSlot(enemies.Cerebus, 3, 4)),
+	0x6E: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.WzOgre, 1, 1), new EncounterSlot(enemies.GrOgre, 1, 1), new EncounterSlot(enemies.Hyena, 0, 7)),
+	0xEE: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.WzOgre, 1, 3), new EncounterSlot(enemies.GrOgre, 0, 2)),
+	0x6F: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Sphinx, 1, 2)),
+	0xEF: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Sphinx, 1, 4)),
+	0x70: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Wyvern, 1, 3)),
+	0xF0: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Wyvern, 1, 4)),
+	0x71: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Ankylo, 1, 1)),
+	0xF1: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Ankylo, 1, 2)),
+	0x72: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.SeaSnake, 2, 4)),
+	0xF2: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.SeaSnake, 3, 6)),
+	0x73: new EncounterInfo(Formation.fiend, false, 4, new EncounterSlot(enemies.Lich2, 1, 1)),
+	0x74: new EncounterInfo(Formation.fiend, false, 4, new EncounterSlot(enemies.Kary2, 1, 1)),
+	0x75: new EncounterInfo(Formation.fiend, false, 4, new EncounterSlot(enemies.Kraken2, 1, 1)),
+	0x76: new EncounterInfo(Formation.fiend, false, 4, new EncounterSlot(enemies.Tiamat2, 1, 1)),
+	0x77: new EncounterInfo(Formation.fiend, false, 4, new EncounterSlot(enemies.Tiamat, 1, 1)),
+	0x78: new EncounterInfo(Formation.fiend, false, 4, new EncounterSlot(enemies.Kraken, 1, 1)),
+	0x79: new EncounterInfo(Formation.fiend, false, 4, new EncounterSlot(enemies.Kary, 1, 1)),
+	0x7A: new EncounterInfo(Formation.fiend, false, 4, new EncounterSlot(enemies.Lich, 1, 1)),
+	0x7B: new EncounterInfo(Formation.chaos, false, 4, new EncounterSlot(enemies.Chaos, 1, 1)),
+	0x7C: new EncounterInfo(Formation.mix, false, 4, new EncounterSlot(enemies.Vampire, 1, 1)),
+	0x7D: new EncounterInfo(Formation.mix, false, 4, new EncounterSlot(enemies.Astos, 1, 1)),
+	0x7E: new EncounterInfo(Formation.small, false, 4, new EncounterSlot(enemies.Pirate, 9, 9)),
+	0xFE: new EncounterInfo(Formation.small, false, 4, new EncounterSlot(enemies.WzSahag, 1, 2), new EncounterSlot(enemies['R.Sahag'], 8, 8)),
+	0x7F: new EncounterInfo(Formation.mix, false, 4, new EncounterSlot(enemies.Garland, 1, 1)),
+	0xFF: new EncounterInfo(Formation.mix, false, 4, new EncounterSlot(enemies.IronGol, 1, 2))
+};
+
+const domainEncounters = {
+	// row 1
+	0:[0xB2, 0x9E, 0xB2, 0x9E, 0xAD, 0xAD, 0x3D, 0xF0],
+	1:[0xE3, 0x31, 0x70, 0x2E, 0x70, 0x60, 0x36, 0x9F],
+	2:[0x89, 0x70, 0x3C, 0x60, 0x3C, 0x39, 0x39, 0x3A],
+	3:[0xEF, 0x60, 0x67, 0x39, 0x67, 0x3A, 0xB7, 0xB1],
+	4:[0xEF, 0x60, 0x67, 0x39, 0x67, 0x3A, 0xB7, 0xB1],
+	5:[0x89, 0x70, 0x3C, 0x60, 0x3C, 0x39, 0x39, 0x3A],
+	6:[0xE3, 0x31, 0x70, 0x2E, 0x70, 0x60, 0x36, 0x9F],
+	7:[0xE3, 0x31, 0x70, 0x2E, 0x70, 0x60, 0x36, 0x9F],
+	// row 2
+	8:[0x71, 0x99, 0x71, 0x99, 0xA2, 0xA2, 0xB7, 0xB1],
+	9:[0xE3, 0x31, 0x70, 0x2E, 0x70, 0x60, 0x36, 0x9F],
+	10:[0x37, 0x37, 0x25, 0x25, 0x36, 0x36, 0x38, 0xB7],
+	11:[0xEF, 0x60, 0x67, 0x39, 0x67, 0x3A, 0xB7, 0xB1],
+	12:[0xEF, 0x60, 0x67, 0x39, 0x67, 0x3A, 0xB7, 0xB1],
+	13:[0xF1, 0xBD, 0xF1, 0xBD, 0xB8, 0xB8, 0xBC, 0x3E],
+	14:[0xF1, 0xBD, 0xF1, 0xBD, 0xB8, 0xB8, 0xBC, 0x3E],
+	15:[0xB2, 0x9E, 0xB2, 0x9E, 0xAD, 0xAD, 0x3D, 0xF0],
+	// row 3
+	16:[0x71, 0x99, 0x71, 0x99, 0xA2, 0xA2, 0xB7, 0xB1],
+	17:[0x71, 0x99, 0x71, 0x99, 0xA2, 0xA2, 0xB7, 0xB1],
+	18:[0,0,0,0,0,0,0,0],
+	19:[0x37, 0x37, 0x25, 0x25, 0x36, 0x36, 0x38, 0xB7],
+	20:[0,0,0,0,0,0,0,0],
+	21:[0xF1, 0xBD, 0xF1, 0xBD, 0xB8, 0xB8, 0xBC, 0x3E],
+	22:[0xF1, 0xBD, 0xF1, 0xBD, 0xB8, 0xB8, 0xBC, 0x3E],
+	23:[0xB2, 0x9E, 0xB2, 0x9E, 0xAD, 0xAD, 0x3D, 0xF0],
+	// row 4
+	24:[0,0,0,0,0,0,0,0],
+	25:[0,0,0,0,0,0,0,0],
+	26:[0,0,0,0,0,0,0,0],
+	27:[0x01, 0x05, 0x82, 0x00, 0x06, 0x07, 0x80, 0x86],
+	28:[0x01, 0x05, 0x82, 0x00, 0x06, 0x07, 0x80, 0x86],
+	29:[0x83, 0x0D, 0x87, 0x0C, 0x87, 0x0B, 0x0B, 0x13],
+	30:[0,0,0,0,0,0,0,0],
+	31:[0xB2, 0x9E, 0xB2, 0x9E, 0xAD, 0xAD, 0x3D, 0xF0],
+	// row 5
+	32:[0,0,0,0,0,0,0,0],
+	33:[0x88, 0x8A, 0x13, 0x8A, 0x8C, 0x8B, 0x19, 0xE6],
+	34:[0x83, 0x0D, 0x87, 0x0C, 0x87, 0x0B, 0x12, 0x13],
+	35:[0x83, 0x0D, 0x87, 0x0C, 0x87, 0x0B, 0x12, 0x13],
+	36:[0x00, 0x00, 0x00, 0x00, 0x82, 0x03, 0x06, 0x80],
+	37:[0x09, 0x07, 0x02, 0x86, 0x83, 0x83, 0x0C, 0x87],
+	38:[0x09, 0x07, 0x02, 0x86, 0x83, 0x83, 0x0C, 0x87],
+	39:[0x8E, 0x0C, 0x8E, 0x0F, 0x0B, 0x12, 0x13, 0x1A],
+	// row 6
+	40:[0x88, 0x8A, 0x13, 0x8A, 0x8C, 0x8B, 0x19, 0xE6],
+	41:[0x88, 0x8A, 0x13, 0x8A, 0x8C, 0x8B, 0x19, 0xE6],
+	42:[0x88, 0x8A, 0x13, 0x8A, 0x8C, 0x8B, 0x19, 0xE6],
+	43:[0x83, 0x0D, 0x87, 0x0C, 0x87, 0x0B, 0x12, 0x13],
+	44:[0,0,0,0,0,0,0,0],
+	45:[0x0D, 0x14, 0x83, 0x8E, 0x0C, 0x0C, 0x0B, 0x11],
+	46:[0x8E, 0x0C, 0x8E, 0x0F, 0x0B, 0x12, 0x13, 0x1A],
+	47:[0x8E, 0x0C, 0x8E, 0x0F, 0x0B, 0x12, 0x13, 0x1A],
+	// row 7
+	48:[0,0,0,0,0,0,0,0],
+	49:[0,0,0,0,0,0,0,0],
+	50:[0x8E, 0x0C, 0x8E, 0x0F, 0x0B, 0x12, 0x13, 0x1A],
+	51:[0x83, 0x0D, 0x87, 0x0C, 0x87, 0x0B, 0x12, 0x13],
+	52:[0x83, 0x0D, 0x87, 0x0C, 0x87, 0x0B, 0x12, 0x13],
+	53:[0x8E, 0x0C, 0x8E, 0x0F, 0x0B, 0x12, 0x13, 0x1A],
+	54:[0x17, 0x63, 0x95, 0x1E, 0x95, 0x9B, 0x9B, 0x9A],
+	55:[0x17, 0x63, 0x95, 0x1E, 0x95, 0x9B, 0x9B, 0x9A],
+	// row 8
+	56:[0,0,0,0,0,0,0,0],
+	57:[0,0,0,0,0,0,0,0],
+	58:[0x8E, 0x0C, 0x8E, 0x0F, 0x0B, 0x12, 0x13, 0x1A],
+	59:[0x8E, 0x0C, 0x8E, 0x0F, 0x0B, 0x12, 0x13, 0x1A],
+	60:[0x83, 0x0D, 0x87, 0x0C, 0x87, 0x0B, 0x12, 0x13],
+	61:[0x8E, 0x0C, 0x8E, 0x0F, 0x0B, 0x12, 0x13, 0x1A],
+	62:[0x17, 0x63, 0x95, 0x1E, 0x95, 0x9B, 0x9B, 0x9A],
+	63:[0x17, 0x63, 0x95, 0x1E, 0x95, 0x9B, 0x9B, 0x9A]
+};
+
+const riverNorthEncounters = [0xA0, 0xA0, 0x65, 0x41, 0x65, 0x62, 0x62, 0xE2]; 
+const riverSouthEncounters = [0x20, 0x5F, 0x20, 0x5F, 0xA5, 0xD0, 0xDF, 0xE5]; 
+const oceanEncounters = [0x5B, 0xDC, 0x5C, 0xDD, 0x5E, 0xDB, 0x5D, 0xDE];
+
+function DungeonInfo(label, mapTileAtlas, tileAtlasImageName, tileAtlasRoomImageName, mapDataName, exitInformation, encounterList = [], encounterThreshold = 8)
 {
 	this.mapTileAtlas = mapTileAtlas;
 	this.tileAtlasImageName = tileAtlasImageName;
@@ -1484,6 +1992,7 @@ function DungeonInfo(label, mapTileAtlas, tileAtlasImageName, tileAtlasRoomImage
 	this.exitInformation = exitInformation;
 	this.label = label;
 	this.warpInformation = [];
+	this.encounterList = encounterList;
 	this.encounterThreshold = encounterThreshold;
 }
 
@@ -1573,53 +2082,53 @@ var dungeons = {
 'ElflandCastle': new DungeonInfo('ElflandCastle', castleMapTileAtlas, 'tiles_castle', 'tiles_castleroom', 'ElflandCastle', new teleportEntry('ElflandCastleExitTarget', 'WARP', 0x0, 0x0)),
 'NorthwestCastle': new DungeonInfo('NorthwestCastle', castleMapTileAtlas, 'tiles_castle', 'tiles_castleroom', 'NorthwestCastle', new teleportEntry('NorthwestCastleExitTarget', 'WARP', 0x0, 0x0)),
 'OrdealsCastle1F': new DungeonInfo('OrdealsCastle1F', castleMapTileAtlas, 'tiles_castle', 'tiles_castleroom', 'OrdealsCastle1F', new teleportEntry('OrdealsCastle1FExitTarget', 'WorldMap', 130, 45)),
-'FiendsTemple': new DungeonInfo('FiendsTemple', shrineMapTileAtlas, 'tiles_fiendstemple', 'tiles_fiendstempleroom', 'FiendsTemple', new teleportEntry('FiendsTempleExitTarget', 'WARP', 0x0, 0x0)),
-'EarthCaveB1': new DungeonInfo('EarthCaveB1', earthCaveMapTileAtlas, 'tiles_earth1', 'tiles_earth1room', 'EarthCaveB1', new teleportEntry('EarthCaveB1ExitTarget', 'WorldMap', 0x41, 0xBB)),
-'VolcanoB1': new DungeonInfo('VolcanoB1', earthCaveMapTileAtlas, 'tiles_volcano1', 'tiles_volcano1room', 'VolcanoB1', new teleportEntry('VolcanoB1ExitTarget', 'WorldMap', 0xBC, 0xCD)),
-'IceCaveB1': new DungeonInfo('IceCaveB1', iceCaveMapTileAtlas, 'tiles_icecave', 'tiles_icecaveroom', 'IceCaveB1', new teleportEntry('IceCaveB1ExitTarget', 'WorldMap', 0xC5, 0xB7)),
+'FiendsTemple': new DungeonInfo('FiendsTemple', shrineMapTileAtlas, 'tiles_fiendstemple', 'tiles_fiendstempleroom', 'FiendsTemple', new teleportEntry('FiendsTempleExitTarget', 'WARP', 0x0, 0x0), [0x01, 0x05, 0x04, 0x08, 0x07, 0x83, 0x02, 0x8E]),
+'EarthCaveB1': new DungeonInfo('EarthCaveB1', earthCaveMapTileAtlas, 'tiles_earth1', 'tiles_earth1room', 'EarthCaveB1', new teleportEntry('EarthCaveB1ExitTarget', 'WorldMap', 0x41, 0xBB), [0x15, 0x15, 0x64, 0x8D, 0x93, 0x90, 0xE6, 0x1D]),
+'VolcanoB1': new DungeonInfo('VolcanoB1', earthCaveMapTileAtlas, 'tiles_volcano1', 'tiles_volcano1room', 'VolcanoB1', new teleportEntry('VolcanoB1ExitTarget', 'WorldMap', 0xBC, 0xCD), [0x6F, 0x6F, 0x6A, 0x6E, 0x97, 0x9A, 0x9A, 0xEB]),
+'IceCaveB1': new DungeonInfo('IceCaveB1', iceCaveMapTileAtlas, 'tiles_icecave', 'tiles_icecaveroom', 'IceCaveB1', new teleportEntry('IceCaveB1ExitTarget', 'WorldMap', 0xC5, 0xB7), [0x9C, 0x9C, 0x96, 0x96, 0xAB, 0xAC, 0x2C, 0x30]),
 'Cardia': new DungeonInfo('Cardia', iceCaveMapTileAtlas, 'tiles_cardia', 'tiles_cardiaroom', 'Cardia', new teleportEntry('CardiaExitTarget', 'WARP', 0x0, 0x0)),
 'BahamutB1': new DungeonInfo('BahamutB1', iceCaveMapTileAtlas, 'tiles_cardia', 'tiles_cardiaroom', 'BahamutB1', new teleportEntry('BahamutB1ExitTarget', 'WARP', 0x0, 0x0)),
-'Waterfall': new DungeonInfo('Waterfall', iceCaveMapTileAtlas, 'tiles_waterfall', 'tiles_waterfallroom', 'Waterfall', new teleportEntry('WaterfallExitTarget', 'WARP', 0x0, 0x0)),
+'Waterfall': new DungeonInfo('Waterfall', iceCaveMapTileAtlas, 'tiles_waterfall', 'tiles_waterfallroom', 'Waterfall', new teleportEntry('WaterfallExitTarget', 'WARP', 0x0, 0x0), [0x4F, 0x3F, 0x4F, 0x3F, 0xCA, 0xCA, 0xA3, 0x59]),
 'DwarfCave': new DungeonInfo('DwarfCave', iceCaveMapTileAtlas, 'tiles_dwarf', 'tiles_dwarfroom', 'DwarfCave', new teleportEntry('DwarfCaveExitTarget', 'WARP', 0x0, 0x0)),
 'MatoyaCave': new DungeonInfo('MatoyaCave', iceCaveMapTileAtlas, 'tiles_matoya', 'tiles_matoyaroom', 'MatoyaCave', new teleportEntry('MatoyaCaveExitTarget', 'WARP', 0x0, 0x0)),
 'SardaCave': new DungeonInfo('SardaCave', iceCaveMapTileAtlas, 'tiles_sarda', 'tiles_sardaroom', 'SardaCave', new teleportEntry('SardaCaveExitTarget', 'WARP', 0x0, 0x0)),
-'MarshCaveB1': new DungeonInfo('MarshCaveB1', towerMapTileAtlas, 'tiles_marsh1', 'tiles_marsh1room', 'MarshCaveB1', new teleportEntry('MarshCaveB1ExitTarget', 'WARP', 0x0, 0x0)),
-'MirageTower1F': new DungeonInfo('MirageTower1F', towerMapTileAtlas, 'tiles_mirage1', 'tiles_mirage1room', 'MirageTower1F', new teleportEntry('MirageTower1FExitTarget', 'WorldMap', 0xC2, 0x3B)),
+'MarshCaveB1': new DungeonInfo('MarshCaveB1', towerMapTileAtlas, 'tiles_marsh1', 'tiles_marsh1room', 'MarshCaveB1', new teleportEntry('MarshCaveB1ExitTarget', 'WARP', 0x0, 0x0), [0x0A, 0x0A, 0x85, 0x84, 0x81, 0x66, 0x6B, 0x11]),
+'MirageTower1F': new DungeonInfo('MirageTower1F', towerMapTileAtlas, 'tiles_mirage1', 'tiles_mirage1room', 'MirageTower1F', new teleportEntry('MirageTower1FExitTarget', 'WorldMap', 0xC2, 0x3B), [0xCF, 0xCF, 0x68, 0x3B, 0x4C, 0xB4, 0xE7, 0xB9]),
 'ConeriaCastle2F': new DungeonInfo('ConeriaCastle2F', castleMapTileAtlas, 'tiles_castle', 'tiles_castleroom', 'ConeriaCastle2F', new teleportEntry('ConeriaCastle2FExitTarget', 'WorldMap', 0x99, 0x9F)),
-'OrdealsCastle2F': new DungeonInfo('OrdealsCastle2F', castleMapTileAtlas, 'tiles_castle', 'tiles_castleroom', 'OrdealsCastle2F', new teleportEntry('OrdealsCastle2FExitTarget', 'WorldMap', 130, 45)),
-'OrdealsCastle3F': new DungeonInfo('OrdealsCastle3F', castleMapTileAtlas, 'tiles_castle', 'tiles_castleroom', 'OrdealsCastle3F', new teleportEntry('OrdealsCastle3FExitTarget', 'WorldMap', 130, 45)),
-'MarshCaveB2': new DungeonInfo('MarshCaveB2', towerMapTileAtlas, 'tiles_marsh1', 'tiles_marsh1room', 'MarshCaveB2', new teleportEntry('MarshCaveB2ExitTarget', 'WARP', 0x0, 0x0)),
-'MarshCaveB3': new DungeonInfo('MarshCaveB3', towerMapTileAtlas, 'tiles_marsh2', 'tiles_marsh2room', 'MarshCaveB3', new teleportEntry('MarshCaveB3ExitTarget', 'WARP', 0x0, 0x0)),
-'EarthCaveB2': new DungeonInfo('EarthCaveB2', earthCaveMapTileAtlas, 'tiles_earth1', 'tiles_earth1room', 'EarthCaveB2', new teleportEntry('EarthCaveB2ExitTarget', 'WorldMap', 0x41, 0xBB)),
-'EarthCaveB3': new DungeonInfo('EarthCaveB3', earthCaveMapTileAtlas, 'tiles_earth1', 'tiles_earth1room', 'EarthCaveB3', new teleportEntry('EarthCaveB3ExitTarget', 'WorldMap', 0x41, 0xBB)),
-'EarthCaveB4': new DungeonInfo('EarthCaveB4', earthCaveMapTileAtlas, 'tiles_earth2', 'tiles_earth2room', 'EarthCaveB4', new teleportEntry('EarthCaveB4ExitTarget', 'WorldMap', 0x41, 0xBB)),
-'EarthCaveB5': new DungeonInfo('EarthCaveB5', earthCaveMapTileAtlas, 'tiles_earth2', 'tiles_earth2room', 'EarthCaveB5', new teleportEntry('EarthCaveB5ExitTarget', 'WorldMap', 0x41, 0xBB)),
-'VolcanoB2': new DungeonInfo('VolcanoB2', earthCaveMapTileAtlas, 'tiles_volcano1', 'tiles_volcano1room', 'VolcanoB2', new teleportEntry('VolcanoB2ExitTarget', 'WorldMap', 0xBC, 0xCD)),
-'VolcanoB3': new DungeonInfo('VolcanoB3', earthCaveMapTileAtlas, 'tiles_volcano2', 'tiles_volcano2room', 'VolcanoB3', new teleportEntry('VolcanoB3ExitTarget', 'WorldMap', 0xBC, 0xCD)),
-'VolcanoB4': new DungeonInfo('VolcanoB4', earthCaveMapTileAtlas, 'tiles_volcano2', 'tiles_volcano2room', 'VolcanoB4', new teleportEntry('VolcanoB4ExitTarget', 'WorldMap', 0xBC, 0xCD)),
-'VolcanoB5': new DungeonInfo('VolcanoB5', earthCaveMapTileAtlas, 'tiles_volcano2', 'tiles_volcano2room', 'VolcanoB5', new teleportEntry('VolcanoB5ExitTarget', 'WorldMap', 0xBC, 0xCD)),
-'IceCaveB2': new DungeonInfo('IceCaveB2', iceCaveMapTileAtlas, 'tiles_icecave', 'tiles_icecaveroom', 'IceCaveB2', new teleportEntry('IceCaveB2ExitTarget', 'WorldMap', 0xC5, 0xB7)),
-'IceCaveB3': new DungeonInfo('IceCaveB3', iceCaveMapTileAtlas, 'tiles_icecave', 'tiles_icecaveroom', 'IceCaveB3', new teleportEntry('IceCaveB3ExitTarget', 'WorldMap', 0xC5, 0xB7)),
+'OrdealsCastle2F': new DungeonInfo('OrdealsCastle2F', castleMapTileAtlas, 'tiles_castle', 'tiles_castleroom', 'OrdealsCastle2F', new teleportEntry('OrdealsCastle2FExitTarget', 'WorldMap', 130, 45), [0x32, 0x32, 0xEA, 0x34, 0x33, 0x9D, 0x35, 0x4B]),
+'OrdealsCastle3F': new DungeonInfo('OrdealsCastle3F', castleMapTileAtlas, 'tiles_castle', 'tiles_castleroom', 'OrdealsCastle3F', new teleportEntry('OrdealsCastle3FExitTarget', 'WorldMap', 130, 45), [0xEA, 0x34, 0x33, 0x9D, 0x9D, 0x35, 0x35, 0x4B]),
+'MarshCaveB2': new DungeonInfo('MarshCaveB2', towerMapTileAtlas, 'tiles_marsh1', 'tiles_marsh1room', 'MarshCaveB2', new teleportEntry('MarshCaveB2ExitTarget', 'WARP', 0x0, 0x0), [0x84, 0x85, 0x10, 0x81, 0x2B, 0x66, 0x1A, 0x91]),
+'MarshCaveB3': new DungeonInfo('MarshCaveB3', towerMapTileAtlas, 'tiles_marsh2', 'tiles_marsh2room', 'MarshCaveB3', new teleportEntry('MarshCaveB3ExitTarget', 'WARP', 0x0, 0x0), [0x85, 0x10, 0x2B, 0x6B, 0x66, 0x11, 0x1A, 0x91]),
+'EarthCaveB2': new DungeonInfo('EarthCaveB2', earthCaveMapTileAtlas, 'tiles_earth1', 'tiles_earth1room', 'EarthCaveB2', new teleportEntry('EarthCaveB2ExitTarget', 'WorldMap', 0x41, 0xBB), [0x8D, 0x64, 0x90, 0x93, 0x91, 0x94, 0x1B, 0x1E]),
+'EarthCaveB3': new DungeonInfo('EarthCaveB3', earthCaveMapTileAtlas, 'tiles_earth1', 'tiles_earth1room', 'EarthCaveB3', new teleportEntry('EarthCaveB3ExitTarget', 'WorldMap', 0x41, 0xBB), [0x91, 0x93, 0x1C, 0x8F, 0x18, 0x16, 0x1D, 0x92]),
+'EarthCaveB4': new DungeonInfo('EarthCaveB4', earthCaveMapTileAtlas, 'tiles_earth2', 'tiles_earth2room', 'EarthCaveB4', new teleportEntry('EarthCaveB4ExitTarget', 'WorldMap', 0x41, 0xBB), [0x1C, 0x8F, 0x18, 0x63, 0x16, 0x0E, 0x0E, 0x92]),
+'EarthCaveB5': new DungeonInfo('EarthCaveB5', earthCaveMapTileAtlas, 'tiles_earth2', 'tiles_earth2room', 'EarthCaveB5', new teleportEntry('EarthCaveB5ExitTarget', 'WorldMap', 0x41, 0xBB), [0x63, 0x18, 0x94, 0x1B, 0x1E, 0x1D, 0x92, 0x21]),
+'VolcanoB2': new DungeonInfo('VolcanoB2', earthCaveMapTileAtlas, 'tiles_volcano1', 'tiles_volcano1room', 'VolcanoB2', new teleportEntry('VolcanoB2ExitTarget', 'WorldMap', 0xBC, 0xCD), [0x6A, 0x6E, 0x1F, 0x97, 0x23, 0x24, 0xEB, 0x27]),
+'VolcanoB3': new DungeonInfo('VolcanoB3', earthCaveMapTileAtlas, 'tiles_volcano2', 'tiles_volcano2room', 'VolcanoB3', new teleportEntry('VolcanoB3ExitTarget', 'WorldMap', 0xBC, 0xCD), [0x1F, 0x6E, 0x6D, 0x24, 0x23, 0x22, 0xEE, 0x27]),
+'VolcanoB4': new DungeonInfo('VolcanoB4', earthCaveMapTileAtlas, 'tiles_volcano2', 'tiles_volcano2room', 'VolcanoB4', new teleportEntry('VolcanoB4ExitTarget', 'WorldMap', 0xBC, 0xCD), [0x6D, 0x23, 0x28, 0xE4, 0x26, 0xEE, 0x29, 0x2A]),
+'VolcanoB5': new DungeonInfo('VolcanoB5', earthCaveMapTileAtlas, 'tiles_volcano2', 'tiles_volcano2room', 'VolcanoB5', new teleportEntry('VolcanoB5ExitTarget', 'WorldMap', 0xBC, 0xCD), [0x28, 0xE4, 0xEE, 0x26, 0x22, 0x27, 0x29, 0x2A]),
+'IceCaveB2': new DungeonInfo('IceCaveB2', iceCaveMapTileAtlas, 'tiles_icecave', 'tiles_icecaveroom', 'IceCaveB2', new teleportEntry('IceCaveB2ExitTarget', 'WorldMap', 0xC5, 0xB7), [0x98, 0x98, 0x6C, 0xAC, 0x2F, 0x2C, 0x2E, 0x30]),
+'IceCaveB3': new DungeonInfo('IceCaveB3', iceCaveMapTileAtlas, 'tiles_icecave', 'tiles_icecaveroom', 'IceCaveB3', new teleportEntry('IceCaveB3ExitTarget', 'WorldMap', 0xC5, 0xB7), [0xAB, 0x2F, 0xAC, 0x6C, 0x2E, 0x31, 0x30, 0x2D]),
 'BahamutB2': new DungeonInfo('BahamutB2', iceCaveMapTileAtlas, 'tiles_bahamut', 'tiles_bahamutroom', 'BahamutB2', new teleportEntry('BahamutB2ExitTarget', 'WARP', 0x0, 0x0)),
-'MirageTower2F': new DungeonInfo('MirageTower2F', towerMapTileAtlas, 'tiles_mirage1', 'tiles_mirage1room', 'MirageTower2F', new teleportEntry('MirageTower2FExitTarget', 'WorldMap', 0xC2, 0x3B)),
-'MirageTower3F': new DungeonInfo('MirageTower3F', towerMapTileAtlas, 'tiles_mirage2', 'tiles_mirage2room', 'MirageTower3F', new teleportEntry('MirageTower3FExitTarget', 'WorldMap', 0xC2, 0x3B)),
-'SeaShrineB5': new DungeonInfo('SeaShrineB5', shrineMapTileAtlas, 'tiles_seashrine2', 'tiles_seashrine2room', 'SeaShrineB5', new teleportEntry('SeaShrineB5ExitTarget', 'WorldMap', 0x3E, 0x38)),
-'SeaShrineB4': new DungeonInfo('SeaShrineB4', shrineMapTileAtlas, 'tiles_seashrine2', 'tiles_seashrine2room', 'SeaShrineB4', new teleportEntry('SeaShrineB4ExitTarget', 'WorldMap', 0x3E, 0x38)),
-'SeaShrineB3': new DungeonInfo('SeaShrineB3', shrineMapTileAtlas, 'tiles_seashrine2', 'tiles_seashrine2room', 'SeaShrineB3', new teleportEntry('SeaShrineB3ExitTarget', 'WorldMap', 0x3E, 0x38)),
-'SeaShrineB2': new DungeonInfo('SeaShrineB2', shrineMapTileAtlas, 'tiles_seashrine1', 'tiles_seashrine1room', 'SeaShrineB2', new teleportEntry('SeaShrineB2ExitTarget', 'WorldMap', 0x3E, 0x38)),
+'MirageTower2F': new DungeonInfo('MirageTower2F', towerMapTileAtlas, 'tiles_mirage1', 'tiles_mirage1room', 'MirageTower2F', new teleportEntry('MirageTower2FExitTarget', 'WorldMap', 0xC2, 0x3B), [0x3B, 0xED, 0x4C, 0x68, 0x4A, 0xE7, 0xB9, 0x4E]),
+'MirageTower3F': new DungeonInfo('MirageTower3F', towerMapTileAtlas, 'tiles_mirage2', 'tiles_mirage2room', 'MirageTower3F', new teleportEntry('MirageTower3FExitTarget', 'WorldMap', 0xC2, 0x3B), [0xED, 0x68, 0xE7, 0x4A, 0xB4, 0xBE, 0xBE, 0x4E]),
+'SeaShrineB5': new DungeonInfo('SeaShrineB5', shrineMapTileAtlas, 'tiles_seashrine2', 'tiles_seashrine2room', 'SeaShrineB5', new teleportEntry('SeaShrineB5ExitTarget', 'WorldMap', 0x3E, 0x38), [0xC4, 0xE1, 0x48, 0xC2, 0x49, 0xC3, 0xC3, 0xF2]),
+'SeaShrineB4': new DungeonInfo('SeaShrineB4', shrineMapTileAtlas, 'tiles_seashrine2', 'tiles_seashrine2room', 'SeaShrineB4', new teleportEntry('SeaShrineB4ExitTarget', 'WorldMap', 0x3E, 0x38), [0xE1, 0xC4, 0xFE, 0xC6, 0xC2, 0x48, 0xC3, 0xF2]),
+'SeaShrineB3': new DungeonInfo('SeaShrineB3', shrineMapTileAtlas, 'tiles_seashrine2', 'tiles_seashrine2room', 'SeaShrineB3', new teleportEntry('SeaShrineB3ExitTarget', 'WorldMap', 0x3E, 0x38), [0x42, 0x72, 0x47, 0x5A, 0xDA, 0xFE, 0x45, 0x61]),
+'SeaShrineB2': new DungeonInfo('SeaShrineB2', shrineMapTileAtlas, 'tiles_seashrine1', 'tiles_seashrine1room', 'SeaShrineB2', new teleportEntry('SeaShrineB2ExitTarget', 'WorldMap', 0x3E, 0x38), [0x5A, 0x72, 0xFE, 0xC6, 0xDA, 0x48, 0x49, 0x61]),
 'SeaShrineB1': new DungeonInfo('SeaShrineB1', shrineMapTileAtlas, 'tiles_seashrine1', 'tiles_seashrine1room', 'SeaShrineB1', new teleportEntry('SeaShrineB1ExitTarget', 'WorldMap', 0x3E, 0x38)),
-'SkyPalace1F': new DungeonInfo('SkyPalace1F', skyCastleMapTileAtlas, 'tiles_skycastle', 'tiles_skycastleroom', 'SkyPalace1F', new teleportEntry('SkyPalace1FExitTarget', 'WorldMap', 0xC2, 0x3B)),
-'SkyPalace2F': new DungeonInfo('SkyPalace2F', skyCastleMapTileAtlas, 'tiles_skycastle', 'tiles_skycastleroom', 'SkyPalace2F', new teleportEntry('SkyPalace2FExitTarget', 'WorldMap', 0xC2, 0x3B)),
-'SkyPalace3F': new DungeonInfo('SkyPalace3F', skyCastleMapTileAtlas, 'tiles_skycastle', 'tiles_skycastleroom', 'SkyPalace3F', new teleportEntry('SkyPalace3FExitTarget', 'WorldMap', 0xC2, 0x3B)),
-'SkyPalace4F': new DungeonInfo('SkyPalace4F', skyCastleMapTileAtlas, 'tiles_skycastle', 'tiles_skycastleroom', 'SkyPalace4F', new teleportEntry('SkyPalace4FExitTarget', 'WorldMap', 0xC2, 0x3B)),
-'SkyPalace5F': new DungeonInfo('SkyPalace5F', skyCastleMapTileAtlas, 'tiles_skycastle', 'tiles_skycastleroom', 'SkyPalace5F', new teleportEntry('SkyPalace5FExitTarget', 'WorldMap', 0xC2, 0x3B), 24),
-'FiendsTemple1F': new DungeonInfo('FiendsTemple1F', fiendsTempleMapTileAtlas, 'tiles_fiendsrevisited', 'tiles_fiendsrevisitedroom', 'FiendsTemple1F', new teleportEntry('FiendsTemple1FExitTarget', 'WARP', 0x0, 0x0)),
-'FiendsTemple2F': new DungeonInfo('FiendsTemple2F', fiendsTempleMapTileAtlas, 'tiles_fiendsrevisited', 'tiles_fiendsrevisitedroom', 'FiendsTemple2F', new teleportEntry('FiendsTemple2FExitTarget', 'WARP', 0x0, 0x0)),
-'FiendsTemple3F': new DungeonInfo('FiendsTemple3F', fiendsTempleMapTileAtlas, 'tiles_fiendsrevisited', 'tiles_fiendsrevisitedroom', 'FiendsTemple3F', new teleportEntry('FiendsTemple3FExitTarget', 'WARP', 0x0, 0x0)),
-'FiendsTempleEarth': new DungeonInfo('FiendsTempleEarth', fiendsTempleMapTileAtlas, 'tiles_fiendsrevisited', 'tiles_fiendsrevisitedroom', 'FiendsTempleEarth', new teleportEntry('FiendsTempleEarthExitTarget', 'WARP', 0x0, 0x0), 9),
-'FiendsTempleFire': new DungeonInfo('FiendsTempleFire', fiendsTempleMapTileAtlas, 'tiles_fiendsrevisited', 'tiles_fiendsrevisitedroom', 'FiendsTempleFire', new teleportEntry('FiendsTempleFireExitTarget', 'WARP', 0x0, 0x0), 10),
-'FiendsTempleWater': new DungeonInfo('FiendsTempleWater', fiendsTempleMapTileAtlas, 'tiles_fiendsrevisited', 'tiles_fiendsrevisitedroom', 'FiendsTempleWater', new teleportEntry('FiendsTempleWaterExitTarget', 'WARP', 0x0, 0x0), 11),
-'FiendsTempleAir': new DungeonInfo('FiendsTempleAir', fiendsTempleMapTileAtlas, 'tiles_fiendsrevisited', 'tiles_fiendsrevisitedroom', 'FiendsTempleAir', new teleportEntry('FiendsTempleAirExitTarget', 'WARP', 0x0, 0x0), 12),
+'SkyPalace1F': new DungeonInfo('SkyPalace1F', skyCastleMapTileAtlas, 'tiles_skycastle', 'tiles_skycastleroom', 'SkyPalace1F', new teleportEntry('SkyPalace1FExitTarget', 'WorldMap', 0xC2, 0x3B), [0x4D, 0x52, 0x69, 0x4D, 0x54, 0xB6, 0x40, 0x50]),
+'SkyPalace2F': new DungeonInfo('SkyPalace2F', skyCastleMapTileAtlas, 'tiles_skycastle', 'tiles_skycastleroom', 'SkyPalace2F', new teleportEntry('SkyPalace2FExitTarget', 'WorldMap', 0xC2, 0x3B), [0x52, 0x69, 0xB6, 0xD5, 0x54, 0x40, 0xD8, 0x50]),
+'SkyPalace3F': new DungeonInfo('SkyPalace3F', skyCastleMapTileAtlas, 'tiles_skycastle', 'tiles_skycastleroom', 'SkyPalace3F', new teleportEntry('SkyPalace3FExitTarget', 'WorldMap', 0xC2, 0x3B), [0xCC, 0xB3, 0xD5, 0xB6, 0xA4, 0xD8, 0x53, 0xD6]),
+'SkyPalace4F': new DungeonInfo('SkyPalace4F', skyCastleMapTileAtlas, 'tiles_skycastle', 'tiles_skycastleroom', 'SkyPalace4F', new teleportEntry('SkyPalace4FExitTarget', 'WorldMap', 0xC2, 0x3B), [0xB3, 0xCC, 0xC1, 0x51, 0xB5, 0x53, 0xD2, 0xD6]),
+'SkyPalace5F': new DungeonInfo('SkyPalace5F', skyCastleMapTileAtlas, 'tiles_skycastle', 'tiles_skycastleroom', 'SkyPalace5F', new teleportEntry('SkyPalace5FExitTarget', 'WorldMap', 0xC2, 0x3B), [0xC1, 0x51, 0xB5, 0xA4, 0xD2, 0x50, 0x56, 0xD6], 24),
+'FiendsTemple1F': new DungeonInfo('FiendsTemple1F', fiendsTempleMapTileAtlas, 'tiles_fiendsrevisited', 'tiles_fiendsrevisitedroom', 'FiendsTemple1F', new teleportEntry('FiendsTemple1FExitTarget', 'WARP', 0x0, 0x0), [0x57, 0x57, 0xB0, 0xB0, 0xB0, 0xBB, 0xBB, 0xD0]),
+'FiendsTemple2F': new DungeonInfo('FiendsTemple2F', fiendsTempleMapTileAtlas, 'tiles_fiendsrevisited', 'tiles_fiendsrevisitedroom', 'FiendsTemple2F', new teleportEntry('FiendsTemple2FExitTarget', 'WARP', 0x0, 0x0), [0xCB, 0xCB, 0xBE, 0xBE, 0x55, 0x55, 0xD0, 0xD3]),
+'FiendsTemple3F': new DungeonInfo('FiendsTemple3F', fiendsTempleMapTileAtlas, 'tiles_fiendsrevisited', 'tiles_fiendsrevisitedroom', 'FiendsTemple3F', new teleportEntry('FiendsTemple3FExitTarget', 'WARP', 0x0, 0x0), [0xCD, 0xCD, 0xD9, 0xD9, 0xD9, 0xAF, 0xAF, 0xD3]),
+'FiendsTempleEarth': new DungeonInfo('FiendsTempleEarth', fiendsTempleMapTileAtlas, 'tiles_fiendsrevisited', 'tiles_fiendsrevisitedroom', 'FiendsTempleEarth', new teleportEntry('FiendsTempleEarthExitTarget', 'WARP', 0x0, 0x0), [0xBF, 0xC0, 0xBF, 0xC0, 0xA1, 0xA1, 0xA1, 0xBA], 9),
+'FiendsTempleFire': new DungeonInfo('FiendsTempleFire', fiendsTempleMapTileAtlas, 'tiles_fiendsrevisited', 'tiles_fiendsrevisitedroom', 'FiendsTempleFire', new teleportEntry('FiendsTempleFireExitTarget', 'WARP', 0x0, 0x0), [0xB8, 0xB8, 0xB6, 0xB6, 0xB9, 0xB9, 0xB7, 0xBA], 10),
+'FiendsTempleWater': new DungeonInfo('FiendsTempleWater', fiendsTempleMapTileAtlas, 'tiles_fiendsrevisited', 'tiles_fiendsrevisitedroom', 'FiendsTempleWater', new teleportEntry('FiendsTempleWaterExitTarget', 'WARP', 0x0, 0x0), [0xC9, 0x44, 0xC9, 0x44, 0xC5, 0xC5, 0xC8, 0xC7], 11),
+'FiendsTempleAir': new DungeonInfo('FiendsTempleAir', fiendsTempleMapTileAtlas, 'tiles_fiendsrevisited', 'tiles_fiendsrevisitedroom', 'FiendsTempleAir', new teleportEntry('FiendsTempleAirExitTarget', 'WARP', 0x0, 0x0), [0xD1, 0xD7, 0xE8, 0xD8, 0xD4, 0xD3, 0xEC, 0xFF], 12),
 'FiendsTempleChaos': new DungeonInfo('FiendsTempleChaos', fiendsTempleMapTileAtlas, 'tiles_fiendsrevisited', 'tiles_fiendsrevisitedroom', 'FiendsTempleChaos', new teleportEntry('FiendsTempleChaosExitTarget', 'WARP', 0x0, 0x0)),
 'TitanTunnel': new DungeonInfo('TitanTunnel', earthCaveMapTileAtlas, 'tiles_titan', 'tiles_titanroom', 'TitanTunnel', new teleportEntry('TitanTunnelExitTarget', 'WorldMap', 0x2A, 0xAE)),
 };
@@ -1963,9 +2472,15 @@ function Player(map, startX, startY, width, height, image, canoeImage, spriteWal
 	this.actionCooldown = 0;
 	this.movementCooldown = 0;
 	this.collision = false;
+	this.currentDomain = this.getDomain();
     console.log("Creating Player At: " + this.gridX + "," + this.gridY);
 	spriteMapList['WorldMap'].push(this);
 }
+
+Player.prototype.getDomain = function()
+{
+	return this.gridX % 32 + (this.gridY % 32) * 8; 
+};
 
 Player.prototype.teleportPlayer = function (map, gridX, gridY, moveMethod)
 {
@@ -1978,6 +2493,7 @@ Player.prototype.teleportPlayer = function (map, gridX, gridY, moveMethod)
     this.direction = (map.overworldMap ?  Directions.Right : Directions.Down);
 	this.mapName = map.name;
 	let tileData = map.getTileData(gridX, gridY);
+	this.currentDomain = this.getDomain();
     this.moveMethod = moveMethod;
 	this.drawCanoe = tileData.canoe;
 };
@@ -2186,6 +2702,9 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
 			Game.processItem(KeyItem.BOTTLE, true);
 		if(tileData.shop != null && tileData.shop.includes('INN'))
 			Game.saveINN();
+		
+		if(Game.currentMap.overworldMap)
+			this.getDomain();
 		
 		if(this.moveMethod != MoveMethod.Airship)
 			Game.logPathLocation(this.gridX, this.gridY);
@@ -3281,7 +3800,26 @@ Game.incrementStepCounter = function()
 		this.player.movementCooldown = 0.5;
 		this.player.offsetX = 0;
 		this.player.offsetY = 0;
-		this.processFight(this.encounterGroup, true);
+		let encounterId = 0;
+		if(this.currentMap.overworldMap)
+		{
+			switch(this.player.moveMethod)
+			{
+				case MoveMethod.Walk:
+					encounterId = domainEncounters[this.player.currentDomain][this.encounterGroup];
+					break;
+				case MoveMethod.Ship:
+					encounterId = oceanEncounters[this.encounterGroup];
+					break;
+				case MoveMethod.Canoe:
+					encounterId = this.player.currentDomain < 32 ? riverNorthEncounters[this.encounterGroup] : riverSouthEncounters[this.encounterGroup];
+					break;
+			}
+		}
+		else
+			encounterId = this.currentDungeon.encounterList[encounterGroup];
+		
+		this.processFight(encounterId, true);
 		this.encounterNumber++;
 		if(this.encounterNumber > 255)
 			this.encounterNumber -= 256;
