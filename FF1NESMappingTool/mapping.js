@@ -1656,6 +1656,12 @@ function EncounterInfo(formation, runnable, surprise, slot1 = new EncounterSlot(
 	this.slot4 = slot4;
 }
 
+EncounterInfo.prototype.getSlotInfo = function(slot)
+{
+	let encounterSlot = this[slot];
+	return encounterSlot.minimum + '-' + encounterSlot.maximum + ' ' + encounterSlot.enemy.name + '(' + encounterSlot.enemy.hp + ' hp)';
+};
+
 const encounters = {
 	0x00: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Imp, 3, 5)),
 	0x80: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Imp, 3, 6), new EncounterSlot(enemies.GrImp, 0, 4)),
@@ -3656,7 +3662,14 @@ Game.update = function (delta) {
 Game.processFight = function (fightNumber, success)
 {
 	this.currentTileLocationEvents.push(new LocationEvent(EventType.Fight, fightNumber));
-	document.getElementById('messageLog').innerHTML += '<br/>Fight: ' + fightNumber;
+	let encounter = encounters[fightNumber];
+	let fightDetails = (encounter.slot1.maximum > 0 ? encounter.getSlotInfo('slot1') : '') + 
+					   (encounter.slot2.maximum > 0 ? ', ' + encounter.getSlotInfo('slot2') : '') + 
+					   (encounter.slot3.maximum > 0 ? ', ' + encounter.getSlotInfo('slot3') : '') + 
+					   (encounter.slot4.maximum > 0 ? ', ' + encounter.getSlotInfo('slot4') : '');
+	if(fightNumber > 127)
+		fightNumber = (fightNumber - 128) + '-f2';
+	document.getElementById('messageLog').innerHTML += '<br/>Fight: ' + fightNumber + ': ' + fightDetails;
 };
 
 Game.processItem = function (itemNumber, success)
@@ -3806,18 +3819,18 @@ Game.incrementStepCounter = function()
 			switch(this.player.moveMethod)
 			{
 				case MoveMethod.Walk:
-					encounterId = domainEncounters[this.player.currentDomain][this.encounterGroup];
+					encounterId = domainEncounters[this.player.currentDomain][this.encounterGroup - 1];
 					break;
 				case MoveMethod.Ship:
-					encounterId = oceanEncounters[this.encounterGroup];
+					encounterId = oceanEncounters[this.encounterGroup - 1];
 					break;
 				case MoveMethod.Canoe:
-					encounterId = this.player.currentDomain < 32 ? riverNorthEncounters[this.encounterGroup] : riverSouthEncounters[this.encounterGroup];
+					encounterId = this.player.currentDomain < 32 ? riverNorthEncounters[this.encounterGroup - 1] : riverSouthEncounters[this.encounterGroup - 1];
 					break;
 			}
 		}
 		else
-			encounterId = this.currentDungeon.encounterList[encounterGroup];
+			encounterId = this.currentDungeon.encounterList[this.encounterGroup - 1];
 		
 		this.processFight(encounterId, true);
 		this.encounterNumber++;
