@@ -3668,8 +3668,8 @@ Game.processFight = function (fightNumber, success)
 					   (encounter.slot3.maximum > 0 ? ', ' + encounter.getSlotInfo('slot3') : '') + 
 					   (encounter.slot4.maximum > 0 ? ', ' + encounter.getSlotInfo('slot4') : '');
 	if(fightNumber > 127)
-		fightNumber = (fightNumber - 128) + '-f2';
-	document.getElementById('messageLog').innerHTML += '<br/>Fight: ' + fightNumber + ': ' + fightDetails;
+		fightNumber = (fightNumber - 128) + '(f2)';
+	document.getElementById('messageLog').innerHTML += '<br/>Fight: ' + fightNumber + ' surprise(' + encounter.surprise +') can run(' + encounter.runnable + '): ' + fightDetails;
 };
 
 Game.processItem = function (itemNumber, success)
