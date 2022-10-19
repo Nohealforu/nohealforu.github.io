@@ -2709,7 +2709,7 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
 		if(tileData.shop != null && tileData.shop.includes('INN'))
 			Game.saveINN();
 		
-		document.getElementById('messageLog').innerHTML = 'Message Log' + Game.messageLog;
+		Game.refreshMessageLog();
 		
 		if(Game.currentMap.overworldMap)
 			this.currentDomain = this.getDomain();
@@ -3569,6 +3569,7 @@ Game.init = function () {
 	this.encounterChance = 0x45;
 	this.encounterNumber = 0;
 	this.encounterGroup = 0;
+	this.updateMessageLog = true;
 	this.messageLog = '';
     this.currentMap = overworldMap;
     this.camera.followPlayer(this.currentMap, this.player);
@@ -3590,7 +3591,7 @@ Game.init = function () {
     this.pathCanvas.height = defaultHeight;
 	this.pathMainColor = '#6000D0';
 	this.pathShadowColor = '#222222';
-this.colorRotation = 30;
+	this.colorRotation = 30;
     // initial draw of the map
     console.log("Intial Map Loading...");
     this._loadCells(this.currentMap);
@@ -3673,6 +3674,7 @@ Game.processFight = function (fightNumber, success)
 	if(fightNumber > 127)
 		fightNumber = (fightNumber - 128) + '-2';
 	this.messageLog = '<br/>Fight: ' + fightNumber + ' surprise(' + encounter.surprise +') can run(' + encounter.runnable + '): ' + fightDetails + this.messageLog;
+	this.updateMessageLog = true;
 };
 
 Game.processItem = function (itemNumber, success)
@@ -3689,6 +3691,7 @@ Game.processItem = function (itemNumber, success)
 	{
 		this.messageLog = '<br/>You need: ' + KeyItemStrings[itemNumber] + this.messageLog;
 	}
+	this.updateMessageLog = true;
 };
 
 Game.processEventTrigger = function (eventNumber, success)
@@ -3733,6 +3736,7 @@ Game.processEventTrigger = function (eventNumber, success)
 	{
 		this.messageLog = '<br/>Missing Requirement: ' + EventStrings[eventNumber] + this.messageLog;
 	}
+	this.updateMessageLog = true;
 };
 
 Game.handleActionButton = function(incompleteMovement, activeMovement)
@@ -3761,7 +3765,7 @@ Game.handleActionButton = function(incompleteMovement, activeMovement)
 					this.processEventTrigger(results.eventTrigger, results.success);
 				if(results.success)
 					this._drawSprites(this.currentMap);
-				document.getElementById('messageLog').innerHTML = 'Message Log' + this.messageLog;
+				this.refreshMessageLog();
 				break;
 			}
 		}
@@ -3793,6 +3797,15 @@ Game.handleActionButton = function(incompleteMovement, activeMovement)
 			this.airship.unboard(this.player);
 	}
 	
+};
+
+Game.refreshMessageLog = function()
+{
+	if(this.updateMessageLog)
+	{
+		document.getElementById('messageLog').innerHTML = 'Message Log' + this.messageLog;
+		this.updateMessageLog = false;
+	}
 };
 
 Game.incrementStepCounter = function()
@@ -3874,18 +3887,22 @@ Game.checkForTeleport = function (tileX, tileY)
 		if(teleport.requirement == teleportEntryRequirement.Crown && this.player.keyItems[KeyItem.CROWN] == false)
 		{
 			this.messageLog = '<br/>No Crown :(' + this.messageLog;
+			this.updateMessageLog = true;
 		}
 		else if(teleport.requirement == teleportEntryRequirement.Cube && this.player.keyItems[KeyItem.CUBE] == false)
 		{
 			this.messageLog = '<br/>No Cube :(' + this.messageLog;
+			this.updateMessageLog = true;
 		}
 		else if(teleport.requirement == teleportEntryRequirement.Chime && this.player.keyItems[KeyItem.CHIME] == false)
 		{
 			this.messageLog = '<br/>No Chime :(' + this.messageLog;
+			this.updateMessageLog = true;
 		}
 		else if(teleport.requirement == teleportEntryRequirement.Orbs && this.player.getOrbs() == false)
 		{
 			this.messageLog = '<br/>Not enough orbs noob' + this.messageLog;
+			this.updateMessageLog = true;
 		}
 		else //teleport
 		{
