@@ -3841,8 +3841,8 @@ Game.incrementStepCounter = function()
 				case MoveMethod.Ship:
 					encounterId = oceanEncounters[this.encounterGroup - 1];
 					break;
-				case MoveMethod.Canoe:
-					encounterId = this.player.currentDomain < 32 ? riverNorthEncounters[this.encounterGroup - 1] : riverSouthEncounters[this.encounterGroup - 1];
+				case MoveMethod.Canoe: // I don't think there are any river tiles between 24-32, but technically north/south split is 3 - 5
+					encounterId = this.player.currentDomain < 24 ? riverNorthEncounters[this.encounterGroup - 1] : riverSouthEncounters[this.encounterGroup - 1];
 					break;
 			}
 		}
