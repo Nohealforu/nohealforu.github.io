@@ -5,7 +5,10 @@ var buildingSelection = '';
 getBuildingList = function()
 {
 	let buildingData = document.getElementById('stateBuildingInput').value;
+  buildingList = [];
   buildingDataLines = buildingData.split('\n');
+  buildingSelection = '';
+  document.getElementById("stateBuildingOutput").innerHTML = '';
   let insideBuildingTag = false;
   for (let i = 0; i < buildingDataLines.length; i++)
   {
