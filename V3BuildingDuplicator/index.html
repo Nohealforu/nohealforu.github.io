@@ -1,3 +1,18 @@
+<!doctype html>
+<html>
+<head>
+    <title>V3 building duplicator tool</title>
+    <meta charset="utf-8">
+    <!--link rel="stylesheet" href="styles.css" type="text/css"-->
+
+    <script src="v3duplicator.js"></script>
+</head>
+<body>
+
+<header class="main-header">
+    <h1><a href="../index.html">Home</a></h1>
+    <p>V3 building duplicator tool</p>
+</header>
 <div><textarea id="stateBuildingInput" name="stateBuildingInput" rows="20" cols="200" placeholder="Insert Building Text Here"></textarea></div>
 <div><button id="getBuildingList" onclick="getBuildingList();" type="button">Parse State Building List</button></div>
 <div><select name="buildingSelect" id="buildingSelect" onchange="changeBuildingSelection(this);" >
@@ -6,3 +21,5 @@
 <button id="doubleBuilding" onclick="doubleBuilding();" type="button">Double Building</button>
 </div>
 <div><textarea id="stateBuildingOutput" name="stateBuildingOutput" rows="20" cols="200" placeholder="Output Goes Here"></textarea></div>
+	</body>
+</html>
