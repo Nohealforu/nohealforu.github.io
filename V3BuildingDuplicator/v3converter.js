@@ -8,7 +8,7 @@ getBuildingList = function()
   buildingList = [];
   buildingDataLines = buildingData.split('\n');
   buildingSelection = '';
-  document.getElementById("stateBuildingOutput").innerHTML = '';
+  document.getElementById("stateBuildingOutput").value = '';
   let insideBuildingTag = false;
   for (let i = 0; i < buildingDataLines.length; i++)
   {
@@ -86,5 +86,5 @@ doubleBuilding = function()
       }
     }
   }
-  document.getElementById("stateBuildingOutput").innerHTML = buildingDataLines.join('\n');
+  document.getElementById("stateBuildingOutput").value = buildingDataLines.join('\n');
 };
