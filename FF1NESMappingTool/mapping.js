@@ -3765,10 +3765,10 @@ Game.handleActionButton = function(incompleteMovement, activeMovement)
 					this.processEventTrigger(results.eventTrigger, results.success);
 				if(results.success)
 					this._drawSprites(this.currentMap);
-				this.refreshMessageLog();
 				break;
 			}
 		}
+		this.refreshMessageLog();
 	}
 	if(incompleteMovement)
 	{
