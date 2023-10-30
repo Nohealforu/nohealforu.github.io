@@ -3301,7 +3301,7 @@ this._drawPath(this.currentMap)
 
 Game.handleWarp = function() 
 {
-	if(this.currentMap.overworldMap)
+	if(this.currentMap.overworldMap || this.player.teleporting)
 		return;
 	let teleport = this.currentDungeon.warpInformation.pop();
 	let warp = true;
@@ -3309,7 +3309,7 @@ Game.handleWarp = function()
 };
 Game.handleExit = function() 
 {
-	if(this.currentMap.overworldMap)
+	if(this.currentMap.overworldMap || this.player.teleporting)
 		return;
 	let warp = true;
 	let teleport = this.getExitTeleport();
