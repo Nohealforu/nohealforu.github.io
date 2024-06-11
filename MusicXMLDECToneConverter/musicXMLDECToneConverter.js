@@ -70,6 +70,7 @@ convertXML = function()
 		else if(inputLine.includes('</measure>')) 
 		{
 			outputLines.push('[' + tempNotes.join('') + ']');
+			tempNotes = [];
 		}
 	}
   document.getElementById("DECToneOutput").value = outputLines.join('\n');
