@@ -20,7 +20,7 @@ const frequencyTable = {'000': 0
 
 createNote = function(currentStep, currentAlter, currentOctave, currentDuration, beatsConversion)
 {
-	return ':t<' + currentStep + currentOctave + currentAlter + ',' + currentDuration * beatsConversion + '>';
+	return ':t<' + frequencyTable[currentStep + currentOctave + currentAlter] + ',' + Math.round(currentDuration * beatsConversion) + '>';
 }
 
 convertXML = function()
