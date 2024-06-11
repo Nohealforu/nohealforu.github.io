@@ -1,6 +1,6 @@
 getTagValue = function(inputString, startingTag, endingTag = null)
 {
-  if endingTag = startingTag.replace('<', '</');
+  endingTag = endingTag || startingTag.replace('<', '</');
   return (inputString.substring(str.indexOf(startingTag) + 1, str.lastIndexOf(endingTag)));
 }
 
