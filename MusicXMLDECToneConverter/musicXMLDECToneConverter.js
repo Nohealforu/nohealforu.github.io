@@ -1,7 +1,7 @@
 getTagValue = function(inputString, startingTag, endingTag = null)
 {
   endingTag = endingTag || startingTag.replace('<', '</');
-  return (inputString.substring(str.indexOf(startingTag) + 1, str.lastIndexOf(endingTag)));
+  return (inputString.substring(inputString.indexOf(startingTag) + 1, inputString.lastIndexOf(endingTag)));
 }
 
 const frequencyTable = {'000': 0
