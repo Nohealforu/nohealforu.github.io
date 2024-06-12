@@ -38,7 +38,7 @@ createNote = function(currentStep, currentAlter, currentOctave, currentDuration,
 		noteIndex = 0;
 	else if(noteIndex > frequencyTable.length - 1)
 		noteIndex = frequencyTable.length - 1;
-	return ':t<' + frequencyTable[currentStep + currentOctave + currentAlter] + ',' + Math.round(currentDuration * beatsConversion) + '>';
+	return ':t<' + frequencyTable[noteIndex] + ',' + Math.round(currentDuration * beatsConversion) + '>';
 }
 
 convertXML = function()
