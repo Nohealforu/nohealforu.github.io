@@ -33,7 +33,7 @@ convertXML = function()
 	let musicXMLInput = document.getElementById('musicXMLInput').value;
 	let outputLines = [];
 	let tempNotes = [];
-	let currentStep, currentAlter, currentOctave, currentDuration;
+	let currentStep = 0, currentAlter = 0, currentOctave = 0, currentDuration;
 	let tempo = 100;
 	let divisions = 100;
 	let beatsConversion = 1.0;
