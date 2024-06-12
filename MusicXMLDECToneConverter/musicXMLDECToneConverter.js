@@ -96,8 +96,8 @@ convertXML = function()
 			currentStep = '0';
 			currentAlter = 0;
 			currentOctave = '0';
-			actualNotes = 0;
-			normalNotes = 0;
+			actualNotes = 1;
+			normalNotes = 1;
 		}
 		else if(inputLine.includes('<staff>'))
 		{
