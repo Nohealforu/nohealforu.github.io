@@ -59,13 +59,8 @@ convertXML = function()
 		}
 		else if(inputLine.includes('<sound tempo="'))
 		{
-			tempo = parseFloat(getTagValue(inputLine, '<sound tempo="', '"/>"'));
+			tempo = parseFloat(getTagValue(inputLine, '<sound tempo="', '"/>'));
 			beatsConversion = 60000.0 / tempo / divisions;
-		}
-		else if(inputLine.includes('<per-minute>'))
-		{
-		  	tempo = parseFloat(getTagValue(inputLine, '<per-minute>'));
-		  	beatsConversion = 60000.0 / tempo / divisions;
 		}
 		else if(inputLine.includes('<step>'))
 		  	currentStep = getTagValue(inputLine, '<step>');
