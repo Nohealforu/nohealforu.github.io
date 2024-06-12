@@ -41,24 +41,23 @@ convertXML = function()
 	let musicXMLInput = document.getElementById('musicXMLInput').value;
 	let outputLines = [];
 	let tempNotes = [];
+	let outputBassLines = [];
+	let tempBassNotes = [];
 	let currentStep = 0, currentAlter = 0, currentOctave = 0, currentDuration;
 	let tempo = 100;
 	let divisions = 100;
 	let beatsConversion = 1.0;
-	let stopReadingNotes = false;
+	let staff = 1;
 	inputLines = musicXMLInput.split('\n');
 	for (let i = 0; i < inputLines.length; i++)
 	{
 		let inputLine = inputLines[i];
 		if(inputLine.includes('</measure>')) 
 		{
-			stopReadingNotes = false;
 			outputLines.push('[' + tempNotes.join('') + ']');
+			outputBassLines.push('[' + tempBassNotes.join('') + ']');
 			tempNotes = [];
-		}
-		if(stopReadingNotes)
-		{
-			
+			tempBassNotes = [];
 		}
 		else if(inputLine.includes('<divisions>'))
 		{
@@ -86,15 +85,21 @@ convertXML = function()
 		}
 		else if(inputLine.includes('</note>'))
 		{
-			tempNotes.push(createNote(currentStep, currentAlter, currentOctave, currentDuration, beatsConversion));
+			let newNote = createNote(currentStep, currentAlter, currentOctave, currentDuration, beatsConversion);
+			if(staff == 1)
+				tempNotes.push(newNote);
+			else if(staff == 2)
+				tempBassNotes.push(newNote);
+			
 			currentStep = '0';
 			currentAlter = 0;
 			currentOctave = '0';
 		}
-		else if(inputLine.includes('<backup>'))
+		else if(inputLine.includes('<staff>'))
 		{
-			stopReadingNotes = true;
+			staff = parseInt(getTagValue(inputLine, '<staff>'));
 		}
 	}
 document.getElementById("DECToneOutput").value = outputLines.join('\n');
+document.getElementById("DECToneBassOutput").value = outputBassLines.join('\n');
 };
