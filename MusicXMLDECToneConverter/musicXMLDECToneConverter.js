@@ -47,6 +47,8 @@ convertXML = function()
 	let tempo = 100;
 	let divisions = 100;
 	let beatsConversion = 1.0;
+	let actualNotes = 1;
+	let normalNotes = 1;
 	let staff = 1;
 	inputLines = musicXMLInput.split('\n');
 	for (let i = 0; i < inputLines.length; i++)
@@ -85,7 +87,7 @@ convertXML = function()
 		}
 		else if(inputLine.includes('</note>'))
 		{
-			let newNote = createNote(currentStep, currentAlter, currentOctave, currentDuration, beatsConversion);
+			let newNote = createNote(currentStep, currentAlter, currentOctave, currentDuration, beatsConversion * normalNotes / actualNotes);
 			if(staff == 1)
 				tempNotes.push(newNote);
 			else if(staff == 2)
@@ -94,10 +96,20 @@ convertXML = function()
 			currentStep = '0';
 			currentAlter = 0;
 			currentOctave = '0';
+			actualNotes = 0;
+			normalNotes = 0;
 		}
 		else if(inputLine.includes('<staff>'))
 		{
 			staff = parseInt(getTagValue(inputLine, '<staff>'));
+		}
+		else if(inputLine.includes('<actual-notes>'))
+		{
+			actualNotes = parseInt(getTagValue(inputLine, '<actual-notes>'));
+		}
+		else if(inputLine.includes('<normal-notes>'))
+		{
+			normalNotes = parseInt(getTagValue(inputLine, '<normal-notes>'));
 		}
 	}
 document.getElementById("DECToneOutput").value = outputLines.join('\n');
