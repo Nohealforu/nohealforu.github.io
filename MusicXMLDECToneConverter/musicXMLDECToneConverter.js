@@ -48,6 +48,7 @@ convertXML = function()
 	let divisions = 100;
 	let beatsConversion = 1.0;
 	let staff = 1;
+	let stopReadingNotes = false;
 	inputLines = musicXMLInput.split('\n');
 	for (let i = 0; i < inputLines.length; i++)
 	{
@@ -58,6 +59,7 @@ convertXML = function()
 			outputBassLines.push('[' + tempBassNotes.join('') + ']');
 			tempNotes = [];
 			tempBassNotes = [];
+			stopReadingNotes = false;
 		}
 		else if(inputLine.includes('<divisions>'))
 		{
@@ -86,7 +88,7 @@ convertXML = function()
 		else if(inputLine.includes('</note>'))
 		{
 			let newNote = createNote(currentStep, currentAlter, currentOctave, currentDuration, beatsConversion);
-			if(staff == 1)
+			if(staff == 1 && !stopReadingNotes)
 				tempNotes.push(newNote);
 			else if(staff == 2)
 				tempBassNotes.push(newNote);
@@ -98,6 +100,10 @@ convertXML = function()
 		else if(inputLine.includes('<staff>'))
 		{
 			staff = parseInt(getTagValue(inputLine, '<staff>'));
+		}
+		else if(inputLine.includes('<backup>'))
+		{
+			stopReadingNotes = true;
 		}
 	}
 document.getElementById("DECToneOutput").value = outputLines.join('\n');
