@@ -86,14 +86,14 @@ convertXML = function()
 		else if(inputLine.includes('<rest/>'))
 		{
 			currentStep = '0';
-			currentAlter = '0';
+			currentAlter = 0;
 			currentOctave = '0';
 		}
 		else if(inputLine.includes('</note>'))
 		{
 			tempNotes.push(createNote(currentStep, currentAlter, currentOctave, currentDuration, beatsConversion));
 			currentStep = '0';
-			currentAlter = '0';
+			currentAlter = 0;
 			currentOctave = '0';
 		}
 		else if(inputLine.includes('<backup>'))
