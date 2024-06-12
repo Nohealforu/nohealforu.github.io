@@ -32,11 +32,22 @@ convertXML = function()
   let tempo = 100;
   let divisions = 100;
   let beatsConversion = 1.0;
+	let stopReadingNotes = false;
   inputLines = musicXMLInput.split('\n');
   for (let i = 0; i < inputLines.length; i++)
   {
   	let inputLine = inputLines[i];
-    if(inputLine.includes('<divisions>'))
+		if(inputLine.includes('</measure>')) 
+		{
+			stopReadingNotes = false;
+			outputLines.push('[' + tempNotes.join('') + ']');
+			tempNotes = [];
+		}
+		if(stopReadingNotes)
+		{
+			
+		}
+    else if(inputLine.includes('<divisions>'))
     {
       divisions = parseFloat(getTagValue(inputLine, '<divisions>'));
       beatsConversion = 60000.0 / tempo / divisions;
@@ -46,6 +57,11 @@ convertXML = function()
       tempo = parseFloat(getTagValue(inputLine, '<sound tempo="', '"/>"'));
       beatsConversion = 60000.0 / tempo / divisions;
 		}
+	  else if inputLine.includes('<per-minute>'))
+    {
+      tempo = parseFloat(getTagValue(inputLine, '<per-minute>'));
+      beatsConversion = 60000.0 / tempo / divisions;
+    }
     else if(inputLine.includes('<step>'))
       currentStep = getTagValue(inputLine, '<step>');
     else if(inputLine.includes('<alter>'))
@@ -67,10 +83,9 @@ convertXML = function()
 			currentAlter = '0';
 			currentOctave = '0';
 		}
-		else if(inputLine.includes('</measure>')) 
+		else if(inputLine.includes('<backup>'))
 		{
-			outputLines.push('[' + tempNotes.join('') + ']');
-			tempNotes = [];
+			stopReadingNotes = true;
 		}
 	}
   document.getElementById("DECToneOutput").value = outputLines.join('\n');
