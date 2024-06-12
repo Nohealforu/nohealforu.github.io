@@ -1,7 +1,7 @@
 getTagValue = function(inputString, startingTag, endingTag = null)
 {
-  endingTag = endingTag || startingTag.replace('<', '</');
-  return (inputString.substring(inputString.indexOf(startingTag) + startingTag.length, inputString.lastIndexOf(endingTag)));
+	endingTag = endingTag || startingTag.replace('<', '</');
+	return (inputString.substring(inputString.indexOf(startingTag) + startingTag.length, inputString.lastIndexOf(endingTag)));
 }
 
 const frequencyTable = {'000': 0
@@ -30,18 +30,18 @@ createNote = function(currentStep, currentAlter, currentOctave, currentDuration,
 
 convertXML = function()
 {
-  let musicXMLInput = document.getElementById('musicXMLInput').value;
-  let outputLines = [];
-  let tempNotes = [];
+	let musicXMLInput = document.getElementById('musicXMLInput').value;
+	let outputLines = [];
+	let tempNotes = [];
 	let currentStep, currentAlter, currentOctave, currentDuration;
-  let tempo = 100;
-  let divisions = 100;
-  let beatsConversion = 1.0;
+	let tempo = 100;
+	let divisions = 100;
+	let beatsConversion = 1.0;
 	let stopReadingNotes = false;
-  inputLines = musicXMLInput.split('\n');
-  for (let i = 0; i < inputLines.length; i++)
-  {
-  	let inputLine = inputLines[i];
+	inputLines = musicXMLInput.split('\n');
+	for (let i = 0; i < inputLines.length; i++)
+	{
+		let inputLine = inputLines[i];
 		if(inputLine.includes('</measure>')) 
 		{
 			stopReadingNotes = false;
@@ -52,29 +52,29 @@ convertXML = function()
 		{
 			
 		}
-    else if(inputLine.includes('<divisions>'))
-    {
-      divisions = parseFloat(getTagValue(inputLine, '<divisions>'));
-      beatsConversion = 60000.0 / tempo / divisions;
-    }
-    else if(inputLine.includes('<sound tempo="'))
-    {
-      tempo = parseFloat(getTagValue(inputLine, '<sound tempo="', '"/>"'));
-      beatsConversion = 60000.0 / tempo / divisions;
+		else if(inputLine.includes('<divisions>'))
+		{
+		  	divisions = parseFloat(getTagValue(inputLine, '<divisions>'));
+		  	beatsConversion = 60000.0 / tempo / divisions;
 		}
-	  else if inputLine.includes('<per-minute>'))
-    {
-      tempo = parseFloat(getTagValue(inputLine, '<per-minute>'));
-      beatsConversion = 60000.0 / tempo / divisions;
-    }
-    else if(inputLine.includes('<step>'))
-      currentStep = getTagValue(inputLine, '<step>');
-    else if(inputLine.includes('<alter>'))
-      currentAlter = getTagValue(inputLine, '<alter>');
-    else if(inputLine.includes('<octave>'))
-      currentOctave = getTagValue(inputLine, '<octave>');
-    else if(inputLine.includes('<duration>'))
-      currentDuration = parseFloat(getTagValue(inputLine, '<duration>'));
+		else if(inputLine.includes('<sound tempo="'))
+		{
+			tempo = parseFloat(getTagValue(inputLine, '<sound tempo="', '"/>"'));
+			beatsConversion = 60000.0 / tempo / divisions;
+		}
+		else if(inputLine.includes('<per-minute>'))
+		{
+		  	tempo = parseFloat(getTagValue(inputLine, '<per-minute>'));
+		  	beatsConversion = 60000.0 / tempo / divisions;
+		}
+		else if(inputLine.includes('<step>'))
+		  	currentStep = getTagValue(inputLine, '<step>');
+		else if(inputLine.includes('<alter>'))
+		  	currentAlter = getTagValue(inputLine, '<alter>');
+		else if(inputLine.includes('<octave>'))
+		  	currentOctave = getTagValue(inputLine, '<octave>');
+		else if(inputLine.includes('<duration>'))
+		  	currentDuration = parseFloat(getTagValue(inputLine, '<duration>'));
 		else if(inputLine.includes('<rest/>'))
 		{
 			currentStep = '0';
@@ -93,5 +93,5 @@ convertXML = function()
 			stopReadingNotes = true;
 		}
 	}
-  document.getElementById("DECToneOutput").value = outputLines.join('\n');
+document.getElementById("DECToneOutput").value = outputLines.join('\n');
 };
