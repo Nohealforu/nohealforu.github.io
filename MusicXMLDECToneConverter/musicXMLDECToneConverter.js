@@ -25,6 +25,7 @@ const frequencyTable = {'000': 0
 
 createNote = function(currentStep, currentAlter, currentOctave, currentDuration, beatsConversion)
 {
+	if(currentAlter == "1") currentAlter = "+1";
 	return ':t<' + frequencyTable[currentStep + currentOctave + currentAlter] + ',' + Math.round(currentDuration * beatsConversion) + '>';
 }
 
