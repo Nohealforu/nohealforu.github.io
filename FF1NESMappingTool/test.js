@@ -4359,7 +4359,7 @@ Game.checkNextTrackerTile = function()
 		
 		return;
 	}
-	let currentEncounterTile = this.encounterTrackerTilesToCheck[encounterTrackerTileIndex];
+	let currentEncounterTile = this.encounterTrackerTilesToCheck[this.encounterTrackerTileIndex];
 	this.queueAdjacentTrackerTiles(currentEncounterTile);
 	this.encounterTrackerTileIndex++;
 	this.checkNextTrackerTile();
