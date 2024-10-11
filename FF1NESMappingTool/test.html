@@ -38,13 +38,10 @@
 	<div class="mainElement">
 		<div>
 			<canvas id="mapping" width="960" height="640"></canvas>
-			<div style="float:right">
-				<div id="messageLog" style="height:300px;width:300px;border:1px solid #ccc;overflow:auto; float:right;">Message Log</div>
-				<div id="pathGetContainer" style="height:300px;width:300px;border:1px solid #ccc;overflow:auto; float:right;">
-					<div><button id="pathResetButton" onclick="Game.refreshPathList();" type="button">Get Paths</button></div>
-					<div id="pathContainer">...</div>
-				</div>
-				<div id="encounterInformation" style="height:300px;width:600px;border:1px solid #ccc;overflow:auto; float:right;">Upcoming Encounters</div>
+			<div id="messageLog" style="height:300px;width:300px;border:1px solid #ccc;overflow:auto; float:right;">Message Log</div>
+			<div id="pathGetContainer" style="height:300px;width:300px;border:1px solid #ccc;overflow:auto; float:right;">
+				<div><button id="pathResetButton" onclick="Game.refreshPathList();" type="button">Get Paths</button></div>
+				<div id="pathContainer">...</div>
 			</div>
 			<div style="clear:both;"><br/></div>
 			<canvas id="controller" width="612" height="252" style="vertical-align: top;"></canvas>
@@ -64,6 +61,7 @@
 				<div id="touchTest"><br/></div>
 			</div>
 			<div id="encounterInformation" class="sideElement" style="border:1px solid #ccc; vertical-align: top;"></div>
+			<div id="possibleEncounters" class="sideElement" style="border:1px solid #ccc; vertical-align: top;">Upcoming Encounters</div>
 		</div>
 		<div>Controls: arrow keys move, "x" key is what I have mapped to the interacting with things at this time (enter/exit airship at this point).</div>
 		<div>If you can't move, make sure the browser window is in focus (click on it).  Customizable keybinds will be available in the future.</div>
