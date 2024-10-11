@@ -4262,7 +4262,7 @@ Game.queueAdjacentTrackerTile = function(currentEncounterTile, direction)
 			return;
 		else //check teleport location
 		{
-			console.log(JSON.stringify(currentEncounterTile));
+			console.log(JSON.stringify(currentEncounterTile.warpInformation));
 			console.log(JSON.stringify(teleport));
 			let warp = teleport.targetMap == 'WARP';
 			if(warp)
@@ -4340,14 +4340,14 @@ Game.checkNextTrackerTile = function()
 	if(this.encounterTrackerTileIndex >= this.encounterTrackerTilesToCheck.length)
 	{
 		let encounterStringOutput = ['Upcoming Encounters'];
-		if(possibleEncounter.length > 0)
+		if(this.possibleEncounters.length > 0)
 		{
-			let encounterNumber = possibleEncounters[0].encounterNumber;
+			let encounterNumber = this.possibleEncounters[0].encounterNumber;
 			let encounterStringGroup = ['Encounter Number: ' + encounterNumber];
-			encounterStringGroup.push('Encounter Threshold: ' + possibleEncounters[0].encounterChance);
-			for(let i = 0; i < possibleEncounters.length; i++) // will need to potentially sort this and trim down to unique encounters
+			encounterStringGroup.push('Encounter Threshold: ' + this.possibleEncounters[0].encounterChance);
+			for(let i = 0; i < this.possibleEncounters.length; i++) // will need to potentially sort this and trim down to unique encounters
 			{
-				let possibleEncounter = possibleEncounters[i];
+				let possibleEncounter = this.possibleEncounters[i];
 				if(encounterNumber != possibleEncounter.encounterNumber)
 				{
 					encounterStringOutput.push(encounterStringGroup.join('<br/>'));
