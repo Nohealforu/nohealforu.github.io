@@ -3218,7 +3218,7 @@ EncounterTrackerTile.prototype.checkForIncrementEncounter = function (tileData, 
 
 EncounterTrackerTile.prototype.toEncounterString = function ()
 {
-	return this.map.name + (this.currentDomain != null ? ' domain: ' + this.currentDomain : '') + ' Encounter Group: ' + this.encounterGroup + ' EncounterId: ' + this.encounterId + ' Steps: ' + this.steps + ' Safe Steps: ' this.safeSteps;
+	return this.map.name + (this.currentDomain != null ? ' domain: ' + this.currentDomain : '') + ' Encounter Group: ' + this.encounterGroup + ' EncounterId: ' + this.encounterId + ' Steps: ' + this.steps + ' Safe Steps: ' + this.safeSteps;
 }
 
 MapSaveData = function(mapName, room)
