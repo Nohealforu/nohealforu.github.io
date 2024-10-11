@@ -4341,7 +4341,7 @@ Game.checkNextTrackerTile = function()
 		if(possibleEncounter.length > 0)
 		{
 			let encounterNumber = possibleEncounters[0].encounterNumber;
-			let encounterStringGroup = ['Encounter Number: ' encounterNumber];
+			let encounterStringGroup = ['Encounter Number: ' + encounterNumber];
 			encounterStringGroup.push('Encounter Threshold: ' + possibleEncounters[0].encounterChance);
 			for(let i = 0; i < possibleEncounters.length; i++) // will need to potentially sort this and trim down to unique encounters
 			{
