@@ -4217,7 +4217,7 @@ Game.updateEncounterTracker = function ()
 	this.possibleEncounters = [];
 	this.encounterTrackerTilesToCheck = [];
 	this.encounterTrackerTileIndex = 0;
-	let currentEncounterTile = new encounterTrackerTile(this.currentMap, this.player.gridX, this.player.gridY, 0, 0, this.player.moveMethod, this.currentMap.overworldMap ? [] : currentDungeon.warpInformation.slice(), false, this.stepCounter1,	this.stepCounter2, this.encounterNumber, this.player.currentDomain);
+	let currentEncounterTile = new EncounterTrackerTile(this.currentMap, this.player.gridX, this.player.gridY, 0, 0, this.player.moveMethod, this.currentMap.overworldMap ? [] : currentDungeon.warpInformation.slice(), false, this.stepCounter1,	this.stepCounter2, this.encounterNumber, this.player.currentDomain);
 	this.encounterTrackerTiles[currentEncounterTile.getUniqueIndex()] = currentEncounterTile;
 	this.queueAdjacentTrackerTiles(currentEncounterTile);
 	this.checkNextTrackerTile();
@@ -4319,7 +4319,7 @@ Game.queueAdjacentTrackerTile = function(currentEncounterTile, direction)
 	}
 	
 	let incrementEncounter = currentEncounterTile.checkForIncrementEncounter(tileData, movementType, teleported);
-	adjacentEncounterTile = new encounterTrackerTile(encounterTileMap, gridX, gridY, encounterTrackerSteps, incrementEncounter.safeSteps, movementType, warpInformation, incrementEncounter.encounterExpected, incrementEncounter.stepCounter1, incrementEncounter.stepCounter2, incrementEncounter.encounterNumber, currentDomain, incrementEncounter.encounterGroup, incrementEncounter.encounterId);
+	adjacentEncounterTile = new EncounterTrackerTile(encounterTileMap, gridX, gridY, encounterTrackerSteps, incrementEncounter.safeSteps, movementType, warpInformation, incrementEncounter.encounterExpected, incrementEncounter.stepCounter1, incrementEncounter.stepCounter2, incrementEncounter.encounterNumber, currentDomain, incrementEncounter.encounterGroup, incrementEncounter.encounterId);
 	let adjacentEncounterTileIndex = adjacentEncounterTile.getUniqueIndex();
 	let existingAdjacentEncounterTile = this.encounterTrackerTiles[adjacentEncounterTileIndex];
 	if(existingAdjacentEncounterTile != null)
@@ -4355,7 +4355,7 @@ Game.checkNextTrackerTile = function()
 			}
 			encounterStringOutput.push(encounterStringGroup.join('<br/>'));
 		}
-		document.getElementById('encounterInformation').innerHTML = encounterStringOutput.join('<br/><br/>');
+		document.getElementById('possibleEncounters').innerHTML = encounterStringOutput.join('<br/><br/>');
 		
 		return;
 	}
