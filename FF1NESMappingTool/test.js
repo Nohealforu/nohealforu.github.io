@@ -3752,7 +3752,7 @@ Game.init = function () {
 	this.currentPathLocations = [new PathLocation(0x99, 0xA5)];
 	this.currentTileLocationEvents = [];
 	this.encounterTrackerEnabled = true;
-	this.encounterTrackerDistance = 64;
+	this.encounterTrackerDistance = 4;
 	this.updateEncounterTracker();
     
     // create a canvas
@@ -4262,6 +4262,8 @@ Game.queueAdjacentTrackerTile = function(currentEncounterTile, direction)
 			return;
 		else //check teleport location
 		{
+			console.log(JSON.stringify(currentEncounterTile));
+			console.log(JSON.stringify(teleport));
 			let warp = teleport.targetMap == 'WARP';
 			if(warp)
 				teleport = currentEncounterTile.warpInformation[currentEncounterTile.warpInformation.length - 1];
