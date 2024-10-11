@@ -4273,7 +4273,7 @@ Game.queueAdjacentTrackerTile = function(currentEncounterTile, direction)
 			{
 				let dungeonInfo = dungeons[teleport.targetMap];
 				if(!warp)
-					warpInformation = warpInformation.splice().push(new teleportEntry('StoredWarp', encounterTileMap.overworldMap ? 'WorldMap' : encounterTileMap.name, sourceX, sourceY, teleportEntryRequirement.None));
+					warpInformation = warpInformation.splice().push(new teleportEntry('StoredWarp', encounterTileMap.overworldMap ? 'WorldMap' : encounterTileMap.name, currentEncounterTile.x, currentEncounterTile.y, teleportEntryRequirement.None));
 				else
 					warpInformation = warpInformation.splice(0,-1);
 				
