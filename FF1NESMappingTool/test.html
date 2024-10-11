@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+<head>
+    <title>FF1 NES Mapping Tool 0.1.0</title>
+    <meta charset="utf-8">
+    <!--link rel="stylesheet" href="styles.css" type="text/css"-->
+
+    <script src="test.js"></script>
+	<style> 
+			.container{
+				width:95%;
+				padding-top:10px;
+				padding-bottom:10px;
+				display:inline-block;
+			}
+            .container > .mainElement{
+                float:left; 
+                width:100%;
+				}
+		.sideElement{
+			width: 10%;
+			display: inline-block;
+			margin-left: 50px;
+		}
+		.main-footer{
+			clear: both;
+		}
+        </style> 
+</head>
+<body>
+
+<header class="main-header">
+    <h1><a href="../index.html">Home</a></h1>
+    <p>FF1 NES Mapping Tool 0.2.0</p>
+</header>
+
+<div class="container">
+	<div class="mainElement">
+		<div>
+			<canvas id="mapping" width="960" height="640"></canvas>
+			<div id="messageLog" style="height:300px;width:300px;border:1px solid #ccc;overflow:auto; float:right;">Message Log</div>
+			<div id="pathGetContainer" style="height:300px;width:300px;border:1px solid #ccc;overflow:auto; float:right;">
+				<div><button id="pathResetButton" onclick="Game.refreshPathList();" type="button">Get Paths</button></div>
+				<div id="pathContainer">...</div>
+			</div>
+			<div id="encounterInformation" style="height:300px;width:300px;border:1px solid #ccc;overflow:auto; float:right;">Upcoming Encounters</div>
+			<div style="clear:both;"><br/></div>
+			<canvas id="controller" width="612" height="252" style="vertical-align: top;"></canvas>
+			<div class="sideElement" style="border:1px solid #ccc; vertical-align: top;">
+				<div><input type="color" id="pathMain" name="pathMain" value="#6000D0" onchange="Game.handleColorChange(this);" ><label for="pathMain">Path Main</label></div>
+				<div><input type="color" id="pathShadow" name="pathShadow" value="#222222" onchange="Game.handleColorChange(this);" ><label for="head">Path Shadow</label></div>
+<div>Color Rotation<input type="range" min="5" default="30" max="55" step="1" onchange="Game.handleColorRotation(this);" /></div>
+				<div>MoveSpeed <input type="range" min="10" default="50" max="100" onchange="Game.handleMovementSpeedChange(this);" /></div>
+				<div><button id="pathResetButton" onclick="Game.handlePathReset();" type="button">Reset Path</button></div>
+				<div><button id="softResetButton" onclick="Game.handleSoftReset();" type="button">Soft Reset</button></div>
+				<div><button id="hardResetButton" onclick="Game.handleHardReset();" type="button">Hard Reset</button></div>
+				<div><button id="manualPathButton" onclick="Game.handleManualPath();" type="button">New Path</button></div>
+				<div><button id="tentButton" onclick="Game.handleSave();" type="button">Tent</button></div>
+				<div><button id="warpButton" onclick="Game.handleWarp();" type="button">Warp</button></div>
+				<div><button id="exitButton" onclick="Game.handleExit();" type="button">Exit</button></div>
+				<div><button id="pathDeleteButton" onclick="if(confirm('This will return you to start of previous path.') == true ) Game.returnToPreviousPath();" type="button">Delete Path</button></div>
+				<div id="touchTest"><br/></div>
+			</div>
+			<div id="encounterInformation" class="sideElement" style="border:1px solid #ccc; vertical-align: top;"></div>
+		</div>
+		<div>Controls: arrow keys move, "x" key is what I have mapped to the interacting with things at this time (enter/exit airship at this point).</div>
+		<div>If you can't move, make sure the browser window is in focus (click on it).  Customizable keybinds will be available in the future.</div>
+		<div>This controller image is also kind of touch enabled (not mouse)</div>
+		<div><br/></div>
+	</div>
+	<div><img id="pathExportOutput"/></div>
+    <footer class="main-footer">
+        <div>Source code on <a href="https://github.com/Nohealforu/noealforu.github.io/" target="_top">the Github repository</a>.</div>
+		<div>Art assets are from screenshots of FF1 NES version, property of Square Enix, they are not pulled from the original data.  (i.e. spritesheets, 3 color pallete, etc.)</div>
+		<div>Code is based on some techniques from <a href="https://developer.mozilla.org/en-US/docs/Games/Techniques/Tilemaps" target="_blank">a Mozilla development article</a> and does not use any portion of code from the FF1 NES Cartridge.</div>
+		<div>This free tool is for learning about the game systems and planning routes for Speedrunning, it is not a recreation of or substitute for the game.</div>
+		<div>If you're looking to play the original game, I highly recommend purchasing the Pixel Remaster version.</div>
+		<div>Thank you to Disch for the FFHackster tool for the ability to see how certain tile systems work so I could approximate portions of the game.</div>
+    </footer>
+</div><!-- main wrapper -->
+
+</body>
+</html>
