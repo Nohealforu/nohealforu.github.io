@@ -3100,14 +3100,14 @@ EncounterTrackerTile.prototype.getPotentialAdjacentMovementType = function (tile
 {
 	if(tileData == null)
 		return -1;
-	if(this.keyItems[KeyItem.KEY] == false && tileData.room == roomOpening.Lock)
+	if(Game.player.keyItems[KeyItem.KEY] == false && tileData.room == roomOpening.Lock)
 		return -1;
 	
     if(this.moveMethod == MoveMethod.Walk && tileData.walk == false)
     {
 		if(Game.bridge.active == true && Game.bridge.gridX == tileX && Game.bridge.gridY == tileY)
 			return MoveMethod.Walk;
-        if(tileData.canoe == true && this.keyItems[KeyItem.CANOE] == true)
+        if(tileData.canoe == true && Game.player.keyItems[KeyItem.CANOE] == true)
         { // Need special treatment entering/leaving river tile itself, (doesn't count to encounters)
             return MoveMethod.Canoe;
         }
@@ -3124,7 +3124,7 @@ EncounterTrackerTile.prototype.getPotentialAdjacentMovementType = function (tile
     }
     else if(this.moveMethod == MoveMethod.Ship && tileData.ship == false)
     {
-        if(tileData.canoe == true && this.keyItems[KeyItem.CANOE] == true)
+        if(tileData.canoe == true && Game.player.keyItems[KeyItem.CANOE] == true)
         {
 			return MoveMethod.Canoe
         } // Build out more scenarios to ride boat, etc.
