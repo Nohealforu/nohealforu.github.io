@@ -4223,7 +4223,25 @@ Game.updateEncounterTracker = function ()
 	this.possibleEncounters = [];
 	this.encounterTrackerTilesToCheck = [];
 	this.encounterTrackerTileIndex = 0;
-	let currentEncounterTile = new EncounterTrackerTile(this.currentMap, this.player.gridX, this.player.gridY, 0, 0, this.player.moveMethod, this.currentMap.overworldMap ? [] : this.currentDungeon.warpInformation.slice(), false, this.stepCounter1,	this.stepCounter2, this.encounterNumber, this.player.currentDomain);
+	let warpInformation = [];
+	if(!this.currentMap.overworldMap && this.currentDungeon.warpInformation.length > 0)
+	{
+		let recursions = 0;
+		let visitedMapCounts = {};
+		let teleport = this.currentDungeon.warpInformation[this.currentDungeon.warpInformation.length - 1];
+		warpInformation[recursions] = teleport;
+		visitedMapCounts[teleport.targetMap] = 1;
+		while(teleport.targetMap != 'WorldMap' && recursions++ < this.encounterTrackerDistance)
+		{
+			if(visitedMapCounts[teleport.targetMap] == null)
+				visitedMapCounts[teleport.targetMap] = 1;
+			teleport = dungeons[teleport.targetMap].warpInformation[dungeons[teleport.targetMap].warpInformation.length - visitedMapCounts[teleport.targetMap]++];
+			warpInformation[recursions] = teleport;
+		}
+		warpInformation.reverse();
+	}
+	
+	let currentEncounterTile = new EncounterTrackerTile(this.currentMap, this.player.gridX, this.player.gridY, 0, 0, this.player.moveMethod, warpInformation, false, this.stepCounter1, this.stepCounter2, this.encounterNumber, this.player.currentDomain);
 	this.encounterTrackerTiles[currentEncounterTile.getUniqueIndex()] = currentEncounterTile;
 	this.queueAdjacentTrackerTiles(currentEncounterTile);
 	while(this.encounterTrackerTileIndex < this.encounterTrackerTilesToCheck.length)
