@@ -3065,7 +3065,7 @@ function EncounterTrackerTile(map, x, y, steps, safeSteps, moveMethod, warpInfor
 	this.y = y;
 	this.steps = steps;
 	this.safeSteps = safeSteps;
-	this.moveMethod = this.moveMethod;
+	this.moveMethod = moveMethod;
 	this.warpInformation = warpInformation;
 	this.displayEncounter = displayEncounter;
 	this.stepCounter1 = stepCounter1;
@@ -3208,7 +3208,7 @@ EncounterTrackerTile.prototype.checkForIncrementEncounter = function (tileData, 
 			}
 		}
 		else
-			encounterInfo.encounterId = this.map.encounterList[encounterInfo.encounterGroup - 1];
+			encounterInfo.encounterId = dungeons[this.map.name].encounterList[encounterInfo.encounterGroup - 1];
 		
 		encounterInfo.encounterNumber++;
 		if(encounterInfo.encounterNumber > 255)
@@ -4297,7 +4297,6 @@ Game.queueAdjacentTrackerTile = function(currentEncounterTile, direction)
 					overworldMap: false,
 					name: dungeonInfo.mapDataName,
 					encounterThreshold: dungeonInfo.encounterThreshold,
-					encounterList: dungeonInfo.encounterList,
 					getTile: function (mapX, mapY, col, row) {
 						return this.data[mapY * this.cells.rows * this.maxCol + row * this.maxCol + mapX * this.cells.cols + col];
 					},
