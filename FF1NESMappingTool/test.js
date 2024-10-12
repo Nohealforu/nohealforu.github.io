@@ -2703,7 +2703,7 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
 		this.ignoreEncounter = false;
 		Game.ship.unboardThisFrame = false;
 
-		if(this.moveMethod != MoveMethod.Airship)
+		if(this.moveMethod != MoveMethod.Airship && !this.teleporting)
 			Game.updateEncounterTracker();
 		
 		if(tileData.raiseAirship && !this.eventsTriggered[EventTrigger.AIRSHIP] && this.keyItems[KeyItem.FLOATER])
