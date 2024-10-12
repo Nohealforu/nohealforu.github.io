@@ -4066,6 +4066,8 @@ Game.takeCanalGlitchStep = function()
 		if(this.encounterNumber > 255)
 			this.encounterNumber -= 256;
 	}
+	this.updateEncounterTracker();
+	this._drawEncounters(this.currentMap);
 	document.getElementById('encounterInformation').innerHTML = 
 		('step1: ' + this.stepCounter1 + 
 		 '<br/>step2: ' + this.stepCounter2 + 
