@@ -4265,15 +4265,16 @@ Game.updateEncounterTracker = function ()
 			let encounterNumber = this.possibleEncounterNumbers[i];
 			let encounterStringGroup = ['Encounter Number: ' + encounterNumber];
 			let encounterIdsWithData = this.possibleEncounterByNumberId[encounterNumber];
-			for(const encounterIdWithData in encounterIdsWithData)
+			for(const encounterId in encounterIdsWithData)
 			{
+				let encounterIdWithData = encounterIdsWithData[encounterId];
 				let encounterLocations = [];
-				let firstEncounter = encounterIdWithData[0];
-				let encounter = encounters[firstEncounter.encounterId];
+				let encounter = encounters[encounterId];
 				let fightDetails = (encounter.slot1.maximum > 0 ? encounter.getSlotInfo('slot1') : '') + 
 								   (encounter.slot2.maximum > 0 ? ', ' + encounter.getSlotInfo('slot2') : '') + 
 								   (encounter.slot3.maximum > 0 ? ', ' + encounter.getSlotInfo('slot3') : '') + 
 								   (encounter.slot4.maximum > 0 ? ', ' + encounter.getSlotInfo('slot4') : '');
+				let fightNumber = encounterId;
 				if(fightNumber > 127)
 					fightNumber = (fightNumber - 128) + '-2';
 				encounterStringGroup.push('<br/>Fight: ' + fightNumber + ' surprise(' + encounter.surprise +') can run(' + encounter.runnable + '): ' + fightDetails);
