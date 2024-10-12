@@ -4220,7 +4220,7 @@ Game.updateEncounterTracker = function ()
 	this.possibleEncounters = [];
 	this.encounterTrackerTilesToCheck = [];
 	this.encounterTrackerTileIndex = 0;
-	let currentEncounterTile = new EncounterTrackerTile(this.currentMap, this.player.gridX, this.player.gridY, 0, 0, this.player.moveMethod, this.currentMap.overworldMap ? [] : this.currentDungeon.warpInformation.slice(), false, this.stepCounter1,	this.stepCounter2, this.encounterNumber, this.player.currentDomain);
+	let currentEncounterTile = new EncounterTrackerTile(this.currentMap, this.player.gridX, this.player.gridY, 0, 0, this.player.moveMethod, this.currentMap.overworldMap ? [] : this.currentDungeon.warpInformation.slice(0), false, this.stepCounter1,	this.stepCounter2, this.encounterNumber, this.player.currentDomain);
 	this.encounterTrackerTiles[currentEncounterTile.getUniqueIndex()] = currentEncounterTile;
 	this.queueAdjacentTrackerTiles(currentEncounterTile);
 	while(this.encounterTrackerTileIndex < this.encounterTrackerTilesToCheck.length)
