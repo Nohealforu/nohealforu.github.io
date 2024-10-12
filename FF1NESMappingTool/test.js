@@ -4223,7 +4223,31 @@ Game.updateEncounterTracker = function ()
 	let currentEncounterTile = new EncounterTrackerTile(this.currentMap, this.player.gridX, this.player.gridY, 0, 0, this.player.moveMethod, this.currentMap.overworldMap ? [] : this.currentDungeon.warpInformation.slice(), false, this.stepCounter1,	this.stepCounter2, this.encounterNumber, this.player.currentDomain);
 	this.encounterTrackerTiles[currentEncounterTile.getUniqueIndex()] = currentEncounterTile;
 	this.queueAdjacentTrackerTiles(currentEncounterTile);
-	this.checkNextTrackerTile();
+	while(this.encounterTrackerTileIndex < this.encounterTrackerTilesToCheck.length)
+	{
+		let currentEncounterTile = this.encounterTrackerTilesToCheck[this.encounterTrackerTileIndex];
+		this.queueAdjacentTrackerTiles(currentEncounterTile);
+		this.encounterTrackerTileIndex++;
+	}
+	let encounterStringOutput = ['Upcoming Encounters'];
+	if(this.possibleEncounters.length > 0)
+	{
+		let encounterNumber = this.possibleEncounters[0].encounterNumber;
+		let encounterStringGroup = ['Encounter Number: ' + encounterNumber];
+		encounterStringGroup.push('Encounter Threshold: ' + this.possibleEncounters[0].encounterChance);
+		for(let i = 0; i < this.possibleEncounters.length; i++) // will need to potentially sort this and trim down to unique encounters
+		{
+			let possibleEncounter = this.possibleEncounters[i];
+			if(encounterNumber != possibleEncounter.encounterNumber)
+			{
+				encounterStringOutput.push(encounterStringGroup.join('<br/>'));
+				encounterNumber = possibleEncounter.encounterNumber;
+			}
+			encounterStringGroup.push(possibleEncounter.toEncounterString());
+		}
+		encounterStringOutput.push(encounterStringGroup.join('<br/>'));
+	}
+	document.getElementById('possibleEncounters').innerHTML = encounterStringOutput.join('<br/><br/>');
 };
 
 Game.queueAdjacentTrackerTiles = function(currentEncounterTile)
@@ -4335,39 +4359,6 @@ Game.queueAdjacentTrackerTile = function(currentEncounterTile, direction)
 	
 	this.encounterTrackerTiles[adjacentEncounterTileIndex] = adjacentEncounterTile;
 	this.encounterTrackerTilesToCheck.push(adjacentEncounterTile);
-}
-
-
-Game.checkNextTrackerTile = function()
-{
-	if(this.encounterTrackerTileIndex >= this.encounterTrackerTilesToCheck.length)
-	{
-		let encounterStringOutput = ['Upcoming Encounters'];
-		if(this.possibleEncounters.length > 0)
-		{
-			let encounterNumber = this.possibleEncounters[0].encounterNumber;
-			let encounterStringGroup = ['Encounter Number: ' + encounterNumber];
-			encounterStringGroup.push('Encounter Threshold: ' + this.possibleEncounters[0].encounterChance);
-			for(let i = 0; i < this.possibleEncounters.length; i++) // will need to potentially sort this and trim down to unique encounters
-			{
-				let possibleEncounter = this.possibleEncounters[i];
-				if(encounterNumber != possibleEncounter.encounterNumber)
-				{
-					encounterStringOutput.push(encounterStringGroup.join('<br/>'));
-					encounterNumber = possibleEncounter.encounterNumber;
-				}
-				encounterStringGroup.push(possibleEncounter.toEncounterString());
-			}
-			encounterStringOutput.push(encounterStringGroup.join('<br/>'));
-		}
-		document.getElementById('possibleEncounters').innerHTML = encounterStringOutput.join('<br/><br/>');
-		
-		return;
-	}
-	let currentEncounterTile = this.encounterTrackerTilesToCheck[this.encounterTrackerTileIndex];
-	this.queueAdjacentTrackerTiles(currentEncounterTile);
-	this.encounterTrackerTileIndex++;
-	this.checkNextTrackerTile();
 }
 
 Game._loadCells = function (map) {
