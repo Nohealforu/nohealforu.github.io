@@ -4279,7 +4279,7 @@ Game.updateEncounterTracker = function ()
 				encounterStringGroup.push('<br/>Fight: ' + fightNumber + ' surprise(' + encounter.surprise +') can run(' + encounter.runnable + '): ' + fightDetails);
 				for(let j = 0; j < encounterIdWithData; j++)
 				{
-					if(!encounterLocations.includes(firstEncounter.map.name + ':' + (firstEncounter.map.overworldMap ? firstEncounter.currentDomain : 'None'))
+					if(!encounterLocations.includes(firstEncounter.map.name + ':' + (firstEncounter.map.overworldMap ? firstEncounter.currentDomain : 'None')))
 					{
 						encounterLocations.push(firstEncounter.map.name + ':' + (firstEncounter.map.overworldMap ? firstEncounter.currentDomain : 'None'));
 						encounterStringGroup.push('Encounter Possible in: ' + firstEncounter.map.name + (firstEncounter.map.overworldMap ? (' domain: ' + firstEncounter.currentDomain % 8) + ',' + Math.floor(firstEncounter.currentDomain / 8) : ''));
