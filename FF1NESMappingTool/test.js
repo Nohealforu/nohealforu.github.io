@@ -711,7 +711,7 @@ new dungeonMapTile(true),
 new dungeonMapTile(true),
 new dungeonMapTile(true),
 // Row 5
-new dungeonMapTile(true, new teleportEntry('TimeWarp', 'FiendsTemple1F', 0x14, 0x11)),
+new dungeonMapTile(true, new teleportEntry('TimeWarp', 'FiendsTemple1F', 0x14, 0x11, TeleportEntryRequirement.Orbs)),
 new dungeonMapTile(true, new teleportEntry('ShrineWarp', 'WARP', 0, 0)),
 new dungeonMapTile(true, new teleportEntry('Shrine2Warp', 'WARP', 0, 0)),
 new dungeonMapTile(true, new teleportEntry('SeaShrine2', 'SeaShrineB2', 0x2d, 0x8)),
@@ -4275,7 +4275,7 @@ Game.queueAdjacentTrackerTile = function(currentEncounterTile, direction)
 	if(tileData == null)
 		return;
 	
-	let movementType = currentEncounterTile.getPotentialAdjacentMovementType(tileData, currentEncounterTile.x, currentEncounterTile.y);
+	let movementType = currentEncounterTile.getPotentialAdjacentMovementType(tileData, gridX, gridY);
 	if(movementType == -1)
 		return;
 	
@@ -4301,11 +4301,11 @@ Game.queueAdjacentTrackerTile = function(currentEncounterTile, direction)
 				let dungeonInfo = dungeons[teleport.targetMap];
 				if(!warp)
 				{
-					warpInformation = warpInformation.splice();
-					warpInformation.push(new teleportEntry('StoredWarp', encounterTileMap.overworldMap ? 'WorldMap' : encounterTileMap.name, currentEncounterTile.x, currentEncounterTile.y, teleportEntryRequirement.None));
+					warpInformation = currentEncounterTile.warpInformation.splice(0);
+					warpInformation.push(new teleportEntry('StoredWarp', encounterTileMap.overworldMap ? 'WorldMap' : encounterTileMap.name, gridX, gridY, teleportEntryRequirement.None));
 				}
 				else
-					warpInformation = warpInformation.splice(0,-1);
+					warpInformation = currentEncounterTile.warpInformation.splice(0,-1);
 				
 				encounterTileMap = {
 					cols: 2,
