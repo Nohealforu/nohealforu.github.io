@@ -51,7 +51,7 @@ const worldMapTileFight = {
 	FightOcean: -4
 };	
 
-const teleportEntryRequirement = {
+const  = {
 	None: 0,
 	Crown: 1,
 	Cube: 2,
@@ -711,7 +711,7 @@ new dungeonMapTile(true),
 new dungeonMapTile(true),
 new dungeonMapTile(true),
 // Row 5
-new dungeonMapTile(true, new teleportEntry('TimeWarp', 'FiendsTemple1F', 0x14, 0x11, TeleportEntryRequirement.Orbs)),
+new dungeonMapTile(true, new teleportEntry('TimeWarp', 'FiendsTemple1F', 0x14, 0x11, teleportEntryRequirement.Orbs)),
 new dungeonMapTile(true, new teleportEntry('ShrineWarp', 'WARP', 0, 0)),
 new dungeonMapTile(true, new teleportEntry('Shrine2Warp', 'WARP', 0, 0)),
 new dungeonMapTile(true, new teleportEntry('SeaShrine2', 'SeaShrineB2', 0x2d, 0x8)),
