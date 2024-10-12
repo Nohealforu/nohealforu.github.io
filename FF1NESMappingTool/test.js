@@ -3344,7 +3344,7 @@ Checkpoint.prototype.loadCheckpoint = function(player, resetType)
 		Game.currentTileLocationEvents.push(new LocationEvent(EventType.Reset, ResetType.Soft));
 	
 	
-	this.updateEncounterTracker();
+	Game.updateEncounterTracker();
 };
 
 StepPath = function(mapName, checkpoint, airship = false)
