@@ -4276,7 +4276,7 @@ Game.updateEncounterTracker = function ()
 								   (encounter.slot4.maximum > 0 ? ', ' + encounter.getSlotInfo('slot4') : '');
 				if(fightNumber > 127)
 					fightNumber = (fightNumber - 128) + '-2';
-				encounterStringGroup.push(<br/>Fight: ' + fightNumber + ' surprise(' + encounter.surprise +') can run(' + encounter.runnable + '): ' + fightDetails);
+				encounterStringGroup.push('<br/>Fight: ' + fightNumber + ' surprise(' + encounter.surprise +') can run(' + encounter.runnable + '): ' + fightDetails);
 				for(let j = 0; j < encounterIdWithData; j++)
 				{
 					if(!encounterLocations.includes(firstEncounter.map.name + ':' + (firstEncounter.map.overworldMap ? firstEncounter.currentDomain : 'None'))
