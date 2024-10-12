@@ -3098,7 +3098,7 @@ EncounterTrackerTile.prototype.getTileData = function (direction)
 	return tileData = this.map.getTileData(newCoords.x, newCoords.y);
 }
 
-EncounterTrackerTile.prototype.getPotentialAdjacentMovementType = function (tileData)
+EncounterTrackerTile.prototype.getPotentialAdjacentMovementType = function (tileData, tileX, tileY)
 {
 	if(tileData == null)
 		return -1;
@@ -4250,7 +4250,7 @@ Game.queueAdjacentTrackerTile = function(currentEncounterTile, direction)
 	if(tileData == null)
 		return;
 	
-	let movementType = currentEncounterTile.getPotentialAdjacentMovementType(tileData);
+	let movementType = currentEncounterTile.getPotentialAdjacentMovementType(tileData, currentEncounterTile.x, currentEncounterTile.y);
 	if(movementType == -1)
 		return;
 	
@@ -4317,7 +4317,7 @@ Game.queueAdjacentTrackerTile = function(currentEncounterTile, direction)
 			gridY = teleport.gridY;
 			currentDomain = encounterTileMap.overworldMap ? null : Math.floor(gridX / 32) + Math.floor(gridY / 32) * 8; 
 			tileData = encounterTileMap.getTileData(gridX, gridY);
-			movementType = currentEncounterTile.getPotentialAdjacentMovementType(tileData);
+			movementType = currentEncounterTile.getPotentialAdjacentMovementType(tileData, gridX, gridY);
 			teleported = true;
 		}
 	}
@@ -4460,7 +4460,7 @@ Game._drawEncounters = function (map) {
     
     for (let i = 0; i < this.possibleEncounters.length; i++) 
 	{
-		let encounter = this.possibleEncounter[i];
+		let encounter = this.possibleEncounters[i];
 		if(encounter.map.name == map.name)
 		{
 			if(startCol <= encounter.x && endCol >= encounter.x &&
