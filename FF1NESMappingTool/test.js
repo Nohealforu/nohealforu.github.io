@@ -3161,7 +3161,7 @@ EncounterTrackerTile.prototype.getPotentialAdjacentMovementType = function (tile
     return this.moveMethod;
 }
 
-EncounterTrackerTile.prototype.checkForIncrementEncounter = function (tileData, moveMethod, teleported)
+EncounterTrackerTile.prototype.checkForIncrementEncounter = function (tileData, moveMethod, teleported, currentDomain)
 {
 	let encounterInfo = {safeSteps: this.safeSteps + 1, stepCounter1: this.stepCounter1, stepCounter2: this.stepCounter2, encounterNumber: this.encounterNumber, encounterGroup: null, encounterId: null, encounterChance: 8};
 	
@@ -3199,13 +3199,13 @@ EncounterTrackerTile.prototype.checkForIncrementEncounter = function (tileData, 
 			switch(this.moveMethod)
 			{
 				case MoveMethod.Walk:
-					encounterInfo.encounterId = domainEncounters[this.currentDomain][encounterInfo.encounterGroup - 1];
+					encounterInfo.encounterId = domainEncounters[currentDomain][encounterInfo.encounterGroup - 1];
 					break;
 				case MoveMethod.Ship:
 					encounterInfo.encounterId = oceanEncounters[encounterInfo.encounterGroup - 1];
 					break;
 				case MoveMethod.Canoe: // I don't think there are any river tiles between 24-32, but technically north/south split is 3 - 5
-					encounterInfo.encounterId = this.currentDomain < 24 ? riverNorthEncounters[encounterInfo.encounterGroup - 1] : riverSouthEncounters[encounterInfo.encounterGroup - 1];
+					encounterInfo.encounterId = currentDomain < 24 ? riverNorthEncounters[encounterInfo.encounterGroup - 1] : riverSouthEncounters[encounterInfo.encounterGroup - 1];
 					break;
 			}
 		}
@@ -4349,7 +4349,7 @@ Game.queueAdjacentTrackerTile = function(currentEncounterTile, direction)
 		}
 	}
 	
-	let incrementEncounter = currentEncounterTile.checkForIncrementEncounter(tileData, movementType, teleported);
+	let incrementEncounter = currentEncounterTile.checkForIncrementEncounter(tileData, movementType, teleported, currentDomain);
 	adjacentEncounterTile = new EncounterTrackerTile(encounterTileMap, gridX, gridY, encounterTrackerSteps, incrementEncounter.safeSteps, movementType, warpInformation, incrementEncounter.encounterExpected, incrementEncounter.stepCounter1, incrementEncounter.stepCounter2, incrementEncounter.encounterNumber, currentDomain, incrementEncounter.encounterGroup, incrementEncounter.encounterId, incrementEncounter.encounterChance);
 	let adjacentEncounterTileIndex = adjacentEncounterTile.getUniqueIndex();
 	let existingAdjacentEncounterTile = this.encounterTrackerTiles[adjacentEncounterTileIndex];
@@ -4439,6 +4439,7 @@ Game._drawEncounters = function (map) {
 	context.lineJoin = 'round';
 	context.lineCap = 'round';
 	pathMainColor = new HSLColor(this.pathMainColor);
+	let startingH = pathMainColor.h;
 	context.strokeStyle = pathMainColor.getHSLString();
 	context.shadowOffsetX = 2;
 	context.shadowOffsetY = 2;
@@ -4462,6 +4463,9 @@ Game._drawEncounters = function (map) {
 			{
 				let x = (encounter.x - startCol) * displayTsize + offsetX;
 				let y = (encounter.y - startRow) * displayTsize + offsetY;
+				
+				pathMainColor.h = startingH + this.colorRotation * encounter.encounterNumber;
+				context.strokeStyle = pathMainColor.getHSLString();
 				
 				context.beginPath();
 				context.ellipse(x, y, 4, 4, 0, 0, Math.PI * 2);
