@@ -4464,7 +4464,7 @@ Game._drawEncounters = function (map) {
 				let x = (encounter.x - startCol) * displayTsize + offsetX;
 				let y = (encounter.y - startRow) * displayTsize + offsetY;
 				
-				pathMainColor.h = startingH + this.colorRotation * encounter.encounterNumber;
+				pathMainColor.h = startingH + this.colorRotation * (encounter.encounterNumber - 1);
 				context.strokeStyle = pathMainColor.getHSLString();
 				
 				context.beginPath();
