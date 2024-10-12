@@ -3754,7 +3754,7 @@ Game.init = function () {
 	this.currentPathLocations = [new PathLocation(0x99, 0xA5)];
 	this.currentTileLocationEvents = [];
 	this.encounterTrackerEnabled = true;
-	this.encounterTrackerDistance = 4;
+	this.encounterTrackerDistance = 64;
 	this.updateEncounterTracker();
     
     // create a canvas
