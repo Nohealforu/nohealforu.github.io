@@ -51,7 +51,7 @@ const worldMapTileFight = {
 	FightOcean: -4
 };	
 
-const  = {
+const teleportEntryRequirement = {
 	None: 0,
 	Crown: 1,
 	Cube: 2,
