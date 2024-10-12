@@ -2664,8 +2664,6 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
 	
 	if(this.gridX != previousGridX || this.gridY != previousGridY)
 	{
-		if(this.moveMethod != MoveMethod.Airship)
-			Game.updateEncounterTracker();
 		if(this.moveMethod == MoveMethod.Walk || this.moveMethod == MoveMethod.Canoe)
 			Game.checkForTeleport(this.gridX, this.gridY);
 		if(!Game.ship.unboardThisFrame && (this.moveMethod == MoveMethod.Walk || this.moveMethod == MoveMethod.Canoe) && Game.currentMap.overworldMap && Game.ship.active == true && Game.ship.gridX == this.gridX && Game.ship.gridY == this.gridY)
@@ -2704,6 +2702,9 @@ Player.prototype.move = function (delta, direction, active, keyHeld) {
 		}
 		this.ignoreEncounter = false;
 		Game.ship.unboardThisFrame = false;
+
+		if(this.moveMethod != MoveMethod.Airship)
+			Game.updateEncounterTracker();
 		
 		if(tileData.raiseAirship && !this.eventsTriggered[EventTrigger.AIRSHIP] && this.keyItems[KeyItem.FLOATER])
 			Game.processEventTrigger(EventTrigger.AIRSHIP, true);
