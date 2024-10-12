@@ -3757,7 +3757,7 @@ Game.init = function () {
 	this.currentPathLocations = [new PathLocation(0x99, 0xA5)];
 	this.currentTileLocationEvents = [];
 	this.encounterTrackerEnabled = true;
-	this.encounterTrackerDistance = 64;
+	this.encounterTrackerDistance = 128;
 	this.updateEncounterTracker();
     
     // create a canvas
@@ -4260,7 +4260,9 @@ Game.updateEncounterTracker = function ()
 	let encounterStringOutput = ['Upcoming Encounters'];
 	if(this.possibleEncounterNumbers.length > 0)
 	{
-		this.possibleEncounterNumbers.sort();
+		this.possibleEncounterNumbers.sort(function(a, b) {
+		  return a - b;
+		});
 		for(let i = 0; i < this.possibleEncounterNumbers.length; i++)
 		{
 			let encounterNumber = this.possibleEncounterNumbers[i];
