@@ -3059,7 +3059,7 @@ Controller.prototype.render = function()
     this.context.drawImage(this.effectsCanvas, 0, 0);
 };
 
-function EncounterTrackerTile(map, x, y, steps, safeSteps, moveMethod, warpInformation, displayEncounter, stepCounter1, stepCounter2, encounterNumber, currentDomain, encounterGroup = null, encounterId = null)
+function EncounterTrackerTile(map, x, y, steps, safeSteps, moveMethod, warpInformation, displayEncounter, stepCounter1, stepCounter2, encounterNumber, currentDomain, encounterGroup = null, encounterId = null, encounterChance = null)
 {
 	this.map = map;
 	this.x = x;
@@ -3075,6 +3075,7 @@ function EncounterTrackerTile(map, x, y, steps, safeSteps, moveMethod, warpInfor
 	this.currentDomain = currentDomain;
 	this.encounterGroup = encounterGroup;
 	this.encounterId = encounterId;
+	this.encounterChance = encounterChance;
 }
 
 EncounterTrackerTile.prototype.getUniqueIndex = function ()
@@ -4242,6 +4243,7 @@ Game.updateEncounterTracker = function ()
 			{
 				encounterStringOutput.push(encounterStringGroup.join('<br/>'));
 				encounterNumber = possibleEncounter.encounterNumber;
+				encounterStringGroup = ['Encounter Number: ' + encounterNumber];
 			}
 			encounterStringGroup.push(possibleEncounter.toEncounterString());
 		}
@@ -4348,7 +4350,7 @@ Game.queueAdjacentTrackerTile = function(currentEncounterTile, direction)
 	}
 	
 	let incrementEncounter = currentEncounterTile.checkForIncrementEncounter(tileData, movementType, teleported);
-	adjacentEncounterTile = new EncounterTrackerTile(encounterTileMap, gridX, gridY, encounterTrackerSteps, incrementEncounter.safeSteps, movementType, warpInformation, incrementEncounter.encounterExpected, incrementEncounter.stepCounter1, incrementEncounter.stepCounter2, incrementEncounter.encounterNumber, currentDomain, incrementEncounter.encounterGroup, incrementEncounter.encounterId);
+	adjacentEncounterTile = new EncounterTrackerTile(encounterTileMap, gridX, gridY, encounterTrackerSteps, incrementEncounter.safeSteps, movementType, warpInformation, incrementEncounter.encounterExpected, incrementEncounter.stepCounter1, incrementEncounter.stepCounter2, incrementEncounter.encounterNumber, currentDomain, incrementEncounter.encounterGroup, incrementEncounter.encounterId, incrementEncounter.encounterChance);
 	let adjacentEncounterTileIndex = adjacentEncounterTile.getUniqueIndex();
 	let existingAdjacentEncounterTile = this.encounterTrackerTiles[adjacentEncounterTileIndex];
 	if(existingAdjacentEncounterTile != null)
@@ -4715,6 +4717,7 @@ Game.render = function () {
 
     // draw the map layers into game context
     this.ctx.drawImage(this.layerCanvas, 0, 0);
+    this.ctx.drawImage(this.encounterCanvas, 0, 0);
     this.ctx.drawImage(this.pathCanvas, 0, 0);
     this.ctx.drawImage(this.spriteCanvas, 0, 0);
 	if(this.player.teleporting)
