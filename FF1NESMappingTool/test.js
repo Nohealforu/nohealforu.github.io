@@ -3892,6 +3892,7 @@ Game.processEventTrigger = function (eventNumber, success)
 			let teleport = new teleportEntry('PrincessWarp', 'ConeriaCastle2F', 0xC, 0x7, teleportEntryRequirement.None, true);
 			let dungeonInfo = dungeons[teleport.targetMap];
 			dungeonInfo.storeWarpInformation(new teleportEntry('StoredWarp', 'ConeriaCastle1F', 0xC, 0x12, teleportEntryRequirement.None, false));
+			dungeons['ConeriaCastle1F'].storeWarpInformation(dungeons['ConeriaCastle1F'].exitInformation);
 			spriteNameMap['Rescued Princess'].active = true;
 			this.startTeleport(true, teleport);
 		}
@@ -4236,6 +4237,8 @@ Game.updateEncounterTracker = function ()
 			if(visitedMapCounts[teleport.targetMap] == null)
 				visitedMapCounts[teleport.targetMap] = 1;
 			teleport = dungeons[teleport.targetMap].warpInformation[dungeons[teleport.targetMap].warpInformation.length - visitedMapCounts[teleport.targetMap]++];
+			if(teleport == null)
+				teleport = dungeons[teleport.targetMap].exitInformation;
 			warpInformation[recursions] = teleport;
 		}
 		warpInformation.reverse();
