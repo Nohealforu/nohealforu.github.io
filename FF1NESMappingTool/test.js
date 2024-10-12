@@ -3141,7 +3141,7 @@ EncounterTrackerTile.prototype.getPotentialAdjacentMovementType = function (tile
     }
 	else if(this.moveMethod == MoveMethod.Canoe && tileData.canoe == false)
 	{
-		if(active && tileData.walk == true)
+		if(tileData.walk == true)
 		{
 			return MoveMethod.Walk;
 		}
