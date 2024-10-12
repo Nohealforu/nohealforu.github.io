@@ -4450,8 +4450,8 @@ Game._drawEncounters = function (map) {
     let endCol = startCol + (this.camera.width) / displayTsize;
     let startRow = Math.floor((this.camera.y - this.camera.height / 2) / displayTsize);
     let endRow = startRow + (this.camera.height) / displayTsize;
-    let offsetX = -this.camera.x + this.camera.width / 2 + startCol * displayTsize;
-    let offsetY = -this.camera.y + this.camera.height / 2 + startRow * displayTsize;
+    let offsetX = -this.camera.x + this.camera.width / 2 + startCol * displayTsize + displayTsize / 2;;
+    let offsetY = -this.camera.y + this.camera.height / 2 + startRow * displayTsize + displayTsize / 2;;
     
     for (let i = 0; i < this.possibleEncounters.length; i++) 
 	{
