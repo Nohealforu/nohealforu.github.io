@@ -4398,7 +4398,7 @@ Game.queueAdjacentTrackerTile = function(currentEncounterTile, direction)
 	
 	if(adjacentEncounterTile.encounterId != null)
 	{
-		if(!this.possibleEncounterNumbers.includes(adjacentEncounterTile.encounterNumber)
+		if(!this.possibleEncounterNumbers.includes(adjacentEncounterTile.encounterNumber))
 	    {
 			this.possibleEncounterNumbers.push(adjacentEncounterTile.encounterNumber);
 			this.possibleEncounterByNumberId[adjacentEncounterTile.encounterNumber] = {};
