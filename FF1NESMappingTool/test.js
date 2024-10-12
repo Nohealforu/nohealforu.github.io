@@ -4282,10 +4282,17 @@ Game.updateEncounterTracker = function ()
 				for(let j = 0; j < encounterIdWithData.length; j++)
 				{
 					let encounterData = encounterIdWithData[j];
-					if(!encounterLocations.includes(encounterData.map.name + ':' + (encounterData.map.overworldMap ? encounterData.currentDomain : 'None')))
+					let domainType = 'Land';
+					if(encounterData.moveMethod == MoveMethod.Ship)
+						domainType = 'Ocean';
+					
+					if(encounterData.moveMethod == MoveMethod.Canoe)
+						domainType = encounterData.currentDomain < 24 ? 'North River' : 'South River';
+					
+					if(!encounterLocations.includes(encounterData.map.name + ':' + (domainType == 'Land' ? (encounterData.map.overworldMap ? encounterData.currentDomain : 'None') : domainType)))
 					{
-						encounterLocations.push(encounterData.map.name + ':' + (encounterData.map.overworldMap ? encounterData.currentDomain : 'None'));
-						encounterStringGroup.push('Encounter Possible in: ' + encounterData.map.name + (encounterData.map.overworldMap ? (' domain: ' + encounterData.currentDomain % 8) + ',' + Math.floor(encounterData.currentDomain / 8) : ''));
+						encounterLocations.push(encounterData.map.name + ':' + (domainType == 'Land' ? (encounterData.map.overworldMap ? encounterData.currentDomain : 'None') : domainType));
+						encounterStringGroup.push('Encounter Possible in: ' + encounterData.map.name + (domainType == 'Land' ? (encounterData.map.overworldMap ? (' domain: ' + encounterData.currentDomain % 8) + ',' + Math.floor(encounterData.currentDomain / 8) : '') : ' ' + domainType));
 					}
 				}
 			}
