@@ -4222,7 +4222,8 @@ Game.updateEncounterTracker = function ()
 	if(!this.encounterTrackerEnabled)
 		return;
     this.encounterTrackerTiles = {};
-	this.possibleEncounters = [];
+	this.possibleEncounterNumbers = [];
+	this.possibleEncounterByNumberId = {};
 	this.encounterTrackerTilesToCheck = [];
 	this.encounterTrackerTileIndex = 0;
 	let warpInformation = [];
@@ -4256,23 +4257,37 @@ Game.updateEncounterTracker = function ()
 		this.encounterTrackerTileIndex++;
 	}
 	let encounterStringOutput = ['Upcoming Encounters'];
-	if(this.possibleEncounters.length > 0)
+	if(this.possibleEncounterNumbers.length > 0)
 	{
-		let encounterNumber = this.possibleEncounters[0].encounterNumber;
-		let encounterStringGroup = ['Encounter Number: ' + encounterNumber];
-		encounterStringGroup.push('Encounter Threshold: ' + this.possibleEncounters[0].encounterChance);
-		for(let i = 0; i < this.possibleEncounters.length; i++) // will need to potentially sort this and trim down to unique encounters
+		this.possibleEncounterNumbers.sort();
+		for(let i = 0; i < this.possibleEncounterNumbers.length; i++)
 		{
-			let possibleEncounter = this.possibleEncounters[i];
-			if(encounterNumber != possibleEncounter.encounterNumber)
+			let encounterNumber = this.possibleEncounterNumbers[i];
+			let encounterStringGroup = ['Encounter Number: ' + encounterNumber];
+			let encounterIdsWithData = this.possibleEncounterByNumberId[encounterNumber];
+			for(const encounterIdWithData in encounterIdsWithData)
 			{
-				encounterStringOutput.push(encounterStringGroup.join('<br/>'));
-				encounterNumber = possibleEncounter.encounterNumber;
-				encounterStringGroup = ['Encounter Number: ' + encounterNumber];
+				let encounterLocations = [];
+				let firstEncounter = encounterIdWithData[0];
+				let encounter = encounters[firstEncounter.encounterId];
+				let fightDetails = (encounter.slot1.maximum > 0 ? encounter.getSlotInfo('slot1') : '') + 
+								   (encounter.slot2.maximum > 0 ? ', ' + encounter.getSlotInfo('slot2') : '') + 
+								   (encounter.slot3.maximum > 0 ? ', ' + encounter.getSlotInfo('slot3') : '') + 
+								   (encounter.slot4.maximum > 0 ? ', ' + encounter.getSlotInfo('slot4') : '');
+				if(fightNumber > 127)
+					fightNumber = (fightNumber - 128) + '-2';
+				encounterStringGroup.push(<br/>Fight: ' + fightNumber + ' surprise(' + encounter.surprise +') can run(' + encounter.runnable + '): ' + fightDetails);
+				for(let j = 0; j < encounterIdWithData; j++)
+				{
+					if(!encounterLocations.includes(firstEncounter.map.name + ':' + (firstEncounter.map.overworldMap ? firstEncounter.currentDomain : 'None'))
+					{
+						encounterLocations.push(firstEncounter.map.name + ':' + (firstEncounter.map.overworldMap ? firstEncounter.currentDomain : 'None'));
+						encounterStringGroup.push('Encounter Possible in: ' + firstEncounter.map.name + (firstEncounter.map.overworldMap ? (' domain: ' + firstEncounter.currentDomain % 8) + ',' + Math.floor(firstEncounter.currentDomain / 8) : ''));
+					}
+				}
 			}
-			encounterStringGroup.push(possibleEncounter.toEncounterString());
+			encounterStringOutput.push(encounterStringGroup.join('<br/>'));
 		}
-		encounterStringOutput.push(encounterStringGroup.join('<br/>'));
 	}
 	document.getElementById('possibleEncounters').innerHTML = encounterStringOutput.join('<br/><br/>');
 };
@@ -4382,7 +4397,18 @@ Game.queueAdjacentTrackerTile = function(currentEncounterTile, direction)
 		return;
 	
 	if(adjacentEncounterTile.encounterId != null)
-		this.possibleEncounters.push(adjacentEncounterTile);
+	{
+		if(!this.possibleEncounterNumbers.includes(adjacentEncounterTile.encounterNumber)
+	    {
+			this.possibleEncounterNumbers.push(adjacentEncounterTile.encounterNumber);
+			this.possibleEncounterByNumberId[adjacentEncounterTile.encounterNumber] = {};
+		}
+		
+		if(this.possibleEncounterByNumberId[adjacentEncounterTile.encounterNumber][adjacentEncounterTile.encounterId] == null)
+			this.possibleEncounterByNumberId[adjacentEncounterTile.encounterNumber][adjacentEncounterTile.encounterId] = [adjacentEncounterTile];
+		else
+			this.possibleEncounterByNumberId[adjacentEncounterTile.encounterNumber][adjacentEncounterTile.encounterId].push(adjacentEncounterTile);
+	}
 	
 	this.encounterTrackerTiles[adjacentEncounterTileIndex] = adjacentEncounterTile;
 	this.encounterTrackerTilesToCheck.push(adjacentEncounterTile);
