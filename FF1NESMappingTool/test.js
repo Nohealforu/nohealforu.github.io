@@ -3081,8 +3081,9 @@ function EncounterTrackerTile(map, x, y, steps, safeSteps, moveMethod, warpInfor
 EncounterTrackerTile.prototype.getUniqueIndex = function ()
 {
 	let teleportEntry = this.warpInformation.length > 0 ? this.warpInformation[this.warpInformation.length - 1] : null;
-	let teleportOrigin = teleportEntry == null ? 'None' : teleportEntry.gridX + ',' + teleportEntry.gridY;
-	return this.map.name + '|' + this.x + ',' + this.y + '|' + teleportOrigin;
+	// maybe a bit too unique given how multiple teleports work with towns, etc.
+	//let teleportOrigin = teleportEntry == null ? 'None' : teleportEntry.gridX + ',' + teleportEntry.gridY;
+	return this.map.name + '|' + this.x + ',' + this.y;// + '|' + teleportOrigin;
 }
 
 EncounterTrackerTile.prototype.getNewCoords = function(direction)
@@ -3222,7 +3223,7 @@ EncounterTrackerTile.prototype.checkForIncrementEncounter = function (tileData, 
 
 EncounterTrackerTile.prototype.toEncounterString = function ()
 {
-	return this.map.name + (this.currentDomain != null ? ' domain: ' + this.currentDomain : '') + ' Encounter Group: ' + this.encounterGroup + ' EncounterId: ' + this.encounterId + ' Steps: ' + this.steps + ' Safe Steps: ' + this.safeSteps;
+	return this.map.name + (this.map.overworldMap != null ? ' domain: ' + this.currentDomain : '') + ' Encounter Group: ' + this.encounterGroup + ' EncounterId: ' + this.encounterId + ' Steps: ' + this.steps + ' Safe Steps: ' + this.safeSteps;
 }
 
 MapSaveData = function(mapName, room)
