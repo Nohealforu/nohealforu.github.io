@@ -4222,6 +4222,7 @@ Game.updateEncounterTracker = function ()
 	if(!this.encounterTrackerEnabled)
 		return;
     this.encounterTrackerTiles = {};
+	this.possibleEncounters = [];
 	this.possibleEncounterNumbers = [];
 	this.possibleEncounterByNumberId = {};
 	this.encounterTrackerTilesToCheck = [];
@@ -4399,6 +4400,7 @@ Game.queueAdjacentTrackerTile = function(currentEncounterTile, direction)
 	
 	if(adjacentEncounterTile.encounterId != null)
 	{
+		this.possibleEncounters.push(adjacentEncounterTile);
 		if(!this.possibleEncounterNumbers.includes(adjacentEncounterTile.encounterNumber))
 	    {
 			this.possibleEncounterNumbers.push(adjacentEncounterTile.encounterNumber);
