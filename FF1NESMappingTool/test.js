@@ -3230,6 +3230,9 @@ MapSaveData = function(mapName, room)
 {
 	this.name = mapName;
 	this.room = room;
+	this.dungeonWarpInformation = {};
+	for(const dungeonName in dungeons)
+		this.dungeonWarpInformation[dungeonName] = dungeons[dungeonName].warpInformation.slice();
 }
 
 PlayerSaveData = function(active, gridX, gridY, moveMethod, keyItems, eventsTriggered)
@@ -3238,12 +3241,8 @@ PlayerSaveData = function(active, gridX, gridY, moveMethod, keyItems, eventsTrig
 	this.gridX = gridX;
 	this.gridY = gridY;
 	this.moveMethod = moveMethod;
-	this.keyItems = [];
-	this.eventsTriggered = [];
-	for(let i = 0; i < keyItems.length; i++)
-		this.keyItems[i] = keyItems[i];
-	for(let i = 0; i < eventsTriggered.length; i++)
-		this.eventsTriggered[i] = eventsTriggered[i];
+	this.keyItems = keyItems.slice();
+	this.eventsTriggered = eventsTriggered.slice();
 }
 
 SpriteSaveDatum = function(name, active, gridX, gridY, triggered, followPlayer)
@@ -3306,6 +3305,8 @@ Checkpoint.prototype.loadCheckpoint = function(player, resetType)
 	
 	if(resetType == ResetType.Path)
 	{
+		for(const dungeonName in dungeons)
+			dungeons[dungeonName].warpInformation = this.mapSaveData.dungeonWarpInformation[dungeonName].slice();
 		Game.stepCounter1 = this.gameSaveData.stepCounter1;
 		Game.stepCounter2 = this.gameSaveData.stepCounter2;
 		Game.encounterGroup = this.gameSaveData.encounterGroup;
@@ -3325,6 +3326,8 @@ Checkpoint.prototype.loadCheckpoint = function(player, resetType)
 	}
 	else if(resetType == ResetType.Hard)
 	{
+		for(const dungeonName in dungeons)
+			dungeons[dungeonName].warpInformation = this.mapSaveData.dungeonWarpInformation[dungeonName].slice();
 		Game.stepCounter1 = 0xFF;
 		Game.stepCounter2 = 0xFF;
 		Game.encounterChance = 0x45;
