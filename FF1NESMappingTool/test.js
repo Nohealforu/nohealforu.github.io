@@ -4323,6 +4323,14 @@ Game.queueAdjacentTrackerTile = function(currentEncounterTile, direction)
 	let warpInformation = currentEncounterTile.warpInformation;
 	let gridX = newCoords.x;
 	let gridY = newCoords.y;
+	if(gridX >= encounterTileMap.maxCol)
+		gridX -= encounterTileMap.maxCol;
+	else if(gridX < 0)
+		gridX += encounterTileMap.maxCol;
+	if(gridY >= encounterTileMap.maxRow)
+		gridY -= encounterTileMap.maxRow;
+	else if(gridY < 0)
+		gridY += encounterTileMap.maxRow;
 	let encounterTrackerSteps = currentEncounterTile.steps + 1;
 	let teleported = false;
 	
