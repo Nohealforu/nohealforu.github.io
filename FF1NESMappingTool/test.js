@@ -1691,8 +1691,8 @@ const encounters = {
 	0x8C: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Ogre, 1, 3), new EncounterSlot(enemies.Hyena, 0, 2)),
 	0x0D: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Asp, 1, 2)),
 	0x8D: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Asp, 3, 7)),
-	0x0E: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.GrImp, 0, 5), new EncounterSlot(enemies.WrWolf, 1, 3), new EncounterSlot(enemies.Giant, 0, 2)),
-	0x8E: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.GrImp, 2, 5), new EncounterSlot(enemies.WrWolf, 0, 2)),
+	0x0E: new EncounterInfo(Formation.mix, true, 33, new EncounterSlot(enemies.GrImp, 0, 5), new EncounterSlot(enemies.WrWolf, 1, 3), new EncounterSlot(enemies.Giant, 0, 2)),
+	0x8E: new EncounterInfo(Formation.mix, true, 33, new EncounterSlot(enemies.GrImp, 2, 5), new EncounterSlot(enemies.WrWolf, 0, 2)),
 	0x0F: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Geist, 1, 4)),
 	0x8F: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Specter, 2, 5), new EncounterSlot(enemies.Geist, 2, 5)),
 	0x10: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Gargoyle, 2, 3)),
@@ -1863,12 +1863,12 @@ const encounters = {
 	0xE2: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.FrGator, 1, 1), new EncounterSlot(enemies['R.Caribe'], 1, 4)),
 	0x63: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Troll, 1, 2)),
 	0xE3: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Troll, 2, 4)),
-	0x64: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Bull, 1, 2)),
-	0xE4: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Bull, 2, 4)),
+	0x64: new EncounterInfo(Formation.large, true, 27, new EncounterSlot(enemies.Bull, 1, 2)),
+	0xE4: new EncounterInfo(Formation.large, true, 27, new EncounterSlot(enemies.Bull, 2, 4)),
 	0x65: new EncounterInfo(Formation.mix, true, 30, new EncounterSlot(enemies.Caribe, 0, 2), new EncounterSlot(enemies.Gator, 0, 2), new EncounterSlot(enemies.Ocho, 1, 1)),
 	0xE5: new EncounterInfo(Formation.mix, true, 30, new EncounterSlot(enemies.Caribe, 2, 4), new EncounterSlot(enemies.Gator, 0, 2)),
-	0x66: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Arachnid, 1, 2), new EncounterSlot(enemies.Spider, 0, 2)),
-	0xE6: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Arachnid, 3, 6), new EncounterSlot(enemies.Spider, 0, 2)),
+	0x66: new EncounterInfo(Formation.small, true, 55, new EncounterSlot(enemies.Arachnid, 1, 2), new EncounterSlot(enemies.Spider, 0, 2), new EncounterSlot(enemies.Scum, 0, 1), new EncounterSlot(enemies.Muck, 0, 1)),
+	0xE6: new EncounterInfo(Formation.small, true, 55, new EncounterSlot(enemies.Arachnid, 3, 6), new EncounterSlot(enemies.Spider, 0, 2)),
 	0x67: new EncounterInfo(Formation.mix, true, 27, new EncounterSlot(enemies.Catman, 1, 3), new EncounterSlot(enemies['Saber T'], 0, 2)),
 	0xE7: new EncounterInfo(Formation.mix, true, 27, new EncounterSlot(enemies.Catman, 4, 7)),
 	0x68: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Vampire, 2, 5)),
@@ -3345,7 +3345,6 @@ Checkpoint.prototype.loadCheckpoint = function(player, resetType)
 		Game.currentTileLocationEvents.push(new LocationEvent(EventType.Reset, ResetType.Soft));
 	
 	
-	Game.updateEncounterTracker();
 };
 
 StepPath = function(mapName, checkpoint, airship = false)
@@ -3369,11 +3368,11 @@ LocationEvent = function(eventType, eventIndex)
 	this.eventIndex = eventIndex;
 }
 
-Game.createCheckpoint = function(player, useExitCoordinates = false)
+Game.createCheckpoint = function(player, useExitCoordinates = false, shipEnd = false)
 {
 	let exitInformation = (useExitCoordinates ? this.getExitTeleport(true): null);
 	let checkpoint = new Checkpoint(new MapSaveData((useExitCoordinates ? 'WorldMap' : this.currentMap.name), (useExitCoordinates ? false : this.currentMap.showRooms)),
-									new PlayerSaveData(player.active, (useExitCoordinates ? exitInformation.gridX : player.gridX), (useExitCoordinates ? exitInformation.gridY : player.gridY), player.moveMethod, player.keyItems, player.eventsTriggered), 
+									new PlayerSaveData(shipEnd ? false : player.active, (useExitCoordinates ? exitInformation.gridX : player.gridX), (useExitCoordinates ? exitInformation.gridY : player.gridY), shipEnd ? MoveMethod.Ship : player.moveMethod, player.keyItems, player.eventsTriggered), 
 									new SpriteSaveData(), 
 									new GameSaveData(this.stepCounter1, this.stepCounter2, this.encounterGroup, this.encounterChance, this.encounterThreshold, this.encounterNumber));
 	return checkpoint;
@@ -4208,7 +4207,7 @@ Game.handleNewPath = function(gridX, gridY, targetMap, newPathType)
 			this.currentPathLocations.push(new PathLocation(gridX, gridY));
 		this.currentStepPath.pathLocations = this.currentPathLocations;
 		this.stepPaths.push(this.currentStepPath);
-		this.currentStepPath = new StepPath(this.currentMap.name, this.createCheckpoint(this.player), airship);
+		this.currentStepPath = new StepPath(this.currentMap.name, this.createCheckpoint(this.player, false, newPathType == NewPathType.ShipEnd), airship);
 		if(newPathType == NewPathType.ShipStart || newPathType == NewPathType.ShipEnd)
 			this.currentPathLocations = [];
 		else
