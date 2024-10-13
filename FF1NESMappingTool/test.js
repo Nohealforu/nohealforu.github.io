@@ -1601,7 +1601,7 @@ var enemies = {
 	'FrGator': new EnemyInfo('FrGator', 288, 2000, 1890, 56, 1, 2, 72, 20, 48, 143, 142),
 	'Ocho': new EnemyInfo('Ocho', 208, 102, 1224, 20, 1, 3, 52, 24, 24, 116, 176),
 	'Naocho': new EnemyInfo('Naocho', 344, 500, 3189, 35, 1, 3, 86, 32, 24, 170, 200),
-	'Hyrda': new EnemyInfo('Hyrda', 212, 150, 915, 30, 1, 3, 53, 14, 36, 116, 138),
+	'Hydra': new EnemyInfo('Hydra', 212, 150, 915, 30, 1, 3, 53, 14, 36, 116, 138),
 	'R.Hydra': new EnemyInfo('R.Hydra', 182, 400, 1215, 20, 1, 3, 46, 14, 36, 103, 152),
 	'Guard': new EnemyInfo('Guard', 200, 400, 1224, 25, 1, 2, 50, 40, 72, 110, 200),
 	'Sentry': new EnemyInfo('Sentry', 400, 2000, 4000, 102, 1, 1, 90, 48, 96, 160, 150),
@@ -2820,6 +2820,7 @@ Ship.prototype.board = function(player)
 
 Ship.prototype.unboard = function(player, river)
 {
+	Game.handleNewPath(player.gridX, player.gridY, 'WorldMap', NewPathType.ShipEnd);
 	this.direction = Directions.Right;
 	player.active = true;
 	player.moveMethod = (river ? MoveMethod.Canoe : MoveMethod.Walk);
@@ -2829,7 +2830,6 @@ Ship.prototype.unboard = function(player, river)
     this.gridX = player.gridX;
     this.gridY = player.gridY;
 	this.unboardThisFrame = true;
-	Game.handleNewPath(player.gridX, player.gridY, 'WorldMap', NewPathType.ShipEnd);
 };
 
 Ship.prototype.getAnimationFrame = function (frames) {
@@ -3368,11 +3368,11 @@ LocationEvent = function(eventType, eventIndex)
 	this.eventIndex = eventIndex;
 }
 
-Game.createCheckpoint = function(player, useExitCoordinates = false, shipEnd = false)
+Game.createCheckpoint = function(player, useExitCoordinates = false)
 {
 	let exitInformation = (useExitCoordinates ? this.getExitTeleport(true): null);
 	let checkpoint = new Checkpoint(new MapSaveData((useExitCoordinates ? 'WorldMap' : this.currentMap.name), (useExitCoordinates ? false : this.currentMap.showRooms)),
-									new PlayerSaveData(shipEnd ? false : player.active, (useExitCoordinates ? exitInformation.gridX : player.gridX), (useExitCoordinates ? exitInformation.gridY : player.gridY), shipEnd ? MoveMethod.Ship : player.moveMethod, player.keyItems, player.eventsTriggered), 
+									new PlayerSaveData(player.active, (useExitCoordinates ? exitInformation.gridX : player.gridX), (useExitCoordinates ? exitInformation.gridY : player.gridY), player.moveMethod, player.keyItems, player.eventsTriggered), 
 									new SpriteSaveData(), 
 									new GameSaveData(this.stepCounter1, this.stepCounter2, this.encounterGroup, this.encounterChance, this.encounterThreshold, this.encounterNumber));
 	return checkpoint;
@@ -4207,7 +4207,7 @@ Game.handleNewPath = function(gridX, gridY, targetMap, newPathType)
 			this.currentPathLocations.push(new PathLocation(gridX, gridY));
 		this.currentStepPath.pathLocations = this.currentPathLocations;
 		this.stepPaths.push(this.currentStepPath);
-		this.currentStepPath = new StepPath(this.currentMap.name, this.createCheckpoint(this.player, false, newPathType == NewPathType.ShipEnd), airship);
+		this.currentStepPath = new StepPath(this.currentMap.name, this.createCheckpoint(this.player), airship);
 		if(newPathType == NewPathType.ShipStart || newPathType == NewPathType.ShipEnd)
 			this.currentPathLocations = [];
 		else
