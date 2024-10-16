@@ -3473,8 +3473,14 @@ Game.handleColorChange = function (colorElement)
 
 Game.handleColorRotation = function (rotationElement)
 {
-this.colorRotation = parseInt(rotationElement.value);
-this._drawPath(this.currentMap)
+	this.colorRotation = parseInt(rotationElement.value);
+	this._drawPath(this.currentMap)
+};
+
+Game.handleEncounterDistanceChange = function (sliderElement)
+{
+	this.encounterTrackerDistance = parseInt(sliderElement.value);
+	this.updateEncounterTracker();
 };
 
 Game.handleWarp = function() 
