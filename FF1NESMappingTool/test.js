@@ -4242,13 +4242,13 @@ Game.updateEncounterTracker = function ()
 		let visitedMapCounts = {};
 		let teleport = this.currentDungeon.warpInformation[this.currentDungeon.warpInformation.length - 1];
 		warpInformation[recursions] = teleport;
-		visitedMapCounts[teleport.targetMap] = 1;
-		while(teleport.targetMap != 'WorldMap' && recursions++ < this.encounterTrackerDistance)
+		visitedMapCounts[this.currentDungeon.label] = 1;
+		while(teleport.targetMap != 'WorldMap' && teleport.targetMap != 'WARP' && recursions++ < this.encounterTrackerDistance)
 		{
 			let targetMap = teleport.targetMap;
 			if(visitedMapCounts[targetMap] == null)
-				visitedMapCounts[targetMap] = 1;
-			teleport = dungeons[targetMap].warpInformation[dungeons[targetMap].warpInformation.length - visitedMapCounts[targetMap]++];
+				visitedMapCounts[targetMap] = 0;
+			teleport = dungeons[targetMap].warpInformation[dungeons[targetMap].warpInformation.length - ++visitedMapCounts[targetMap]];
 			if(teleport == null)
 				teleport = dungeons[targetMap].exitInformation;
 			warpInformation[recursions] = teleport;
