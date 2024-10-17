@@ -3164,7 +3164,7 @@ EncounterTrackerTile.prototype.getPotentialAdjacentMovementType = function (tile
 
 EncounterTrackerTile.prototype.checkForIncrementEncounter = function (tileData, moveMethod, teleported, currentDomain)
 {
-	let encounterInfo = {safeSteps: this.safeSteps + 1, stepCounter1: this.stepCounter1, stepCounter2: this.stepCounter2, encounterNumber: this.encounterNumber, encounterGroup: null, encounterId: null, encounterChance: 8};
+	let encounterInfo = {safeTile: true, safeSteps: this.safeSteps + 1, stepCounter1: this.stepCounter1, stepCounter2: this.stepCounter2, encounterNumber: this.encounterNumber, encounterGroup: null, encounterId: null, encounterChance: 8};
 	
 	//if swapping between walk, canoe, ship or teleport, there is no increment of rng
 	//or walking onto a safe tile
@@ -3174,6 +3174,7 @@ EncounterTrackerTile.prototype.checkForIncrementEncounter = function (tileData, 
 	   (moveMethod == MoveMethod.Ship && tileData.fight == worldMapTileFight.FightOcean)))
 		return encounterInfo;
 	
+	encounterInfo.safeTile = false;
 	
 	encounterInfo.safeSteps = this.safeSteps;
 	if(encounterInfo.stepCounter2 < 0x80)
@@ -4234,7 +4235,9 @@ Game.updateEncounterTracker = function ()
 	this.possibleEncounterNumbers = [];
 	this.possibleEncounterByNumberId = {};
 	this.encounterTrackerTilesToCheck = [];
+	this.encounterTrackerSafeTilesToCheck = [];
 	this.encounterTrackerTileIndex = 0;
+	this.encounterTrackerSafeTileIndex = 0;
 	let warpInformation = [];
 	if(!this.currentMap.overworldMap && this.currentDungeon.warpInformation.length > 0)
 	{
@@ -4259,11 +4262,20 @@ Game.updateEncounterTracker = function ()
 	let currentEncounterTile = new EncounterTrackerTile(this.currentMap, this.player.gridX, this.player.gridY, 0, 0, this.player.moveMethod, warpInformation, false, this.stepCounter1, this.stepCounter2, this.encounterNumber, this.player.currentDomain);
 	this.encounterTrackerTiles[currentEncounterTile.getUniqueIndex()] = currentEncounterTile;
 	this.queueAdjacentTrackerTiles(currentEncounterTile);
-	while(this.encounterTrackerTileIndex < this.encounterTrackerTilesToCheck.length)
+	while(this.encounterTrackerTileIndex < this.encounterTrackerTilesToCheck.length || this.encounterTrackerSafeTileIndex < this.encounterTrackerSafeTilesToCheck.length)
 	{
-		let currentEncounterTile = this.encounterTrackerTilesToCheck[this.encounterTrackerTileIndex];
-		this.queueAdjacentTrackerTiles(currentEncounterTile);
-		this.encounterTrackerTileIndex++;
+		if(this.encounterTrackerSafeTileIndex < this.encounterTrackerSafeTilesToCheck.length)
+		{
+			let currentEncounterTile = this.encounterTrackerSafeTilesToCheck[this.encounterTrackerSafeTileIndex];
+			this.queueAdjacentTrackerTiles(currentEncounterTile);
+			this.encounterTrackerSafeTileIndex++;
+		}
+		else
+		{
+			let currentEncounterTile = this.encounterTrackerTilesToCheck[this.encounterTrackerTileIndex];
+			this.queueAdjacentTrackerTiles(currentEncounterTile);
+			this.encounterTrackerTileIndex++;
+		}
 	}
 	let encounterStringOutput = ['Upcoming Encounters'];
 	if(this.possibleEncounterNumbers.length > 0)
@@ -4440,7 +4452,10 @@ Game.queueAdjacentTrackerTile = function(currentEncounterTile, direction)
 	}
 	
 	this.encounterTrackerTiles[adjacentEncounterTileIndex] = adjacentEncounterTile;
-	this.encounterTrackerTilesToCheck.push(adjacentEncounterTile);
+	if(incrementEncounter.safeTile)
+		this.encounterTrackerSafeTilesToCheck.push(adjacentEncounterTile);
+	else
+		this.encounterTrackerTilesToCheck.push(adjacentEncounterTile);
 }
 
 Game._loadCells = function (map) {
