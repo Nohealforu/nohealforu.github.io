@@ -2412,6 +2412,3 @@ async function runRoute()
 	console.log(delayStates);
 	console.log(damageTakenStates);
 }
-
-runRoute();
-console.log('Started');
