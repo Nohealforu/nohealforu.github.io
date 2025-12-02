@@ -1191,8 +1191,8 @@ function BattleCharacter(characterData, currentHp = characterData.hp, hitMultipl
 	this.abilityIndex = abilityIndex;
 	this.magicIndex = magicIndex;
 	this.ai = monsterAI[characterData.ai] ?? new MonsterAI(0x00, 0x00, [], []);
-	this.magicSize = this.ai?.magicList?.size ?? 0;
-	this.abilitySize = this.ai?.abilityList?.size ?? 0;
+	this.magicSize = this.ai?.magicList?.length ?? 0;
+	this.abilitySize = this.ai?.abilityList?.length ?? 0;
 }
 
 BattleCharacter.prototype.saveInstance = function(refreshDefense = false)
