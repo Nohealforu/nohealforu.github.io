@@ -910,7 +910,7 @@ const encounters = {
 	0x78: new EncounterInfo(Formation.fiend, false, 4, new EncounterSlot(enemies.Kraken, 1, 1)),
 	0x79: new EncounterInfo(Formation.fiend, false, 4, new EncounterSlot(enemies.Kary, 1, 1)),
 	0x7A: new EncounterInfo(Formation.fiend, false, 4, new EncounterSlot(enemies.Lich, 1, 1)),
-	0x7B: new EncounterInfo(Formation.chaos, false, 4, new EncounterSlot(enemies.Chaos, 1, 1)),
+	0x7B: new EncounterInfo(Formation.chaos, false, 4, new EncounterSlot(enemies.CHAOS, 1, 1)),
 	0x7C: new EncounterInfo(Formation.mix, false, 4, new EncounterSlot(enemies.Vampire, 1, 1)),
 	0x7D: new EncounterInfo(Formation.mix, false, 4, new EncounterSlot(enemies.Astos, 1, 1)),
 	0x7E: new EncounterInfo(Formation.small, false, 4, new EncounterSlot(enemies.Pirate, 9, 9)),
