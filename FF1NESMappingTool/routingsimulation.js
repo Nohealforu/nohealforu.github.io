@@ -1760,7 +1760,7 @@ BattleState.prototype.runTurn = function(delay)
 						let damage = spellInfo.strength;
 						if (target != null && target != targetOption)
 							continue;
-						let targetCharacter = battleCharacter[targetOption];
+						let targetCharacter = this.battleCharacters[targetOption];
 						if (!targetCharacter.canTarget())
 							continue;
 						let resistant = (targetCharacter.resistances & spellInfo.element) > 0;
@@ -1797,7 +1797,7 @@ BattleState.prototype.runTurn = function(delay)
 					{
 						if (target != null && target != targetOption)
 							continue;
-						let targetCharacter = battleCharacter[targetOption];
+						let targetCharacter = this.battleCharacters[targetOption];
 						if (!targetCharacter.canTarget())
 							continue;
 						let resistant = (targetCharacter.resistances & spellInfo.element) > 0;
@@ -1850,7 +1850,7 @@ BattleState.prototype.runTurn = function(delay)
 					{
 						if (target != null && target != targetOption)
 							continue;
-						let targetCharacter = battleCharacter[targetOption];
+						let targetCharacter = this.battleCharacters[targetOption];
 						if (!targetCharacter.canTarget())
 							continue;
 						
@@ -1873,7 +1873,7 @@ BattleState.prototype.runTurn = function(delay)
 					{
 						if (target != null && target != targetOption)
 							continue;
-						let targetCharacter = battleCharacter[targetOption];
+						let targetCharacter = this.battleCharacters[targetOption];
 						if (!targetCharacter.canTarget())
 							continue;
 						let resistant = (targetCharacter.resistances & spellInfo.element) > 0;
@@ -1976,10 +1976,17 @@ function runBattle(currentState, encounter, redoBattleEndState, redoBattleNextSt
 	let currentIterationCount = 0;
 	let redoBattle = redoBattleEndState != null;
 	let delay = redoBattle ? (delayStates[battleState.index] ?? 0) : 0;
-	let damageTaken = battleState.runTurn(delay);
-	while(!battleState.battleComplete)
+	let damageTaken;
+	do 
 	{
 		currentIterationCount++;
+		damageTaken = battleState.runTurn(delay);
+		
+		if(battleState.battleComplete && redoBattle && !battleState.improvedEndState(redoBattleEndState, redoBattleNextState))
+		{
+			battleState.battleComplete = false;
+			battleState.badTurn = true;
+		}
 		if(battleState.partyWipe || battleState.badTurn)
 		{
 			delay++;
@@ -1993,7 +2000,7 @@ function runBattle(currentState, encounter, redoBattleEndState, redoBattleNextSt
 			}
 			battleState = priorBattleState.newTurn();
 		}
-		else
+		else if(!battleState.battleComplete)
 		{
 			delayStates[battleState.index] = delay; // need some kind of detection for pointless RNG loop
 			damageTakenStates[battleState.index] = damageTaken;
@@ -2005,13 +2012,8 @@ function runBattle(currentState, encounter, redoBattleEndState, redoBattleNextSt
 		{
 			return false;
 		}
-		damageTaken = battleState.runTurn(delay);
-		if(battleState.battleComplete && redoBattle && !battleState.improvedEndState(redoBattleEndState, redoBattleNextState))
-		{
-			battleState.battleComplete = false;
-			battleState.badTurn = true;
-		}
-	}
+	} while(!battleState.battleComplete);
+	
 	delayStates[battleState.index] = delay;
 	damageTakenStates[battleState.index] = damageTaken;
 	return battleState;
@@ -2398,7 +2400,7 @@ async function runRoute()
 			default:
 				console.log('UnknownCommand: ' + currentAction.inputString);
 		}
-		if(currentIterationCount > 1000) // something has probably gone wrong, abort everything
+		if(currentIterationCount > 10000) // something has probably gone wrong, abort everything
 		{
 			console.log('Too many route steps - Please stop and fix your route');
 			console.log(delayStates);
