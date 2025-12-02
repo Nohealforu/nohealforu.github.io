@@ -1060,7 +1060,7 @@ const EXPTable = [
 ];
 
 
-function PlayerInfo(name, characterClass, classChanged, level, exp, hp, str, agi, int, vit, luck, evade, absorb, hits, hit, attack, crit, mdef, weaknesses, resistances, weapon, armor, helmet, gloves, shield)
+function PlayerInfo(name, characterClass, classChanged, level, exp, hp, str, agi, int, vit, luck, evade, absorb, hits, hit, attack, crit, mdef, weaknesses, resistances, weapon, armor, shield, helmet, glove)
 {
 	this.name = name;
 	this.characterClass = characterClass;
@@ -1083,13 +1083,13 @@ function PlayerInfo(name, characterClass, classChanged, level, exp, hp, str, agi
 	this.weaknesses = weaknesses;
 	this.resistances = resistances;
 	this.weapon = weapon;
-	this.armor = [armor, shield, helmet, gloves];
+	this.armor = [armor, shield, helmet, glove];
 }
 
 // create snapshot of player stats at the current point
 PlayerInfo.prototype.saveInstance = function ()
 {
-	return new PlayerInfo(this.name, this.characterClass, this.classChanged, this.level, this.exp, this.hp, this.str, this.agi, this.int, this.vit, this.luck, this.evade, this.absorb, this.hits, this.hit, this.attack, this.crit, this.mdef, this.weaknesses, this.resistances, this.weapon, this.armor[Slot.Armor], this.armor[Slot.Helmet], this.armor[Slot.Gloves], this.armor[Slot.Shield]);
+	return new PlayerInfo(this.name, this.characterClass, this.classChanged, this.level, this.exp, this.hp, this.str, this.agi, this.int, this.vit, this.luck, this.evade, this.absorb, this.hits, this.hit, this.attack, this.crit, this.mdef, this.weaknesses, this.resistances, this.weapon, this.armor[Slot.Armor], this.armor[Slot.Shield], this.armor[Slot.Helmet], this.armor[Slot.Glove]);
 };
 
 PlayerInfo.prototype.updateSwings = function()
@@ -1610,17 +1610,17 @@ BattleState.prototype.runTurn = function(delay)
 			continue;
 		if (characterIndex > 127 && (character.status & (StatusEffect.stop | StatusEffect.sleep | StatusEffect.conf)) > 0)
         {   
-            if (character.status & (StatusEffect.stop | StatusEffect.conf) > 0)
+            if ((character.status & (StatusEffect.stop | StatusEffect.conf)) > 0)
             {
                 let roll = this.getRandomNumber();
                 if (roll % 4 == 0)
-                    heroList[slot].status &= ~0x90;
+                    character.status &= ~0x90;
             }
-            else if (character.status & StatusEffect.sleep > 0)
+            else if ((character.status & StatusEffect.sleep) > 0)
             {
                 let roll = this.getRandomNumber(0, 80);
                 if (roll < character.characterData.hp)
-                    heroList[slot].status &= ~0x20;
+                    character.status &= ~0x20;
             }
 			continue;
 		}
@@ -1706,7 +1706,7 @@ BattleState.prototype.runTurn = function(delay)
 				if (hitCount < 1)
 					hitCount = 1;
 				
-				let statusThreshold = character.characterData.weaknesses & targetCharacter.resistances > 0 ? 0 : 100 - targetCharacter.characterData.mdef;
+				let statusThreshold = (character.characterData.weaknesses & targetCharacter.resistances) > 0 ? 0 : 100 - targetCharacter.characterData.mdef;
 				let result = this.rollAttacks(hitCount, character.characterData.hit, character.characterData.attack, character.characterData.crit,
 										 targetCharacter.evade, targetCharacter.absorb, character.characterData.attackEffects > 0, statusThreshold,
 										 character.status, targetCharacter.status);
@@ -1761,7 +1761,7 @@ BattleState.prototype.runTurn = function(delay)
 						if (target != null && target != targetOption)
 							continue;
 						let targetCharacter = this.battleCharacters[targetOption];
-						if (!targetCharacter.canTarget())
+						if (targetCharacter == null || !targetCharacter.canTarget())
 							continue;
 						let resistant = (targetCharacter.resistances & spellInfo.element) > 0;
 						if (resistant)
@@ -1798,7 +1798,7 @@ BattleState.prototype.runTurn = function(delay)
 						if (target != null && target != targetOption)
 							continue;
 						let targetCharacter = this.battleCharacters[targetOption];
-						if (!targetCharacter.canTarget())
+						if (targetCharacter == null || !targetCharacter.canTarget())
 							continue;
 						let resistant = (targetCharacter.resistances & spellInfo.element) > 0;
 						this.incrementRandomIndex(1);
@@ -1851,7 +1851,7 @@ BattleState.prototype.runTurn = function(delay)
 						if (target != null && target != targetOption)
 							continue;
 						let targetCharacter = this.battleCharacters[targetOption];
-						if (!targetCharacter.canTarget())
+						if (targetCharacter == null || !targetCharacter.canTarget())
 							continue;
 						
 						targetCharacter.hitMultiplier = Math.min(targetCharacter.hitMultiplier + 1, 2);
@@ -1874,13 +1874,13 @@ BattleState.prototype.runTurn = function(delay)
 						if (target != null && target != targetOption)
 							continue;
 						let targetCharacter = this.battleCharacters[targetOption];
-						if (!targetCharacter.canTarget())
+						if (targetCharacter == null || !targetCharacter.canTarget())
 							continue;
 						let resistant = (targetCharacter.resistances & spellInfo.element) > 0;
 						
 						// probably need to later add in the if weak thing?
 						// later weakness calculations go here
-						if (targetCharacter.currentHp < 300 && !(heroList[target].resistance & element))
+						if (targetCharacter.currentHp < 300 && !(targetCharacter.resistance & spellInfo.element))
 						{
 							targetCharacter.currentHp.hp = 0;
 							targetCharacter.status |= StatusEffect.dead;
@@ -1898,6 +1898,8 @@ BattleState.prototype.runTurn = function(delay)
 	if(playerDamageTaken > averageDamageThreshold * 2)
 		this.badTurn = true;
 	if(playerDamageTaken == 0 && playerDamageDealt == 0 && this.turn > 1) // idk figure out something better to track average damage or something
+		this.badTurn = true;
+	if(this.battleCharacters[0x80].status > 0) // poison could be acceptable, or secondary characters dying pre garland, but /shrug
 		this.badTurn = true;
 	return playerDamageTaken;
 };
@@ -1987,10 +1989,10 @@ function runBattle(currentState, encounter, redoBattleEndState, redoBattleNextSt
 			battleState.battleComplete = false;
 			battleState.badTurn = true;
 		}
-		if(battleState.partyWipe || battleState.badTurn)
+		if(battleState.partyWipe || battleState.badTurn) 
 		{
 			delay++;
-			if(battleState.abortPath || delay == 256)
+			if(battleState.abortPath || delay == 256 || battleState.encounterState == EncounterState.Ambushed)
 			{
 				priorBattleState = battleStates[battleState.index - 2];
 				battleState = battleStates[battleState.index - 1];
@@ -2066,7 +2068,7 @@ function RouteAction(actionString)
 				break;
 			case 'UnequipArmor':
 				this.action = Action.UnequipArmor;
-				this.slot = (parseInt(splitAction[1]) || 0);
+				this.slot = (parseInt(splitAction[1]) || armor[splitAction[1]]?.slot || 0);
 				this.characterSlot = (parseInt(splitAction[2]) || 0x80);
 				break;
 			case 'Heal': // might need a heal all or parameter for that
@@ -2310,7 +2312,7 @@ new RouteAction('Encounter 0x77'),
 new RouteAction('Encounter 0x7B'),
 ];
 
-//PlayerInfo(name, characterClass, classChanged, level, exp, hp, str, agi, int, vit, luck, evade, absorb, hits, hit, attack, crit, mdef, weaknesses, resistances, weapon, armor, helmet, gloves, shield)
+//PlayerInfo(name, characterClass, classChanged, level, exp, hp, str, agi, int, vit, luck, evade, absorb, hits, hit, attack, crit, mdef, weaknesses, resistances, weapon, armor, shield, helmet, glove)
 
 let testCharacters = {
 	0: null,
@@ -2355,7 +2357,7 @@ async function runRoute()
 				if(i == highestIndex)
 					encounterIndexes[encounterCount] = i;
 				startingBattleStates[encounterCount] = currentState;
-				debugFightsRan[debugFightsRanIndex++] = {count: encounterCount, randomIndex: currentState.randomNumberIndex, delayStates:delayStates[currentState.index], stateIndex: currentState.index};
+				debugFightsRan[debugFightsRanIndex++] = {count: encounterCount, randomIndex: currentState.randomNumberIndex, delayState:delayStates[currentState.index], stateIndex: currentState.index, hp: currentState.battleCharacters[0x80].currentHp, encounter: currentAction.encounterIndex};
 				let endOfBattleState = await runBattle(currentState, currentAction.encounterIndex, redoBattle ? endingBattleStates[encounterCount] : null, redoBattle ? startingBattleStates[encounterCount] : null);
 				if(!endOfBattleState) // if the battle failed, go backwards to the previous battle
 				{
