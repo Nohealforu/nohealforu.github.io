@@ -2400,7 +2400,7 @@ async function runRoute()
 			default:
 				console.log('UnknownCommand: ' + currentAction.inputString);
 		}
-		if(currentIterationCount > 10000) // something has probably gone wrong, abort everything
+		if(currentIterationCount > 1000) // something has probably gone wrong, abort everything
 		{
 			console.log('Too many route steps - Please stop and fix your route');
 			console.log(delayStates);
