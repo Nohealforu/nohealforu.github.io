@@ -1195,9 +1195,9 @@ function BattleCharacter(characterData, currentHp = characterData.hp, hitMultipl
 	this.abilitySize = this.ai?.abilityList?.size ?? 0;
 }
 
-BattleCharacter.prototype.saveInstance = function()
+BattleCharacter.prototype.saveInstance = function(refreshDefense = false)
 {
-	return new BattleCharacter(this.characterData.saveInstance(), this.currentHp, this.hitMultiplier, this.abilityIndex, this.magicIndex, this.status, this.absorb, this.evade, this.morale, this.resistances);
+	return refreshDefense ? new BattleCharacter(this.characterData.saveInstance(), this.currentHp, this.hitMultiplier, this.abilityIndex, this.magicIndex, this.status, this.characterData.absorb, this.characterData.evade, this.morale, this.characterData.resistances) : new BattleCharacter(this.characterData.saveInstance(), this.currentHp, this.hitMultiplier, this.abilityIndex, this.magicIndex, this.status, this.absorb, this.evade, this.morale, this.resistances);
 };
 
 BattleCharacter.prototype.getNextSpellId = function()
@@ -1468,7 +1468,7 @@ BattleState.prototype.newEncounter = function(encounterIndex, futureCheck = fals
 		battleStates[this.index] = this;
 	let battleCharacters = {};
 	for(let i = 0x80; i < 0x84; i++)
-		battleCharacters[i] = this.battleCharacters[i]?.saveInstance() ?? null;
+		battleCharacters[i] = this.battleCharacters[i]?.saveInstance(true) ?? null;
 	
 	let encounter = encounters[encounterIndex];
 	// Generate enemies
@@ -2297,18 +2297,18 @@ new RouteAction('Encounter 0x57'),
 new RouteAction('Encounter 0x57'),
 new RouteAction('Encounter 0xA1'),
 new RouteAction('Encounter 0xBA'),
-new RouteAction('Encounter 0x7A'),
+new RouteAction('Encounter 0x73'),
 new RouteAction('Encounter 0xA6'),
 new RouteAction('Encounter 0xA8'),
 new RouteAction('Encounter 0xA8'),
 new RouteAction('Encounter 0xA6'),
 new RouteAction('Encounter 0xA6'),
-new RouteAction('Encounter 0x79'),
+new RouteAction('Encounter 0x74'),
 new RouteAction('Encounter 0xC9'),
 new RouteAction('Encounter 0xC9'),
-new RouteAction('Encounter 0x78'),
+new RouteAction('Encounter 0x75'),
 new RouteAction('Encounter 0xD4'),
-new RouteAction('Encounter 0x77'),
+new RouteAction('Encounter 0x76'),
 new RouteAction('Encounter 0x7B'),
 ];
 
@@ -2402,7 +2402,7 @@ async function runRoute()
 			default:
 				console.log('UnknownCommand: ' + currentAction.inputString);
 		}
-		if(currentIterationCount > 1000) // something has probably gone wrong, abort everything
+		if(currentIterationCount > 5000) // something has probably gone wrong, abort everything
 		{
 			console.log('Too many route steps - Please stop and fix your route');
 			console.log(delayStates);
