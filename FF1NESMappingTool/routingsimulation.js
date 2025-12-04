@@ -21,6 +21,18 @@ const partyTargetList = [
 	0x83
 ]
 
+const enemyTargetList = [
+	0,
+	1,
+	2,
+	3,
+	4,
+	5,
+	6,
+	7,
+	8
+]
+
 const StatusEffect = {
 	dead: 0x01,
 	stone: 0x02, 
@@ -45,6 +57,25 @@ const EncounterState = {
 	Normal: 0,
 	FirstStrike: 1,
 	Ambushed: 2
+}
+
+const Action = {
+	None: 0,
+	UnknownCommand: 1,
+	Encounter: 2,
+	ChangeGold: 3,
+	EquipWeapon: 4,
+	UnequipWeapon: 5,
+	EquipArmor: 6,
+	UnequipArmor: 7,
+	Heal: 8,
+	Burn: 9
+}
+
+const EncounterAction = {
+	Fight: 0,
+	Bane: 1,
+	Flee: 2
 }
 
 const randomNumbers = [
@@ -231,6 +262,7 @@ attackResult.prototype.toString  = function attackResultToString()
 }
 
 const SpellNames = [
+	'NONE',
 	'CURE',
 	'HARM',
 	'FOG',
@@ -1228,6 +1260,11 @@ BattleCharacter.prototype.heal = function(amount)
 		this.currentHp = Math.min(this.currentHp + amount, this.characterData.hp);
 }
 
+BattleCharacter.prototype.burn = function(amount)
+{
+	this.currentHp = Math.max(this.currentHp - amount, 1);
+}
+
 BattleCharacter.prototype.canAct = function()
 {
 	return !(this.status & (StatusEffect.dead | StatusEffect.stone | StatusEffect.stop | StatusEffect.sleep) || this.currentHp <= 0);
@@ -1238,11 +1275,11 @@ BattleCharacter.prototype.canTarget = function()
 	return !(this.status & (StatusEffect.dead | StatusEffect.stone) || this.currentHp <= 0);
 };
 
-function PlayerCommand(battleState, command, index = null, targetType = 0, target = null)
+function PlayerCommand(battleState, command, info = null, targetType = 0, target = null)
 {
 	this.command = command;
-	this.index = index;
-	if(command == Command.Fight && target == null)
+	this.info = info;
+	if((command == Command.Fight || targetType == Target.Enemy) && target == null)
 	{
 		target = battleState.getFirstTarget();
 		targetType = Target.Enemy;
@@ -1419,7 +1456,7 @@ BattleState.prototype.getFirstTarget = function()
 }
 
 
-BattleState.prototype.newTurn = function()
+BattleState.prototype.newTurn = function(playerAction)
 {
 	battleStates[this.index] = this;
 	let battleCharacters = {};
@@ -1428,7 +1465,14 @@ BattleState.prototype.newTurn = function()
 	for(let i = 0x80; i < 0x84; i++)
 		battleCharacters[i] = this.battleCharacters[i]?.saveInstance() ?? null;
 	let battleState = new BattleState(1 + this.index, this.randomNumberIndex, this.gold, battleCharacters, this.encounterIndex, this.formation, this.turn + 1);
-	battleState.playerCommands = {0x80: new PlayerCommand(battleState, Command.Fight),0x81: null,0x82: null,0x83: null};
+	let command;
+	if(playerAction == EncounterAction.Fight)
+		command = new PlayerCommand(battleState, Command.Fight);
+	else if(playerAction == EncounterAction.Flee)
+		command = new PlayerCommand(battleState, Command.Flee);
+	else if(playerAction == EncounterAction.Bane)
+		command = new PlayerCommand(battleState, Command.Item, weapons['BaneSword']);
+	battleState.playerCommands = {0x80: command, 0x81: null, 0x82: null, 0x83: null};
 	return battleState;
 };
 
@@ -1462,7 +1506,7 @@ BattleState.prototype.loadEnemySlot = function(formation, slot, enemyCounts, for
 	return enemyCounts;
 }
 
-BattleState.prototype.newEncounter = function(encounterIndex, futureCheck = false)
+BattleState.prototype.newEncounter = function(encounterIndex, playerAction, futureCheck = false)
 {
 	if(!futureCheck)
 		battleStates[this.index] = this;
@@ -1503,7 +1547,14 @@ BattleState.prototype.newEncounter = function(encounterIndex, futureCheck = fals
 	
 	battleState.minimumEnemies = enemyCounts[2];
 	
-	battleState.playerCommands = {0x80: new PlayerCommand(battleState, Command.Fight),0x81: null,0x82: null,0x83: null};
+	let command;
+	if(playerAction == EncounterAction.Fight)
+		command = new PlayerCommand(battleState, Command.Fight);
+	else if(playerAction == EncounterAction.Flee)
+		command = new PlayerCommand(battleState, Command.Flee);
+	else if(playerAction == EncounterAction.Bane)
+		command = new PlayerCommand(battleState, Command.Item, weapons['BaneSword']);
+	battleState.playerCommands = {0x80: command, 0x81: null, 0x82: null, 0x83: null};
 	return battleState;
 };
 
@@ -1673,6 +1724,63 @@ BattleState.prototype.runTurn = function(delay)
 				
 				playerDamageDealt += damageSum;
 			}
+			else if(playerCommand.command == Command.Flee)
+			{
+				// for complete simulation will need to calculate all the bugged values and stuff.
+				// just assuming solo character, so slot 3 == StatusEffect.dead
+				// also put in a runnable check to fail, but if you route to flee from and unrunnable, that's on you when it fails
+				if(this.encounterState == EncounterState.FirstStrike || character.luck > this.getRandomNumber(0, 16))
+				{
+					this.battleComplete = true;
+					return playerDamageTaken;
+				}
+			}
+			else if(playerCommand.command == Command.Magic || playerCommand.command == Command.Item)
+			{
+				let spellInfo = (playerCommand.command == Command.Item ? spells[SpellNames[playerCommand.info.spell]] : playerCommand.info);
+				
+				if (spellInfo.effect == 3 || spellInfo.effect == 4)
+				{
+					// status skills
+					let target;
+					
+					if (spellInfo.target == Target.Enemy)
+						target = playerCommand.target;
+
+					for (let targetOption of enemyTargetList)
+					{
+						if (target != null && target != targetOption)
+							continue;
+						let targetCharacter = this.battleCharacters[targetOption];
+						if (targetCharacter == null || !targetCharacter.canTarget())
+							continue;
+						let resistant = (targetCharacter.resistances & spellInfo.element) > 0;
+						this.incrementRandomIndex(1);
+						
+						// probably need to later add in the if weak thing?
+						// later weakness calculations go here
+						
+						let attackRoll = this.getRandomNumber(0, 200);
+						
+						if(attackRoll != 200 && attackRoll <= Math.max(resistant ? 0 : 148 + spellInfo.hit - targetCharacter.characterData.mdef, 1))
+						{
+							if(spellInfo.effect == 3)
+							{
+								if (!(targetCharacter.status & spellInfo.strength))
+								{
+									targetCharacter.status |= spellInfo.strength;
+									if((targetCharacter.status & (StatusEffect.dead | StatusEffect.stone)) > 0)
+										targetCharacter.currentHp = 0;
+								}
+							}
+							else // spellInfo.effect == 4
+							{
+								targetCharacter.hitMultiplier = Math.max(targetCharacter.hitMultiplier - 1, 0);
+							}
+						}
+					}
+				}
+			}
 			
 			if(this.checkEnemyDead())
 				return playerDamageTaken;
@@ -1772,7 +1880,7 @@ BattleState.prototype.runTurn = function(delay)
 						// later weakness calculations go here
 						
 						let attackRoll = this.getRandomNumber(0, 200);
-						if(attackRoll != 200 && Math.max(resistant ? 0 : 148 + spellInfo.hit - character.mdef, 1) > attackRoll)
+						if(attackRoll != 200 && attackRoll <= Math.max(resistant ? 0 : 148 + spellInfo.hit - targetCharacter.characterData.mdef, 1))
 							damageRoll *= 2;
 						
 						targetCharacter.currentHp -= damageRoll;
@@ -1807,7 +1915,7 @@ BattleState.prototype.runTurn = function(delay)
 						// later weakness calculations go here
 						
 						let attackRoll = this.getRandomNumber(0, 200);
-						if(attackRoll != 200 && Math.max(resistant ? 0 : 148 + spellInfo.hit - character.mdef, 1) > attackRoll)
+						if(attackRoll != 200 && attackRoll <= Math.max(resistant ? 0 : 148 + spellInfo.hit - targetCharacter.characterData.mdef, 1))
 						{
 							if(spellInfo.effect == 3)
 							{
@@ -1836,7 +1944,7 @@ BattleState.prototype.runTurn = function(delay)
 					if(character.evade > 255)
 						character.evade = 255;
 					
-					this.incrementRandomIndex(targetIndex < 2 ? formationRNGPrimaryIncrement[this.formation] : formationRNGSecondaryIncrement[this.formation]);
+					this.incrementRandomIndex(characterIndex < 2 ? formationRNGPrimaryIncrement[this.formation] : formationRNGSecondaryIncrement[this.formation]);
 				}
 				else if (spellInfo.effect == 0xc)
 				{
@@ -1856,7 +1964,7 @@ BattleState.prototype.runTurn = function(delay)
 						
 						targetCharacter.hitMultiplier = Math.min(targetCharacter.hitMultiplier + 1, 2);
 						
-						this.incrementRandomIndex(targetIndex < 2 ? formationRNGPrimaryIncrement[this.formation] : formationRNGSecondaryIncrement[this.formation]);
+						this.incrementRandomIndex(targetOption < 2 ? formationRNGPrimaryIncrement[this.formation] : formationRNGSecondaryIncrement[this.formation]);
 					}
 
 
@@ -1906,7 +2014,7 @@ BattleState.prototype.runTurn = function(delay)
 
 BattleState.prototype.improvedEndState = function(redoBattleEndState, redoBattleNextState)
 {
-	let battleStartState = this.newEncounter(redoBattleNextState.encounterIndex, true);
+	let battleStartState = this.newEncounter(redoBattleNextState.encounterIndex, EncounterAction.Fight, true);
 	let sumHp = 0;
 	let oldSumHp = 0;
 	let sumEnemyHp = 0;
@@ -1968,13 +2076,13 @@ BattleState.prototype.improvedEndState = function(redoBattleEndState, redoBattle
 	return false;
 };
 
-function runBattle(currentState, encounter, redoBattleEndState, redoBattleNextState)
+function runBattle(currentState, encounter, encounterAction, redoBattleEndState, redoBattleNextState)
 {
-	let battleStartState = currentState.newEncounter(encounter);
+	let battleStartState = currentState.newEncounter(encounter, encounterAction);
 	delayStates[battleStartState.index] = 0;
 	damageTakenStates[battleStartState.index] = 0;
 	let priorBattleState = battleStartState;
-	let battleState = battleStartState.newTurn();
+	let battleState = battleStartState.newTurn(encounterAction);
 	let currentIterationCount = 0;
 	let redoBattle = redoBattleEndState != null;
 	let delay = redoBattle ? (delayStates[battleState.index] ?? 0) : 0;
@@ -2000,14 +2108,14 @@ function runBattle(currentState, encounter, redoBattleEndState, redoBattleNextSt
 				if(battleState.index == battleStartState.index)
 					return false;
 			}
-			battleState = priorBattleState.newTurn();
+			battleState = priorBattleState.newTurn(encounterAction);
 		}
 		else if(!battleState.battleComplete)
 		{
 			delayStates[battleState.index] = delay; // need some kind of detection for pointless RNG loop
 			damageTakenStates[battleState.index] = damageTaken;
 			priorBattleState = battleState;
-			battleState = priorBattleState.newTurn();
+			battleState = priorBattleState.newTurn(encounterAction);
 			delay = redoBattle ? (delayStates[battleState.index] ?? 0) : 0
 		}
 		if(currentIterationCount > 10000) // something has probably gone wrong, abort path.  TODO: add better culling to prevent useless turns from eating time/count
@@ -2019,18 +2127,6 @@ function runBattle(currentState, encounter, redoBattleEndState, redoBattleNextSt
 	delayStates[battleState.index] = delay;
 	damageTakenStates[battleState.index] = damageTaken;
 	return battleState;
-}
-
-const Action = {
-	None: 0,
-	UnknownCommand: 1,
-	Encounter: 2,
-	ChangeGold: 3,
-	EquipWeapon: 4,
-	UnequipWeapon: 5,
-	EquipArmor: 6,
-	UnequipArmor: 7,
-	Heal: 8
 }
 
 function RouteAction(actionString)
@@ -2047,6 +2143,13 @@ function RouteAction(actionString)
 			case 'Encounter':
 				this.action = Action.Encounter;
 				this.encounterIndex = (parseInt(splitAction[1]) || 0);
+				let encounterAction = splitAction[2];
+				if (encounterAction == 'Bane')
+					this.encounterAction = EncounterAction.Bane;
+				else if (encounterAction == 'Flee')
+					this.encounterAction = EncounterAction.Flee;
+				else
+					this.encounterAction = EncounterAction.Fight;
 				break;
 			case 'ChangeGold':
 				this.action = Action.ChangeGold;
@@ -2075,7 +2178,12 @@ function RouteAction(actionString)
 				this.action = Action.Heal;
 				this.amount = (parseInt(splitAction[1]) || -1);
 				this.characterSlot = (parseInt(splitAction[2]) || 0x80);
-				break;
+				break;Burn
+			case 'Burn': // should hit all but I don't care atm
+				this.action = Action.Burn;
+				this.amount = (parseInt(splitAction[1]) || -1);
+				this.characterSlot = (parseInt(splitAction[2]) || 0x80);
+				break;Burn
 			default:
 				this.action = Action.UnknownCommand;
 				this.inputString = actionString;
@@ -2195,12 +2303,14 @@ new RouteAction('Encounter 0x9C'),
 new RouteAction('Encounter 0x2C'),
 new RouteAction('Encounter 0x98'),
 new RouteAction('Encounter 0x2F'),
-new RouteAction('Encounter 0x2C'), // trap undead tile // TODO: GET DAMAGE TAKEN FROM SPIKES
+new RouteAction('Encounter 0x2C'), // trap undead tile // Ice spikes?
 new RouteAction('Encounter 0x2E'),
+new RouteAction('Burn 6'),
 new RouteAction('Encounter 0x6C'),
 new RouteAction('Encounter 0x2C'),
 new RouteAction('Encounter 0x69'),
 new RouteAction('Encounter 0x2C'), // trap undead tile 
+new RouteAction('Burn 6'),
 new RouteAction('Encounter 0x2F'),
 new RouteAction('Encounter 0x2F'),
 new RouteAction('Encounter 0x6C'),
@@ -2212,12 +2322,16 @@ new RouteAction('Encounter 0x20'),
 new RouteAction('Encounter 0xDE'),
 new RouteAction('Heal'),
 new RouteAction('Encounter 0x1E'),
-new RouteAction('Encounter 0xDE'), // TODO: GET DAMAGE TAKEN FROM LAVA 403 -> 355
+new RouteAction('Burn 48'),
+new RouteAction('Encounter 0xDE'), // LAVA 403 -> 355
+new RouteAction('Burn 167'),
 new RouteAction('Encounter 0x24'), // 355 -> 188
 new RouteAction('EquipWeapon IceSword'),
 new RouteAction('EquipArmor IceShield'),
 new RouteAction('UnequipArmor SilverGauntlet'),
+new RouteAction('Burn 29'),
 new RouteAction('Encounter 0x24'), // 185 -> 156
+new RouteAction('Burn 45'),
 new RouteAction('Encounter 0x29'), // 147 -> 102
 new RouteAction('Encounter 0x79'),
 new RouteAction('Encounter 0x26'),
@@ -2285,7 +2399,7 @@ new RouteAction('Encounter 0x51'),
 new RouteAction('Encounter 0xC1'),
 new RouteAction('Encounter 0x51'),
 new RouteAction('Encounter 0xC1'),
-new RouteAction('Encounter 0x76'),
+new RouteAction('Encounter 0x77 Bane'),
 new RouteAction('Encounter 0xBD'),
 new RouteAction('Heal'),
 new RouteAction('Encounter 0x02'),
@@ -2306,10 +2420,10 @@ new RouteAction('Encounter 0xA6'),
 new RouteAction('Encounter 0x74'),
 new RouteAction('Encounter 0xC9'),
 new RouteAction('Encounter 0xC9'),
-new RouteAction('Encounter 0x75'),
+new RouteAction('Encounter 0x75 Bane'),
 new RouteAction('Encounter 0xD4'),
-new RouteAction('Encounter 0x76'),
-new RouteAction('Encounter 0x7B'),
+new RouteAction('Encounter 0x76 Bane'),
+new RouteAction('Encounter 0x7B Bane'),
 ];
 
 //PlayerInfo(name, characterClass, classChanged, level, exp, hp, str, agi, int, vit, luck, evade, absorb, hits, hit, attack, crit, mdef, weaknesses, resistances, weapon, armor, shield, helmet, glove)
@@ -2358,7 +2472,7 @@ async function runRoute()
 					encounterIndexes[encounterCount] = i;
 				startingBattleStates[encounterCount] = currentState;
 				debugFightsRan[debugFightsRanIndex++] = {count: encounterCount, randomIndex: currentState.randomNumberIndex, delayState:delayStates[currentState.index], stateIndex: currentState.index, hp: currentState.battleCharacters[0x80].currentHp, encounter: currentAction.encounterIndex};
-				let endOfBattleState = await runBattle(currentState, currentAction.encounterIndex, redoBattle ? endingBattleStates[encounterCount] : null, redoBattle ? startingBattleStates[encounterCount] : null);
+				let endOfBattleState = await runBattle(currentState, currentAction.encounterIndex, currentAction.encounterAction, redoBattle ? endingBattleStates[encounterCount] : null, redoBattle ? startingBattleStates[encounterCount] : null);
 				if(!endOfBattleState) // if the battle failed, go backwards to the previous battle
 				{
 					if(encounterCount == 0) 
@@ -2399,10 +2513,13 @@ async function runRoute()
 			case Action.Heal: // might need a heal all or parameter for that
 				currentState.battleCharacters[currentAction.characterSlot].heal(currentAction.amount);
 				break;
+			case Action.Burn: // should hit all characters alive
+				currentState.battleCharacters[currentAction.characterSlot].burn(currentAction.amount);
+				break;
 			default:
 				console.log('UnknownCommand: ' + currentAction.inputString);
 		}
-		if(currentIterationCount > 5000) // something has probably gone wrong, abort everything
+		if(currentIterationCount > 10000) // something has probably gone wrong, abort everything
 		{
 			console.log('Too many route steps - Please stop and fix your route');
 			console.log(delayStates);
@@ -2415,4 +2532,9 @@ async function runRoute()
 	console.log('Completed');
 	console.log(delayStates);
 	console.log(damageTakenStates);
+	console.log(route[highestIndex]);
+	console.log(debugFightsRan);
 }
+
+runRoute();
+console.log('Started');
