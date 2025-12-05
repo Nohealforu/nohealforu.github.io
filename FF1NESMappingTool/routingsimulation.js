@@ -2529,7 +2529,7 @@ async function runRoute()
 				targetTime = null;
 				if(endOfBattleState.startState) // if the battle failed, go backwards to the previous battle
 				{
-					startingBattleStates[encounterCount] = currentState;
+					startingBattleStates[encounterCount] = endOfBattleState;
 					if(encounterCount > 0) 
 						i = encounterIndexes[--encounterCount] - 1; // go back 1 further so that we hit the right spot
 					
@@ -2587,3 +2587,6 @@ async function runRoute()
 	console.log(endingBattleSummaries);
 	console.log(iterationAbortCount);
 }
+
+runRoute();
+console.log('Started');
