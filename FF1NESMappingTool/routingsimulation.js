@@ -2041,7 +2041,7 @@ BattleState.prototype.improvedEndState = function(redoBattleEndState, redoBattle
 	
 	for (let i = 0x80; i < 0x84; i++)
 	{
-		let character = this.battleCharacters[i];
+		let character = battleStartState.battleCharacters[i];
 		let characterOld = redoBattleEndState.battleCharacters[i];
 		let characterNew = redoBattleNextState.battleCharacters[i];
 		if (character != null && character.canAct())
@@ -2100,6 +2100,7 @@ var iterationAbortCount = 0;
 function runBattle(currentState, encounter, encounterAction, redoBattleEndState, redoBattleNextState, currentTargetTime)
 {
 	let battleStartState = currentState.newEncounter(encounter, encounterAction);
+	battleStartState.startState = true;
 	delayStates[battleStartState.index] = 0;
 	let delayCommands = [];
 	let damageTakenStates = [];
@@ -2133,7 +2134,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 				battleState = battleStates[battleState.index - 1];
 				delay = delayStates[battleState.index];
 				if(battleState.index == battleStartState.index)
-					return false;
+					return battleStartState;
 			}
 			battleState = priorBattleState.newTurn(encounterAction);
 			battleState.estimatedTime += (delay < 6 ? delay * 41 : 50 * Math.floor(delay / 3) + 41 * (delay % 3));
@@ -2154,7 +2155,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 		if(currentIterationCount > 500) // something has probably gone wrong, abort path.  TODO: add better culling to prevent useless turns from eating time/count
 		{
 			iterationAbortCount++;
-			return false;
+			return battleStartState;
 		}
 	} while(!battleState.battleComplete);
 	
@@ -2524,16 +2525,14 @@ async function runRoute()
 				if(i == highestIndex)
 					encounterIndexes[encounterCount] = i;
 				startingBattleStates[encounterCount] = currentState;
-				let endOfBattleState = await runBattle(currentState, currentAction.encounterIndex, currentAction.encounterAction, redoBattle ? endingBattleStates[encounterCount] : null, redoBattle ? startingBattleStates[encounterCount] : null, targetTime);
+				let endOfBattleState = await runBattle(currentState, currentAction.encounterIndex, currentAction.encounterAction, redoBattle ? endingBattleStates[encounterCount] : null, redoBattle ? startingBattleStates[encounterCount + 1] : null, targetTime);
 				targetTime = null;
-				if(!endOfBattleState) // if the battle failed, go backwards to the previous battle
+				if(endOfBattleState.startState) // if the battle failed, go backwards to the previous battle
 				{
-					if(encounterCount == 0) 
-					{
-						console.log('Reverted to start - Please stop and fix your route');
-						return;
-					}
-					i = encounterIndexes[--encounterCount] - 1; // go back 1 further so that we hit the right spot
+					startingBattleStates[encounterCount] = currentState;
+					if(encounterCount > 0) 
+						i = encounterIndexes[--encounterCount] - 1; // go back 1 further so that we hit the right spot
+					
 					for(let indexBack = 2; currentState.index - indexBack >= 0 && ++delayStates[currentState.index - indexBack] == 256; indexBack++)
 						delayStates[currentState.index - indexBack] = 0;
 					
