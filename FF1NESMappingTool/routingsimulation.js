@@ -1289,8 +1289,8 @@ function PlayerCommand(battleState, command, info = null, targetType = 0, target
 	this.target = target;
 }
 
-var battleStates = [];
-var delayStates = [0];
+var battleStates;
+var delayStates;
 
 // used to store the state of characters each round in battle, also track changes between battles
 function BattleState(index, randomNumberIndex, gold, battleCharacters, startTime = 0, encounterIndex = 0, formation = Formation.small, turn = 0)
@@ -2095,7 +2095,7 @@ BattleState.prototype.improvedEndState = function(redoBattleEndState, redoBattle
 	return false;
 };
 
-var iterationAbortCount = 0;
+var iterationAbortCount;
 
 function runBattle(currentState, encounter, encounterAction, redoBattleEndState, redoBattleNextState, currentTargetTime)
 {
@@ -2513,6 +2513,9 @@ async function runRoute()
 	let currentIterationCount = 0;
 	let redoBattle = false;
 	let targetTime;
+	battleStates = [];
+	delayStates = [0];
+	iterationAbortCount = 0;
 	
 	for(let i = 0; i < route.length; i++)
 	{
