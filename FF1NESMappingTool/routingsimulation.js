@@ -2587,6 +2587,3 @@ async function runRoute()
 	console.log(endingBattleSummaries);
 	console.log(iterationAbortCount);
 }
-
-runRoute();
-console.log('Started');
