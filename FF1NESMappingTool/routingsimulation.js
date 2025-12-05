@@ -2109,6 +2109,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 	let estimatedTimeTotalStates = [battleStartState.startTime];
 	let priorBattleState = battleStartState;
 	let battleState = battleStartState.newTurn(encounterAction);
+	battleState.encounterState = battleStartState.encounterState;
 	let currentIterationCount = 0;
 	let redoBattle = redoBattleEndState != null;
 	let delay = redoBattle ? (delayStates[battleState.index] ?? 0) : 0;
