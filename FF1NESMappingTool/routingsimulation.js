@@ -1473,7 +1473,7 @@ BattleState.prototype.newTurn = function(playerAction)
 	if(playerAction == EncounterAction.Fight)
 		command = new PlayerCommand(battleState, Command.Fight);
 	else if(playerAction == EncounterAction.Flee)
-		command = new PlayerCommand(battleState, Command.Flee);
+		command = new PlayerCommand(battleState, Command.Run);
 	else if(playerAction == EncounterAction.Bane)
 		command = new PlayerCommand(battleState, Command.Item, weapons['BaneSword']);
 	battleState.playerCommands = {0x80: command, 0x81: null, 0x82: null, 0x83: null};
@@ -1555,7 +1555,7 @@ BattleState.prototype.newEncounter = function(encounterIndex, playerAction, futu
 	if(playerAction == EncounterAction.Fight)
 		command = new PlayerCommand(battleState, Command.Fight);
 	else if(playerAction == EncounterAction.Flee)
-		command = new PlayerCommand(battleState, Command.Flee);
+		command = new PlayerCommand(battleState, Command.Run);
 	else if(playerAction == EncounterAction.Bane)
 		command = new PlayerCommand(battleState, Command.Item, weapons['BaneSword']);
 	battleState.playerCommands = {0x80: command, 0x81: null, 0x82: null, 0x83: null};
@@ -1736,12 +1736,12 @@ BattleState.prototype.runTurn = function(delay)
 				this.estimatedTime += 150;
 				this.damageDealt += damageSum;
 			}
-			else if(playerCommand.command == Command.Flee)
+			else if(playerCommand.command == Command.Run)
 			{
 				// for complete simulation will need to calculate all the bugged values and stuff.
 				// just assuming solo character, so slot 3 == StatusEffect.dead
 				// also put in a runnable check to fail, but if you route to flee from and unrunnable, that's on you when it fails
-				if(this.encounterState == EncounterState.FirstStrike || character.luck > this.getRandomNumber(0, 16))
+				if(this.encounterState == EncounterState.FirstStrike || character.characterData.luck > this.getRandomNumber(0, 16))
 				{
 					this.battleComplete = true;
 					return;
@@ -2026,6 +2026,8 @@ BattleState.prototype.runTurn = function(delay)
 		this.badTurn = true;
 	if(this.battleCharacters[0x80].status > 0) // poison could be acceptable, or secondary characters dying pre garland, but /shrug
 		this.badTurn = true;
+	if(this.encounterState != EncounterState.Ambushed && this.playerCommands[0x80].command == Command.Run)
+		this.badTurn = true;
 	return;
 };
 
@@ -2088,7 +2090,7 @@ BattleState.prototype.improvedEndState = function(redoBattleEndState, redoBattle
 		return true;
 	if(sumEnemies == battleStartState.minimumEnemies && sumHp > oldSumHp)
 		return true;
-	if(sumEnemies == oldSumEnemies && ((battleStartState.encounterState == EncounterState.FirstStrike && redoBattleNextState != EncounterState.FirstStrike) || (battleStartState.encounterState != EncounterState.Ambushed && redoBattleNextState == EncounterState.Ambushed)))
+	if(sumEnemies == oldSumEnemies && ((battleStartState.encounterState == EncounterState.FirstStrike && redoBattleNextState.encounterState != EncounterState.FirstStrike) || (battleStartState.encounterState != EncounterState.Ambushed && redoBattleNextState.encounterState == EncounterState.Ambushed)))
 		return true;
 	//if(this.startTime + this.estimatedTime < redoBattleEndState.startTime + redoBattleEndState.estimatedTime)
 	//	return true;
@@ -2591,3 +2593,6 @@ async function runRoute()
 	console.log(endingBattleSummaries);
 	console.log(iterationAbortCount);
 }
+
+runRoute();
+console.log('Started');
