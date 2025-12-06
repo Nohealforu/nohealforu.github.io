@@ -1307,6 +1307,7 @@ function BattleState(index, randomNumberIndex, gold, battleCharacters, startTime
 	this.estimatedTime = 0;
 	this.damageTaken = 0;
 	this.damageDealt = 0;
+	this.score = 0;
 	this.battleComplete = false;
 	this.partyWipe = false;
 	this.abortPath = false;
@@ -1521,12 +1522,13 @@ BattleState.prototype.newEncounter = function(encounterIndex, playerAction, futu
 	let encounter = encounters[encounterIndex];
 	// Generate enemies
 	let formation2 = encounterIndex >= 0x80;
-	let enemyCounts = [0, 0, 0]; // small/large enemy count
+	let enemyCounts = [0, 0, 0]; // small/large/minimum enemy count
 	let battleState = new BattleState(1 + this.index, this.randomNumberIndex, this.gold, battleCharacters, this.startTime + this.estimatedTime, encounterIndex, this.formation);
 	
 	if(encounter.formation == Formation.fiend || encounter.formation == Formation.chaos)
 	{
 		battleState.battleCharacters[0] = new BattleCharacter(encounter.slot1.enemy);
+		enemyCounts = [0, 1, 1];
 	}
 	else
 	{
@@ -1550,6 +1552,7 @@ BattleState.prototype.newEncounter = function(encounterIndex, playerAction, futu
 	}
 	
 	battleState.minimumEnemies = enemyCounts[2];
+	battleState.startingEnemies = enemyCounts[0] + enemyCounts[1];
 	
 	let command;
 	if(playerAction == EncounterAction.Fight)
@@ -1568,6 +1571,7 @@ BattleState.prototype.checkPartyDead = function()
 		if (this.battleCharacters[i] != null && this.battleCharacters[i].canTarget())
 			return false;
 	this.partyWipe = true;
+	this.score -= 100000;
 	return true;
 };
 
@@ -1611,13 +1615,16 @@ BattleState.prototype.checkEnemyDead = function()
         }
 	}
     this.gold += gold;
+	this.score += 500;
+	
+	// TODO: Score based on next encounter threat
 	
 	// TODO: reorder party based on status 
 	
 	return true;
 };
 
-BattleState.prototype.runTurn = function(delay)
+BattleState.prototype.runTurn = function(delay, stepsToHeal)
 {
 	let missCount = 0;
 	let critCount = 0;
@@ -1634,7 +1641,7 @@ BattleState.prototype.runTurn = function(delay)
 	if(this.checkPartyDead())
 	{ // if we died to poison at start of turn, no point rolling through 256 seeds
 		this.abortPath = true;
-		return 2;
+		return;
 	}
 	
 	this.incrementRandomIndex(delay);
@@ -1656,7 +1663,7 @@ BattleState.prototype.runTurn = function(delay)
 		if (character != null && character.currentHp > 0 && (character.category & 0x80))
 			character.currentHp = Math.min(character.currentHp + 3, character.characterData.hp);
 		if (character != null && character.canAct())
-			averageDamageThreshold += Math.max(character.characterData.hits * character.hitMultiplier * (character.characterData.attack * 1.5 - targetCharacter.absorb), 1);
+			averageDamageThreshold += Math.max(character.characterData.hits * character.hitMultiplier * (character.characterData.attack * 2 - targetCharacter.absorb) / 4, 1);
 	}
 	
 	let turnOrder = this.getTurnOrder();
@@ -1730,7 +1737,22 @@ BattleState.prototype.runTurn = function(delay)
 				if (targetCharacter.currentHp <= 0)
 				{
 					targetCharacter.currentHp = 0;
+					this.score += 1000;
 					targetCharacter.status |= StatusEffect.dead;
+					let targetCharacter2 = this.battleCharacters[0x80];
+					for (let i = 0; i < 9; i++)
+					{
+						let character2 = this.battleCharacters[i];
+						if (character2 != null && character2.currentHp > 0 && (character2.category & 0x80))
+							character2.currentHp = Math.min(character2.currentHp + 3, character2.characterData.hp);
+						if (character2 != null && character2.canAct())
+							averageDamageThreshold += Math.max(character2.characterData.hits * character2.hitMultiplier * (character2.characterData.attack * 2 - targetCharacter2.absorb) / 4, 1);
+					}
+				}
+				else // percent of hp damage dealt in a turn or something, idk 
+				{
+					let damageRatio = damageSum / targetCharacter.characterData.hp;
+					this.score += 1000 * damageRatio * damageRatio;
 				}
 				
 				this.estimatedTime += 150;
@@ -1744,8 +1766,11 @@ BattleState.prototype.runTurn = function(delay)
 				if(this.encounterState == EncounterState.FirstStrike || character.characterData.luck > this.getRandomNumber(0, 16))
 				{
 					this.battleComplete = true;
+					this.score += 1000;
 					return;
 				}
+				else
+					this.score -= 1000;
 			}
 			else if(playerCommand.command == Command.Magic || playerCommand.command == Command.Item)
 			{
@@ -1782,7 +1807,10 @@ BattleState.prototype.runTurn = function(delay)
 								{
 									targetCharacter.status |= spellInfo.strength;
 									if((targetCharacter.status & (StatusEffect.dead | StatusEffect.stone)) > 0)
+									{
 										targetCharacter.currentHp = 0;
+										this.score += 1000;
+									}
 								}
 							}
 							else // spellInfo.effect == 4
@@ -1802,6 +1830,7 @@ BattleState.prototype.runTurn = function(delay)
 			let morale = character.morale - 2 * this.battleCharacters[0x80].characterData.level + this.getRandomNumber(0, 50);
 			if (morale < 80) // enemy runs
 			{
+				this.score += 1000;
 				this.battleCharacters[characterIndex] = null;
 				if(this.checkEnemyDead())
 					return;
@@ -1855,6 +1884,15 @@ BattleState.prototype.runTurn = function(delay)
 					targetCharacter.currentHp = 0;
 					targetCharacter.status |= StatusEffect.dead;
 				}
+				else // percent of hp damage dealt in a turn or something, idk 
+				{
+					let damageRatio = damageSum / targetCharacter.characterData.hp; // adjust this by starting hp or something?
+					// use averageDamageThreshold calculation here instead?
+					// fights till next inn?
+					// calculated danger levels?
+					// idk?
+					this.score -= 2000 * damageRatio * damageRatio * (stepsToHeal + 1);
+				}
 				this.damageTaken += damageSum;
 				this.estimatedTime += 90;
 			}
@@ -1902,6 +1940,11 @@ BattleState.prototype.runTurn = function(delay)
 							targetCharacter.currentHp = 0;
 							targetCharacter.status |= StatusEffect.dead;
 						}
+						else // percent of hp damage dealt in a turn or something, idk 
+						{
+							let damageRatio = damageSum / targetCharacter.characterData.hp; // adjust this by starting hp or something? idk
+							this.score -= 2000 * damageRatio * damageRatio * (stepsToHeal + 1);
+						}
 						
 						this.damageTaken += damageRoll;
 						this.estimatedTime += 70;
@@ -1943,6 +1986,9 @@ BattleState.prototype.runTurn = function(delay)
 							else // spellInfo.effect == 4
 							{
 								targetCharacter.hitMultiplier = Math.max(targetCharacter.hitMultiplier - 1, 0);
+								this.score -= 1000;
+								if(this.encounterIndex == 0x7D)
+									this.score = 10000;
 							}
 						}
 						
@@ -2017,23 +2063,16 @@ BattleState.prototype.runTurn = function(delay)
 				return;
 		}
 	}
-	// failsafe if somehow the enemies are missing, idk
+	// failsafe if somehow the enemies are missing
 	if(this.checkEnemyDead())
 		return;
-	if(this.damageTaken > averageDamageThreshold * 2)
-		this.badTurn = true;
-	if(this.damageTaken == 0 && this.damageDealt == 0 && this.turn > 1) // idk figure out something better to track average damage or something
-		this.badTurn = true;
-	if(this.battleCharacters[0x80].status > 0) // poison could be acceptable, or secondary characters dying pre garland, but /shrug
-		this.badTurn = true;
-	if(this.encounterState != EncounterState.Ambushed && this.playerCommands[0x80].command == Command.Run)
-		this.badTurn = true;
+	if((this.battleCharacters[0x80].status & !(StatusEffect.mute | StatusEffect.dark)) > 0) // poison could be acceptable, or secondary characters dying pre garland, but /shrug
+		this.score -= 1000;
 	return;
 };
 
-BattleState.prototype.improvedEndState = function(redoBattleEndState, redoBattleNextState)
+BattleState.prototype.improvedEndState = function(battleStartState, redoBattleEndState, redoBattleNextState)
 {
-	let battleStartState = this.newEncounter(redoBattleNextState.encounterIndex, EncounterAction.Fight, true);
 	let sumHp = 0;
 	let oldSumHp = 0;
 	let sumEnemyHp = 0;
@@ -2099,12 +2138,13 @@ BattleState.prototype.improvedEndState = function(redoBattleEndState, redoBattle
 
 var iterationAbortCount;
 
-function runBattle(currentState, encounter, encounterAction, redoBattleEndState, redoBattleNextState, currentTargetTime)
+function runBattle(currentState, encounter, encounterAction, redoBattleEndState, redoBattleNextState)
 {
-	let battleStartState = currentState.newEncounter(encounter, encounterAction);
+	let battleStartState = currentState.newEncounter(encounter.index, encounterAction);
 	battleStartState.startState = true;
 	delayStates[battleStartState.index] = 0;
 	let delayCommands = [];
+	let scoreStates = [];
 	let damageTakenStates = [];
 	let damageDealtStates = [];
 	let estimatedTimeStates = [];
@@ -2114,20 +2154,62 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 	battleState.encounterState = battleStartState.encounterState;
 	let currentIterationCount = 0;
 	let redoBattle = redoBattleEndState != null;
-	let delay = redoBattle ? (delayStates[battleState.index] ?? 0) : 0;
+	let delay = redoBattle && battleState.encounterState != EncounterState.Ambushed ? (delayStates[battleState.index] ?? 0) : 0;
+	let bestScore = -999999;
+	let bestDelay = 0;
+	battleState.estimatedTime += (delay < 6 ? delay * 41 : 50 * Math.floor(delay / 3) + 41 * (delay % 3));
 	
 	do 
 	{
 		currentIterationCount++;
-		battleState.runTurn(delay);
+		for (let i = delay; i < (battleState.encounterState == EncounterState.Ambushed ? 1 : 256); i++)
+		{
+			battleState = priorBattleState.newTurn(encounterAction);
+			battleState.estimatedTime += (i < 6 ? i * 41 : 50 * Math.floor(i / 3) + 41 * (i % 3));
+			if(priorBattleState == battleStartState)
+				battleState.encounterState = battleStartState.encounterState;
+			battleState.runTurn(i, encounter.stepsToHeal);
+			
+			let nextEncounterState;
+			if(battleState.battleComplete && encounter.nextIndex != null)
+			{
+				nextEncounterState = battleState.newEncounter(encounter.nextIndex, EncounterAction.Fight, true);
+				battleState.score -= 3000 * (nextEncounterState.startingEnemies / nextEncounterState.minimumEnemies - 1);
+			}
+			
+			battleState.score -= battleState.estimatedTime;
+			if(battleState.score > bestScore)
+			{
+				bestScore = battleState.score;
+				bestDelay = i;
+			}
+		}
 		
-		if(battleState.battleComplete && redoBattle && !battleState.improvedEndState(redoBattleEndState, redoBattleNextState))
+		delay = bestDelay;
+		battleState = priorBattleState.newTurn(encounterAction);
+		battleState.estimatedTime += (delay < 6 ? delay * 41 : 50 * Math.floor(delay / 3) + 41 * (delay % 3));
+		battleState.runTurn(delay, encounter.stepsToHeal);
+		
+		let nextEncounterState;
+		if(battleState.battleComplete && encounter.nextIndex != null)
+		{
+			nextEncounterState = battleState.newEncounter(encounter.nextIndex, EncounterAction.Fight, true);
+			battleState.score -= 3000 * (nextEncounterState.startingEnemies / nextEncounterState.minimumEnemies - 1);
+		}
+		
+		battleState.score -= battleState.estimatedTime;
+		
+		if(battleState.score < -1000)
+			battleState.badTurn = true;
+		
+		if(battleState.battleComplete && redoBattle && !battleState.improvedEndState(nextEncounterState, redoBattleEndState, redoBattleNextState))
 		{
 			battleState.battleComplete = false;
 			battleState.badTurn = true;
 		}
-		if(currentTargetTime != null && battleState.startTime + battleState.estimatedTime >= currentTargetTime)
+		if(encounter.currentTargetTime != null && battleState.startTime + battleState.estimatedTime >= encounter.currentTargetTime)
 			battleState.badTurn = true;
+		
 		if(battleState.partyWipe || battleState.badTurn) 
 		{
 			delay++;
@@ -2146,16 +2228,18 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 		{
 			delayStates[battleState.index] = delay; // need some kind of detection for pointless RNG loop
 			delayCommands[battleState.turn - 1] = delay;
+			scoreStates[battleState.turn - 1] = battleState.score;
 			damageTakenStates[battleState.turn - 1] = battleState.damageTaken;
 			damageDealtStates[battleState.turn - 1] = battleState.damageDealt;
 			estimatedTimeStates[battleState.turn - 1] = battleState.estimatedTime;
 			estimatedTimeTotalStates[battleState.turn - 1] = battleState.startTime + battleState.estimatedTime;
 			priorBattleState = battleState;
 			battleState = priorBattleState.newTurn(encounterAction);
-			delay = redoBattle ? (delayStates[battleState.index] ?? 0) : 0
+			delay = redoBattle ? (delayStates[battleState.index] ?? 0) : 0;
+			bestScore = -999999;
 			battleState.estimatedTime += (delay < 6 ? delay * 41 : 50 * Math.floor(delay / 3) + 41 * (delay % 3));
 		}
-		if(currentIterationCount > 500) // something has probably gone wrong, abort path.  TODO: add better culling to prevent useless turns from eating time/count
+		if(currentIterationCount > 10) // something has probably gone wrong, abort path.  TODO: add better culling to prevent useless turns from eating time/count
 		{
 			iterationAbortCount++;
 			return battleStartState;
@@ -2164,12 +2248,13 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 	
 	delayStates[battleState.index] = delay;
 	delayCommands[battleState.turn - 1] = delay;
+	scoreStates[battleState.turn - 1] = battleState.score;
 	damageTakenStates[battleState.turn - 1] = battleState.damageTaken;
 	damageDealtStates[battleState.turn - 1] = battleState.damageDealt;
 	estimatedTimeStates[battleState.turn - 1] = battleState.estimatedTime;
 	estimatedTimeTotalStates[battleState.turn - 1] = battleState.startTime + battleState.estimatedTime;
 	
-	battleState.encounterSummary = {encounter: encounter, characters: battleStartState.battleCharacters, delay: delayCommands, dealt: damageDealtStates, taken: damageTakenStates, time: estimatedTimeStates, totalTime: estimatedTimeTotalStates};
+	battleState.encounterSummary = {hp: battleStartState.battleCharacters[0x80].currentHp, hp2: battleState.battleCharacters[0x80].currentHp, encounter: encounter, characters: battleStartState.battleCharacters, delay: delayCommands, score: scoreStates, dealt: damageDealtStates, taken: damageTakenStates, time: estimatedTimeStates, totalTime: estimatedTimeTotalStates};
 	return battleState;
 }
 
@@ -2518,6 +2603,28 @@ async function runRoute()
 	battleStates = [];
 	delayStates = [0];
 	iterationAbortCount = 0;
+	let stop = false;
+	let nextEncounter;
+	let stepsToHeal = 1;
+	
+	for(let i = route.length; i--; i > 0)
+	{
+		let currentAction = route[i];
+		switch(currentAction.action)
+		{
+			case Action.Encounter:
+				currentAction.encounter = {index: currentAction.encounterIndex, nextIndex: nextEncounter, stepsToHeal: stepsToHeal, targetTime: targetTime};
+				nextEncounter = currentAction.encounterIndex;
+				stepsToHeal++;
+				break;
+			case Action.Heal:
+				stepsToHeal = 1;
+				break;
+			case Action.TimeTarget: 
+				targetTime = currentAction.amount;
+				break;
+		}
+	}
 	
 	for(let i = 0; i < route.length; i++)
 	{
@@ -2525,19 +2632,29 @@ async function runRoute()
 		if(i > highestIndex)
 			highestIndex = i;
 		currentIterationCount++;
+		if(i == highestIndex && stop)
+			break;
 		switch(currentAction.action)
 		{
 			case Action.Encounter:
 				if(i == highestIndex)
 					encounterIndexes[encounterCount] = i;
 				startingBattleStates[encounterCount] = currentState;
-				let endOfBattleState = await runBattle(currentState, currentAction.encounterIndex, currentAction.encounterAction, redoBattle ? endingBattleStates[encounterCount] : null, redoBattle ? startingBattleStates[encounterCount + 1] : null, targetTime);
+				let endOfBattleState = await runBattle(currentState, currentAction.encounter, currentAction.encounterAction, redoBattle ? endingBattleStates[encounterCount] : null, redoBattle ? startingBattleStates[encounterCount + 1] : null);
 				targetTime = null;
+				
 				if(endOfBattleState.startState) // if the battle failed, go backwards to the previous battle
 				{
-					startingBattleStates[encounterCount] = endOfBattleState;
 					if(encounterCount > 0) 
+					{
+						startingBattleStates[encounterCount] = endOfBattleState;
 						i = encounterIndexes[--encounterCount] - 1; // go back 1 further so that we hit the right spot
+					}
+					else
+					{
+						delayStates[0]++;
+						i--;
+					}
 					
 					for(let indexBack = 2; currentState.index - indexBack >= 0 && ++delayStates[currentState.index - indexBack] == 256; indexBack++)
 						delayStates[currentState.index - indexBack] = 0;
@@ -2576,16 +2693,17 @@ async function runRoute()
 				currentState.battleCharacters[currentAction.characterSlot].burn(currentAction.amount);
 				break;
 			case Action.TimeTarget: 
-				targetTime = currentAction.amount;
+				//targetTime = currentAction.amount;
 				if(i == highestIndex)
 					console.log('index ' + i + ': ' + (currentState.startTime + currentState.estimatedTime));
 				break;
 			default:
 				console.log('UnknownCommand: ' + currentAction.inputString);
 		}
-		if(currentIterationCount > 50000) // something has probably gone wrong, abort everything
+		if(currentIterationCount > 500) // something has probably gone wrong, abort everything
 		{
 			console.log('Too many route steps - Please stop and fix your route');
+			stop = true;
 			break;
 		}
 	}
@@ -2593,6 +2711,3 @@ async function runRoute()
 	console.log(endingBattleSummaries);
 	console.log(iterationAbortCount);
 }
-
-runRoute();
-console.log('Started');
