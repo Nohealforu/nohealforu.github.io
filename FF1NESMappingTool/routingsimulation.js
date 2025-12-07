@@ -55,8 +55,8 @@ const Command = {
 
 const EncounterState = {
 	Normal: 0,
-	FirstStrike: 1,
-	Ambushed: 2
+	FirstStrike: -1,
+	Ambushed: 1
 }
 
 const Action = {
@@ -2168,7 +2168,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 				if(battleState.battleComplete && encounter.nextIndex != null)
 				{
 					nextEncounterState = battleState.newEncounter(encounter.nextIndex, EncounterAction.Fight, true);
-					battleState.score -= 3000 * (nextEncounterState.startingEnemies / nextEncounterState.minimumEnemies - 1) - (nextEncounterState.encounterState == EncounterState.FirstStrike ? 1000 : 0) + (nextEncounterState.encounterState == EncounterState.Ambushed ? 1000 : 0);
+					battleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState) / nextEncounterState.minimumEnemies - 1);
 				}
 				
 				if(battleState.encounterIndex != 0x7D)
@@ -2195,7 +2195,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 		if(battleState.battleComplete && encounter.nextIndex != null)
 		{
 			nextEncounterState = battleState.newEncounter(encounter.nextIndex, EncounterAction.Fight, true);
-			battleState.score -= 3000 * (nextEncounterState.startingEnemies / nextEncounterState.minimumEnemies - 1) - (nextEncounterState.encounterState == EncounterState.FirstStrike ? 1000 : 0) + (nextEncounterState.encounterState == EncounterState.Ambushed ? 1000 : 0);
+			battleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState) / nextEncounterState.minimumEnemies - 1);
 		}
 		
 		if(battleState.encounterIndex != 0x7D)
