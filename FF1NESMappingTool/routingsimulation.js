@@ -2144,6 +2144,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 	let delayIndex = redoBattle && battleState.encounterState != EncounterState.Ambushed ? (delayStates[battleState.index] ?? 0) : 0;
 	let bestScore = -999999;
 	let bestDelay = 0;
+	let delay;
 	
 	do 
 	{
@@ -2183,7 +2184,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 			scoreTracker[battleState.index] = scores;
 		}
 		
-		let delay = bestDelay;
+		delay = bestDelay;
 		battleState = priorBattleState.newTurn(encounterAction);
 		if(priorBattleState == battleStartState)
 			battleState.encounterState = battleStartState.encounterState;
