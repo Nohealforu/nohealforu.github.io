@@ -2148,7 +2148,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 	let bestScore = -999999;
 	let bestDelay = 0;
 	let delay;
-	let dangerRatio = encounter.danger / encounter.next?.encounterDanger || 1;
+	let dangerRatio = encounter.next?.encounterDanger / encounter.danger || 1;
 	
 	do 
 	{
@@ -2176,7 +2176,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 				battleState.estimatedTime += (i < 6 ? i * 41 : 50 * Math.floor(i / 3) + 41 * (i % 3));
 				if(priorBattleState == battleStartState)
 					battleState.encounterState = battleStartState.encounterState;
-				battleState.runTurn(i, encounter.stepsToHeal, dangerRatio);
+				battleState.runTurn(i, encounter.stepsToHeal, encounter.danger / 3);
 				
 				let nextEncounterState;
 				if(battleState.battleComplete && encounter.next.index != null)
@@ -2203,7 +2203,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 		if(priorBattleState == battleStartState)
 			battleState.encounterState = battleStartState.encounterState;
 		battleState.estimatedTime += (delay < 6 ? delay * 41 : 50 * Math.floor(delay / 3) + 41 * (delay % 3));
-		battleState.runTurn(delay, encounter.stepsToHeal, dangerRatio);
+		battleState.runTurn(delay, encounter.stepsToHeal, encounter.danger / 3);
 		
 		let nextEncounterState;
 		if(battleState.battleComplete && encounter.next.index != null)
