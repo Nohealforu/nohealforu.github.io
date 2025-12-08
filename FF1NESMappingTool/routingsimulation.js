@@ -1554,6 +1554,8 @@ BattleState.prototype.newEncounter = function(encounterIndex, playerAction, futu
 	
 	battleState.minimumEnemies = enemyCounts[2];
 	battleState.startingEnemies = enemyCounts[0] + enemyCounts[1];
+	if(encounterIndex == 0x4A)
+		battleState.minimumEnemies = 2;
 	
 	let command;
 	if(playerAction == EncounterAction.Fight)
@@ -1614,11 +1616,11 @@ BattleState.prototype.checkEnemyDead = function()
             character.status &= (StatusEffect.poison | StatusEffect.dead | StatusEffect.stone);
 			character.resistances = character.characterData.resistances;
 			if((character.status & StatusEffect.poison) > 0) // poison could be acceptable, or secondary characters dying pre garland, but /shrug
-				this.score -= 1000;
+				this.score -= 3500;
         }
 	}
     this.gold += gold;
-	this.score += 500;
+	this.score += 1500;
 	
 	// TODO: Score based on next encounter threat
 	
@@ -1627,7 +1629,7 @@ BattleState.prototype.checkEnemyDead = function()
 	return true;
 };
 
-BattleState.prototype.runTurn = function(delay, stepsToHeal)
+BattleState.prototype.runTurn = function(delay, stepsToHeal, dangerRatio)
 {
 	let missCount = 0;
 	let critCount = 0;
@@ -1878,7 +1880,7 @@ BattleState.prototype.runTurn = function(delay, stepsToHeal)
 				{
 					let damageRatio = damageSum / targetCharacter.characterData.hp; // adjust this by starting hp or something?
 					// calculated danger levels?
-					this.score -= 2000 * damageRatio * damageRatio * (stepsToHeal + 1);
+					this.score -= 2000 * damageRatio * damageRatio * (stepsToHeal + 1) * dangerRatio;
 				}
 				this.damageTaken += damageSum;
 				this.estimatedTime += 90;
@@ -1930,7 +1932,7 @@ BattleState.prototype.runTurn = function(delay, stepsToHeal)
 						else // percent of hp damage dealt in a turn or something, idk 
 						{
 							let damageRatio = damageRoll / targetCharacter.characterData.hp; // adjust this by starting hp or something? idk
-							this.score -= 2000 * damageRatio * damageRatio * (stepsToHeal + 1);
+							this.score -= 2000 * damageRatio * damageRatio * (stepsToHeal + 1) * dangerRatio;
 						}
 						
 						this.damageTaken += damageRoll;
@@ -2053,11 +2055,12 @@ BattleState.prototype.runTurn = function(delay, stepsToHeal)
 	// failsafe if somehow the enemies are missing
 	if(this.checkEnemyDead())
 		return;
-	if((this.battleCharacters[0x80].status & !(StatusEffect.mute | StatusEffect.dark)) > 0) // poison could be acceptable, or secondary characters dying pre garland, but /shrug
+	if((this.battleCharacters[0x80].status & ~(StatusEffect.mute | StatusEffect.dark)) > 0) // poison could be acceptable, or secondary characters dying pre garland, but /shrug
 		this.score -= 1000;
 	return;
 };
 
+/*
 BattleState.prototype.improvedEndState = function(battleStartState, redoBattleEndState, redoBattleNextState)
 {
 	let sumHp = 0;
@@ -2121,7 +2124,7 @@ BattleState.prototype.improvedEndState = function(battleStartState, redoBattleEn
 	//if(this.startTime + this.estimatedTime < redoBattleEndState.startTime + redoBattleEndState.estimatedTime)
 	//	return true;
 	return false;
-};
+};*/
 
 var iterationAbortCount;
 
@@ -2145,6 +2148,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 	let bestScore = -999999;
 	let bestDelay = 0;
 	let delay;
+	let dangerRatio = encounter.danger / encounter.next?.encounterDanger || 1;
 	
 	do 
 	{
@@ -2156,29 +2160,39 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 		else
 		{
 			let scores = [];
-			for (let i = 0; i < (priorBattleState.encounterState == EncounterState.Ambushed ? 1 : 256); i++)
+			let canDelay = false;
+			for (let i = 0x80; i < 0x84; i++)
+			{
+				let character = battleState.battleCharacters[i];
+				if (character != null && character.canAct())
+					canDelay = true;
+			}
+			if(priorBattleState.encounterState == EncounterState.Ambushed)
+				canDelay = false;
+			
+			for (let i = 0; i < (canDelay ? 256 : 1); i++)
 			{
 				battleState = priorBattleState.newTurn(encounterAction);
 				battleState.estimatedTime += (i < 6 ? i * 41 : 50 * Math.floor(i / 3) + 41 * (i % 3));
 				if(priorBattleState == battleStartState)
 					battleState.encounterState = battleStartState.encounterState;
-				battleState.runTurn(i, encounter.stepsToHeal);
+				battleState.runTurn(i, encounter.stepsToHeal, dangerRatio);
 				
 				let nextEncounterState;
-				if(battleState.battleComplete && encounter.nextIndex != null)
+				if(battleState.battleComplete && encounter.next.index != null)
 				{
-					nextEncounterState = battleState.newEncounter(encounter.nextIndex, EncounterAction.Fight, true);
-					battleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState) / nextEncounterState.minimumEnemies - 1);
+					nextEncounterState = battleState.newEncounter(encounter.next.index, EncounterAction.Fight, true);
+					battleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState) / nextEncounterState.minimumEnemies - 1) * dangerRatio;
 				}
 				
 				if(battleState.encounterIndex != 0x7D)
-					battleState.score -= battleState.estimatedTime;
+					battleState.score -= battleState.estimatedTime * 2;
 				if(battleState.score > bestScore)
 				{
 					bestScore = battleState.score;
 					bestDelay = i;
 				}
-				scores[i] = {score: battleState.score, delay: i};
+				scores[i] = {score: battleState.score, delay: i, dmg: battleState.damageDealt, lost: battleState.damageTaken, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState};
 			}
 			scores.sort((a, b) => b.score - a.score);
 			scoreTracker[battleState.index] = scores;
@@ -2189,17 +2203,17 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 		if(priorBattleState == battleStartState)
 			battleState.encounterState = battleStartState.encounterState;
 		battleState.estimatedTime += (delay < 6 ? delay * 41 : 50 * Math.floor(delay / 3) + 41 * (delay % 3));
-		battleState.runTurn(delay, encounter.stepsToHeal);
+		battleState.runTurn(delay, encounter.stepsToHeal, dangerRatio);
 		
 		let nextEncounterState;
-		if(battleState.battleComplete && encounter.nextIndex != null)
+		if(battleState.battleComplete && encounter.next.index != null)
 		{
-			nextEncounterState = battleState.newEncounter(encounter.nextIndex, EncounterAction.Fight, true);
-			battleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState) / nextEncounterState.minimumEnemies - 1);
+			nextEncounterState = battleState.newEncounter(encounter.next.index, EncounterAction.Fight, true);
+			battleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState) / nextEncounterState.minimumEnemies - 1) * dangerRatio;
 		}
 		
 		if(battleState.encounterIndex != 0x7D)
-			battleState.score -= battleState.estimatedTime;
+			battleState.score -= battleState.estimatedTime * 2;
 		
 		if(battleState.score < -1500)
 			battleState.badTurn = true;
@@ -2207,11 +2221,11 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 		if(battleState.battleComplete && redoBattle && battleState.score < -1500)
 			delayStates[battleState.index - 1]++;
 		
-		if(battleState.battleComplete && redoBattle && !battleState.improvedEndState(nextEncounterState, redoBattleEndState, redoBattleNextState))
+		/*if(battleState.battleComplete && redoBattle && !battleState.improvedEndState(nextEncounterState, redoBattleEndState, redoBattleNextState))
 		{
 			battleState.battleComplete = false;
 			battleState.badTurn = true;
-		}
+		}*/
 		if(encounter.currentTargetTime != null && battleState.startTime + battleState.estimatedTime >= encounter.currentTargetTime)
 			battleState.badTurn = true;
 		
@@ -2238,7 +2252,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 			delayIndex = redoBattle ? (delayStates[battleState.index] ?? 0) : 0;
 			bestScore = -999999;
 		}
-		if(currentIterationCount > 10) // something has probably gone wrong, abort path.  TODO: add better culling to prevent useless turns from eating time/count
+		if(currentIterationCount > 20 || battleState.turn > 10) // something has probably gone wrong, abort path.  TODO: add better culling to prevent useless turns from eating time/count
 		{
 			iterationAbortCount++;
 			return battleStartState;
@@ -2271,7 +2285,8 @@ function RouteAction(actionString)
 			case 'Encounter':
 				this.action = Action.Encounter;
 				this.encounterIndex = (parseInt(splitAction[1]) || 0);
-				let encounterAction = splitAction[2];
+				this.encounterDanger = (parseInt(splitAction[2]) || 3);
+				let encounterAction = splitAction[3];
 				if (encounterAction == 'Bane')
 					this.encounterAction = EncounterAction.Bane;
 				else if (encounterAction == 'Flee')
@@ -2324,246 +2339,243 @@ function RouteAction(actionString)
 }
 
 var route = [
-new RouteAction('Encounter 0x02'),
-new RouteAction('Encounter 0x83'),
-new RouteAction('Encounter 0x07'),
+new RouteAction('Encounter 0x02'), // GrImp
+new RouteAction('Encounter 0x83'), // Wolf
+new RouteAction('Encounter 0x07 4'), // Creep
 new RouteAction('EquipWeapon ShortSword'),
 new RouteAction('Encounter 0x7E'), // pirates
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
-new RouteAction('Encounter 0xDC'),
-new RouteAction('Encounter 0x5D'),
+new RouteAction('Encounter 0xDC'), // Shark
+new RouteAction('Encounter 0x5D'), // Shark
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
-new RouteAction('Encounter 0x87'),
-new RouteAction('Encounter 0x87'),
-new RouteAction('Encounter 0x87'),
-new RouteAction('Encounter 0x0b'),
-new RouteAction('Encounter 0x0a'),
-new RouteAction('Encounter 0x66'),
-new RouteAction('Encounter 0x85'),
-new RouteAction('Encounter 0x66'),
+new RouteAction('Encounter 0x87 4'), // Ogre/Creep
+new RouteAction('Encounter 0x87 4'), // Ogre/Creep
+new RouteAction('Encounter 0x87 4'), // Ogre/Creep
+new RouteAction('Encounter 0x0b'), // GrWolf
+new RouteAction('Encounter 0x0a'), // Shadow
+new RouteAction('Encounter 0x66'), // Arachnid
+new RouteAction('Encounter 0x85'), // Scum
+new RouteAction('Encounter 0x66'), // Arachnid 
 new RouteAction('EquipArmor IronArmor'),
-new RouteAction('Encounter 0x1C'),
-new RouteAction('Encounter 0x85'),
-new RouteAction('Encounter 0x10'),
-new RouteAction('Encounter 0x6B'),
-new RouteAction('Encounter 0x81'),
-new RouteAction('Encounter 0x6B'),
-new RouteAction('Encounter 0x0F'),
-new RouteAction('Encounter 0x0D'),
-new RouteAction('Encounter 0x7D'),
-new RouteAction('Encounter 0x0C'),
-new RouteAction('Encounter 0x12'),
-new RouteAction('Encounter 0x8E'),
-new RouteAction('Encounter 0x0C'),
-new RouteAction('Encounter 0x5D'),
-new RouteAction('Encounter 0x01'),
-new RouteAction('Encounter 0x0C'),
-new RouteAction('Encounter 0x82'),
-new RouteAction('Encounter 0x5C'),
-new RouteAction('Encounter 0x5C'),
+new RouteAction('Encounter 0x1C 5'), // Wizard
+new RouteAction('Encounter 0x85'), // Scum
+new RouteAction('Encounter 0x10'), // Gargoyle
+new RouteAction('Encounter 0x6B'), // Muck
+new RouteAction('Encounter 0x81'), // Bone
+new RouteAction('Encounter 0x6B'), // Muck
+new RouteAction('Encounter 0x0F'), // Geist
+new RouteAction('Encounter 0x0D'), // Asp
+new RouteAction('Encounter 0x7D 5'), // Astos
+new RouteAction('Encounter 0x0C'), // Ogre
+new RouteAction('Encounter 0x12'), // Arachnid
+new RouteAction('Encounter 0x8E'), // GrImp
+new RouteAction('Encounter 0x0C'), // Ogre // CANAL
+new RouteAction('Encounter 0x5D'), // Shark
+new RouteAction('Encounter 0x01'), // Bone
+new RouteAction('Encounter 0x0C'), // Ogre
+new RouteAction('Encounter 0x82'), // GrImp
+new RouteAction('Encounter 0x5C'), // Kyzoku
+new RouteAction('Encounter 0x5C'), // Kyzoku
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
 new RouteAction('EquipWeapon SilverSword'),
-new RouteAction('Encounter 0x5E'),
-new RouteAction('Encounter 0x5C'),
-new RouteAction('Encounter 0x0C'),
-new RouteAction('Encounter 0x87'),
-new RouteAction('Encounter 0x12'),
-new RouteAction('Encounter 0xDC'),
-new RouteAction('Encounter 0xDC'),
-new RouteAction('Encounter 0x88'),
-new RouteAction('Encounter 0x8A'),
-new RouteAction('Encounter 0x90'),
-new RouteAction('Encounter 0x8D'),
-new RouteAction('Encounter 0x93'),
-new RouteAction('Encounter 0x1C'),
-new RouteAction('Encounter 0x93'),
-new RouteAction('Encounter 0x16'),
-new RouteAction('Encounter 0x8F'),
-new RouteAction('Encounter 0x7C'),
-new RouteAction('Encounter 0x1C'),
-new RouteAction('Encounter 0x93'),
-new RouteAction('Encounter 0x91'),
-new RouteAction('Encounter 0x93'),
-new RouteAction('Encounter 0x91'),
-new RouteAction('Encounter 0x91'),
-new RouteAction('Encounter 0x15'),
-new RouteAction('Encounter 0x13'),
-new RouteAction('Encounter 0x13'),
-new RouteAction('Encounter 0x19'),
-new RouteAction('Encounter 0x13'),
-new RouteAction('Encounter 0x13'),
-new RouteAction('Encounter 0x8C'),
-new RouteAction('Encounter 0x88'),
-new RouteAction('Encounter 0x19'),
-new RouteAction('Encounter 0x8A'),
-new RouteAction('Encounter 0x13'),
+new RouteAction('Encounter 0x5E'), // Shark // CANAL
+new RouteAction('Encounter 0x5C'), // Kyzoku
+new RouteAction('Encounter 0x0C'), // Ogre
+new RouteAction('Encounter 0x87'), // Ogre/Creep
+new RouteAction('Encounter 0x12'), // Arachnid
+new RouteAction('Encounter 0xDC'), // Shark
+new RouteAction('Encounter 0xDC'), // Shark
+new RouteAction('Encounter 0x88'), // Ghoul
+new RouteAction('Encounter 0x8A'), // Shadow
+new RouteAction('Encounter 0x90'), // Gargoyle
+new RouteAction('Encounter 0x8D'), // Asp
+new RouteAction('Encounter 0x93'), // GrOgre
+new RouteAction('Encounter 0x1C 4'), // Wizard
+new RouteAction('Encounter 0x93'), // GrOgre
+new RouteAction('Encounter 0x16'), // Coctrice
+new RouteAction('Encounter 0x8F Flee'), // Spect/Geist
+new RouteAction('Encounter 0x7C 5'), // Vampire
+new RouteAction('Encounter 0x1C 4'), // Wizard
+new RouteAction('Encounter 0x93'), // GrOgre
+new RouteAction('Encounter 0x91'), // WrWolf
+new RouteAction('Encounter 0x93'), // GrOgre
+new RouteAction('Encounter 0x91'), // WrWolf
+new RouteAction('Encounter 0x91'), // WrWolf
+new RouteAction('Encounter 0x15'), // Cobra
+new RouteAction('Encounter 0x13'), // GrOgre
+new RouteAction('Encounter 0x13'), // GrOgre
+new RouteAction('Encounter 0x19 4'), // Tiger
+new RouteAction('Encounter 0x13'), // GrOgre
+new RouteAction('Encounter 0x13'), // GrOgre
+new RouteAction('Encounter 0x8C'), // Ogre
+new RouteAction('Encounter 0x88'), // Ghoul
+new RouteAction('Encounter 0x19 4'), // Tiger
+new RouteAction('Encounter 0x8A'), // Shadow
+new RouteAction('Encounter 0x13'), // GrOgre
 new RouteAction('TimeTarget'),
 new RouteAction('Heal 120'),
-new RouteAction('Encounter 0x15'),
-new RouteAction('Encounter 0x64'),
-new RouteAction('Encounter 0x93'),
-new RouteAction('Encounter 0x91'),
-new RouteAction('Encounter 0x1C'),
-new RouteAction('Encounter 0x8F'),
-new RouteAction('Encounter 0x93'),
-new RouteAction('Encounter 0x1C'),
-new RouteAction('Encounter 0x0E'),
-new RouteAction('Encounter 0x63'),
-new RouteAction('Encounter 0x18'),
-new RouteAction('Encounter 0x63'),
-new RouteAction('Encounter 0x1D'),
-new RouteAction('Encounter 0x63'),
-new RouteAction('Encounter 0x7A'),
-new RouteAction('Encounter 0x8C'),
-new RouteAction('Encounter 0x8A'),
-new RouteAction('Encounter 0x88'),
-new RouteAction('Encounter 0x5B'),
-new RouteAction('Encounter 0x5C'),
-new RouteAction('Encounter 0x1E'),
-new RouteAction('Encounter 0x63'),
+new RouteAction('Encounter 0x15'), // Cobra
+new RouteAction('Encounter 0x64'), // Bull
+new RouteAction('Encounter 0x93'), // GrOgre
+new RouteAction('Encounter 0x91'), // WrWolf
+new RouteAction('Encounter 0x1C 4'), // Wizard
+new RouteAction('Encounter 0x8F Flee'), // Spect/Geist
+new RouteAction('Encounter 0x93'), // GrOgre
+new RouteAction('Encounter 0x1C 4'), // Wizard
+new RouteAction('Encounter 0x0E'), // WrWolf
+new RouteAction('Encounter 0x63'), // Troll
+new RouteAction('Encounter 0x18'), // Image
+new RouteAction('Encounter 0x63'), // Mummy 
+new RouteAction('Encounter 0x7A 5'), // LICH
+new RouteAction('Encounter 0x8C'), // Ogre
+new RouteAction('Encounter 0x8A'), // Shadow
+new RouteAction('Encounter 0x88'), // Ghoul
+new RouteAction('Encounter 0x5B'), // OddEye
+new RouteAction('Encounter 0x5C'), // Kyzoku
+new RouteAction('Encounter 0x1E'), // Giant
+new RouteAction('Encounter 0x63'), // Troll
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
 new RouteAction('EquipArmor SilverGauntlet'),
 new RouteAction('EquipArmor SilverHelmet'),
-new RouteAction('Encounter 0x20'),
-new RouteAction('Encounter 0x1E'),
-new RouteAction('Encounter 0x20'),
-new RouteAction('Encounter 0x5F'),
-new RouteAction('Encounter 0xA5'),
-new RouteAction('Encounter 0x20'),
-new RouteAction('Encounter 0x9C'),
-new RouteAction('Encounter 0x9C'),
-new RouteAction('Encounter 0x2C'),
-new RouteAction('Encounter 0x98'),
-new RouteAction('Encounter 0x2F'),
-new RouteAction('Encounter 0x2C'), // trap undead tile // Ice spikes?
-new RouteAction('Encounter 0x2E'),
+new RouteAction('Encounter 0x20'), // Hydra
+new RouteAction('Encounter 0x1E'), // Giant
+new RouteAction('Encounter 0x20'), // Hydra
+new RouteAction('Encounter 0x5F'), // Caribe
+new RouteAction('Encounter 0xA5'), // Ocho
+new RouteAction('Encounter 0x20'), // Hydra
+new RouteAction('Encounter 0x9C 4'), // Wizard
+new RouteAction('Encounter 0x9C 4'), // Wizard
+new RouteAction('Encounter 0x2C'), // Wraith
+new RouteAction('Encounter 0x98'), // Image
+new RouteAction('Encounter 0x2F'), // Mage
+new RouteAction('Encounter 0x2C 4'), // trap undead tile // Ice spikes?
+new RouteAction('Encounter 0x2E'), // FrGiant
 new RouteAction('Burn 6'),
-new RouteAction('Encounter 0x6C'),
-new RouteAction('Encounter 0x2C'),
-new RouteAction('Encounter 0x69'),
-new RouteAction('Encounter 0x2C'), // trap undead tile 
+new RouteAction('Encounter 0x6C 4'), // Sorcs
+new RouteAction('Encounter 0x2C'), // Wraith
+new RouteAction('Encounter 0x69 4'), // Eye
+new RouteAction('Encounter 0x2C 4'), // trap undead tile 
 new RouteAction('Burn 6'),
-new RouteAction('Encounter 0x2F'),
-new RouteAction('Encounter 0x2F'),
-new RouteAction('Encounter 0x6C'),
-new RouteAction('Encounter 0x96'),
-new RouteAction('Encounter 0x0F'),
-new RouteAction('Encounter 0x5F'),
-new RouteAction('Encounter 0x5F'),
-new RouteAction('Encounter 0x20'),
-new RouteAction('Encounter 0xDE'),
+new RouteAction('Encounter 0x2F'), // Mage
+new RouteAction('Encounter 0x2F'), // Mage
+new RouteAction('Encounter 0x6C'), // Sorcs
+new RouteAction('Encounter 0x96'), // Cocktrice/mummy
+new RouteAction('Encounter 0x0F'), // Geist
+new RouteAction('Encounter 0x5F'), // Caribe
+new RouteAction('Encounter 0x5F'), // Caribe
+new RouteAction('Encounter 0x20'), // Hydra
+new RouteAction('Encounter 0xDE'), // Shark 
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
 new RouteAction('Encounter 0x1E'),
 new RouteAction('Burn 48'),
-new RouteAction('Encounter 0xDE'), // LAVA 403 -> 355
+new RouteAction('Encounter 0x24'), // R. Hydra LAVA 403 -> 355
 new RouteAction('Burn 167'),
-new RouteAction('Encounter 0x24'), // 355 -> 188
+new RouteAction('Encounter 0x24'), // R. Hydra 355 -> 188
 new RouteAction('EquipWeapon IceSword'),
 new RouteAction('EquipArmor IceShield'),
 new RouteAction('UnequipArmor SilverGauntlet'),
 new RouteAction('Burn 29'),
-new RouteAction('Encounter 0x24'), // 185 -> 156
+new RouteAction('Encounter 0x29'), // Agama 185 -> 156
 new RouteAction('Burn 45'),
-new RouteAction('Encounter 0x29'), // 147 -> 102
-new RouteAction('Encounter 0x79'),
-new RouteAction('Encounter 0x26'),
+new RouteAction('Encounter 0x79 4'), // Kary 147 -> 102
+new RouteAction('Encounter 0x26'), // R. Giant
 new RouteAction('TimeTarget'),
 new RouteAction('ChangeGold -50000'), // bottle, need to get other chests in here 
 new RouteAction('Heal'),
 new RouteAction('EquipArmor ProRing'),
-new RouteAction('Encounter 0xA0'),
-new RouteAction('Encounter 0x72'),
-new RouteAction('Encounter 0x72'),
-new RouteAction('Encounter 0x49'),
-new RouteAction('Encounter 0x48'),
+new RouteAction('Encounter 0xA0'), // Hydra
+new RouteAction('Encounter 0x72'), // SeaSnake
+new RouteAction('Encounter 0x72'), // SeaSnake
+new RouteAction('Encounter 0x49 5'), // Water
+new RouteAction('Encounter 0x48 4'), // GrShark 
 new RouteAction('EquipArmor OpalBracelet'),
-new RouteAction('Encounter 0x5A'),
-new RouteAction('Encounter 0xDA'),
-new RouteAction('Encounter 0x47'),
-new RouteAction('Encounter 0x5A'),
-new RouteAction('Encounter 0xE1'),
-new RouteAction('Encounter 0x47'),
-new RouteAction('Encounter 0xDA'),
-new RouteAction('Encounter 0xC4'),
-new RouteAction('Encounter 0x48'),
-new RouteAction('Encounter 0x49'),
-new RouteAction('Encounter 0xC2'),
-new RouteAction('Encounter 0xC4'),
-new RouteAction('Encounter 0x78'),
-new RouteAction('Encounter 0x60'),
-new RouteAction('Encounter 0xA0'),
-new RouteAction('Encounter 0xA0'),
-new RouteAction('Encounter 0x4F'),
-new RouteAction('Encounter 0x3F'),
-new RouteAction('Encounter 0x4F'),
-new RouteAction('Encounter 0x4F'),
-new RouteAction('Encounter 0x4A'), // waterfall trap tile
-new RouteAction('Encounter 0x4A'), // waterfall trap tile
-new RouteAction('Encounter 0x3F'),
-new RouteAction('Encounter 0x4F'),
-new RouteAction('Encounter 0xCA'),
-new RouteAction('Encounter 0x4F'),
-new RouteAction('Encounter 0x3F'),
-new RouteAction('Encounter 0xA0'),
-new RouteAction('Encounter 0x41'),
-new RouteAction('Encounter 0x41'),
+new RouteAction('Encounter 0x5A 4'), // GrShark 
+new RouteAction('Encounter 0xDA 4'), // GrShark 
+new RouteAction('Encounter 0x47'), // Naga
+new RouteAction('Encounter 0x5A 4'), // GrShark 
+new RouteAction('Encounter 0xE1 4'), // SeaTroll
+new RouteAction('Encounter 0x47'), // Naga
+new RouteAction('Encounter 0xDA 4'), // GrShark 
+new RouteAction('Encounter 0xC4'), // Lobster
+new RouteAction('Encounter 0x48 4'), // GrShark
+new RouteAction('Encounter 0x49 5'), // Water
+new RouteAction('Encounter 0xC2 4'), // SeaTroll/Lobster
+new RouteAction('Encounter 0xC4'), // Lobster
+new RouteAction('Encounter 0x78 5'), // Kraken
+new RouteAction('Encounter 0x60'), // Hydra
+new RouteAction('Encounter 0xA0'), // Hydra
+new RouteAction('Encounter 0xA0'), // Hydra
+new RouteAction('Encounter 0x4F'), // Nitemare
+new RouteAction('Encounter 0x3F'), // MudGol
+new RouteAction('Encounter 0x4F'), // Nitemare
+new RouteAction('Encounter 0x4F'), // Nitemare
+new RouteAction('Encounter 0x4A 4'), // waterfall trap tile
+new RouteAction('Encounter 0x4A 4'), // waterfall trap tile
+new RouteAction('Encounter 0x3F'), // MudGol
+new RouteAction('Encounter 0x4F'), // Nitemare
+new RouteAction('Encounter 0xCA'), // WzMummy/Mummy
+new RouteAction('Encounter 0x4F'), // Nitemare
+new RouteAction('Encounter 0x3F'), // MudGol
+new RouteAction('Encounter 0xA0'), // Hydra
+new RouteAction('Encounter 0x41'), // Naocho
+new RouteAction('Encounter 0x41'), // Naocho
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
-new RouteAction('Encounter 0x82'),
-new RouteAction('Encounter 0x82'),
-new RouteAction('Encounter 0x82'),
-new RouteAction('Encounter 0x9E'),
-new RouteAction('Encounter 0x82'),
-new RouteAction('Encounter 0x8D'),
-new RouteAction('Encounter 0x88'),
-new RouteAction('Encounter 0x3B'),
-new RouteAction('Encounter 0x4C'),
-new RouteAction('Encounter 0x3B'),
-new RouteAction('Encounter 0x68'),
+new RouteAction('Encounter 0x82'), // ZomBull
+new RouteAction('Encounter 0x82'), // ZomBull
+new RouteAction('Encounter 0x82'), // ZomBull
+new RouteAction('Encounter 0x9E'), // Giant
+new RouteAction('Encounter 0x82'), // ZomBull
+new RouteAction('Encounter 0x8D'), // Tyro
+new RouteAction('Encounter 0x88'), // R.Ankylo
+new RouteAction('Encounter 0x3B'), // Chimera
+new RouteAction('Encounter 0x4C'), // Guard
+new RouteAction('Encounter 0x3B'), // Chimera
+new RouteAction('Encounter 0x68'), // Vampire
 new RouteAction('EquipWeapon SunSword'),
-new RouteAction('Encounter 0x4C'),
-new RouteAction('Encounter 0x4A'),
-new RouteAction('Encounter 0x4E'),
-new RouteAction('Encounter 0x69'),
-new RouteAction('Encounter 0x54'),
-new RouteAction('Encounter 0x4D'),
-new RouteAction('Encounter 0x69'),
-new RouteAction('Encounter 0xB3'),
-new RouteAction('Encounter 0x51'),
-new RouteAction('Encounter 0xC1'),
-new RouteAction('Encounter 0x51'),
-new RouteAction('Encounter 0xC1'),
-new RouteAction('Encounter 0x77 Bane'),
-new RouteAction('Encounter 0xBD'),
+new RouteAction('Encounter 0x4C'), // Guard
+new RouteAction('Encounter 0x4A'), // WzMummy
+new RouteAction('Encounter 0x4E'), // BlueD
+new RouteAction('Encounter 0x69'), // Eye
+new RouteAction('Encounter 0x54'), // Evilman/Nitemare
+new RouteAction('Encounter 0x4D'), // Badman
+new RouteAction('Encounter 0x69'), // Eye
+new RouteAction('Encounter 0xB3'), // Mancat
+new RouteAction('Encounter 0x51'), // Air
+new RouteAction('Encounter 0xC1'), // Naocho
+new RouteAction('Encounter 0x51'), // Air
+new RouteAction('Encounter 0xC1'), // Naocho
+new RouteAction('Encounter 0x77 Bane'), // Tiamat
+new RouteAction('Encounter 0xBD'), // Tyro
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
-new RouteAction('Encounter 0x02'),
-new RouteAction('Encounter 0x57'),
-new RouteAction('Encounter 0xAF'),
-new RouteAction('Encounter 0x46'),
-new RouteAction('Encounter 0xCB'),
-new RouteAction('Encounter 0x57'),
-new RouteAction('Encounter 0x57'),
-new RouteAction('Encounter 0xA1'),
-new RouteAction('Encounter 0xBA'),
-new RouteAction('Encounter 0x73'),
-new RouteAction('Encounter 0xA6'),
-new RouteAction('Encounter 0xA8'),
-new RouteAction('Encounter 0xA8'),
-new RouteAction('Encounter 0xA6'),
-new RouteAction('Encounter 0xA6'),
-new RouteAction('Encounter 0x74'),
-new RouteAction('Encounter 0xC9'),
-new RouteAction('Encounter 0xC9'),
-new RouteAction('Encounter 0x75 Bane'),
-new RouteAction('Encounter 0xD4'),
-new RouteAction('Encounter 0x76 Bane'),
-new RouteAction('Encounter 0x7B Bane'),
+new RouteAction('Encounter 0x02'), // GrImp
+new RouteAction('Encounter 0x57'), // Worm
+new RouteAction('Encounter 0xAF'), // Mage/Fighter
+new RouteAction('Encounter 0x46'), // Phantom
+new RouteAction('Encounter 0xCB'), // ZombieD
+new RouteAction('Encounter 0x57'), // Worm
+new RouteAction('Encounter 0x57'), // Worm
+new RouteAction('Encounter 0xA1'), // Earth
+new RouteAction('Encounter 0xBA'), // Sauria
+new RouteAction('Encounter 0x73'), // Lich2
+new RouteAction('Encounter 0xA6'), // R.Giant/Agama
+new RouteAction('Encounter 0xA8'), // GreyW
+new RouteAction('Encounter 0xA8'), // GreyW
+new RouteAction('Encounter 0xA6'), // R.Giant/Agama
+new RouteAction('Encounter 0xA6'), // R.Giant/Agama
+new RouteAction('Encounter 0x74'), // Kary2
+new RouteAction('Encounter 0xC9'), // Water
+new RouteAction('Encounter 0xC9'), // Water
+new RouteAction('Encounter 0x75 Bane'), // Kraken2
+new RouteAction('Encounter 0xD4'), // Evilman/Nightmare
+new RouteAction('Encounter 0x76 Bane'), // Tiamat2
+new RouteAction('Encounter 0x7B Bane'), // CHAOS
 new RouteAction('TimeTarget'),
 ];
 
@@ -2613,8 +2625,8 @@ async function runRoute()
 		switch(currentAction.action)
 		{
 			case Action.Encounter:
-				currentAction.encounter = {index: currentAction.encounterIndex, nextIndex: nextEncounter, stepsToHeal: stepsToHeal, targetTime: targetTime};
-				nextEncounter = currentAction.encounterIndex;
+				currentAction.encounter = {index: currentAction.encounterIndex, next: nextEncounter, danger: currentAction.encounterDanger, stepsToHeal: stepsToHeal, targetTime: targetTime};
+				nextEncounter = currentAction;
 				stepsToHeal++;
 				break;
 			case Action.Heal:
@@ -2700,7 +2712,7 @@ async function runRoute()
 			default:
 				console.log('UnknownCommand: ' + currentAction.inputString);
 		}
-		if(currentIterationCount > 500) // something has probably gone wrong, abort everything
+		if(currentIterationCount > 10000) // something has probably gone wrong, abort everything
 		{
 			console.log('Too many route steps - Please stop and fix your route');
 			stop = true;
@@ -2709,5 +2721,6 @@ async function runRoute()
 	}
 	console.log('Completed');
 	console.log(endingBattleSummaries);
+	console.log(scoreTracker); 
 	console.log(iterationAbortCount);
 }
