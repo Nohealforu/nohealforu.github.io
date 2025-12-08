@@ -2396,7 +2396,7 @@ new RouteAction('Encounter 0x93'), // GrOgre
 new RouteAction('Encounter 0x1C 4'), // Wizard
 new RouteAction('Encounter 0x93'), // GrOgre
 new RouteAction('Encounter 0x16'), // Coctrice
-new RouteAction('Encounter 0x8F Flee'), // Spect/Geist
+new RouteAction('Encounter 0x8F 3 Flee'), // Spect/Geist
 new RouteAction('Encounter 0x7C 5'), // Vampire
 new RouteAction('Encounter 0x1C 4'), // Wizard
 new RouteAction('Encounter 0x93'), // GrOgre
@@ -2422,7 +2422,7 @@ new RouteAction('Encounter 0x64'), // Bull
 new RouteAction('Encounter 0x93'), // GrOgre
 new RouteAction('Encounter 0x91'), // WrWolf
 new RouteAction('Encounter 0x1C 4'), // Wizard
-new RouteAction('Encounter 0x8F Flee'), // Spect/Geist
+new RouteAction('Encounter 0x8F 3 Flee'), // Spect/Geist
 new RouteAction('Encounter 0x93'), // GrOgre
 new RouteAction('Encounter 0x1C 4'), // Wizard
 new RouteAction('Encounter 0x0E'), // WrWolf
@@ -2550,7 +2550,7 @@ new RouteAction('Encounter 0x51'), // Air
 new RouteAction('Encounter 0xC1'), // Naocho
 new RouteAction('Encounter 0x51'), // Air
 new RouteAction('Encounter 0xC1'), // Naocho
-new RouteAction('Encounter 0x77 Bane'), // Tiamat
+new RouteAction('Encounter 0x77 4 Bane'), // Tiamat
 new RouteAction('Encounter 0xBD'), // Tyro
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
@@ -2572,10 +2572,10 @@ new RouteAction('Encounter 0xA6'), // R.Giant/Agama
 new RouteAction('Encounter 0x74'), // Kary2
 new RouteAction('Encounter 0xC9'), // Water
 new RouteAction('Encounter 0xC9'), // Water
-new RouteAction('Encounter 0x75 Bane'), // Kraken2
+new RouteAction('Encounter 0x75 4 Bane'), // Kraken2
 new RouteAction('Encounter 0xD4'), // Evilman/Nightmare
-new RouteAction('Encounter 0x76 Bane'), // Tiamat2
-new RouteAction('Encounter 0x7B Bane'), // CHAOS
+new RouteAction('Encounter 0x76 4 Bane'), // Tiamat2
+new RouteAction('Encounter 0x7B 4 Bane'), // CHAOS
 new RouteAction('TimeTarget'),
 ];
 
