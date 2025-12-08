@@ -1524,7 +1524,7 @@ BattleState.prototype.newEncounter = function(encounterIndex, playerAction, futu
 	// Generate enemies
 	let formation2 = encounterIndex >= 0x80;
 	let enemyCounts = [0, 0, 0]; // small/large/minimum enemy count
-	let battleState = new BattleState(1 + this.index, this.randomNumberIndex, this.gold, battleCharacters, this.startTime + this.estimatedTime, encounterIndex, this.formation);
+	let battleState = new BattleState(1 + this.index, this.randomNumberIndex, this.gold, battleCharacters, this.startTime + this.estimatedTime, encounterIndex, encounter.formation);
 	
 	if(encounter.formation == Formation.fiend || encounter.formation == Formation.chaos)
 	{
@@ -1578,7 +1578,7 @@ BattleState.prototype.checkPartyDead = function()
 	return true;
 };
 
-BattleState.prototype.checkEnemyDead = function()
+BattleState.prototype.checkEnemyDead = function(dangerRatio)
 {
 	let exp = 0;
 	let gold = 0;
@@ -1620,7 +1620,7 @@ BattleState.prototype.checkEnemyDead = function()
         }
 	}
     this.gold += gold;
-	this.score += 1500;
+	this.score += 1500 * dangerRatio;
 	
 	// TODO: Score based on next encounter threat
 	
@@ -1780,6 +1780,7 @@ BattleState.prototype.runTurn = function(delay, stepsToHeal, dangerRatio)
 					{
 						if (target != null && target != targetOption)
 							continue;
+						this.incrementRandomIndex(targetOption < 2 ? formationRNGPrimaryIncrement[this.formation] : formationRNGSecondaryIncrement[this.formation]);
 						let targetCharacter = this.battleCharacters[targetOption];
 						if (targetCharacter == null || !targetCharacter.canTarget())
 							continue;
@@ -1801,7 +1802,7 @@ BattleState.prototype.runTurn = function(delay, stepsToHeal, dangerRatio)
 									if((targetCharacter.status & (StatusEffect.dead | StatusEffect.stone)) > 0)
 									{
 										targetCharacter.currentHp = 0;
-										this.score += 1000;
+										this.score += 10000;
 									}
 								}
 							}
@@ -1814,7 +1815,7 @@ BattleState.prototype.runTurn = function(delay, stepsToHeal, dangerRatio)
 				}
 			}
 			
-			if(this.checkEnemyDead())
+			if(this.checkEnemyDead(dangerRatio))
 				return;
 		}
 		else if (characterIndex < 9 && this.encounterState != EncounterState.FirstStrike) // monster
@@ -1824,7 +1825,7 @@ BattleState.prototype.runTurn = function(delay, stepsToHeal, dangerRatio)
 			{
 				this.score += 1000;
 				this.battleCharacters[characterIndex] = null;
-				if(this.checkEnemyDead())
+				if(this.checkEnemyDead(dangerRatio))
 					return;
 				continue;
 			}
@@ -1880,7 +1881,7 @@ BattleState.prototype.runTurn = function(delay, stepsToHeal, dangerRatio)
 				{
 					let damageRatio = damageSum / targetCharacter.characterData.hp; // adjust this by starting hp or something?
 					// calculated danger levels?
-					this.score -= 2000 * damageRatio * damageRatio * (stepsToHeal + 1) * dangerRatio;
+					this.score -= 2000 * damageRatio * damageRatio * (stepsToHeal + 1);
 				}
 				this.damageTaken += damageSum;
 				this.estimatedTime += 90;
@@ -1932,7 +1933,7 @@ BattleState.prototype.runTurn = function(delay, stepsToHeal, dangerRatio)
 						else // percent of hp damage dealt in a turn or something, idk 
 						{
 							let damageRatio = damageRoll / targetCharacter.characterData.hp; // adjust this by starting hp or something? idk
-							this.score -= 2000 * damageRatio * damageRatio * (stepsToHeal + 1) * dangerRatio;
+							this.score -= 2000 * damageRatio * damageRatio * (stepsToHeal + 1);
 						}
 						
 						this.damageTaken += damageRoll;
@@ -2053,7 +2054,7 @@ BattleState.prototype.runTurn = function(delay, stepsToHeal, dangerRatio)
 		}
 	}
 	// failsafe if somehow the enemies are missing
-	if(this.checkEnemyDead())
+	if(this.checkEnemyDead(dangerRatio))
 		return;
 	if((this.battleCharacters[0x80].status & ~(StatusEffect.mute | StatusEffect.dark)) > 0) // poison could be acceptable, or secondary characters dying pre garland, but /shrug
 		this.score -= 1000;
@@ -2179,9 +2180,9 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 				battleState.runTurn(i, encounter.stepsToHeal, encounter.danger / 3);
 				
 				let nextEncounterState;
-				if(battleState.battleComplete && encounter.next.encounterIndex != null)
+				if(battleState.battleComplete && encounter.next?.encounterIndex != null)
 				{
-					nextEncounterState = battleState.newEncounter(encounter.next.encounterIndex, EncounterAction.Fight, true);
+					nextEncounterState = battleState.newEncounter(encounter.next?.encounterIndex, EncounterAction.Fight, true);
 					battleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState) / nextEncounterState.minimumEnemies - 1) * dangerRatio;
 				}
 				
@@ -2206,9 +2207,9 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 		battleState.runTurn(delay, encounter.stepsToHeal, encounter.danger / 3);
 		
 		let nextEncounterState;
-		if(battleState.battleComplete && encounter.next.encounterIndex != null)
+		if(battleState.battleComplete && encounter.next?.encounterIndex != null)
 		{
-			nextEncounterState = battleState.newEncounter(encounter.next.encounterIndex, EncounterAction.Fight, true);
+			nextEncounterState = battleState.newEncounter(encounter.next?.encounterIndex, EncounterAction.Fight, true);
 			battleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState) / nextEncounterState.minimumEnemies - 1) * dangerRatio;
 		}
 		
