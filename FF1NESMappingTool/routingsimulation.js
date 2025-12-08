@@ -2179,9 +2179,9 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 				battleState.runTurn(i, encounter.stepsToHeal, encounter.danger / 3);
 				
 				let nextEncounterState;
-				if(battleState.battleComplete && encounter.next.index != null)
+				if(battleState.battleComplete && encounter.next.encounterIndex != null)
 				{
-					nextEncounterState = battleState.newEncounter(encounter.next.index, EncounterAction.Fight, true);
+					nextEncounterState = battleState.newEncounter(encounter.next.encounterIndex, EncounterAction.Fight, true);
 					battleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState) / nextEncounterState.minimumEnemies - 1) * dangerRatio;
 				}
 				
@@ -2206,9 +2206,9 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 		battleState.runTurn(delay, encounter.stepsToHeal, encounter.danger / 3);
 		
 		let nextEncounterState;
-		if(battleState.battleComplete && encounter.next.index != null)
+		if(battleState.battleComplete && encounter.next.encounterIndex != null)
 		{
-			nextEncounterState = battleState.newEncounter(encounter.next.index, EncounterAction.Fight, true);
+			nextEncounterState = battleState.newEncounter(encounter.next.encounterIndex, EncounterAction.Fight, true);
 			battleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState) / nextEncounterState.minimumEnemies - 1) * dangerRatio;
 		}
 		
