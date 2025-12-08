@@ -1554,8 +1554,8 @@ BattleState.prototype.newEncounter = function(encounterIndex, playerAction, futu
 	
 	battleState.minimumEnemies = enemyCounts[2];
 	battleState.startingEnemies = enemyCounts[0] + enemyCounts[1];
-	if(encounterIndex == 0x4A)
-		battleState.minimumEnemies = 2;
+	if(encounterIndex == 0x4A || encounterIndex == 0x2C)
+		battleState.minimumEnemies = 3;
 	
 	let command;
 	if(playerAction == EncounterAction.Fight)
@@ -2186,7 +2186,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 					battleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState) / nextEncounterState.minimumEnemies - 1) * dangerRatio;
 				}
 				
-				if(battleState.encounterIndex != 0x7D)
+				//if(battleState.encounterIndex != 0x7D)
 					battleState.score -= battleState.estimatedTime * 2;
 				if(battleState.score > bestScore)
 				{
@@ -2213,7 +2213,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 			battleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState) / nextEncounterState.minimumEnemies - 1) * dangerRatio;
 		}
 		
-		if(battleState.encounterIndex != 0x7D)
+		//if(battleState.encounterIndex != 0x7D)
 			battleState.score -= battleState.estimatedTime * 2;
 		
 		if(battleState.score < -1500)
@@ -2515,8 +2515,8 @@ new RouteAction('Encounter 0x4F'), // Nitemare
 new RouteAction('Encounter 0x3F'), // MudGol
 new RouteAction('Encounter 0x4F'), // Nitemare
 new RouteAction('Encounter 0x4F'), // Nitemare
-new RouteAction('Encounter 0x4A 4'), // waterfall trap tile
-new RouteAction('Encounter 0x4A 4'), // waterfall trap tile
+new RouteAction('Encounter 0x4A'), // waterfall trap tile
+new RouteAction('Encounter 0x4A'), // waterfall trap tile
 new RouteAction('Encounter 0x3F'), // MudGol
 new RouteAction('Encounter 0x4F'), // Nitemare
 new RouteAction('Encounter 0xCA'), // WzMummy/Mummy
