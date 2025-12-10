@@ -1305,7 +1305,7 @@ function BattleState(index, randomNumberIndex, gold, battleCharacters, startTime
 	this.encounterState = EncounterState.Normal;
 	this.turn = turn;
 	this.startTime = startTime;
-	this.estimatedTime = 0;
+	this.estimatedTime = 200;
 	this.damageTaken = 0;
 	this.damageDealt = 0;
 	this.score = 0;
@@ -1616,7 +1616,7 @@ BattleState.prototype.checkEnemyDead = function(dangerRatio)
             character.status &= (StatusEffect.poison | StatusEffect.dead | StatusEffect.stone);
 			character.resistances = character.characterData.resistances;
 			if((character.status & StatusEffect.poison) > 0) // poison could be acceptable, or secondary characters dying pre garland, but /shrug
-				this.score -= 5500;
+				this.score -= 10000;
         }
 	}
     this.gold += gold;
@@ -2058,7 +2058,7 @@ BattleState.prototype.runTurn = function(delay, stepsToHeal, dangerRatio)
 	if(this.checkEnemyDead(dangerRatio))
 		return;
 	if((this.battleCharacters[0x80].status & ~(StatusEffect.mute | StatusEffect.dark)) > 0) // poison could be acceptable, or secondary characters dying pre garland, but /shrug
-		this.score -= 3500;
+		this.score -= 5000;
 	return;
 };
 
@@ -2218,10 +2218,10 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 		//if(battleState.encounterIndex != 0x7D)
 			battleState.score -= battleState.estimatedTime * 2;
 		
-		if(battleState.score < -5000)
+		if(battleState.score < -6000)
 			battleState.badTurn = true;
 		
-		if(battleState.battleComplete && redoBattle && battleState.score < -5000)
+		if(battleState.battleComplete && redoBattle && battleState.score < -6000)
 			delayStates[battleState.index - 1]++;
 		
 		/*if(battleState.battleComplete && redoBattle && !battleState.improvedEndState(nextEncounterState, redoBattleEndState, redoBattleNextState))
@@ -2347,7 +2347,7 @@ new RouteAction('Encounter 0x83'), // Wolf
 new RouteAction('Encounter 0x07'), // Creep
 new RouteAction('EquipWeapon ShortSword'),
 new RouteAction('Encounter 0x7E'), // pirates
-new RouteAction('TimeTarget 8500'),
+new RouteAction('TimeTarget 13000'),
 new RouteAction('Heal'),
 new RouteAction('Encounter 0xDC'), // Shark
 new RouteAction('Encounter 0x5D'), // Shark
@@ -2555,7 +2555,7 @@ new RouteAction('Encounter 0x51'), // Air
 new RouteAction('Encounter 0xC1'), // Naocho
 new RouteAction('Encounter 0x77 4 Bane'), // Tiamat
 new RouteAction('Encounter 0xBD'), // Tyro
-new RouteAction('TimeTarget'),
+new RouteAction('TimeTarget 311760'),
 new RouteAction('Heal'),
 new RouteAction('Encounter 0x02'), // GrImp
 new RouteAction('Encounter 0x57'), // Worm
@@ -2579,7 +2579,7 @@ new RouteAction('Encounter 0x75 4 Bane'), // Kraken2
 new RouteAction('Encounter 0xD4'), // Evilman/Nightmare
 new RouteAction('Encounter 0x76 4 Bane'), // Tiamat2
 new RouteAction('Encounter 0x7B 4 Bane'), // CHAOS
-new RouteAction('TimeTarget'),
+new RouteAction('TimeTarget 352415'),
 ];
 
 //PlayerInfo(name, characterClass, classChanged, level, exp, hp, str, agi, int, vit, luck, evade, absorb, hits, hit, attack, crit, mdef, weaknesses, resistances, weapon, armor, shield, helmet, glove)
