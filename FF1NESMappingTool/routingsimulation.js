@@ -1882,7 +1882,7 @@ BattleState.prototype.runTurn = function(delay, stepsToHeal, dangerRatio)
 				{
 					let damageRatio = damageSum / targetCharacter.characterData.hp; // adjust this by starting hp or something?
 					// calculated danger levels?
-					this.score -= 2000 * damageRatio * damageRatio * (stepsToHeal + 1);
+					this.score -= 2000 * damageRatio * damageRatio * (stepsToHeal + 8) * stepsToHeal / 8;
 				}
 				this.damageTaken += damageSum;
 				this.estimatedTime += 90;
@@ -1934,7 +1934,7 @@ BattleState.prototype.runTurn = function(delay, stepsToHeal, dangerRatio)
 						else // percent of hp damage dealt in a turn or something, idk 
 						{
 							let damageRatio = damageRoll / targetCharacter.characterData.hp; // adjust this by starting hp or something? idk
-							this.score -= 2000 * damageRatio * damageRatio * (stepsToHeal + 1);
+							this.score -= 2000 * damageRatio * damageRatio * (stepsToHeal + 8) * stepsToHeal / 8;
 						}
 						
 						this.damageTaken += damageRoll;
@@ -2058,7 +2058,7 @@ BattleState.prototype.runTurn = function(delay, stepsToHeal, dangerRatio)
 	if(this.checkEnemyDead(dangerRatio))
 		return;
 	if((this.battleCharacters[0x80].status & ~(StatusEffect.mute | StatusEffect.dark)) > 0) // poison could be acceptable, or secondary characters dying pre garland, but /shrug
-		this.score -= 1000;
+		this.score -= 3500;
 	return;
 };
 
