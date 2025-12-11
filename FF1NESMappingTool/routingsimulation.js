@@ -2614,6 +2614,7 @@ async function runRoute()
 	let currentIterationCount = 0;
 	let redoBattle = false;
 	let targetTime;
+	let rngScoring = {};
 	battleStates = [];
 	delayStates = [0];
 	scoreTracker = {};
@@ -2641,6 +2642,95 @@ async function runRoute()
 		}
 	}
 	
+	// calculating ideal rng values in route 
+	for(let i = 0; i < route.length; i++)
+	{
+		let currentAction = route[i];
+		if(i > highestIndex)
+			highestIndex = i;
+		currentIterationCount++;
+		if(i == highestIndex && stop)
+			break;
+		switch(currentAction.action)
+		{
+			case Action.Encounter:
+				if(i == highestIndex)
+					encounterIndexes[encounterCount] = i;
+				
+				let bestScoredState;
+				let bestScore = -999999;
+				let rngScores = [];
+				for(let j = 0; j < 256; j++) // time targets could mess up the initial checks, could temporarily remove/then readd after?
+				{
+					currentState.randomNumberIndex = j;
+					// full heal so we can see what is possible, not accurate for like Kary after lava
+					currentState.battleCharacters[currentAction.characterSlot].heal(-1);
+					let endOfBattleState = await runBattle(currentState, currentAction.encounter, currentAction.encounterAction);
+					
+					if(endOfBattleState.startState) 
+						rngScores[j] = {rng: j, score: -999999, time: null, taken: null, shortBounce: null, longBounce: null};
+					else
+					{
+						let scoreSum = 0, timeSum = 0, takenSum = 0, shortBounceSum = 0, longBounceSum = 0;
+						let summary = endOfBattleState.encounterSummary;
+						for(let k = 0; k < summary.score.length; k++)
+						{
+							scoreSum += summary.score[k];
+							timeSum += summary.time[k];
+							takenSum += summary.taken[k];
+							shortBounceSum += summary.delay[k] < 6 ? summary.delay[k] : summary.delay[k] % 3;
+							longBounceSum += summary.delay[k] < 6 ? 0 : Math.floor(summary.delay[k] / 3);
+						}
+						if(scoreSum > bestScore)
+						{
+							bestScore = scoreSum;
+							bestScoredState = endOfBattleState;
+						}
+						rngScores[j] = {rng: j, score: scoreSum, time: timeSum, taken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum};
+					}
+				}
+				
+				rngScores.sort((a, b) => b.score - a.score);
+				rngScoring[encounterCount] = rngScores;
+				currentState = bestScoredState;
+				encounterCount++;
+				break;
+			case Action.ChangeGold:
+				currentState.gold += currentAction.amount;
+				break;
+			case Action.EquipWeapon:
+				currentState.battleCharacters[currentAction.characterSlot].characterData.equipWeapon(currentAction.weapon);
+				break;
+			case Action.UnequipWeapon:
+				currentState.battleCharacters[currentAction.characterSlot].characterData.unequipWeapon();
+				break;
+			case Action.EquipArmor:
+				currentState.battleCharacters[currentAction.characterSlot].characterData.equipArmor(currentAction.armor);
+				break;
+			case Action.UnequipArmor:
+				currentState.battleCharacters[currentAction.characterSlot].characterData.unequipArmor(currentAction.slot);
+				break;
+			case Action.Heal: // might need a heal all or parameter for that
+				currentState.battleCharacters[currentAction.characterSlot].heal(currentAction.amount);
+				break;
+			case Action.Burn: // should hit all characters alive
+				currentState.battleCharacters[currentAction.characterSlot].burn(currentAction.amount);
+				break;
+			case Action.TimeTarget: 
+				//targetTime = currentAction.amount;
+				break;
+			default:
+				console.log('UnknownCommand: ' + currentAction.inputString);
+		}
+		if(currentIterationCount > 10000) // something has probably gone wrong, abort everything
+		{
+			console.log('Too many route steps - Please stop and fix your route');
+			stop = true;
+			break;
+		}
+	}
+	
+	// calculating ideal path using rng values as reference  
 	for(let i = 0; i < route.length; i++)
 	{
 		let currentAction = route[i];
@@ -2726,4 +2816,20 @@ async function runRoute()
 	console.log(endingBattleSummaries);
 	console.log(scoreTracker); 
 	console.log(iterationAbortCount);
+	let turnCount = 0;
+	let shortBounces = 0;
+	let longBounces = 0;
+	for(let i = 0; i < endingBattleSummaries.length; i++)
+	{
+		let endingSummary = endingBattleSummaries[i];
+		for (let j = 0; j < endingSummary.delay.length; j++)
+		{
+			turnCount++;
+			shortBounces += endingSummary.delay[j] < 6 ? endingSummary.delay[j] : endingSummary.delay[j] % 3;
+			longBounces += endingSummary.delay[j] < 6 ? 0 : Math.floor(endingSummary.delay[j] / 3);
+		}
+	}
+	console.log(turnCount);
+	console.log(shortBounces);
+	console.log(longBounces);
 }
