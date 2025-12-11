@@ -144,7 +144,7 @@ function WeaponInfo(name, hit, attack, crit, spell)
 	this.hit = hit;
 	this.attack = attack;
 	this.crit = crit;
-	this.spell = spell;
+	this.spell = spell - 1;
 }
 
 const Slot = {
@@ -263,7 +263,6 @@ attackResult.prototype.toString  = function attackResultToString()
 }
 
 const SpellNames = [
-	'NONE',
 	'CURE',
 	'HARM',
 	'FOG',
@@ -2646,25 +2645,21 @@ async function runRoute()
 	for(let i = 0; i < route.length; i++)
 	{
 		let currentAction = route[i];
-		if(i > highestIndex)
-			highestIndex = i;
-		currentIterationCount++;
-		if(i == highestIndex && stop)
-			break;
 		switch(currentAction.action)
 		{
 			case Action.Encounter:
-				if(i == highestIndex)
-					encounterIndexes[encounterCount] = i;
+				encounterIndexes[encounterCount] = i;
 				
 				let bestScoredState;
 				let bestScore = -999999;
 				let rngScores = [];
+				
+				// full heal so we can see what is possible, not accurate for like Kary after lava
+				currentState.battleCharacters[0x80].heal(-1);
+				
 				for(let j = 0; j < 256; j++) // time targets could mess up the initial checks, could temporarily remove/then readd after?
 				{
 					currentState.randomNumberIndex = j;
-					// full heal so we can see what is possible, not accurate for like Kary after lava
-					currentState.battleCharacters[currentAction.characterSlot].heal(-1);
 					let endOfBattleState = await runBattle(currentState, currentAction.encounter, currentAction.encounterAction);
 					
 					if(endOfBattleState.startState) 
@@ -2721,12 +2716,6 @@ async function runRoute()
 				break;
 			default:
 				console.log('UnknownCommand: ' + currentAction.inputString);
-		}
-		if(currentIterationCount > 10000) // something has probably gone wrong, abort everything
-		{
-			console.log('Too many route steps - Please stop and fix your route');
-			stop = true;
-			break;
 		}
 	}
 	
