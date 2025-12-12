@@ -2775,7 +2775,7 @@ async function runRoute()
 				if(i == highestIndex)
 					encounterIndexes[encounterCount] = i;
 				startingBattleStates[encounterCount] = currentState;
-				let endOfBattleState = await runBattle(currentState, currentAction.encounter, currentAction.encounterAction, redoBattle ? endingBattleStates[encounterCount] : null, redoBattle ? startingBattleStates[encounterCount + 1] : null, rngScoring[encounterCount]);
+				let endOfBattleState = await runBattle(currentState, currentAction.encounter, currentAction.encounterAction, redoBattle ? endingBattleStates[encounterCount] : null, redoBattle ? startingBattleStates[encounterCount + 1] : null, rngScoring[encounterCount + 1]);
 				//targetTime = null;
 				
 				if(endOfBattleState.startState) // if the battle failed, go backwards to the previous battle
