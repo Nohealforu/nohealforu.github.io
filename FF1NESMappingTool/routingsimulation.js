@@ -2701,7 +2701,7 @@ async function runRoute()
 						}
 						scoreSum -= 20 * takenSum;
 						scoreSum -= 200 * endOfBattleState.turn;
-						battleState.score -= 3000 * ((nextEncounterState.startingEnemies) / (nextEncounterState.minimumEnemies + 1) - 1);
+						scoreSum -= 3000 * ((endOfBattleState.startingEnemies) / (endOfBattleState.minimumEnemies + 1) - 1);
 						rngScores[j] = {startingRng: j, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, taken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum};
 					}
 				}
