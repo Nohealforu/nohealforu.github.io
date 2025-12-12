@@ -1614,12 +1614,13 @@ BattleState.prototype.checkEnemyDead = function(dangerRatio)
                 character.characterData.levelUp(this);
             character.status &= (StatusEffect.poison | StatusEffect.dead | StatusEffect.stone);
 			character.resistances = character.characterData.resistances;
+			character.hitMultiplier = 1;
 			if((character.status & StatusEffect.poison) > 0) // poison could be acceptable, or secondary characters dying pre garland, but /shrug
 				this.score -= 10000;
         }
 	}
     this.gold += gold;
-	this.score += 1500;
+	this.score += 1500 * dangerRatio;
 	
 	// TODO: Score based on next encounter threat
 	
@@ -1743,7 +1744,7 @@ BattleState.prototype.runTurn = function(delay, stepsToHeal, dangerRatio)
 				else // percent of hp damage dealt in a turn or something, idk 
 				{
 					let damageRatio = damageSum / targetCharacter.characterData.hp;
-					this.score += 1000 * damageRatio * damageRatio;
+					this.score += 1000 * damageRatio * damageRatio * dangerRatio;
 				}
 				
 				this.estimatedTime += 150;
@@ -2129,7 +2130,7 @@ BattleState.prototype.improvedEndState = function(battleStartState, redoBattleEn
 
 var iterationAbortCount;
 
-function runBattle(currentState, encounter, encounterAction, redoBattleEndState, redoBattleNextState)
+function runBattle(currentState, encounter, encounterAction, redoBattleEndState, redoBattleNextState, rngScores = [])
 {
 	let battleStartState = currentState.newEncounter(encounter.index, encounterAction);
 	battleStartState.startState = true;
@@ -2183,8 +2184,13 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 				let nextEncounterState;
 				if(battleState.battleComplete && encounter.next?.encounterIndex != null)
 				{
-					nextEncounterState = battleState.newEncounter(encounter.next?.encounterIndex, EncounterAction.Fight, true);
-					battleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 2) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
+					if(rngScores != null && rngScores[battleState.randomNumberIndex] != null)
+						battleState.score += rngScores[battleState.randomNumberIndex].score;
+					else
+					{
+						nextEncounterState = battleState.newEncounter(encounter.next?.encounterIndex, EncounterAction.Fight, true);
+						battleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 2) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
+					}
 				}
 				
 				//if(battleState.encounterIndex != 0x7D)
@@ -2210,8 +2216,13 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 		let nextEncounterState;
 		if(battleState.battleComplete && encounter.next?.encounterIndex != null)
 		{
-			nextEncounterState = battleState.newEncounter(encounter.next?.encounterIndex, EncounterAction.Fight, true);
-			battleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 2) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
+			if(rngScores != null && rngScores[battleState.randomNumberIndex] != null)
+				battleState.score += rngScores[battleState.randomNumberIndex].score;
+			else
+			{
+				nextEncounterState = battleState.newEncounter(encounter.next?.encounterIndex, EncounterAction.Fight, true);
+				battleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 2) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
+			}
 		}
 		
 		//if(battleState.encounterIndex != 0x7D)
@@ -2269,7 +2280,10 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 	estimatedTimeStates[battleState.turn - 1] = battleState.estimatedTime;
 	estimatedTimeTotalStates[battleState.turn - 1] = battleState.startTime + battleState.estimatedTime;
 	
-	battleState.encounterSummary = {hp: battleStartState.battleCharacters[0x80].currentHp, hp2: battleState.battleCharacters[0x80].currentHp, encounter: encounter, characters: battleStartState.battleCharacters, delay: delayCommands, score: scoreStates, dealt: damageDealtStates, taken: damageTakenStates, time: estimatedTimeStates, totalTime: estimatedTimeTotalStates, startIndex: battleStartState.index + 1, startRNG: battleStartState.randomNumberIndex};
+	battleState.startingEnemies = battleStartState.startingEnemies;
+	battleState.minimumEnemies = battleStartState.minimumEnemies;
+	
+	battleState.encounterSummary = {hp: battleStartState.battleCharacters[0x80].currentHp, hp2: battleState.battleCharacters[0x80].currentHp, encounter: encounter, characters: battleStartState.battleCharacters, delay: delayCommands, score: scoreStates, dealt: damageDealtStates, taken: damageTakenStates, time: estimatedTimeStates, totalTime: estimatedTimeTotalStates, startIndex: battleStartState.index + 1, preRNG: currentState.randomNumberIndex, startRNG: battleStartState.randomNumberIndex, endingRNG: battleState.randomNumberIndex};
 	return battleState;
 }
 
@@ -2346,7 +2360,7 @@ new RouteAction('Encounter 0x83'), // Wolf
 new RouteAction('Encounter 0x07'), // Creep
 new RouteAction('EquipWeapon ShortSword'),
 new RouteAction('Encounter 0x7E'), // pirates
-new RouteAction('TimeTarget 13000'),
+new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
 new RouteAction('Encounter 0xDC'), // Shark
 new RouteAction('Encounter 0x5D'), // Shark
@@ -2554,7 +2568,7 @@ new RouteAction('Encounter 0x51'), // Air
 new RouteAction('Encounter 0xC1'), // Naocho
 new RouteAction('Encounter 0x77 4 Bane'), // Tiamat
 new RouteAction('Encounter 0xBD'), // Tyro
-new RouteAction('TimeTarget 311760'),
+new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
 new RouteAction('Encounter 0x02'), // GrImp
 new RouteAction('Encounter 0x57'), // Worm
@@ -2578,30 +2592,28 @@ new RouteAction('Encounter 0x75 4 Bane'), // Kraken2
 new RouteAction('Encounter 0xD4'), // Evilman/Nightmare
 new RouteAction('Encounter 0x76 4 Bane'), // Tiamat2
 new RouteAction('Encounter 0x7B 4 Bane'), // CHAOS
-new RouteAction('TimeTarget 352415'),
+new RouteAction('TimeTarget'),
 ];
 
 //PlayerInfo(name, characterClass, classChanged, level, exp, hp, str, agi, int, vit, luck, evade, absorb, hits, hit, attack, crit, mdef, weaknesses, resistances, weapon, armor, shield, helmet, glove)
 
-let testCharacters = {
-	0: null,
-	1: null,
-	2: null,
-	3: null,
-	4: null,
-	5: null,
-	6: null,
-	7: null,
-	8: null,
-	0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 2, 138, 61, 21, 6, 1, 11, 5, 39, 15, 1, 18, 19, 4, 18, 0, 0, weapons['Rapier'], armor['ChainArmor'], null, null, null), 35),
-	0x81: null,
-	0x82: null,
-	0x83: null,
-}
-
-
 async function runRoute()
 {
+	let testCharacters = {
+		0: null,
+		1: null,
+		2: null,
+		3: null,
+		4: null,
+		5: null,
+		6: null,
+		7: null,
+		8: null,
+		0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 2, 138, 61, 21, 6, 1, 11, 5, 39, 15, 1, 18, 19, 4, 18, 0, 0, weapons['Rapier'], armor['ChainArmor'], null, null, null), 35),
+		0x81: null,
+		0x82: null,
+		0x83: null,
+	};
 	let startingState = new BattleState(0, 193, 630, testCharacters);
 	let startingBattleStates = [];
 	let endingBattleStates = [];
@@ -2641,19 +2653,25 @@ async function runRoute()
 		}
 	}
 	
-	// calculating ideal rng values in route 
+	// calculating ideal rng values in route by scores 
 	for(let i = 0; i < route.length; i++)
 	{
 		let currentAction = route[i];
 		switch(currentAction.action)
 		{
 			case Action.Encounter:
-				encounterIndexes[encounterCount] = i;
-				
 				let bestScoredState;
 				let bestScore = -999999;
 				let rngScores = [];
 				
+				
+				if(currentState == null || currentState.battleCharacters == null)
+				{
+					console.log('Failed fight');
+					console.log(rngScoring);
+					return;
+				}
+
 				// full heal so we can see what is possible, not accurate for like Kary after lava
 				currentState.battleCharacters[0x80].heal(-1);
 				
@@ -2663,10 +2681,10 @@ async function runRoute()
 					let endOfBattleState = await runBattle(currentState, currentAction.encounter, currentAction.encounterAction);
 					
 					if(endOfBattleState.startState) 
-						rngScores[j] = {rng: j, score: -999999, time: null, taken: null, shortBounce: null, longBounce: null};
+						rngScores[j] = {startingRng: j, endingRng: null, score: -999999, time: null, taken: null, shortBounce: null, longBounce: null};
 					else
 					{
-						let scoreSum = 0, timeSum = 0, takenSum = 0, shortBounceSum = 0, longBounceSum = 0;
+						let scoreSum = 2000, timeSum = 0, takenSum = 0, shortBounceSum = 0, longBounceSum = 0;
 						let summary = endOfBattleState.encounterSummary;
 						for(let k = 0; k < summary.score.length; k++)
 						{
@@ -2681,7 +2699,11 @@ async function runRoute()
 							bestScore = scoreSum;
 							bestScoredState = endOfBattleState;
 						}
-						rngScores[j] = {rng: j, score: scoreSum, time: timeSum, taken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum};
+						scoreSum -= 20 * takenSum;
+						scoreSum -= 200 * endOfBattleState.turn;
+						battleState.score -= 3000 * ((nextEncounterState.startingEnemies) / (nextEncounterState.minimumEnemies + 1) - 1);
+						endOfBattleState.startingEnemies endOfBattleState.minimumEnemies
+						rngScores[j] = {startingRng: j, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, taken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum};
 					}
 				}
 				
@@ -2719,6 +2741,26 @@ async function runRoute()
 		}
 	}
 	
+	console.log(rngScoring);
+	encounterCount = 0;
+	testCharacters = {
+		0: null,
+		1: null,
+		2: null,
+		3: null,
+		4: null,
+		5: null,
+		6: null,
+		7: null,
+		8: null,
+		0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 2, 138, 61, 21, 6, 1, 11, 5, 39, 15, 1, 18, 19, 4, 18, 0, 0, weapons['Rapier'], armor['ChainArmor'], null, null, null), 35),
+		0x81: null,
+		0x82: null,
+		0x83: null,
+	};
+	startingState = new BattleState(0, 193, 630, testCharacters);
+	currentState = startingState;
+	
 	// calculating ideal path using rng values as reference  
 	for(let i = 0; i < route.length; i++)
 	{
@@ -2734,7 +2776,7 @@ async function runRoute()
 				if(i == highestIndex)
 					encounterIndexes[encounterCount] = i;
 				startingBattleStates[encounterCount] = currentState;
-				let endOfBattleState = await runBattle(currentState, currentAction.encounter, currentAction.encounterAction, redoBattle ? endingBattleStates[encounterCount] : null, redoBattle ? startingBattleStates[encounterCount + 1] : null);
+				let endOfBattleState = await runBattle(currentState, currentAction.encounter, currentAction.encounterAction, redoBattle ? endingBattleStates[encounterCount] : null, redoBattle ? startingBattleStates[encounterCount + 1] : null, rngScoring);
 				//targetTime = null;
 				
 				if(endOfBattleState.startState) // if the battle failed, go backwards to the previous battle
