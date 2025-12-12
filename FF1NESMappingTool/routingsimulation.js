@@ -2706,7 +2706,7 @@ async function runRoute()
 					}
 				}
 				
-				rngScores.sort((a, b) => b.score - a.score);
+				//rngScores.sort((a, b) => b.score - a.score);
 				rngScoring[encounterCount] = rngScores;
 				currentState = bestScoredState;
 				encounterCount++;
