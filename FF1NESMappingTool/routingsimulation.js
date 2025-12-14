@@ -2756,7 +2756,8 @@ async function runRoute()
 			if(rngNextScores[j].score > maxScore)
 				maxScore = rngNextScores[j].score;
 		for(let j = 0; j < 256; j++)
-			rngScores[j].score += rngNextScores[rngScores[j].endingRng].score - maxScore;
+			if(rngScores[j].endingRng != null)
+				rngScores[j].score += rngNextScores[rngScores[j].endingRng].score - maxScore;
 	}
 	
 	console.log(rngScoring);
