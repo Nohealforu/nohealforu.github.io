@@ -1744,6 +1744,8 @@ BattleState.prototype.runTurn = function(delay, stepsToHeal, dangerRatio)
 				else // percent of hp damage dealt in a turn or something, idk 
 				{
 					let damageRatio = damageSum / targetCharacter.characterData.hp;
+					if(damageRatio > 0.75) // more than 75% damage but not a kill should be capped off in score
+						damageRatio = 0.75;	
 					this.score += 1000 * damageRatio * damageRatio * dangerRatio;
 				}
 				
@@ -2684,7 +2686,7 @@ async function runRoute()
 						rngScores[j] = {startingRng: j, endingRng: null, score: -999999, time: null, taken: null, shortBounce: null, longBounce: null};
 					else
 					{
-						let scoreSum = 2000, timeSum = 0, takenSum = 0, shortBounceSum = 0, longBounceSum = 0;
+						let scoreSum = 0, timeSum = 0, takenSum = 0, shortBounceSum = 0, longBounceSum = 0;
 						let summary = endOfBattleState.encounterSummary;
 						for(let k = 0; k < summary.score.length; k++)
 						{
@@ -2699,8 +2701,10 @@ async function runRoute()
 							bestScore = scoreSum;
 							bestScoredState = endOfBattleState;
 						}
-						scoreSum -= 20 * takenSum;
-						scoreSum -= 200 * endOfBattleState.turn;
+						scoreSum /= endOfBattleState.minimumEnemies;
+						let damageRatio = takenSum / currentState.battleCharacters[0x80].characterData.hp;
+						let stepsToHeal = currentAction.encounter.stepsToHeal;
+						scoreSum -= 1000 * damageRatio * damageRatio * (stepsToHeal + 8) * stepsToHeal / 8;
 						scoreSum -= 3000 * ((endOfBattleState.startingEnemies) / (endOfBattleState.minimumEnemies + 1) - 1);
 						rngScores[j] = {startingRng: j, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, taken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum};
 					}
@@ -2741,6 +2745,22 @@ async function runRoute()
 	}
 	
 	console.log(rngScoring);
+	
+	// transfer score delta backwards, will this help, idk?
+	for(let i = encounterCount - 2; i >= 0; i--)
+	{
+		let rngScores = rngScoring[i];
+		let rngNextScores = rngScoring[i + 1];
+		let maxScore = -999999;
+		for(let j = 0; j < 256; j++)
+			if(rngNextScores[j].score > maxScore)
+				maxScore = rngNextScores[j].score;
+		for(let j = 0; j < 256; j++)
+			rngScores[j].score += rngNextScores[rngScores[j].endingRng].score - maxScore;
+	}
+	
+	console.log(rngScoring);
+	
 	encounterCount = 0;
 	testCharacters = {
 		0: null,
