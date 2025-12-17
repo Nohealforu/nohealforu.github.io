@@ -2189,7 +2189,12 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 				if(battleState.battleComplete && encounter.next?.encounterIndex != null)
 				{
 					if(rngScores != null && rngScores[battleState.randomNumberIndex] != null)
+					{
 						battleState.score += rngScores[battleState.randomNumberIndex].score;
+						// idk if this is good, feels like we might be skipping entire decent route that could be corrected somehow? idk
+						if(rngScores[battleState.randomNumberIndex].taken > currentState.battleCharacters[0x80].currentHp)
+							battleState.score -= 10000;
+					}
 					else
 					{
 						nextEncounterState = battleState.newEncounter(encounter.next?.encounterIndex, EncounterAction.Fight, true);
@@ -2637,6 +2642,8 @@ async function runRoute()
 	let stop = false;
 	let nextEncounter;
 	let stepsToHeal = 1;
+	let healed = 0;
+	let healTracker = [];
 	
 	for(let i = route.length; i--; i > 0)
 	{
@@ -2656,6 +2663,7 @@ async function runRoute()
 				break;
 		}
 	}
+	
 	
 	// calculating ideal rng values in route by scores 
 	for(let i = 0; i < route.length; i++)
@@ -2714,6 +2722,8 @@ async function runRoute()
 				
 				//rngScores.sort((a, b) => b.score - a.score);
 				rngScoring[encounterCount] = rngScores;
+				healTracker[encounterCount] = healed;
+				healed = 0;
 				currentState = bestScoredState;
 				encounterCount++;
 				break;
@@ -2734,6 +2744,9 @@ async function runRoute()
 				break;
 			case Action.Heal: // might need a heal all or parameter for that
 				currentState.battleCharacters[currentAction.characterSlot].heal(currentAction.amount);
+				healed = currentAction.amount;
+				if(healed == -1)
+					healed = 999;
 				break;
 			case Action.Burn: // should hit all characters alive
 				currentState.battleCharacters[currentAction.characterSlot].burn(currentAction.amount);
@@ -2754,6 +2767,7 @@ async function runRoute()
 		let rngScores = rngScoring[i];
 		let rngNextScores = rngScoring[i + 1];
 		let maxScore = -999999;
+		healed = healTracker[encounterCount];
 		for(let j = 0; j < 256; j++)
 			if(rngNextScores[j].score > maxScore)
 				maxScore = rngNextScores[j].score;
@@ -2762,10 +2776,14 @@ async function runRoute()
 			if(rngScores[j].endingRng != null)
 			{
 				for(let k = 0; k < 256; k++)
+				{
 					rngScores[j].endingScores[k].score += rngNextScores[rngScores[j].endingScores[k].rng].score - maxScore;
+					rngScores[j].endingScores[k].lost += Math.max(rngNextScores[rngScores[j].endingScores[k].rng].taken - healed, 0);
+				}
 				rngScores[j].endingScores.sort((a, b) => b.score - a.score);
 				rngScores[j].score = rngScores[j].endingScores[0].score;
 				rngScores[j].endingRng = rngScores[j].endingScores[0].rng;
+				rngScores[j].taken = rngScores[j].endingScores[0].lost;
 			}
 		}
 	}
