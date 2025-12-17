@@ -2152,6 +2152,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 	let bestScore = -999999;
 	let bestDelay = 0;
 	let delay;
+	let scores;
 	let dangerRatio = encounter.encounterDanger / 3 || 1;
 	let nextDangerRatio = encounter.next?.encounterDanger / 3 || 1;
 	
@@ -2164,7 +2165,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 		}
 		else
 		{
-			let scores = [];
+			scores = [];
 			let canDelay = false;
 			for (let i = 0x80; i < 0x84; i++)
 			{
@@ -2285,7 +2286,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 	battleState.startingEnemies = battleStartState.startingEnemies;
 	battleState.minimumEnemies = battleStartState.minimumEnemies;
 	
-	battleState.encounterSummary = {hp: battleStartState.battleCharacters[0x80].currentHp, hp2: battleState.battleCharacters[0x80].currentHp, encounter: encounter, characters: battleStartState.battleCharacters, delay: delayCommands, score: scoreStates, dealt: damageDealtStates, taken: damageTakenStates, time: estimatedTimeStates, totalTime: estimatedTimeTotalStates, startIndex: battleStartState.index + 1, preRNG: currentState.randomNumberIndex, startRNG: battleStartState.randomNumberIndex, endingRNG: battleState.randomNumberIndex};
+	battleState.encounterSummary = {hp: battleStartState.battleCharacters[0x80].currentHp, hp2: battleState.battleCharacters[0x80].currentHp, encounter: encounter, characters: battleStartState.battleCharacters, delay: delayCommands, score: scoreStates, dealt: damageDealtStates, taken: damageTakenStates, time: estimatedTimeStates, totalTime: estimatedTimeTotalStates, startIndex: battleStartState.index + 1, preRNG: currentState.randomNumberIndex, startRNG: battleStartState.randomNumberIndex, endingRNG: battleState.randomNumberIndex, endingScores: scores};
 	return battleState;
 }
 
@@ -2706,7 +2707,7 @@ async function runRoute()
 						let stepsToHeal = currentAction.encounter.stepsToHeal;
 						scoreSum -= 1000 * damageRatio * damageRatio * (stepsToHeal + 8) * stepsToHeal / 8;
 						scoreSum -= 3000 * ((endOfBattleState.startingEnemies) / (endOfBattleState.minimumEnemies + 1) - 1);
-						rngScores[j] = {startingRng: j, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, taken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum};
+						rngScores[j] = {startingRng: j, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, taken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum, endingScores: summary.endingScores};
 					}
 				}
 				
@@ -2756,8 +2757,16 @@ async function runRoute()
 			if(rngNextScores[j].score > maxScore)
 				maxScore = rngNextScores[j].score;
 		for(let j = 0; j < 256; j++)
+		{
 			if(rngScores[j].endingRng != null)
-				rngScores[j].score += rngNextScores[rngScores[j].endingRng].score - maxScore;
+			{
+				for(let k = 0; k < 256; k++)
+					rngScores[j].endingScores[k].score += rngNextScores[rngScores[j].endingScores[k].rng] - maxScore;
+				rngScores[j].endingScores.sort((a, b) => b.score - a.score);
+				rngScores[j].score = rngScores[j].endingScores[0].score;
+				rngScores[j].endingRng = rngScores[j].endingScores[0].rng;
+			}
+		}
 	}
 	
 	console.log(rngScoring);
