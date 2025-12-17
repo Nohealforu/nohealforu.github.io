@@ -2173,7 +2173,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 				if (character != null && character.canAct())
 					canDelay = true;
 			}
-			if(priorBattleState.encounterState == EncounterState.Ambushed)
+			if(battleState.encounterState == EncounterState.Ambushed)
 				canDelay = false;
 			
 			for (let i = 0; i < (canDelay ? 256 : 1); i++)
