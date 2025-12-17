@@ -2183,7 +2183,8 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 				if(priorBattleState == battleStartState)
 					battleState.encounterState = battleStartState.encounterState;
 				battleState.runTurn(i, encounter.stepsToHeal, dangerRatio);
-				
+				if(battleState.battleComplete && !canDelay)
+					canDelay = false;
 				let nextEncounterState;
 				if(battleState.battleComplete && encounter.next?.encounterIndex != null)
 				{
