@@ -2664,7 +2664,7 @@ async function runRoute()
 		}
 	}
 	
-	
+	console.log("Calculating Good RNG seeds...");
 	// calculating ideal rng values in route by scores 
 	for(let i = 0; i < route.length; i++)
 	{
@@ -2762,7 +2762,7 @@ async function runRoute()
 		}
 	}
 	
-	console.log(rngScoring);
+	console.log("Applying Good RNG backwards...");
 	
 	// transfer score delta backwards, will this help, idk?
 	for(let i = encounterCount - 2; i >= 0; i--)
@@ -2778,6 +2778,7 @@ async function runRoute()
 		{
 			if(rngScores[j].endingRng != null)
 			{
+				let baseLineTaken = rngScores[j].endingScores[0].lost;
 				for(let k = 0; k < 256; k++)
 				{
 					rngScores[j].endingScores[k].score += rngNextScores[rngScores[j].endingScores[k].rng].score - maxScore;
@@ -2786,7 +2787,7 @@ async function runRoute()
 				rngScores[j].endingScores.sort((a, b) => b.score - a.score);
 				rngScores[j].score = rngScores[j].endingScores[0].score;
 				rngScores[j].endingRng = rngScores[j].endingScores[0].rng;
-				rngScores[j].taken = rngScores[j].endingScores[0].lost;
+				rngScores[j].taken += rngScores[j].endingScores[0].lost - baseLineTaken;
 			}
 		}
 	}
