@@ -2720,7 +2720,7 @@ async function runRoute()
 						else
 							scoreSum -= 1000 * damageRatio * damageRatio * (stepsToHeal + 8) * stepsToHeal / 8;
 						scoreSum -= 3000 * ((endOfBattleState.startingEnemies) / (endOfBattleState.minimumEnemies + 1) - 1);
-						rngScores[j] = {startingRng: j, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, taken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum, endingScores: summary.endingScores};
+						rngScores[j] = {startingRng: j, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, taken: takenSum, totalTaken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum, endingScores: summary.endingScores};
 					}
 				}
 				
@@ -2785,12 +2785,12 @@ async function runRoute()
 				for(let k = 0; k < 256; k++)
 				{
 					rngScores[j].endingScores[k].score += rngNextScores[rngScores[j].endingScores[k].rng].score - maxScore;
-					rngScores[j].endingScores[k].lost += Math.max(rngNextScores[rngScores[j].endingScores[k].rng].taken - healed, 0);
+					rngScores[j].endingScores[k].lost += Math.max(rngNextScores[rngScores[j].endingScores[k].rng].totalTaken - healed, 0);
 				}
 				rngScores[j].endingScores.sort((a, b) => b.score - a.score);
 				rngScores[j].score += rngScores[j].endingScores[0].score - baseLineScore;
 				rngScores[j].endingRng = rngScores[j].endingScores[0].rng;
-				rngScores[j].taken += rngScores[j].endingScores[0].lost - baseLineTaken;
+				rngScores[j].totalTaken = rngScores[j].endingScores[0].lost - baseLineTaken;
 			}
 		}
 	}
