@@ -2765,7 +2765,7 @@ async function runRoute()
 	for(let i = encounterCount - 2; i >= 0; i--)
 	{
 		let rngScores = rngScoring[i];
-		let rngNextScores = rngScoring[i + 1];
+		let rngNextScores = rngScoring[i];
 		let maxScore = -999999;
 		healed = healTracker[i + 1];
 		for(let j = 0; j < 256; j++)
