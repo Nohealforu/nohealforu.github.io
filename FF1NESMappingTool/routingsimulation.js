@@ -2644,6 +2644,7 @@ async function runRoute()
 	let stepsToHeal = 1;
 	let healed = 0;
 	let healTracker = [];
+	let encounterTracker = [];
 	
 	for(let i = route.length; i--; i > 0)
 	{
@@ -2726,6 +2727,7 @@ async function runRoute()
 				//rngScores.sort((a, b) => b.score - a.score);
 				rngScoring[encounterCount] = rngScores;
 				healTracker[encounterCount] = healed;
+				encounterTracker[encounterCount] = currentAction.encounter;
 				healed = 0;
 				currentState = bestScoredState;
 				encounterCount++;
@@ -2770,7 +2772,7 @@ async function runRoute()
 		let rngScores = rngScoring[i];
 		let rngNextScores = rngScoring[i + 1];
 		let maxScore = -999999;
-		healed = healTracker[i + 1];
+		healed = healTracker[i];
 		for(let j = 0; j < 256; j++)
 			if(rngNextScores[j].score > maxScore)
 				maxScore = rngNextScores[j].score;
@@ -2897,6 +2899,7 @@ async function runRoute()
 		}
 	}
 	console.log('Completed');
+	console.log(encounterTracker);
 	console.log(endingBattleSummaries);
 	console.log(scoreTracker); 
 	console.log(iterationAbortCount);
