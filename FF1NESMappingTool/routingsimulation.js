@@ -2192,7 +2192,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 					{
 						battleState.score += rngScores[battleState.randomNumberIndex].score;
 						// idk if this is good, feels like we might be skipping entire decent route that could be corrected somehow? idk
-						if(rngScores[battleState.randomNumberIndex].taken > currentState.battleCharacters[0x80].currentHp)
+						if(rngScores[battleState.randomNumberIndex].taken >= currentState.battleCharacters[0x80].currentHp)
 							battleState.score -= 10000;
 					}
 					else
