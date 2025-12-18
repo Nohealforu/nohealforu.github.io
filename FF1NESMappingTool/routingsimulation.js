@@ -2184,7 +2184,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 					battleState.encounterState = battleStartState.encounterState;
 				battleState.runTurn(i, encounter.stepsToHeal, dangerRatio);
 				if(battleState.battleComplete && !canDelay)
-					canDelay = false;
+					canDelay = false; // this was here for a breakpoint, but could break stuff if like a single enemy ambushes and flees or something idk
 				let nextEncounterState;
 				if(battleState.battleComplete && encounter.next?.encounterIndex != null)
 				{
@@ -2714,8 +2714,11 @@ async function runRoute()
 						scoreSum /= endOfBattleState.minimumEnemies;
 						let damageRatio = takenSum / currentState.battleCharacters[0x80].characterData.hp;
 						let stepsToHeal = currentAction.encounter.stepsToHeal;
-						scoreSum -= 1000 * damageRatio * damageRatio * (stepsToHeal + 8) * stepsToHeal / 8;
-						scoreSum -= 3000 * ((endOfBattleState.startingEnemies) / (endOfBattleState.minimumEnemies + 1) - 1);
+						if(takenSum == 0)
+							scoreSum += 500;
+						else
+							scoreSum -= 1000 * damageRatio * damageRatio * (stepsToHeal + 8) * stepsToHeal / 8;
+						scoreSum -= 6000 * ((endOfBattleState.startingEnemies) / (endOfBattleState.minimumEnemies + 1) - 1);
 						rngScores[j] = {startingRng: j, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, taken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum, endingScores: summary.endingScores};
 					}
 				}
