@@ -2156,7 +2156,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 	let bestDelay = 0;
 	let delay;
 	let scores;
-	let dangerRatio = encounter.encounterDanger / 3 || 1;
+	let dangerRatio = encounter.danger / 3 || 1;
 	let nextDangerRatio = encounter.next?.encounterDanger / 3 || 1;
 	
 	do 
@@ -2720,8 +2720,8 @@ async function runRoute()
 						let stepsToHeal = currentAction.encounter.stepsToHeal;
 						if(takenSum == 0)
 							scoreSum += 500;
-						else
-							scoreSum -= 1000 * damageRatio * damageRatio * (stepsToHeal + 8) * stepsToHeal / 8;
+						//else
+						//	scoreSum -= 1000 * damageRatio * damageRatio * (stepsToHeal + 8) * stepsToHeal / 8;
 						scoreSum -= 3000 * ((endOfBattleState.startingEnemies) / (endOfBattleState.minimumEnemies + 1) - 1);
 						rngScores[j] = {startingRng: j, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, taken: takenSum, totalTaken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum, endingScores: summary.endingScores};
 					}
