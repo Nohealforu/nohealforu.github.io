@@ -2724,6 +2724,12 @@ async function runRoute()
 						//else
 						//	scoreSum -= 1000 * damageRatio * damageRatio * (stepsToHeal + 8) * stepsToHeal / 8;
 						scoreSum -= 3000 * ((endOfBattleState.startingEnemies) / (endOfBattleState.minimumEnemies + 1) - 1);
+						if(summary.endingScores.length == 1) // failsafe for when dumb thing like grimp running away in ambush 
+						{
+							let endingScore = summary.endingScores[0];
+							for(let k = 1; k < 256; k++)
+								summary.endingScores[k] = endingScore;
+						}
 						rngScores[j] = {startingRng: j, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, taken: takenSum, totalTaken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum, endingScores: summary.endingScores};
 					}
 				}
