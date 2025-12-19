@@ -2685,6 +2685,7 @@ async function runRoute()
 				{
 					console.log('Failed fight');
 					console.log(rngScoring);
+					console.log(encounterTracker);
 					return;
 				}
 
