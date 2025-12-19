@@ -1887,7 +1887,7 @@ BattleState.prototype.runTurn = function(delay, stepsToHeal, dangerRatio)
 				{
 					let damageRatio = damageSum / targetCharacter.characterData.hp; // adjust this by starting hp or something?
 					// calculated danger levels?
-					this.score -= 2000 * damageRatio * damageRatio * (stepsToHeal + 8) * stepsToHeal / 8;
+					this.score -= 2000 * damageRatio * damageRatio * (stepsToHeal + 8) * stepsToHeal / 8 / dangerRatio;
 				}
 				this.damageTaken += damageSum;
 				this.estimatedTime += 90;
@@ -1939,7 +1939,7 @@ BattleState.prototype.runTurn = function(delay, stepsToHeal, dangerRatio)
 						else // percent of hp damage dealt in a turn or something, idk 
 						{
 							let damageRatio = damageRoll / targetCharacter.characterData.hp; // adjust this by starting hp or something? idk
-							this.score -= 2000 * damageRatio * damageRatio * (stepsToHeal + 8) * stepsToHeal / 8;
+							this.score -= 2000 * damageRatio * damageRatio * (stepsToHeal + 8) * stepsToHeal / 8 / dangerRatio;
 						}
 						
 						this.damageTaken += damageRoll;
