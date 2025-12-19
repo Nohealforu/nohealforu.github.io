@@ -1834,10 +1834,13 @@ BattleState.prototype.runTurn = function(delay, stepsToHeal, dangerRatio)
 			}
 			
 			let enemyCommand = Command.Fight;
-			if(character.ai.magicChance > 0 && this.getRandomNumber(0, 128) < character.ai.magicChance)
-				enemyCommand = Command.Magic;
-			else if(character.ai.abilityChance > 0 && this.getRandomNumber(0, 128) < character.ai.abilityChance)
-				enemyCommand = Command.Ability;
+			if(character.characterData.ai != 0xff)
+			{
+				if(this.getRandomNumber(0, 128) < character.ai.magicChance)
+					enemyCommand = Command.Magic;
+				else if(this.getRandomNumber(0, 128) < character.ai.abilityChance)
+					enemyCommand = Command.Ability;
+			}
 			
 			if (enemyCommand == Command.Fight)
 			{
