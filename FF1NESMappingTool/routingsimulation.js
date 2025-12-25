@@ -2240,10 +2240,10 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 		//if(battleState.encounterIndex != 0x7D)
 			battleState.score -= battleState.estimatedTime * 2;
 		
-		if(battleState.score < -6000)
+		if(battleState.score < -20000)
 			battleState.badTurn = true;
 		
-		if(battleState.battleComplete && redoBattle && battleState.score < -6000)
+		if(battleState.battleComplete && redoBattle && battleState.score < -20000)
 			delayStates[battleState.index - 1]++;
 		
 		/*if(battleState.battleComplete && redoBattle && !battleState.improvedEndState(nextEncounterState, redoBattleEndState, redoBattleNextState))
