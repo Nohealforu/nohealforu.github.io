@@ -2297,7 +2297,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 	
 	// probably need some way to calculate/store additional paths that end on different turns... calculation nightmare but will be needed for quick delay options, limit depth and top x options?
 	let completedScores = [];
-	if(rngScores == null)
+	if(scores != null && rngScores != null && rngScores.length == 0)
 		for(let i = 0; i < scores.length; i++)
 			if(scores[i].complete)
 				completedScores.push(scores[i]);
