@@ -2212,7 +2212,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 					bestScore = battleState.score;
 					bestDelay = i;
 				}
-				scores[i] = {score: battleState.score, delay: i, dmg: battleState.damageDealt, lost: battleState.damageTaken, rng: battleState.randomNumberIndex, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState};
+				scores[i] = {score: battleState.score, delay: i, dmg: battleState.damageDealt, lost: battleState.damageTaken, rng: battleState.randomNumberIndex, complete: battleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState};
 			}
 			scores.sort((a, b) => b.score - a.score);
 			scoreTracker[battleState.index] = scores;
@@ -2295,7 +2295,12 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 	battleState.startingEnemies = battleStartState.startingEnemies;
 	battleState.minimumEnemies = battleStartState.minimumEnemies;
 	
-	battleState.encounterSummary = {hp: battleStartState.battleCharacters[0x80].currentHp, hp2: battleState.battleCharacters[0x80].currentHp, encounter: encounter, characters: battleStartState.battleCharacters, delay: delayCommands, score: scoreStates, dealt: damageDealtStates, taken: damageTakenStates, time: estimatedTimeStates, totalTime: estimatedTimeTotalStates, startIndex: battleStartState.index + 1, preRNG: currentState.randomNumberIndex, startRNG: battleStartState.randomNumberIndex, endingRNG: battleState.randomNumberIndex, endingScores: scores};
+	// probably need some way to calculate/store additional paths that end on different turns... calculation nightmare but will be needed for quick delay options, limit depth and top x options?
+	let completedScores = [];
+	for(let i = 0; i < scores.length; i++)
+		if(scores[i].complete)
+			completedScores.push(scores[i]);
+	battleState.encounterSummary = {hp: battleStartState.battleCharacters[0x80].currentHp, hp2: battleState.battleCharacters[0x80].currentHp, encounter: encounter, characters: battleStartState.battleCharacters, delay: delayCommands, score: scoreStates, dealt: damageDealtStates, taken: damageTakenStates, time: estimatedTimeStates, totalTime: estimatedTimeTotalStates, startIndex: battleStartState.index + 1, preRNG: currentState.randomNumberIndex, startRNG: battleStartState.randomNumberIndex, endingRNG: battleState.randomNumberIndex, endingScores: completedScores};
 	return battleState;
 }
 
@@ -2724,12 +2729,6 @@ async function runRoute()
 						//else
 						//	scoreSum -= 1000 * damageRatio * damageRatio * (stepsToHeal + 8) * stepsToHeal / 8;
 						scoreSum -= 3000 * ((endOfBattleState.startingEnemies) / (endOfBattleState.minimumEnemies + 1) - 1);
-						if(summary.endingScores.length == 1) // failsafe for when dumb thing like grimp running away in ambush 
-						{
-							let endingScore = summary.endingScores[0];
-							for(let k = 1; k < 256; k++)
-								summary.endingScores[k] = endingScore;
-						}
 						rngScores[j] = {startingRng: j, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, taken: takenSum, totalTaken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum, endingScores: summary.endingScores};
 					}
 				}
@@ -2792,7 +2791,7 @@ async function runRoute()
 			{
 				let baseLineScore = rngScores[j].endingScores[0].score;
 				let baseLineTaken = rngScores[j].endingScores[0].lost;
-				for(let k = 0; k < 256; k++)
+				for(let k = 0; k < rngScores[j].endingScores.length; k++)
 				{
 					rngScores[j].endingScores[k].score += rngNextScores[rngScores[j].endingScores[k].rng].score - maxScore;
 					rngScores[j].endingScores[k].lost += Math.max(rngNextScores[rngScores[j].endingScores[k].rng].totalTaken - healed, 0);
