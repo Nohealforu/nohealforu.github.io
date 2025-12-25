@@ -2793,14 +2793,15 @@ async function runRoute()
 				let baseLineScore = rngScores[j].endingScores[0].score;
 				let baseLineTaken = rngScores[j].endingScores[0].lost;
 				for(let k = 0; k < rngScores[j].endingScores.length; k++)
-				{
 					rngScores[j].endingScores[k].score += rngNextScores[rngScores[j].endingScores[k].rng].score - maxScore;
-					rngScores[j].endingScores[k].lost += Math.max(rngNextScores[rngScores[j].endingScores[k].rng].totalTaken - healed, 0);
-				}
 				rngScores[j].endingScores.sort((a, b) => b.score - a.score);
 				rngScores[j].score += rngScores[j].endingScores[0].score - baseLineScore;
 				rngScores[j].endingRng = rngScores[j].endingScores[0].rng;
-				rngScores[j].totalTaken = rngScores[j].endingScores[0].lost - baseLineTaken;
+				// rngscores.endingscores.lost is only last round damage
+				// rngscores.totaltaken is whole fight Damage
+				// trying to get the difference in last round damage if it changed due to score adjustments to a new rng Number
+				// and then adding in damage taken from the next battle + battles after, adjusted by healing amounts
+				rngScores[j].totalTaken += rngScores[j].endingScores[0].lost - baseLineTaken + Math.max(rngNextScores[rngScores[j].endingScores[0].rng].totalTaken - healed, 0);
 			}
 		}
 	}
