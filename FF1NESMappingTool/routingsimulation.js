@@ -2305,10 +2305,13 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 		for(let i = 0; i < scores.length; i++)
 		{
 			let score = scores[i];
-			if(score.complete && score.score > endingRNGValueScores[score.rng])
+			if(score.complete)
 			{
-				completedScores.push(score);
-				endingRNGValueScores[score.rng] = score.score;
+				if(score.score > endingRNGValueScores[score.rng])
+				{
+					completedScores.push(score);
+					endingRNGValueScores[score.rng] = score.score;
+				}
 			}
 			else if(i < 10) // calculate next turn for top 10 scores that aren't complete
 			{
