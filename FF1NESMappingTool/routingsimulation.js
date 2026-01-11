@@ -2212,7 +2212,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 					bestScore = battleState.score;
 					bestDelay = i;
 				}
-				scores[i] = {score: battleState.score, delay: i, dmg: battleState.damageDealt, lost: battleState.damageTaken, rng: battleState.randomNumberIndex, complete: battleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState};
+				scores[i] = {score: battleState.score, delay: i, dmg: battleState.damageDealt, lost: battleState.damageTaken, rng: battleState.randomNumberIndex, complete: battleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: battleState};
 			}
 			scores.sort((a, b) => b.score - a.score);
 			scoreTracker[battleState.index] = scores;
@@ -2295,12 +2295,63 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 	battleState.startingEnemies = battleStartState.startingEnemies;
 	battleState.minimumEnemies = battleStartState.minimumEnemies;
 	
-	// probably need some way to calculate/store additional paths that end on different turns... calculation nightmare but will be needed for quick delay options, limit depth and top x options?
+	
+	let endingRNGValueScores = [];
+	for(let i = 0; i < 256; i++)
+		endingRNGValueScores[i] = -999999;
 	let completedScores = [];
 	if(scores != null && rngScores != null && rngScores.length == 0)
+	{
 		for(let i = 0; i < scores.length; i++)
-			if(scores[i].complete)
-				completedScores.push(scores[i]);
+		{
+			let score = scores[i];
+			if(score.complete && score.score > endingRNGValueScores[score.rng])
+			{
+				completedScores.push(score);
+				endingRNGValueScores[score.rng] = score.score;
+			}
+			else if(i < 10) // calculate next turn for top 10 scores that aren't complete
+			{
+				let additionalScores = [];
+				let additionalBattleState = score.battleState;
+				let priorAdditionalBattleState = battleState;
+				let canDelay = false;
+				for (let i = 0x80; i < 0x84; i++)
+				{
+					let character = additionalBattleState.battleCharacters[i];
+					if (character != null && character.canAct())
+						canDelay = true;
+				}
+				
+				for (let i = 0; i < (canDelay ? 256 : 1); i++)
+				{
+					additionalBattleState = priorAdditionalBattleState.newTurn(encounterAction);
+					additionalBattleState.estimatedTime += (i < 6 ? i * 41 : 50 * Math.floor(i / 3) + 41 * (i % 3));
+					additionalBattleState.runTurn(i, encounter.stepsToHeal, dangerRatio);
+					let nextEncounterState;
+					if(additionalBattleState.battleComplete && encounter.next?.encounterIndex != null)
+					{
+						nextEncounterState = additionalBattleState.newEncounter(encounter.next?.encounterIndex, EncounterAction.Fight, true);
+						additionalBattleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 2) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
+					}
+					
+					//if(additionalBattleState.encounterIndex != 0x7D)
+						additionalBattleState.score -= additionalBattleState.estimatedTime * 2;
+					additionalScores[i] = {score: additionalBattleState.score, delay: i, dmg: additionalBattleState.damageDealt, lost: additionalBattleState.damageTaken, rng: additionalBattleState.randomNumberIndex, complete: additionalBattleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: additionalBattleState};
+				}
+				additionalScores.sort((a, b) => b.score - a.score);
+				for(let i = 0; i < additionalScores.length; i++)
+				{
+					let score = additionalScores[i];
+					if(score.complete && score.score > endingRNGValueScores[score.rng])
+					{
+						completedScores.push(score);
+						endingRNGValueScores[score.rng] = score.score;
+					}
+				}
+			}
+		}
+	}
 	battleState.encounterSummary = {hp: battleStartState.battleCharacters[0x80].currentHp, hp2: battleState.battleCharacters[0x80].currentHp, encounter: encounter, characters: battleStartState.battleCharacters, delay: delayCommands, score: scoreStates, dealt: damageDealtStates, taken: damageTakenStates, time: estimatedTimeStates, totalTime: estimatedTimeTotalStates, startIndex: battleStartState.index + 1, preRNG: currentState.randomNumberIndex, startRNG: battleStartState.randomNumberIndex, endingRNG: battleState.randomNumberIndex, endingScores: completedScores};
 	return battleState;
 }
@@ -2372,6 +2423,51 @@ function RouteAction(actionString)
 	}
 }
 
+// shortened route for faster bugfix
+var route = [
+new RouteAction('Encounter 0x02'), // GrImp
+new RouteAction('Encounter 0x83'), // Wolf
+new RouteAction('Encounter 0x07'), // Creep
+new RouteAction('EquipWeapon ShortSword'),
+new RouteAction('Encounter 0x7E'), // pirates
+new RouteAction('TimeTarget'),
+new RouteAction('Heal'),
+new RouteAction('Encounter 0xDC'), // Shark
+new RouteAction('Encounter 0x5D'), // Shark
+new RouteAction('TimeTarget'),
+new RouteAction('Heal'),
+new RouteAction('Encounter 0x87 4'), // Ogre/Creep
+new RouteAction('Encounter 0x87 4'), // Ogre/Creep
+new RouteAction('Encounter 0x87 4'), // Ogre/Creep
+new RouteAction('Encounter 0x0b'), // GrWolf
+new RouteAction('Encounter 0x0a'), // Shadow
+new RouteAction('Encounter 0x66'), // Arachnid
+new RouteAction('Encounter 0x85'), // Scum
+new RouteAction('Encounter 0x66'), // Arachnid 
+new RouteAction('EquipArmor IronArmor'),
+new RouteAction('Encounter 0x1C 5'), // Wizard
+new RouteAction('Encounter 0x85'), // Scum
+new RouteAction('Encounter 0x10'), // Gargoyle
+new RouteAction('Encounter 0x6B'), // Muck
+new RouteAction('Encounter 0x81'), // Bone
+new RouteAction('Encounter 0x6B'), // Muck
+new RouteAction('Encounter 0x0F'), // Geist
+new RouteAction('Encounter 0x0D'), // Asp
+new RouteAction('Encounter 0x7D 5'), // Astos
+new RouteAction('Encounter 0x0C'), // Ogre
+new RouteAction('Encounter 0x12'), // Arachnid
+new RouteAction('Encounter 0x8E'), // GrImp
+new RouteAction('Encounter 0x0C'), // Ogre // CANAL
+new RouteAction('Encounter 0x5D'), // Shark
+new RouteAction('Encounter 0x01'), // Bone
+new RouteAction('Encounter 0x0C'), // Ogre
+new RouteAction('Encounter 0x82'), // GrImp
+new RouteAction('Encounter 0x5C'), // Kyzoku
+new RouteAction('Encounter 0x5C'), // Kyzoku
+new RouteAction('TimeTarget'),
+new RouteAction('Heal')];
+
+/*
 var route = [
 new RouteAction('Encounter 0x02'), // GrImp
 new RouteAction('Encounter 0x83'), // Wolf
@@ -2611,7 +2707,7 @@ new RouteAction('Encounter 0xD4'), // Evilman/Nightmare
 new RouteAction('Encounter 0x76 4 Bane'), // Tiamat2
 new RouteAction('Encounter 0x7B 4 Bane'), // CHAOS
 new RouteAction('TimeTarget'),
-];
+];*/
 
 //PlayerInfo(name, characterClass, classChanged, level, exp, hp, str, agi, int, vit, luck, evade, absorb, hits, hit, attack, crit, mdef, weaknesses, resistances, weapon, armor, shield, helmet, glove)
 
@@ -2675,6 +2771,9 @@ async function runRoute()
 	}
 	
 	console.log("Calculating Good RNG seeds...");
+	let endingRngValues = [];
+	for(let i = 0; i < 256; i++)
+		endingRngValues[i] = (i == startingState.randomNumberIndex);
 	// calculating ideal rng values in route by scores 
 	for(let i = 0; i < route.length; i++)
 	{
@@ -2694,16 +2793,26 @@ async function runRoute()
 					console.log(encounterTracker);
 					return;
 				}
-
+				let possibleStartingRngValues = [];
+				for(let j = 0; j < 256; j++)
+				{
+					possibleStartingRngValues[j] = endingRngValues[j];
+					endingRngValues[j] = false;
+				}
 				// full heal so we can see what is possible, not accurate for like Kary after lava
 				currentState.battleCharacters[0x80].heal(-1);
-				
-				for(let j = 0; j < 256; j++) // time targets could mess up the initial checks, could temporarily remove/then readd after?
+				for(let j = 0; j < 256; j++) 
 				{
+					if(!possibleStartingRngValues[j])
+					{
+						rngScores[j] = {startingRng: j, endingRng: null, score: -999999, time: null, taken: null, shortBounce: null, longBounce: null};
+						continue;
+					}
+					// consider using actual states from different endings instead of highest score one for something?
 					currentState.randomNumberIndex = j;
 					let endOfBattleState = await runBattle(currentState, currentAction.encounter, currentAction.encounterAction);
 					
-					if(endOfBattleState.startState) 
+					if(endOfBattleState.startState)
 						rngScores[j] = {startingRng: j, endingRng: null, score: -999999, time: null, taken: null, shortBounce: null, longBounce: null};
 					else
 					{
@@ -2731,6 +2840,8 @@ async function runRoute()
 						//	scoreSum -= 1000 * damageRatio * damageRatio * (stepsToHeal + 8) * stepsToHeal / 8;
 						scoreSum -= 3000 * ((endOfBattleState.startingEnemies) / (endOfBattleState.minimumEnemies + 1) - 1);
 						rngScores[j] = {startingRng: j, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, taken: takenSum, totalTaken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum, endingScores: summary.endingScores};
+						for(let k = 0; k < summary.endingScores.length; k++)
+							endingRngValues[summary.endingScores[k].rng] = true;
 					}
 				}
 				
