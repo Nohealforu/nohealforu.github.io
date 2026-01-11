@@ -2352,7 +2352,11 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 			}
 		}
 	}
-	battleState.encounterSummary = {hp: battleStartState.battleCharacters[0x80].currentHp, hp2: battleState.battleCharacters[0x80].currentHp, encounter: encounter, characters: battleStartState.battleCharacters, delay: delayCommands, score: scoreStates, dealt: damageDealtStates, taken: damageTakenStates, time: estimatedTimeStates, totalTime: estimatedTimeTotalStates, startIndex: battleStartState.index + 1, preRNG: currentState.randomNumberIndex, startRNG: battleStartState.randomNumberIndex, endingRNG: battleState.randomNumberIndex, endingScores: completedScores};
+	let bestCompletedScores = [];
+	for(let i = 0; i < completedScores.length; i++)
+		if(endingRNGValueScores[completedScores[i].rng] == completedScores[i].score)
+			bestCompletedScores.push(completedScores[i]);
+	battleState.encounterSummary = {hp: battleStartState.battleCharacters[0x80].currentHp, hp2: battleState.battleCharacters[0x80].currentHp, encounter: encounter, characters: battleStartState.battleCharacters, delay: delayCommands, score: scoreStates, dealt: damageDealtStates, taken: damageTakenStates, time: estimatedTimeStates, totalTime: estimatedTimeTotalStates, startIndex: battleStartState.index + 1, preRNG: currentState.randomNumberIndex, startRNG: battleStartState.randomNumberIndex, endingRNG: battleState.randomNumberIndex, endingScores: bestCompletedScores};
 	return battleState;
 }
 
