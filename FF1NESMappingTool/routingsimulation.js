@@ -2317,7 +2317,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 			{
 				let additionalScores = [];
 				let additionalBattleState = score.battleState;
-				let priorAdditionalBattleState = battleState;
+				let priorAdditionalBattleState = additionalBattleState;
 				let canDelay = false;
 				for (let i = 0x80; i < 0x84; i++)
 				{
@@ -2340,7 +2340,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 					
 					//if(additionalBattleState.encounterIndex != 0x7D)
 						additionalBattleState.score -= additionalBattleState.estimatedTime * 2;
-					additionalScores[i] = {score: additionalBattleState.score, delay: i, dmg: additionalBattleState.damageDealt, lost: additionalBattleState.damageTaken, rng: additionalBattleState.randomNumberIndex, complete: additionalBattleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: additionalBattleState};
+					additionalScores[i] = {score: additionalBattleState.score + priorAdditionalBattleState.score, delay: i, dmg: additionalBattleState.damageDealt + priorAdditionalBattleState.damageDealt, lost: additionalBattleState.damageTaken + priorAdditionalBattleState.damageTaken, rng: additionalBattleState.randomNumberIndex, complete: additionalBattleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: additionalBattleState};
 				}
 				additionalScores.sort((a, b) => b.score - a.score);
 				for(let i = 0; i < additionalScores.length; i++)
