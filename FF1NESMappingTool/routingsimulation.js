@@ -2812,8 +2812,7 @@ async function runRoute()
 					possibleStartingRngValues[j] = endingRngValues[j];
 					endingRngValues[j] = null;
 				}
-				// full heal so we can see what is possible, not accurate for like Kary after lava
-				currentState.battleCharacters[0x80].heal(-1);
+				
 				for(let j = 0; j < 256; j++) 
 				{
 					if(possibleStartingRngValues[j] == undefined || possibleStartingRngValues[j] == null)
@@ -2822,6 +2821,8 @@ async function runRoute()
 						continue;
 					}
 					currentState = possibleStartingRngValues[j];
+					// full heal so we can see what is possible, not accurate for like Kary after lava
+					currentState.battleCharacters[0x80].heal(-1);
 					let endOfBattleState = await runBattle(currentState, currentAction.encounter, currentAction.encounterAction);
 					
 					if(endOfBattleState.startState)
