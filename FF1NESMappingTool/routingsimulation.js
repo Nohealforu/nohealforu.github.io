@@ -2293,7 +2293,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 	
 	let endingRNGValueScores = [].concat(array256NegativeTemplate);
 	let completedScores = [];
-	if(scores != null && rngScores != null && rngScores.length == 0)
+	if(scores != null && rngScores == null)
 	{
 		for(let i = 0; i < scores.length; i++)
 		{
