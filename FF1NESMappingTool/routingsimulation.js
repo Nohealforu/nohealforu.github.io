@@ -2844,6 +2844,7 @@ async function runRoute()
 							bestScore = scoreSum;
 							bestScoredState = endOfBattleState;
 						}
+						// are all these score adjustments throwing stuff off?
 						scoreSum /= endOfBattleState.minimumEnemies;
 						let damageRatio = takenSum / currentState.battleCharacters[0x80].characterData.hp;
 						let stepsToHeal = currentAction.encounter.stepsToHeal;
@@ -2870,28 +2871,52 @@ async function runRoute()
 				encounterCount++;
 				break;
 			case Action.ChangeGold:
-				currentState.gold += currentAction.amount;
+				for(let j = 0; j < 256; j++) 
+				{
+					if(endingRngValues[j] == undefined || endingRngValues[j] == null)
+						continue;
+					endingRngValues[j].gold += currentAction.amount;
+				}
 				break;
 			case Action.EquipWeapon:
-				currentState.battleCharacters[currentAction.characterSlot].characterData.equipWeapon(currentAction.weapon);
+				for(let j = 0; j < 256; j++) 
+				{
+					if(endingRngValues[j] == undefined || endingRngValues[j] == null)
+						continue;
+					endingRngValues[j].battleCharacters[currentAction.characterSlot].characterData.equipWeapon(currentAction.weapon);
+				}
 				break;
 			case Action.UnequipWeapon:
-				currentState.battleCharacters[currentAction.characterSlot].characterData.unequipWeapon();
+				for(let j = 0; j < 256; j++) 
+				{
+					if(endingRngValues[j] == undefined || endingRngValues[j] == null)
+						continue;
+					endingRngValues[j].battleCharacters[currentAction.characterSlot].characterData.unequipWeapon();
+				}
 				break;
 			case Action.EquipArmor:
-				currentState.battleCharacters[currentAction.characterSlot].characterData.equipArmor(currentAction.armor);
+				for(let j = 0; j < 256; j++) 
+				{
+					if(endingRngValues[j] == undefined || endingRngValues[j] == null)
+						continue;
+					endingRngValues[j].battleCharacters[currentAction.characterSlot].characterData.equipArmor(currentAction.armor);
+				}
 				break;
 			case Action.UnequipArmor:
-				currentState.battleCharacters[currentAction.characterSlot].characterData.unequipArmor(currentAction.slot);
+				for(let j = 0; j < 256; j++) 
+				{
+					if(endingRngValues[j] == undefined || endingRngValues[j] == null)
+						continue;
+					endingRngValues[j].battleCharacters[currentAction.characterSlot].characterData.unequipArmor(currentAction.slot);
+				}
 				break;
-			case Action.Heal: // might need a heal all or parameter for that
-				currentState.battleCharacters[currentAction.characterSlot].heal(currentAction.amount);
+			case Action.Heal: // full heal every fight anyway so only for tracking in this loop
 				healed = currentAction.amount;
 				if(healed == -1)
 					healed = 999;
 				break;
-			case Action.Burn: // should hit all characters alive
-				currentState.battleCharacters[currentAction.characterSlot].burn(currentAction.amount);
+			case Action.Burn: // todo: verify this works properly
+				healed = 0 - currentAction.amount;
 				break;
 			case Action.TimeTarget: 
 				//targetTime = currentAction.amount;
