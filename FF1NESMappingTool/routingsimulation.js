@@ -2821,8 +2821,7 @@ async function runRoute()
 						rngScores[j] = {startingRng: j, endingRng: null, score: -999999, time: null, taken: null, shortBounce: null, longBounce: null};
 						continue;
 					}
-					// consider using actual states from different endings instead of highest score one for something?
-					currentState.randomNumberIndex = j;
+					currentState = possibleStartingRngValues[j];
 					let endOfBattleState = await runBattle(currentState, currentAction.encounter, currentAction.encounterAction);
 					
 					if(endOfBattleState.startState)
@@ -2904,6 +2903,7 @@ async function runRoute()
 	console.log("Applying Good RNG backwards...");
 	
 	// transfer score delta backwards, will this help, idk?
+	// I don't think this is sufficient, needs to solve (RCSPP) instead of using single score pathfinding 
 	for(let i = encounterCount - 2; i >= 0; i--)
 	{
 		let rngScores = rngScoring[i];
