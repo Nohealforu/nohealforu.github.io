@@ -2303,6 +2303,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 				if(score.score > endingRNGValueScores[score.rng])
 				{
 					score.delayCommands = delayCommands.concat(score.delay);
+					
 					completedScores.push(score);
 					endingRNGValueScores[score.rng] = score.score;
 				}
@@ -2785,8 +2786,7 @@ async function runRoute()
 	
 	console.log("Calculating Good RNG seeds...");
 	let endingRngValues = Array(256);
-	for(let i = 0; i < 256; i++)
-		endingRngValues[i] = (i == startingState.randomNumberIndex);
+	endingRngValues[startingState.randomNumberIndex] = startingState;
 	// calculating ideal rng values in route by scores 
 	for(let i = 0; i < route.length; i++)
 	{
@@ -2810,13 +2810,13 @@ async function runRoute()
 				for(let j = 0; j < 256; j++)
 				{
 					possibleStartingRngValues[j] = endingRngValues[j];
-					endingRngValues[j] = false;
+					endingRngValues[j] = null;
 				}
 				// full heal so we can see what is possible, not accurate for like Kary after lava
 				currentState.battleCharacters[0x80].heal(-1);
 				for(let j = 0; j < 256; j++) 
 				{
-					if(!possibleStartingRngValues[j])
+					if(possibleStartingRngValues[j] == undefined || possibleStartingRngValues[j] == null)
 					{
 						rngScores[j] = {startingRng: j, endingRng: null, score: -999999, time: null, taken: null, shortBounce: null, longBounce: null};
 						continue;
@@ -2854,7 +2854,10 @@ async function runRoute()
 						scoreSum -= 3000 * ((endOfBattleState.startingEnemies) / (endOfBattleState.minimumEnemies + 1) - 1);
 						rngScores[j] = {startingRng: j, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, taken: takenSum, totalTaken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum, endingScores: summary.endingScores};
 						for(let k = 0; k < summary.endingScores.length; k++)
-							endingRngValues[summary.endingScores[k].rng] = true;
+						{
+							endingRngValues[summary.endingScores[k].rng] = summary.endingScores[k].battleState;
+							summary.endingScores[k].battleState = null; // clear reference so that when we're done memory can be reused.
+						}
 					}
 				}
 				
