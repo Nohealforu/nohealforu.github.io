@@ -2134,8 +2134,9 @@ BattleState.prototype.improvedEndState = function(battleStartState, redoBattleEn
 };*/
 
 var iterationAbortCount;
+var array256NegativeTemplate = Array(256).fill(-999999);
 
-function runBattle(currentState, encounter, encounterAction, redoBattleEndState, redoBattleNextState, rngScores = [])
+function runBattle(currentState, encounter, encounterAction, redoBattleEndState, redoBattleNextState, rngScores, setDelays)
 {
 	let battleStartState = currentState.newEncounter(encounter.index, encounterAction);
 	battleStartState.startState = true;
@@ -2162,9 +2163,15 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 	do 
 	{
 		currentIterationCount++;
+		
+		// ideally we get rid of redoing battles, or use it for the pathfinding (RCSPP)?
 		if(redoBattle && scoreTracker[battleState.index] != null && scoreTracker[battleState.index][delayIndex] != null)
 		{
 			bestDelay = scoreTracker[battleState.index][delayIndex].delay;
+		}
+		else if (setDelays != null)
+		{
+			bestDelay = setDelays[turn - 1];
 		}
 		else
 		{
@@ -2212,7 +2219,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 					bestScore = battleState.score;
 					bestDelay = i;
 				}
-				scores[i] = {score: battleState.score, delay: i, dmg: battleState.damageDealt, lost: battleState.damageTaken, rng: battleState.randomNumberIndex, complete: battleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: battleState};
+				scores[i] = {score: battleState.score, delayCommands: null, delay: i, dmg: battleState.damageDealt, lost: battleState.damageTaken, rng: battleState.randomNumberIndex, complete: battleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: battleState};
 			}
 			scores.sort((a, b) => b.score - a.score);
 			scoreTracker[battleState.index] = scores;
@@ -2284,21 +2291,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 		}
 	} while(!battleState.battleComplete);
 	
-	delayStates[battleState.index] = delayIndex;
-	delayCommands[battleState.turn - 1] = delay;
-	scoreStates[battleState.turn - 1] = battleState.score;
-	damageTakenStates[battleState.turn - 1] = battleState.damageTaken;
-	damageDealtStates[battleState.turn - 1] = battleState.damageDealt;
-	estimatedTimeStates[battleState.turn - 1] = battleState.estimatedTime;
-	estimatedTimeTotalStates[battleState.turn - 1] = battleState.startTime + battleState.estimatedTime;
-	
-	battleState.startingEnemies = battleStartState.startingEnemies;
-	battleState.minimumEnemies = battleStartState.minimumEnemies;
-	
-	
-	let endingRNGValueScores = [];
-	for(let i = 0; i < 256; i++)
-		endingRNGValueScores[i] = -999999;
+	let endingRNGValueScores = [].concat(array256NegativeTemplate);
 	let completedScores = [];
 	if(scores != null && rngScores != null && rngScores.length == 0)
 	{
@@ -2309,6 +2302,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 			{
 				if(score.score > endingRNGValueScores[score.rng])
 				{
+					score.delayCommands = delayCommands.concat(score.delay);
 					completedScores.push(score);
 					endingRNGValueScores[score.rng] = score.score;
 				}
@@ -2340,7 +2334,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 					
 					//if(additionalBattleState.encounterIndex != 0x7D)
 						additionalBattleState.score -= additionalBattleState.estimatedTime * 2;
-					additionalScores[i] = {score: additionalBattleState.score + priorAdditionalBattleState.score, delay: i, dmg: additionalBattleState.damageDealt + priorAdditionalBattleState.damageDealt, lost: additionalBattleState.damageTaken + priorAdditionalBattleState.damageTaken, rng: additionalBattleState.randomNumberIndex, complete: additionalBattleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: additionalBattleState};
+					additionalScores[i] = {score: additionalBattleState.score + priorAdditionalBattleState.score, delayCommands: delayCommands.concat(score.delay, i), delay: i, dmg: additionalBattleState.damageDealt + priorAdditionalBattleState.damageDealt, lost: additionalBattleState.damageTaken + priorAdditionalBattleState.damageTaken, rng: additionalBattleState.randomNumberIndex, complete: additionalBattleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: additionalBattleState};
 				}
 				additionalScores.sort((a, b) => b.score - a.score);
 				for(let i = 0; i < additionalScores.length; i++)
@@ -2355,6 +2349,18 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 			}
 		}
 	}
+	
+	delayStates[battleState.index] = delayIndex;
+	delayCommands[battleState.turn - 1] = delay;
+	scoreStates[battleState.turn - 1] = battleState.score;
+	damageTakenStates[battleState.turn - 1] = battleState.damageTaken;
+	damageDealtStates[battleState.turn - 1] = battleState.damageDealt;
+	estimatedTimeStates[battleState.turn - 1] = battleState.estimatedTime;
+	estimatedTimeTotalStates[battleState.turn - 1] = battleState.startTime + battleState.estimatedTime;
+	
+	battleState.startingEnemies = battleStartState.startingEnemies;
+	battleState.minimumEnemies = battleStartState.minimumEnemies;
+	
 	let bestCompletedScores = [];
 	for(let i = 0; i < completedScores.length; i++)
 		if(endingRNGValueScores[completedScores[i].rng] == completedScores[i].score)
@@ -2778,9 +2784,9 @@ async function runRoute()
 	}
 	
 	console.log("Calculating Good RNG seeds...");
-	let endingRngValues = [];
+	let endingRngValues = Array(256);
 	for(let i = 0; i < 256; i++)
-		endingRngValues[i] = (i == startingState.randomNumberIndex);
+		endingRngValues[startingState.randomNumberIndex] = (i == startingState.randomNumberIndex);
 	// calculating ideal rng values in route by scores 
 	for(let i = 0; i < route.length; i++)
 	{
@@ -2790,7 +2796,7 @@ async function runRoute()
 			case Action.Encounter:
 				let bestScoredState;
 				let bestScore = -999999;
-				let rngScores = [];
+				let rngScores = Array(256);
 				
 				
 				if(currentState == null || currentState.battleCharacters == null)
@@ -2800,7 +2806,7 @@ async function runRoute()
 					console.log(encounterTracker);
 					return;
 				}
-				let possibleStartingRngValues = [];
+				let possibleStartingRngValues = Array(256);
 				for(let j = 0; j < 256; j++)
 				{
 					possibleStartingRngValues[j] = endingRngValues[j];
@@ -2960,7 +2966,7 @@ async function runRoute()
 				if(i == highestIndex)
 					encounterIndexes[encounterCount] = i;
 				startingBattleStates[encounterCount] = currentState;
-				let endOfBattleState = await runBattle(currentState, currentAction.encounter, currentAction.encounterAction, redoBattle ? endingBattleStates[encounterCount] : null, redoBattle ? startingBattleStates[encounterCount + 1] : null, rngScoring[encounterCount + 1]);
+				let endOfBattleState = await runBattle(currentState, currentAction.encounter, currentAction.encounterAction, redoBattle ? endingBattleStates[encounterCount] : null, redoBattle ? startingBattleStates[encounterCount + 1] : null, rngScoring[encounterCount + 1], rngScoring[encounterCount][currentState.randomNumberIndex].delayCommands);
 				//targetTime = null;
 				
 				if(endOfBattleState.startState) // if the battle failed, go backwards to the previous battle
