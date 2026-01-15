@@ -2786,7 +2786,7 @@ async function runRoute()
 	console.log("Calculating Good RNG seeds...");
 	let endingRngValues = Array(256);
 	for(let i = 0; i < 256; i++)
-		endingRngValues[startingState.randomNumberIndex] = (i == startingState.randomNumberIndex);
+		endingRngValues[i] = (i == startingState.randomNumberIndex);
 	// calculating ideal rng values in route by scores 
 	for(let i = 0; i < route.length; i++)
 	{
