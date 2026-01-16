@@ -2465,7 +2465,7 @@ new RouteAction('Encounter 0x10'), // Gargoyle
 new RouteAction('Encounter 0x6B'), // Muck
 new RouteAction('Encounter 0x81'), // Bone
 new RouteAction('Encounter 0x6B'), // Muck
-new RouteAction('Encounter 0x0F'), // Geist
+new RouteAction('Encounter 0x0F 5'), // Geist
 new RouteAction('Encounter 0x0D'), // Asp
 new RouteAction('Encounter 0x7D 5'), // Astos
 new RouteAction('Encounter 0x0C'), // Ogre
@@ -2509,7 +2509,7 @@ new RouteAction('Encounter 0x10'), // Gargoyle
 new RouteAction('Encounter 0x6B'), // Muck
 new RouteAction('Encounter 0x81'), // Bone
 new RouteAction('Encounter 0x6B'), // Muck
-new RouteAction('Encounter 0x0F'), // Geist
+new RouteAction('Encounter 0x0F 5'), // Geist
 new RouteAction('Encounter 0x0D'), // Asp
 new RouteAction('Encounter 0x7D 5'), // Astos
 new RouteAction('Encounter 0x0C'), // Ogre
@@ -2532,7 +2532,7 @@ new RouteAction('Encounter 0x87'), // Ogre/Creep
 new RouteAction('Encounter 0x12'), // Arachnid
 new RouteAction('Encounter 0xDC'), // Shark
 new RouteAction('Encounter 0xDC'), // Shark
-new RouteAction('Encounter 0x88'), // Ghoul
+new RouteAction('Encounter 0x88 5'), // Ghoul
 new RouteAction('Encounter 0x8A'), // Shadow
 new RouteAction('Encounter 0x90'), // Gargoyle
 new RouteAction('Encounter 0x8D'), // Asp
@@ -2555,7 +2555,7 @@ new RouteAction('Encounter 0x19 4'), // Tiger
 new RouteAction('Encounter 0x13'), // GrOgre
 new RouteAction('Encounter 0x13'), // GrOgre
 new RouteAction('Encounter 0x8C'), // Ogre
-new RouteAction('Encounter 0x88'), // Ghoul
+new RouteAction('Encounter 0x88 5'), // Ghoul
 new RouteAction('Encounter 0x19 4'), // Tiger
 new RouteAction('Encounter 0x8A'), // Shadow
 new RouteAction('Encounter 0x13'), // GrOgre
@@ -2571,8 +2571,8 @@ new RouteAction('Encounter 0x93'), // GrOgre
 new RouteAction('Encounter 0x1C 4'), // Wizard
 new RouteAction('Encounter 0x0E'), // WrWolf
 new RouteAction('Encounter 0x63'), // Troll
-new RouteAction('Encounter 0x18'), // Image
-new RouteAction('Encounter 0x63'), // Mummy 
+new RouteAction('Encounter 0x18 4'), // Image
+new RouteAction('Encounter 0x63 4'), // Mummy 
 new RouteAction('Encounter 0x7A 5'), // LICH
 new RouteAction('Encounter 0x8C'), // Ogre
 new RouteAction('Encounter 0x8A'), // Shadow
@@ -3000,6 +3000,11 @@ async function runRoute()
 				
 				if(endOfBattleState.startState) // if the battle failed, go backwards to the previous battle
 				{
+					// after we pathfind this, just abort 
+					console.log('Path failed to execute');
+					stop = true;
+					break;
+					
 					if(encounterCount > 0) 
 					{
 						startingBattleStates[encounterCount] = endOfBattleState;
