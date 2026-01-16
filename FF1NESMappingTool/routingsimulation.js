@@ -1331,6 +1331,11 @@ BattleState.prototype.incrementRandomIndex = function(value)
 		this.randomNumberIndex -= 256;
 }
 
+BattleState.prototype.getKey = function()
+{
+	return this.randomNumberIndex + ":" + this.battleCharacters[0x80].characterData.exp;
+}
+
 BattleState.prototype.getRandomNumber = function(minimum = 0, maximum = -1)
 {
 	let value = randomNumbers[this.randomNumberIndex];
@@ -2198,11 +2203,11 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 				let nextEncounterState;
 				if(battleState.battleComplete && encounter.next?.encounterIndex != null)
 				{
-					if(rngScores != null && rngScores[battleState.randomNumberIndex] != null)
+					if(rngScores != null && rngScores[battleState.getKey()] != null)
 					{
-						battleState.score += rngScores[battleState.randomNumberIndex].score;
+						battleState.score += rngScores[battleState.getKey()].score;
 						// idk if this is good, feels like we might be skipping entire decent route that could be corrected somehow? idk
-						if(rngScores[battleState.randomNumberIndex].taken >= currentState.battleCharacters[0x80].currentHp)
+						if(rngScores[battleState.getKey()].taken >= currentState.battleCharacters[0x80].currentHp)
 							battleState.score -= 10000;
 					}
 					else
@@ -2219,7 +2224,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 					bestScore = battleState.score;
 					bestDelay = i;
 				}
-				scores[i] = {score: battleState.score, delayCommands: null, delay: i, dmg: battleState.damageDealt, lost: battleState.damageTaken, rng: battleState.randomNumberIndex, complete: battleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: battleState};
+				scores[i] = {score: battleState.score, delayCommands: null, delay: i, dmg: battleState.damageDealt, lost: battleState.damageTaken, rng: battleState.randomNumberIndex, complete: battleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: battleState, key: additionalBattleState.getKey()};
 			}
 			scores.sort((a, b) => b.score - a.score);
 			scoreTracker[battleState.index] = scores;
@@ -2235,8 +2240,8 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 		let nextEncounterState;
 		if(battleState.battleComplete && encounter.next?.encounterIndex != null)
 		{
-			if(rngScores != null && rngScores[battleState.randomNumberIndex] != null)
-				battleState.score += rngScores[battleState.randomNumberIndex].score;
+			if(rngScores != null && rngScores[battleState.getKey()] != null)
+				battleState.score += rngScores[battleState.getKey()].score;
 			else
 			{
 				nextEncounterState = battleState.newEncounter(encounter.next?.encounterIndex, EncounterAction.Fight, true);
@@ -2335,7 +2340,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 					
 					//if(additionalBattleState.encounterIndex != 0x7D)
 						additionalBattleState.score -= additionalBattleState.estimatedTime * 2;
-					additionalScores[i] = {score: additionalBattleState.score + priorAdditionalBattleState.score, delayCommands: delayCommands.concat(score.delay, i), delay: i, dmg: additionalBattleState.damageDealt + priorAdditionalBattleState.damageDealt, lost: additionalBattleState.damageTaken + priorAdditionalBattleState.damageTaken, rng: additionalBattleState.randomNumberIndex, complete: additionalBattleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: additionalBattleState};
+					additionalScores[i] = {score: additionalBattleState.score + priorAdditionalBattleState.score, delayCommands: delayCommands.concat(score.delay, i), delay: i, dmg: additionalBattleState.damageDealt + priorAdditionalBattleState.damageDealt, lost: additionalBattleState.damageTaken + priorAdditionalBattleState.damageTaken, rng: additionalBattleState.randomNumberIndex, complete: additionalBattleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: additionalBattleState, key: additionalBattleState.getKey()};
 				}
 				additionalScores.sort((a, b) => b.score - a.score);
 				for(let i = 0; i < additionalScores.length; i++)
@@ -2785,8 +2790,8 @@ async function runRoute()
 	}
 	
 	console.log("Calculating Good RNG seeds...");
-	let endingRngValues = Array(256);
-	endingRngValues[startingState.randomNumberIndex] = startingState;
+	let endingRngValues = {};
+	endingRngValues[startingState.getKey()] = startingState;
 	// calculating ideal rng values in route by scores 
 	for(let i = 0; i < route.length; i++)
 	{
@@ -2796,7 +2801,7 @@ async function runRoute()
 			case Action.Encounter:
 				let bestScoredState;
 				let bestScore = -999999;
-				let rngScores = Array(256);
+				let rngScores = {};
 				
 				
 				if(currentState == null || currentState.battleCharacters == null)
@@ -2806,27 +2811,21 @@ async function runRoute()
 					console.log(encounterTracker);
 					return;
 				}
-				let possibleStartingRngValues = Array(256);
-				for(let j = 0; j < 256; j++)
-				{
-					possibleStartingRngValues[j] = endingRngValues[j];
-					endingRngValues[j] = null;
-				}
+				let possibleStartingRngValues = {};
+				for(let key in endingRngValues)
+					possibleStartingRngValues[key] = endingRngValues[key];
+				endingRngValues = {};
 				
-				for(let j = 0; j < 256; j++) 
+				for(let key in possibleStartingRngValues) 
 				{
-					if(possibleStartingRngValues[j] == undefined || possibleStartingRngValues[j] == null)
-					{
-						rngScores[j] = {startingRng: j, endingRng: null, score: -999999, time: null, taken: null, shortBounce: null, longBounce: null};
-						continue;
-					}
-					currentState = possibleStartingRngValues[j];
+					currentState = possibleStartingRngValues[key];
+					let startRng = currentState.randomNumberIndex;
 					// full heal so we can see what is possible, not accurate for like Kary after lava
 					currentState.battleCharacters[0x80].heal(-1);
 					let endOfBattleState = await runBattle(currentState, currentAction.encounter, currentAction.encounterAction);
 					
 					if(endOfBattleState.startState)
-						rngScores[j] = {startingRng: j, endingRng: null, score: -999999, time: null, taken: null, shortBounce: null, longBounce: null};
+						rngScores[key] = {startingRng: startRng, endingRng: null, score: -999999, time: null, taken: null, shortBounce: null, longBounce: null};
 					else
 					{
 						let scoreSum = 0, timeSum = 0, takenSum = 0, shortBounceSum = 0, longBounceSum = 0;
@@ -2853,10 +2852,10 @@ async function runRoute()
 						//else
 						//	scoreSum -= 1000 * damageRatio * damageRatio * (stepsToHeal + 8) * stepsToHeal / 8;
 						scoreSum -= 3000 * ((endOfBattleState.startingEnemies) / (endOfBattleState.minimumEnemies + 1) - 1);
-						rngScores[j] = {startingRng: j, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, taken: takenSum, totalTaken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum, endingScores: summary.endingScores};
+						rngScores[key] = {startingRng: startRng, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, taken: takenSum, totalTaken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum, endingScores: summary.endingScores};
 						for(let k = 0; k < summary.endingScores.length; k++)
 						{
-							endingRngValues[summary.endingScores[k].rng] = summary.endingScores[k].battleState;
+							endingRngValues[summary.endingScores[k].key] = summary.endingScores[k].battleState;
 							summary.endingScores[k].battleState = null; // clear reference so that when we're done memory can be reused.
 						}
 					}
@@ -2871,44 +2870,24 @@ async function runRoute()
 				encounterCount++;
 				break;
 			case Action.ChangeGold:
-				for(let j = 0; j < 256; j++) 
-				{
-					if(endingRngValues[j] == undefined || endingRngValues[j] == null)
-						continue;
-					endingRngValues[j].gold += currentAction.amount;
-				}
+				for(let key in endingRngValues) 
+					endingRngValues[key].gold += currentAction.amount;
 				break;
 			case Action.EquipWeapon:
-				for(let j = 0; j < 256; j++) 
-				{
-					if(endingRngValues[j] == undefined || endingRngValues[j] == null)
-						continue;
-					endingRngValues[j].battleCharacters[currentAction.characterSlot].characterData.equipWeapon(currentAction.weapon);
-				}
+				for(let key in endingRngValues) 
+					endingRngValues[key].battleCharacters[currentAction.characterSlot].characterData.equipWeapon(currentAction.weapon);
 				break;
 			case Action.UnequipWeapon:
-				for(let j = 0; j < 256; j++) 
-				{
-					if(endingRngValues[j] == undefined || endingRngValues[j] == null)
-						continue;
-					endingRngValues[j].battleCharacters[currentAction.characterSlot].characterData.unequipWeapon();
-				}
+				for(let key in endingRngValues) 
+					endingRngValues[key].battleCharacters[currentAction.characterSlot].characterData.unequipWeapon();
 				break;
 			case Action.EquipArmor:
-				for(let j = 0; j < 256; j++) 
-				{
-					if(endingRngValues[j] == undefined || endingRngValues[j] == null)
-						continue;
-					endingRngValues[j].battleCharacters[currentAction.characterSlot].characterData.equipArmor(currentAction.armor);
-				}
+				for(let key in endingRngValues) 
+					endingRngValues[key].battleCharacters[currentAction.characterSlot].characterData.equipArmor(currentAction.armor);
 				break;
 			case Action.UnequipArmor:
-				for(let j = 0; j < 256; j++) 
-				{
-					if(endingRngValues[j] == undefined || endingRngValues[j] == null)
-						continue;
-					endingRngValues[j].battleCharacters[currentAction.characterSlot].characterData.unequipArmor(currentAction.slot);
-				}
+				for(let key in endingRngValues) 
+					endingRngValues[key].battleCharacters[currentAction.characterSlot].characterData.unequipArmor(currentAction.slot);
 				break;
 			case Action.Heal: // full heal every fight anyway so only for tracking in this loop
 				healed = currentAction.amount;
@@ -2936,25 +2915,25 @@ async function runRoute()
 		let rngNextScores = rngScoring[i + 1];
 		let maxScore = -999999;
 		healed = healTracker[i + 1];
-		for(let j = 0; j < 256; j++)
-			if(rngNextScores[j].score > maxScore)
-				maxScore = rngNextScores[j].score;
-		for(let j = 0; j < 256; j++)
+		for(let key in rngNextScores)
+			if(rngNextScores[key].score > maxScore)
+				maxScore = rngNextScores[key].score;
+		for(let key in rngScores)
 		{
-			if(rngScores[j].endingRng != null)
+			if(rngScores[key].endingRng != null)
 			{
-				let baseLineScore = rngScores[j].endingScores[0].score;
-				let baseLineTaken = rngScores[j].endingScores[0].lost;
-				for(let k = 0; k < rngScores[j].endingScores.length; k++)
-					rngScores[j].endingScores[k].score += rngNextScores[rngScores[j].endingScores[k].rng].score - maxScore;
-				rngScores[j].endingScores.sort((a, b) => b.score - a.score);
-				rngScores[j].score += rngScores[j].endingScores[0].score - baseLineScore;
-				rngScores[j].endingRng = rngScores[j].endingScores[0].rng;
+				let baseLineScore = rngScores[key].endingScores[0].score;
+				let baseLineTaken = rngScores[key].endingScores[0].lost;
+				for(let k = 0; k < rngScores[key].endingScores.length; k++)
+					rngScores[key].endingScores[k].score += rngNextScores[rngScores[key].endingScores[k].key].score - maxScore;
+				rngScores[key].endingScores.sort((a, b) => b.score - a.score);
+				rngScores[key].score += rngScores[key].endingScores[0].score - baseLineScore;
+				rngScores[key].endingRng = rngScores[key].endingScores[0].rng;
 				// rngscores.endingscores.lost is only last round damage
 				// rngscores.totaltaken is whole fight Damage
 				// trying to get the difference in last round damage if it changed due to score adjustments to a new rng Number
 				// and then adding in damage taken from the next battle + battles after, adjusted by healing amounts
-				rngScores[j].totalTaken += rngScores[j].endingScores[0].lost - baseLineTaken + Math.max(rngNextScores[rngScores[j].endingScores[0].rng].totalTaken - healed, 0);
+				rngScores[key].totalTaken += rngScores[key].endingScores[0].lost - baseLineTaken + Math.max(rngNextScores[rngScores[key].endingScores[0].key].totalTaken - healed, 0);
 			}
 		}
 	}
