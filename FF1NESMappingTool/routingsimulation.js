@@ -2171,7 +2171,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 		}
 		else if (setDelays != null)
 		{
-			bestDelay = setDelays[turn - 1];
+			bestDelay = setDelays[battleState.turn - 1];
 		}
 		else
 		{
