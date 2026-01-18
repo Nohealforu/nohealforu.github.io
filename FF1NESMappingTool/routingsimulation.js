@@ -2141,7 +2141,7 @@ BattleState.prototype.improvedEndState = function(battleStartState, redoBattleEn
 var iterationAbortCount;
 var array256NegativeTemplate = Array(256).fill(-999999);
 
-function runBattle(currentState, encounter, encounterAction, redoBattleEndState, redoBattleNextState, rngScores, setDelays)
+function runBattle(currentState, encounter, encounterAction, encounterEnemyCounts, redoBattleEndState, redoBattleNextState, rngScores, setDelays)
 {
 	let battleStartState = currentState.newEncounter(encounter.index, encounterAction);
 	battleStartState.startState = true;
@@ -2212,7 +2212,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 					}
 					else
 					{
-						nextEncounterState = battleState.newEncounter(encounter.next?.encounterIndex, EncounterAction.Fight, true);
+						nextEncounterState = encounterEnemyCounts[battleState.randomNumberIndex];
 						battleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 2) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
 					}
 				}
@@ -2334,7 +2334,7 @@ function runBattle(currentState, encounter, encounterAction, redoBattleEndState,
 					let nextEncounterState;
 					if(additionalBattleState.battleComplete && encounter.next?.encounterIndex != null)
 					{
-						nextEncounterState = additionalBattleState.newEncounter(encounter.next?.encounterIndex, EncounterAction.Fight, true);
+						nextEncounterState = encounterEnemyCounts[battleState.randomNumberIndex];
 						additionalBattleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 2) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
 					}
 					
@@ -2758,7 +2758,6 @@ async function runRoute()
 	let currentIterationCount = 0;
 	let redoBattle = false;
 	let targetTime;
-	let rngScoring = {};
 	battleStates = [];
 	delayStates = [0];
 	scoreTracker = {};
@@ -2767,8 +2766,7 @@ async function runRoute()
 	let nextEncounter;
 	let stepsToHeal = 1;
 	let healed = 0;
-	let healTracker = [];
-	let encounterTracker = [];
+	
 	
 	for(let i = route.length; i--; i > 0)
 	{
@@ -2779,6 +2777,7 @@ async function runRoute()
 				currentAction.encounter = {index: currentAction.encounterIndex, next: nextEncounter, danger: currentAction.encounterDanger, stepsToHeal: stepsToHeal, targetTime: targetTime};
 				nextEncounter = currentAction;
 				stepsToHeal++;
+				encounterCount++;
 				break;
 			case Action.Heal:
 				stepsToHeal = 1;
@@ -2790,7 +2789,12 @@ async function runRoute()
 	}
 	
 	console.log("Calculating Good RNG seeds...");
+	encounterCount = 0;
 	let endingRngValues = {};
+	let allEncounterEnemyCounts = Array(encounterCount);
+	let healTracker = Array(encounterCount);
+	let encounterTracker = Array(encounterCount);
+	let rngScoring = Array(encounterCount);
 	endingRngValues[startingState.getKey()] = startingState;
 	// calculating ideal rng values in route by scores 
 	for(let i = 0; i < route.length; i++)
@@ -2802,7 +2806,18 @@ async function runRoute()
 				let bestScoredState;
 				let bestScore = -999999;
 				let rngScores = {};
+				let encounterEnemyCounts = Array(256);
 				
+				if(currentAction.encounter.next)
+				{
+					for(let j = 0; j < 256; j++)
+					{
+						currentState.randomNumberIndex = j;
+						nextEncounterState = currentState.newEncounter(currentAction.encounter.next.encounterIndex, EncounterAction.Fight, true);
+						encounterEnemyCounts[j] = {startingEnemies: nextEncounterState.startingEnemies, encounterState: nextEncounterState.encounterState, minimumEnemies: nextEncounterState.minimumEnemies};
+					}
+				}
+				allEncounterEnemyCounts[encounterCount] = encounterEnemyCounts;
 				
 				if(currentState == null || currentState.battleCharacters == null)
 				{
@@ -2822,7 +2837,7 @@ async function runRoute()
 					let startRng = currentState.randomNumberIndex;
 					// full heal so we can see what is possible, not accurate for like Kary after lava
 					currentState.battleCharacters[0x80].heal(-1);
-					let endOfBattleState = await runBattle(currentState, currentAction.encounter, currentAction.encounterAction);
+					let endOfBattleState = await runBattle(currentState, currentAction.encounter, currentAction.encounterAction, encounterEnemyCounts);
 					
 					if(endOfBattleState.startState)
 						rngScores[key] = {startingRng: startRng, endingRng: null, score: -999999, time: null, taken: null, shortBounce: null, longBounce: null};
@@ -2855,7 +2870,8 @@ async function runRoute()
 						rngScores[key] = {startingRng: startRng, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, taken: takenSum, totalTaken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum, endingScores: summary.endingScores};
 						for(let k = 0; k < summary.endingScores.length; k++)
 						{
-							endingRngValues[summary.endingScores[k].key] = summary.endingScores[k].battleState;
+							if(currentAction.encounter.next && encounterEnemyCounts[0].minimumEnemies == summary.endingScores[k].enemies)
+								endingRngValues[summary.endingScores[k].key] = summary.endingScores[k].battleState;
 							summary.endingScores[k].battleState = null; // clear reference so that when we're done memory can be reused.
 						}
 					}
@@ -2974,7 +2990,8 @@ async function runRoute()
 				if(i == highestIndex)
 					encounterIndexes[encounterCount] = i;
 				startingBattleStates[encounterCount] = currentState;
-				let endOfBattleState = await runBattle(currentState, currentAction.encounter, currentAction.encounterAction, redoBattle ? endingBattleStates[encounterCount] : null, redoBattle ? startingBattleStates[encounterCount + 1] : null, rngScoring[encounterCount + 1], rngScoring[encounterCount][currentState.getKey()].endingScores[0].delayCommands);
+				let encounterEnemyCounts = allEncounterEnemyCounts[encounterCount];
+				let endOfBattleState = await runBattle(currentState, currentAction.encounter, currentAction.encounterAction, encounterEnemyCounts, redoBattle ? endingBattleStates[encounterCount] : null, redoBattle ? startingBattleStates[encounterCount + 1] : null, rngScoring[encounterCount + 1], rngScoring[encounterCount][currentState.getKey()].endingScores[0].delayCommands);
 				//targetTime = null;
 				
 				if(endOfBattleState.startState) // if the battle failed, go backwards to the previous battle
