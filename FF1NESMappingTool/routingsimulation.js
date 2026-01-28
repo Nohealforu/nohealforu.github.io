@@ -2823,7 +2823,7 @@ async function runRoute()
 					{
 						currentState.randomNumberIndex = j;
 						nextEncounterState = currentState.newEncounter(currentAction.encounter.next.encounterIndex, EncounterAction.Fight, true);
-						encounterEnemyCounts[j] = {startingEnemies: nextEncounterState.startingEnemies, encounterState: nextEncounterState.encounterState, minimumEnemies: nextEncounterState.minimumEnemies, expValue = nextEncounterState.expValue};
+						encounterEnemyCounts[j] = {startingEnemies: nextEncounterState.startingEnemies, encounterState: nextEncounterState.encounterState, minimumEnemies: nextEncounterState.minimumEnemies, expValue: nextEncounterState.expValue};
 						if(minimumEnemies > nextEncounterState.startingEnemies)
 							minimumEnemies = nextEncounterState.startingEnemies;
 					}
