@@ -1308,6 +1308,10 @@ function BattleState(index, randomNumberIndex, gold, battleCharacters, startTime
 	this.damageTaken = 0;
 	this.damageDealt = 0;
 	this.score = 0;
+	this.minimumEnemies = 9;
+	this.startingEnemies = 0;
+	this.expValue = 0;
+	this.playerCommands = {};
 	this.battleComplete = false;
 	this.partyWipe = false;
 	this.abortPath = false;
@@ -1497,6 +1501,7 @@ BattleState.prototype.loadEnemySlot = function(formation, slot, enemyCounts, for
 		let enemyCount = this.getRandomNumber(slot.minimum, slot.maximum);
 		if(enemyCount > 0 && !formation2Extras)
 		{
+			enemyCounts[3] += enemyCount * slot.enemy.exp;
 			if(largeEnemy)
 			{
 				enemyCount = Math.min(enemyCounts[1] + enemyCount, standardFormation ? 4 : 2) - enemyCounts[1];
@@ -1527,13 +1532,13 @@ BattleState.prototype.newEncounter = function(encounterIndex, playerAction, futu
 	let encounter = encounters[encounterIndex];
 	// Generate enemies
 	let formation2 = encounterIndex >= 0x80;
-	let enemyCounts = [0, 0, 0]; // small/large/minimum enemy count
+	let enemyCounts = [0, 0, 0, 0]; // small/large/minimum enemy count/exp value
 	let battleState = new BattleState(1 + this.index, this.randomNumberIndex, this.gold, battleCharacters, this.startTime + this.estimatedTime, encounterIndex, encounter.formation);
 	
 	if(encounter.formation == Formation.fiend || encounter.formation == Formation.chaos)
 	{
 		battleState.battleCharacters[0] = new BattleCharacter(encounter.slot1.enemy);
-		enemyCounts = [0, 1, 1];
+		enemyCounts = [0, 1, 1, encounter.slot1.enemy.exp]; //exp value
 	}
 	else
 	{
@@ -1558,6 +1563,7 @@ BattleState.prototype.newEncounter = function(encounterIndex, playerAction, futu
 	
 	battleState.minimumEnemies = enemyCounts[2];
 	battleState.startingEnemies = enemyCounts[0] + enemyCounts[1];
+	battleState.expValue = enemyCounts[3];
 	if(encounterIndex == 0x4A || encounterIndex == 0x2C)
 		battleState.minimumEnemies = 2;
 	
@@ -2807,14 +2813,26 @@ async function runRoute()
 				let bestScore = -999999;
 				let rngScores = {};
 				let encounterEnemyCounts = Array(256);
+				let minimumExp = 999999;
+				let minimumEnemies = 9;
 				
 				if(currentAction.encounter.next)
 				{
+					
 					for(let j = 0; j < 256; j++)
 					{
 						currentState.randomNumberIndex = j;
 						nextEncounterState = currentState.newEncounter(currentAction.encounter.next.encounterIndex, EncounterAction.Fight, true);
-						encounterEnemyCounts[j] = {startingEnemies: nextEncounterState.startingEnemies, encounterState: nextEncounterState.encounterState, minimumEnemies: nextEncounterState.minimumEnemies};
+						encounterEnemyCounts[j] = {startingEnemies: nextEncounterState.startingEnemies, encounterState: nextEncounterState.encounterState, minimumEnemies: nextEncounterState.minimumEnemies, expValue = nextEncounterState.expValue};
+						if(minimumEnemies > nextEncounterState.startingEnemies)
+							minimumEnemies = nextEncounterState.startingEnemies;
+					}
+					
+					for(let j = 0; j < 256; j++)
+					{
+						encounterEnemyCounts[j].minimumEnemies = minimumEnemies;
+						if(encounterEnemyCounts[j].startingEnemies == minimumEnemies && minimumExp > encounterEnemyCounts[j].expValue)
+							minimumExp = encounterEnemyCounts[j].expValue;
 					}
 				}
 				allEncounterEnemyCounts[encounterCount] = encounterEnemyCounts;
@@ -2858,7 +2876,7 @@ async function runRoute()
 							bestScore = scoreSum;
 							bestScoredState = endOfBattleState;
 						}
-						// are all these score adjustments throwing stuff off?
+						/*// are all these score adjustments throwing stuff off?
 						scoreSum /= endOfBattleState.minimumEnemies;
 						let damageRatio = takenSum / currentState.battleCharacters[0x80].characterData.hp;
 						let stepsToHeal = currentAction.encounter.stepsToHeal;
@@ -2866,11 +2884,11 @@ async function runRoute()
 							scoreSum += 500;
 						//else
 						//	scoreSum -= 1000 * damageRatio * damageRatio * (stepsToHeal + 8) * stepsToHeal / 8;
-						scoreSum -= 3000 * ((endOfBattleState.startingEnemies) / (endOfBattleState.minimumEnemies + 1) - 1);
+						scoreSum -= 3000 * ((endOfBattleState.startingEnemies) / (endOfBattleState.minimumEnemies + 1) - 1);*/
 						rngScores[key] = {startingRng: startRng, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, taken: takenSum, totalTaken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum, endingScores: summary.endingScores};
 						for(let k = 0; k < summary.endingScores.length; k++)
 						{
-							if(currentAction.encounter.next && encounterEnemyCounts[0].minimumEnemies == summary.endingScores[k].enemies)
+							if(currentAction.encounter.next && minimumEnemies == summary.endingScores[k].enemies && minimumExp == encounterEnemyCounts[summary.endingScores[k].rng])
 								endingRngValues[summary.endingScores[k].key] = summary.endingScores[k].battleState;
 							summary.endingScores[k].battleState = null; // clear reference so that when we're done memory can be reused.
 						}
