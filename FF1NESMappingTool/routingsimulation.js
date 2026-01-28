@@ -2230,7 +2230,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					bestScore = battleState.score;
 					bestDelay = i;
 				}
-				scores[i] = {score: battleState.score, delayCommands: null, delay: i, dmg: battleState.damageDealt, lost: battleState.damageTaken, rng: battleState.randomNumberIndex, complete: battleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: battleState, key: battleState.getKey()};
+				scores[i] = {score: battleState.score, delayCommands: null, delay: i, dmg: battleState.damageDealt, lost: battleState.damageTaken, rng: battleState.randomNumberIndex, complete: battleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: battleState, key: battleState.getKey(), status: battleState.battleCharacters[0x80].status};
 			}
 			scores.sort((a, b) => b.score - a.score);
 			scoreTracker[battleState.index] = scores;
@@ -2346,7 +2346,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					
 					//if(additionalBattleState.encounterIndex != 0x7D)
 						additionalBattleState.score -= additionalBattleState.estimatedTime * 2;
-					additionalScores[i] = {score: additionalBattleState.score + priorAdditionalBattleState.score, delayCommands: delayCommands.concat(score.delay, i), delay: i, dmg: additionalBattleState.damageDealt + priorAdditionalBattleState.damageDealt, lost: additionalBattleState.damageTaken + priorAdditionalBattleState.damageTaken, rng: additionalBattleState.randomNumberIndex, complete: additionalBattleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: additionalBattleState, key: additionalBattleState.getKey()};
+					additionalScores[i] = {score: additionalBattleState.score + priorAdditionalBattleState.score, delayCommands: delayCommands.concat(score.delay, i), delay: i, dmg: additionalBattleState.damageDealt + priorAdditionalBattleState.damageDealt, lost: additionalBattleState.damageTaken + priorAdditionalBattleState.damageTaken, rng: additionalBattleState.randomNumberIndex, complete: additionalBattleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: additionalBattleState, key: additionalBattleState.getKey(), status: additionalBattleState.battleCharacters[0x80].status};
 				}
 				additionalScores.sort((a, b) => b.score - a.score);
 				for(let i = 0; i < additionalScores.length; i++)
@@ -2882,7 +2882,7 @@ async function runRoute()
 						rngScores[key] = {startingRng: startRng, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, taken: takenSum, totalTaken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum, endingScores: summary.endingScores};
 						for(let k = 0; k < summary.endingScores.length; k++)
 						{
-							if(currentAction.encounter.next && minimumEnemies == summary.endingScores[k].enemies && minimumExp == encounterEnemyCounts[summary.endingScores[k].rng].expValue)
+							if(summary.endingScores[k].status == 0 && currentAction.encounter.next && minimumEnemies == summary.endingScores[k].enemies && minimumExp == encounterEnemyCounts[summary.endingScores[k].rng].expValue)
 								endingRngValues[summary.endingScores[k].key] = summary.endingScores[k].battleState;
 							summary.endingScores[k].battleState = null; // clear reference so that when we're done memory can be reused.
 						}
