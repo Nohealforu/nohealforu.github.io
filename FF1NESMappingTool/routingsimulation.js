@@ -2816,6 +2816,7 @@ async function runRoute()
 				let minimumExp = 999999;
 				let minimumEnemies = 9;
 				
+				
 				if(currentAction.encounter.next)
 				{
 					
@@ -2837,13 +2838,6 @@ async function runRoute()
 				}
 				allEncounterEnemyCounts[encounterCount] = encounterEnemyCounts;
 				
-				if(currentState == null || currentState.battleCharacters == null)
-				{
-					console.log('Failed fight');
-					console.log(rngScoring);
-					console.log(encounterTracker);
-					return;
-				}
 				let possibleStartingRngValues = {};
 				for(let key in endingRngValues)
 					possibleStartingRngValues[key] = endingRngValues[key];
@@ -2888,7 +2882,7 @@ async function runRoute()
 						rngScores[key] = {startingRng: startRng, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, taken: takenSum, totalTaken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum, endingScores: summary.endingScores};
 						for(let k = 0; k < summary.endingScores.length; k++)
 						{
-							if(currentAction.encounter.next && minimumEnemies == summary.endingScores[k].enemies && minimumExp == encounterEnemyCounts[summary.endingScores[k].rng])
+							if(currentAction.encounter.next && minimumEnemies == summary.endingScores[k].enemies && minimumExp == encounterEnemyCounts[summary.endingScores[k].rng].expValue)
 								endingRngValues[summary.endingScores[k].key] = summary.endingScores[k].battleState;
 							summary.endingScores[k].battleState = null; // clear reference so that when we're done memory can be reused.
 						}
@@ -2901,6 +2895,15 @@ async function runRoute()
 				encounterTracker[encounterCount] = currentAction.encounter;
 				healed = 0;
 				currentState = bestScoredState;
+				
+				if(currentState == null || currentState.battleCharacters == null)
+				{
+					console.log('Failed fight');
+					console.log(rngScoring);
+					console.log(encounterTracker);
+					return;
+				}
+				
 				encounterCount++;
 				break;
 			case Action.ChangeGold:
