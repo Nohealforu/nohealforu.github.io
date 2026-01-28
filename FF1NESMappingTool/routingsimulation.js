@@ -2962,7 +2962,12 @@ async function runRoute()
 				let baseLineScore = rngScores[key].endingScores[0].score;
 				let baseLineTaken = rngScores[key].endingScores[0].lost;
 				for(let k = 0; k < rngScores[key].endingScores.length; k++)
-					rngScores[key].endingScores[k].score += rngNextScores[rngScores[key].endingScores[k].key].score - maxScore;
+				{
+					if(rngNextScores[rngScores[key].endingScores[k].key] == null)
+						rngScores[key].endingScores[k].score = -999999;
+					else
+						rngScores[key].endingScores[k].score += rngNextScores[rngScores[key].endingScores[k].key].score - maxScore;
+				}
 				rngScores[key].endingScores.sort((a, b) => b.score - a.score);
 				rngScores[key].score += rngScores[key].endingScores[0].score - baseLineScore;
 				rngScores[key].endingRng = rngScores[key].endingScores[0].rng;
