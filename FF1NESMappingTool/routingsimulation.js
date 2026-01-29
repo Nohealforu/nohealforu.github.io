@@ -2760,7 +2760,7 @@ async function runRoute()
 	let encounterIndexes = [];
 	let highestIndex = 0;
 	let encounterCount = 0;
-	let currentState = startingState;
+	let currentState = new BattleState(0, 193, 630, testCharacters);
 	let currentIterationCount = 0;
 	let redoBattle = false;
 	let targetTime;
