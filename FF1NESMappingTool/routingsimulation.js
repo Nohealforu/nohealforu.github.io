@@ -3046,7 +3046,7 @@ async function runRoute()
 				if(endingRngValuesCount == 0)
 					endingRngValues = backupEndingRngValues;
 				for(let key in endingRngValues)
-					if(endingRngValues[key].startTime + endingRngValues[key].estimatedTime == endingRNGValuesBestTime[endingRngValues[key]].randomNumberIndex)
+					if(endingRngValues[key].startTime + endingRngValues[key].estimatedTime == endingRNGValuesBestTime[endingRngValues[key].randomNumberIndex])
 						possibleStartingRngValues[key] = endingRngValues[key];
 				endingRngValues = {};
 				 endingRngValuesCount = 0;
