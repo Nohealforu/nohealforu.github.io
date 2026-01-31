@@ -2494,8 +2494,6 @@ new RouteAction('TimeTarget'),
 new RouteAction('Heal')];*/
 
 var route = [
-new RouteAction('EquipWeapon SilverSword'),
-new RouteAction('EquipArmor IronArmor'),
 new RouteAction('Encounter 0x0C'), // Ogre
 new RouteAction('Encounter 0x5D'), // Shark
 new RouteAction('Encounter 0x01'), // Bone
@@ -2954,19 +2952,20 @@ async function runRoute()
 		6: null,
 		7: null,
 		8: null,
-		0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 2, 138, 61, 21, 6, 1, 11, 5, 39, 15, 1, 18, 19, 4, 18, 0, 0, weapons['Rapier'], armor['ChainArmor'], null, null, null), 35),
+		//0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 2, 138, 61, 21, 6, 1, 11, 5, 39, 15, 1, 18, 19, 4, 18, 0, 0, weapons['Rapier'], armor['ChainArmor'], null, null, null), 35),
+		0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 8, 7326, 230, 27, 12, 3, 15, 9, 37, 24, 2, 46, 36, weapons['SilverSword'].crit, 36, 0, 0, weapons['SilverSword'], armor['IronArmor'], null, null, null)),
 		0x81: null,
 		0x82: null,
 		0x83: null,
 	};
-	let startingState = new BattleState(0, 193, 630, testCharacters);
+	let startingState = new BattleState(0, 254, 630, testCharacters);
 	let startingBattleStates = [];
 	let endingBattleStates = [];
 	let endingBattleSummaries = [];
 	let encounterIndexes = [];
 	let highestIndex = 0;
 	let encounterCount = 0;
-	let currentState = new BattleState(0, 193, 630, testCharacters);
+	let currentState = new BattleState(0, 254, 630, testCharacters);
 	let currentIterationCount = 0;
 	let redoBattle = false;
 	let targetTime;
@@ -3199,12 +3198,13 @@ async function runRoute()
 		6: null,
 		7: null,
 		8: null,
-		0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 2, 138, 61, 21, 6, 1, 11, 5, 39, 15, 1, 18, 19, 4, 18, 0, 0, weapons['Rapier'], armor['ChainArmor'], null, null, null), 35),
+		//0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 2, 138, 61, 21, 6, 1, 11, 5, 39, 15, 1, 18, 19, 4, 18, 0, 0, weapons['Rapier'], armor['ChainArmor'], null, null, null), 35),
+		0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 8, 7326, 230, 27, 12, 3, 15, 9, 37, 24, 2, 46, 36, weapons['SilverSword'].crit, 36, 0, 0, weapons['SilverSword'], armor['IronArmor'], null, null, null)),
 		0x81: null,
 		0x82: null,
 		0x83: null,
 	};
-	startingState = new BattleState(0, 193, 630, testCharacters);
+	startingState = new BattleState(0, 254, 630, testCharacters);
 	currentState = startingState;
 	
 	// calculating ideal path using rng values as reference  
