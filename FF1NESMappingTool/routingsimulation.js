@@ -2495,8 +2495,8 @@ new RouteAction('Encounter 0x5D'), // Shark
 new RouteAction('Encounter 0x01'), // Bone
 new RouteAction('Encounter 0x01'), // Bone
 new RouteAction('Encounter 0x0C'), // Ogre
-new RouteAction('Encounter 0xD8'), // Sahag
-new RouteAction('Encounter 0xD8'), // Sahag
+new RouteAction('Encounter 0xDB'), // Sahag
+new RouteAction('Encounter 0xDB'), // Sahag
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
 new RouteAction('Encounter 0x5C'), // Kyzoku
@@ -2550,7 +2550,7 @@ new RouteAction('Encounter 0x7A 5'), // LICH
 new RouteAction('Heal 120'),
 new RouteAction('Encounter 0x19 4'), // Tiger
 new RouteAction('Encounter 0x5B'), // OddEye
-new RouteAction('Encounter 0xD8'), // Sahag
+new RouteAction('Encounter 0xDB'), // Sahag
 new RouteAction('Encounter 0x88'), // Ghoul
 new RouteAction('Encounter 0x5B'), // OddEye
 new RouteAction('Encounter 0x63'), // Troll
