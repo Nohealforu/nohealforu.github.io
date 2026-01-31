@@ -98,13 +98,6 @@ const randomNumbers = [
 	0xD1,0xA5,0x42,0xE7,0xD6,0x76,0xA7,0x84,0x8E,0x66,0x7C,0x23,0x88,0x37,0x49,0xD9
 ];
 
-const targetTable = {
-	1: [15, 18, 19, 20, 23, 25, 28, 31, 36, 37, 38, 40, 43, 48, 49, 51, 52, 54, 56, 59, 61, 62, 64, 68, 72, 75, 77, 78, 79, 83, 85, 88, 90, 91, 92, 94, 95, 96, 99, 100, 101, 103, 104, 105, 109, 110, 112, 113, 114, 115, 118, 119, 120, 123, 124, 125, 126, 129, 130, 132, 138, 139, 140, 141, 146, 150, 153, 154, 155, 157, 158, 160, 161, 162, 163, 170, 171, 174, 175, 177, 178, 179, 181, 184, 185, 186, 188, 190, 191, 192, 193, 202, 203, 204, 206, 212, 215, 216, 217, 218, 222, 225, 227, 228, 229, 232, 234, 235, 236, 237, 238, 239, 241, 242, 244, 245, 247, 248, 249, 253, 0, 1, 2, 4, 5, 7, 12],
-	2: [14, 21, 24, 26, 29, 32, 33, 39, 42, 44, 50, 55, 65, 66, 70, 71, 74, 76, 80, 84, 86, 93, 97, 106, 107, 108, 116, 133, 135, 137, 148, 149, 151, 156, 164, 165, 166, 169, 176, 183, 189, 195, 197, 198, 199, 200, 208, 211, 214, 221, 224, 230, 231, 233, 240, 243, 246, 250, 251, 255, 6, 8, 9, 10],
-	3: [16, 22, 27, 30, 35, 41, 46, 53, 57, 60, 67, 82, 87, 89, 121, 131, 142, 147, 152, 159, 167, 173, 180, 187, 194, 213, 223, 252, 254, 3, 11],
-	4: [17, 34, 45, 47, 58, 63, 69, 73, 81, 98, 102, 111, 117, 122, 127, 128, 134, 136, 143, 144, 145, 168, 172, 182, 196, 201, 205, 207, 209, 210, 219, 220, 226, 13]
-}
-
 const formationRNGPrimaryIncrement = {
 	[Formation.small]: 54,
 	[Formation.large]: 72,
@@ -2146,6 +2139,7 @@ BattleState.prototype.improvedEndState = function(battleStartState, redoBattleEn
 
 var iterationAbortCount;
 var array256NegativeTemplate = Array(256).fill(-999999);
+var array256PositiveTemplate = Array(256).fill(999999);
 
 function runBattle(currentState, encounter, encounterAction, encounterEnemyCounts, redoBattleEndState, redoBattleNextState, rngScores, setDelays)
 {
@@ -2304,6 +2298,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 	} while(!battleState.battleComplete);
 	
 	let endingRNGValueScores = [].concat(array256NegativeTemplate);
+	
 	let completedScores = [];
 	if(scores != null && rngScores == null)
 	{
@@ -2630,7 +2625,7 @@ new RouteAction('Encounter 0xC3'), // Lobster
 new RouteAction('Encounter 0xC2 4'), // SeaTroll/Lobster
 new RouteAction('Encounter 0x48 4'), // GrShark
 new RouteAction('Encounter 0xE1 4'), // SeaTroll
-new RouteAction('Encounter 0x78 5'), // Kraken
+new RouteAction('Encounter 0x78 9'), // Kraken
 new RouteAction('Encounter 0xA0'), // Hydra
 new RouteAction('Encounter 0x41'), // Naocho
 new RouteAction('Encounter 0xCA'), // WzMummy/Mummy
@@ -3008,6 +3003,8 @@ async function runRoute()
 	let encounterTracker = Array(encounterCount);
 	let rngScoring = Array(encounterCount);
 	endingRngValues[startingState.getKey()] = startingState;
+	let endingRNGValuesBestTime = [].concat(array256PositiveTemplate);
+	endingRNGValuesBestTime[startingState.randomNumberIndex] = 200;
 	let endingRngValuesCount = 1;
 	// calculating ideal rng values in route by scores 
 	for(let i = 0; i < route.length; i++)
@@ -3049,10 +3046,13 @@ async function runRoute()
 				if(endingRngValuesCount == 0)
 					endingRngValues = backupEndingRngValues;
 				for(let key in endingRngValues)
-					possibleStartingRngValues[key] = endingRngValues[key];
+					if(endingRngValues[key].startTime + endingRngValues[key].estimatedTime == endingRNGValuesBestTime[endingRngValues[key]].randomNumberIndex)
+						possibleStartingRngValues[key] = endingRngValues[key];
 				endingRngValues = {};
 				 endingRngValuesCount = 0;
 				backupEndingRngValues = {};
+				
+				endingRNGValuesBestTime = [].concat(array256PositiveTemplate);
 				
 				for(let key in possibleStartingRngValues) 
 				{
@@ -3093,14 +3093,22 @@ async function runRoute()
 						rngScores[key] = {startingRng: startRng, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, taken: takenSum, totalTaken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum, endingScores: summary.endingScores};
 						for(let k = 0; k < summary.endingScores.length; k++)
 						{
-							if(summary.endingScores[k].status == 0 && currentAction.encounter.next && minimumEnemies == summary.endingScores[k].enemies && minimumExp == encounterEnemyCounts[summary.endingScores[k].rng].expValue)
+							let endScore = summary.endingScores[k];
+							let added = false;
+							if(endScore.status == 0 && currentAction.encounter.next && minimumEnemies == endScore.enemies && minimumExp == encounterEnemyCounts[endScore.rng].expValue)
 							{
+								added = true;
 								endingRngValuesCount++;
-								endingRngValues[summary.endingScores[k].key] = summary.endingScores[k].battleState;
+								endingRngValues[endScore.key] = endScore.battleState;
 							}
-							else if(summary.endingScores[k].status == 0 && currentAction.encounter.next && minimumEnemies + 1 >= summary.endingScores[k].enemies)
-								backupEndingRngValues[summary.endingScores[k].key] = summary.endingScores[k].battleState;
-							summary.endingScores[k].battleState = null; // clear reference so that when we're done memory can be reused.
+							else if(endScore.status == 0 && currentAction.encounter.next && minimumEnemies + 1 >= endScore.enemies)
+							{
+								added = true;
+								backupEndingRngValues[endScore.key] = endScore.battleState;
+							}
+							if(added && endingRNGValuesBestTime[endScore.rng] > endScore.battleState.startTime + endScore.battleState.estimatedTime)
+								endingRNGValuesBestTime[endScore.rng] = endScore.battleState.startTime + endScore.battleState.estimatedTime;
+							endScore.battleState = null; // clear reference so that when we're done memory can be reused.
 						}
 					}
 				}
