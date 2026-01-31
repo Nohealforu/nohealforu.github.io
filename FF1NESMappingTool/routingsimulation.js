@@ -3197,7 +3197,8 @@ async function runRoute()
 				// rngscores.totaltaken is whole fight Damage
 				// trying to get the difference in last round damage if it changed due to score adjustments to a new rng Number
 				// and then adding in damage taken from the next battle + battles after, adjusted by healing amounts
-				rngScores[key].totalTaken += rngScores[key].endingScores[0].lost - baseLineTaken + Math.max(rngNextScores[rngScores[key].endingScores[0].key].totalTaken - healed, 0);
+				if(rngNextScores[rngScores[key].endingScores[0].key] != null)
+					rngScores[key].totalTaken += rngScores[key].endingScores[0].lost - baseLineTaken + Math.max(rngNextScores[rngScores[key].endingScores[0].key].totalTaken - healed, 0);
 			}
 		}
 	}
