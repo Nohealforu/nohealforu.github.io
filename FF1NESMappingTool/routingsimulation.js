@@ -3094,20 +3094,18 @@ async function runRoute()
 						for(let k = 0; k < summary.endingScores.length; k++)
 						{
 							let endScore = summary.endingScores[k];
-							let added = false;
-							if(endScore.status == 0 && currentAction.encounter.next && minimumEnemies == endScore.enemies && minimumExp == encounterEnemyCounts[endScore.rng].expValue)
+							if(endingRNGValuesBestTime[endScore.rng] > endScore.battleState.startTime + endScore.battleState.estimatedTime)
 							{
-								added = true;
-								endingRngValuesCount++;
-								endingRngValues[endScore.key] = endScore.battleState;
-							}
-							else if(endScore.status == 0 && currentAction.encounter.next && minimumEnemies + 1 >= endScore.enemies)
-							{
-								added = true;
-								backupEndingRngValues[endScore.key] = endScore.battleState;
-							}
-							if(added && endingRNGValuesBestTime[endScore.rng] > endScore.battleState.startTime + endScore.battleState.estimatedTime)
+								if(endScore.status == 0 && currentAction.encounter.next && minimumEnemies == endScore.enemies && minimumExp == encounterEnemyCounts[endScore.rng].expValue)
+								{
+									endingRngValuesCount++;
+									endingRngValues[endScore.key] = endScore.battleState;
+								}
+								else if(endScore.status == 0 && currentAction.encounter.next && minimumEnemies + 1 >= endScore.enemies)
+									backupEndingRngValues[endScore.key] = endScore.battleState;
+								
 								endingRNGValuesBestTime[endScore.rng] = endScore.battleState.startTime + endScore.battleState.estimatedTime;
+							}
 							endScore.battleState = null; // clear reference so that when we're done memory can be reused.
 						}
 					}
