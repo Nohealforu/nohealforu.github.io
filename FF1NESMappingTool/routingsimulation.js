@@ -1640,7 +1640,7 @@ BattleState.prototype.checkEnemyDead = function(dangerRatio)
 	return true;
 };
 
-BattleState.prototype.runTurn = function(delay, stepsToHeal, dangerRatio)
+BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 {
 	let missCount = 0;
 	let critCount = 0;
@@ -1898,7 +1898,7 @@ BattleState.prototype.runTurn = function(delay, stepsToHeal, dangerRatio)
 				{
 					let damageRatio = damageSum / targetCharacter.characterData.hp; // adjust this by starting hp or something?
 					// calculated danger levels?
-					this.score -= 2000 * damageRatio * damageRatio * (stepsToHeal + 8) * stepsToHeal / 8 / dangerRatio;
+					this.score -= 2000 * damageRatio * damageRatio * damageTakenRatio / dangerRatio;
 				}
 				this.damageTaken += damageSum;
 				this.estimatedTime += 90;
@@ -1950,7 +1950,7 @@ BattleState.prototype.runTurn = function(delay, stepsToHeal, dangerRatio)
 						else // percent of hp damage dealt in a turn or something, idk 
 						{
 							let damageRatio = damageRoll / targetCharacter.characterData.hp; // adjust this by starting hp or something? idk
-							this.score -= 2000 * damageRatio * damageRatio * (stepsToHeal + 8) * stepsToHeal / 8 / dangerRatio;
+							this.score -= 2000 * damageRatio * damageRatio * damageTakenRatio / dangerRatio;
 						}
 						
 						this.damageTaken += damageRoll;
@@ -2170,6 +2170,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 	let scores;
 	let dangerRatio = encounter.danger / 3 || 1;
 	let nextDangerRatio = encounter.next?.encounterDanger / 3 || 1;
+	let damageTakenRatio = (encounter.stepsToHeal + 8) * encounter.stepsToHeal / 64;
 	
 	do 
 	{
@@ -2203,7 +2204,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 				battleState.estimatedTime += (i < 6 ? i * 41 : 50 * Math.floor(i / 3) + 41 * (i % 3));
 				if(priorBattleState == battleStartState)
 					battleState.encounterState = battleStartState.encounterState;
-				battleState.runTurn(i, encounter.stepsToHeal, dangerRatio);
+				battleState.runTurn(i, damageTakenRatio, dangerRatio);
 				if(battleState.battleComplete && !canDelay)
 					canDelay = false; // this was here for a breakpoint, but could break stuff if like a single enemy ambushes and flees or something idk
 				let nextEncounterState;
@@ -2241,7 +2242,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 		if(priorBattleState == battleStartState)
 			battleState.encounterState = battleStartState.encounterState;
 		battleState.estimatedTime += (delay < 6 ? delay * 41 : 50 * Math.floor(delay / 3) + 41 * (delay % 3));
-		battleState.runTurn(delay, encounter.stepsToHeal, dangerRatio);
+		battleState.runTurn(delay, damageTakenRatio, dangerRatio);
 		
 		let nextEncounterState;
 		if(battleState.battleComplete && encounter.next?.encounterIndex != null)
@@ -2336,7 +2337,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 				{
 					additionalBattleState = priorAdditionalBattleState.newTurn(encounterAction);
 					additionalBattleState.estimatedTime += (i < 6 ? i * 41 : 50 * Math.floor(i / 3) + 41 * (i % 3));
-					additionalBattleState.runTurn(i, encounter.stepsToHeal, dangerRatio);
+					additionalBattleState.runTurn(i, damageTakenRatio, dangerRatio);
 					let nextEncounterState;
 					if(additionalBattleState.battleComplete && encounter.next?.encounterIndex != null)
 					{
