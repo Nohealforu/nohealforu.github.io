@@ -3007,6 +3007,7 @@ async function runRoute()
 	let encounterTracker = Array(encounterCount);
 	let rngScoring = Array(encounterCount);
 	endingRngValues[startingState.getKey()] = startingState;
+	let endingRngValuesCount = 1;
 	// calculating ideal rng values in route by scores 
 	for(let i = 0; i < route.length; i++)
 	{
@@ -3044,9 +3045,13 @@ async function runRoute()
 				allEncounterEnemyCounts[encounterCount] = encounterEnemyCounts;
 				
 				let possibleStartingRngValues = {};
+				if(endingRngValuesCount == 0)
+					endingRngValues = backupEndingRngValues;
 				for(let key in endingRngValues)
 					possibleStartingRngValues[key] = endingRngValues[key];
 				endingRngValues = {};
+				 endingRngValuesCount = 0;
+				backupEndingRngValues = {};
 				
 				for(let key in possibleStartingRngValues) 
 				{
@@ -3088,7 +3093,12 @@ async function runRoute()
 						for(let k = 0; k < summary.endingScores.length; k++)
 						{
 							if(summary.endingScores[k].status == 0 && currentAction.encounter.next && minimumEnemies == summary.endingScores[k].enemies && minimumExp == encounterEnemyCounts[summary.endingScores[k].rng].expValue)
+							{
+								endingRngValuesCount++;
 								endingRngValues[summary.endingScores[k].key] = summary.endingScores[k].battleState;
+							}
+							else if(summary.endingScores[k].status == 0 && currentAction.encounter.next && minimumEnemies + 1 >= summary.endingScores[k].enemies)
+								backupEndingRngValues[summary.endingScores[k].key] = summary.endingScores[k].battleState;
 							summary.endingScores[k].battleState = null; // clear reference so that when we're done memory can be reused.
 						}
 					}
