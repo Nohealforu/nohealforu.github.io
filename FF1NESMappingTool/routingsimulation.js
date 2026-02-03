@@ -2292,7 +2292,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 			delayIndex = redoBattle ? (delayStates[battleState.index] ?? 0) : 0;
 			bestScore = -999999;
 		}
-		if(currentIterationCount > 20 || battleState.turn > 10) // something has probably gone wrong, abort path.  TODO: add better culling to prevent useless turns from eating time/count
+		if(setDelays == null && (currentIterationCount > 20 || battleState.turn > 10)) // something has probably gone wrong, abort path.  TODO: add better culling to prevent useless turns from eating time/count
 		{
 			iterationAbortCount++;
 			return battleStartState;
@@ -2532,7 +2532,7 @@ new RouteAction('Encounter 0x13'), // GrOgre/Ogre
 new RouteAction('Heal 30'),
 new RouteAction('Encounter 0x19 4'), // Tiger
 new RouteAction('Encounter 0x8A'), // Shadow
-new RouteAction('Heal 60'),
+new RouteAction('Heal 30'),
 new RouteAction('Encounter 0x19 4'), // Tiger
 new RouteAction('Encounter 0x8C'), // Ogre
 new RouteAction('Encounter 0x13'), // GrOgre/Ogre
@@ -2549,19 +2549,18 @@ new RouteAction('Encounter 0x16'), // Coctrice
 new RouteAction('Encounter 0x0E'), // GrImp
 new RouteAction('Encounter 0x1B'), // Troll
 new RouteAction('Encounter 0x18'), // Image
-new RouteAction('Encounter 0x7A 5 227'), // LICH
-new RouteAction('Heal 120'),
+new RouteAction('Encounter 0x7A 5 205'), // LICH
+new RouteAction('Heal 60'),
 new RouteAction('Encounter 0x19 4'), // Tiger
 new RouteAction('Encounter 0x5B'), // OddEye
 new RouteAction('Encounter 0xDB'), // Sahag
 new RouteAction('Encounter 0x88'), // Ghoul
 new RouteAction('Encounter 0x5B'), // OddEye
 new RouteAction('Encounter 0x63'), // Troll
-new RouteAction('Encounter 0x17'), // Pede
+new RouteAction('Encounter 0x17 3 80'), // Pede
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
 new RouteAction('EquipArmor SilverGauntlet'),
-new RouteAction('EquipArmor SilverHelmet'),
 new RouteAction('Encounter 0x17 3 20'), // Pede
 new RouteAction('Encounter 0x1E 3 20'), // Giant
 new RouteAction('Encounter 0xE0 3 20'), // Hydra
@@ -2614,7 +2613,6 @@ new RouteAction('Encounter 0x5A 4 20'), // GrShark
 new RouteAction('Encounter 0x47'),   // Naga
 new RouteAction('Encounter 0x49 5 20'), // Water
 new RouteAction('Encounter 0x72'), // SeaSnake
-new RouteAction('Encounter 0x72'), // SeaSnake
 new RouteAction('EquipArmor OpalBracelet'),
 new RouteAction('Encounter 0x72'), // SeaSnake
 new RouteAction('Encounter 0x5A 4 20'), // GrShark 
@@ -2628,23 +2626,22 @@ new RouteAction('Encounter 0xC3'), // Lobster
 new RouteAction('Encounter 0xC2 4'), // SeaTroll/Lobster
 new RouteAction('Encounter 0x48 4 20'), // GrShark
 new RouteAction('Encounter 0xE1 4'), // SeaTroll
-new RouteAction('Encounter 0x78 15 300'), // Kraken
-new RouteAction('Encounter 0xA0'), // Hydra
+new RouteAction('Encounter 0x78 15 330'), // Kraken
+new RouteAction('Heal 120'),
 new RouteAction('Encounter 0x41'), // Naocho
-new RouteAction('Encounter 0xCA'), // WzMummy/Mummy
-new RouteAction('Encounter 0xCA'), // WzMummy/Mummy
-new RouteAction('Encounter 0x3F'), // MudGol
+new RouteAction('Encounter 0xCA 3 20'), // WzMummy/Mummy
+new RouteAction('Encounter 0xCA 3 20'), // WzMummy/Mummy
+new RouteAction('Encounter 0x3F 3 20'), // MudGol
 new RouteAction('Encounter 0x4F'), // Nitemare
 new RouteAction('Encounter 0x4F'), // Nitemare
 new RouteAction('Encounter 0x4F'), // Nitemare
-new RouteAction('Encounter 0xCA'), // WzMummy/Mummy
-new RouteAction('Encounter 0x3F'), // MudGol
+new RouteAction('Encounter 0xCA 3 20'), // WzMummy/Mummy
+new RouteAction('Encounter 0x3F 3 20'), // MudGol
 new RouteAction('Encounter 0x4F'), // Nitemare
-new RouteAction('Encounter 0xCA'), // WzMummy/Mummy
+new RouteAction('Encounter 0xCA 3 20'), // WzMummy/Mummy
 new RouteAction('Encounter 0x4F'), // Nitemare
-new RouteAction('Encounter 0x62'), // FrGator
-new RouteAction('Encounter 0x31'), // GrPede
-new RouteAction('Encounter 0x71'), // Ankylo
+new RouteAction('Encounter 0x62 3 20'), // FrGator
+new RouteAction('Encounter 0x31 3 20'), // GrPede
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
 new RouteAction('Encounter 0xB2'), // ZomBull
@@ -2657,7 +2654,7 @@ new RouteAction('Encounter 0xED'), // Cerebus
 new RouteAction('Encounter 0x4C'), // Guard
 new RouteAction('Encounter 0xE7'), // CatMan
 new RouteAction('Encounter 0x68'), // Vampire
-//new RouteAction('EquipWeapon SunSword'),
+new RouteAction('EquipWeapon SunSword'),
 new RouteAction('Encounter 0x4C'), // Guard
 new RouteAction('Encounter 0xBE'), // Wyvern
 new RouteAction('Encounter 0x4E'), // BlueD
