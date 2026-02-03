@@ -1,3 +1,7 @@
+var timeScoreFactor = 1;
+var damageDealtScoreFactor = 1000;
+var damageTakenScoreFactor = 2000;
+
 const Formation = {
 	small: 0,
 	large: 1,
@@ -1742,7 +1746,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 				if (targetCharacter.currentHp <= 0)
 				{
 					targetCharacter.currentHp = 0;
-					this.score += 1000 * dangerRatio;
+					this.score += damageDealtScoreFactor * dangerRatio;
 					targetCharacter.status |= StatusEffect.dead;
 				}
 				else // percent of hp damage dealt in a turn or something, idk 
@@ -1750,7 +1754,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 					let damageRatio = damageSum / targetCharacter.characterData.hp;
 					if(damageRatio > 0.75) // more than 75% damage but not a kill should be capped off in score
 						damageRatio = 0.75;	
-					this.score += 1000 * damageRatio * damageRatio * dangerRatio;
+					this.score += damageDealtScoreFactor * damageRatio * damageRatio * dangerRatio;
 				}
 				
 				this.estimatedTime += 150;
@@ -1891,7 +1895,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 				{
 					let damageRatio = damageSum / targetCharacter.characterData.hp; // adjust this by starting hp or something?
 					// calculated danger levels?
-					this.score -= 2000 * damageRatio * damageRatio * damageTakenRatio / dangerRatio;
+					this.score -= damageTakenScoreFactor * damageRatio * damageRatio * damageTakenRatio / dangerRatio;
 				}
 				this.damageTaken += damageSum;
 				this.estimatedTime += 90;
@@ -1943,7 +1947,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 						else // percent of hp damage dealt in a turn or something, idk 
 						{
 							let damageRatio = damageRoll / targetCharacter.characterData.hp; // adjust this by starting hp or something? idk
-							this.score -= 2000 * damageRatio * damageRatio * damageTakenRatio / dangerRatio;
+							this.score -= damageTakenScoreFactor * damageRatio * damageRatio * damageTakenRatio / dangerRatio;
 						}
 						
 						this.damageTaken += damageRoll;
@@ -1987,8 +1991,6 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 							{
 								targetCharacter.hitMultiplier = Math.max(targetCharacter.hitMultiplier - 1, 0);
 								this.score -= 1000;
-								if(this.encounterIndex == 0x7D)
-									this.score = 10000;
 							}
 						}
 						
@@ -2219,7 +2221,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 				}
 				
 				//if(battleState.encounterIndex != 0x7D)
-					battleState.score -= battleState.estimatedTime * 2;
+					battleState.score -= battleState.estimatedTime * timeScoreFactor;
 				if(battleState.score > bestScore)
 				{
 					bestScore = battleState.score;
@@ -2251,7 +2253,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 		}
 		
 		//if(battleState.encounterIndex != 0x7D)
-			battleState.score -= battleState.estimatedTime * 2;
+			battleState.score -= battleState.estimatedTime * timeScoreFactor;
 		
 		if(battleState.score < -20000)
 			battleState.badTurn = true;
@@ -2341,7 +2343,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					}
 					
 					//if(additionalBattleState.encounterIndex != 0x7D)
-						additionalBattleState.score -= additionalBattleState.estimatedTime * 2;
+						additionalBattleState.score -= additionalBattleState.estimatedTime * timeScoreFactor;
 					additionalScores[i] = {score: additionalBattleState.score + priorAdditionalBattleState.score, delayCommands: delayCommands.concat(score.delay, i), delay: i, dmg: additionalBattleState.damageDealt + priorAdditionalBattleState.damageDealt, lost: additionalBattleState.damageTaken + priorAdditionalBattleState.damageTaken, rng: additionalBattleState.randomNumberIndex, complete: additionalBattleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: additionalBattleState, key: additionalBattleState.getKey(), status: additionalBattleState.battleCharacters[0x80].status};
 				}
 				additionalScores.sort((a, b) => b.score - a.score);
