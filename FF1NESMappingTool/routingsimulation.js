@@ -2560,36 +2560,36 @@ new RouteAction('Encounter 0x63'), // Troll
 new RouteAction('Encounter 0x17'), // Pede
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
-//new RouteAction('EquipArmor SilverGauntlet'),
-//new RouteAction('EquipArmor SilverHelmet'),
+new RouteAction('EquipArmor SilverGauntlet'),
+new RouteAction('EquipArmor SilverHelmet'),
 new RouteAction('Encounter 0x17'), // Pede
-new RouteAction('Encounter 0x1E'), // Giant
-new RouteAction('Encounter 0xE0'), // Hydra
-new RouteAction('Encounter 0xE0'), // Hydra
-new RouteAction('Encounter 0x20'), // Hydra
+new RouteAction('Encounter 0x1E 3 50'), // Giant
+new RouteAction('Encounter 0xE0 3 50'), // Hydra
+new RouteAction('Encounter 0xE0 3 50'), // Hydra
+new RouteAction('Encounter 0x20 3 50'), // Hydra
 new RouteAction('Encounter 0x0B'), // GrWolf
 new RouteAction('Encounter 0x8E'), // GrImp
-new RouteAction('Encounter 0x9C 4'), // Wizard
-new RouteAction('Encounter 0x2C'), // Wraith
+new RouteAction('Encounter 0x9C 3 50'), // Wizard
+new RouteAction('Encounter 0x2C 4'), // Wraith
 new RouteAction('Encounter 0x98'), // Image
-new RouteAction('Encounter 0xAC'), // Wraith
+new RouteAction('Encounter 0xAC 3 50'), // Wraith
 new RouteAction('Encounter 0x2F'), // Mage
 new RouteAction('Encounter 0x2C 4'), // trap undead tile // Ice spikes?
-new RouteAction('Encounter 0xAC'), // Wraith
+new RouteAction('Encounter 0xAC 3 50'), // Wraith
 new RouteAction('Burn 6'),
-new RouteAction('Encounter 0xAC'), // Wraith
-new RouteAction('Encounter 0x69 4'), // Eye
+new RouteAction('Encounter 0xAC 3 50'), // Wraith
+new RouteAction('Encounter 0x69 4 299'), // Eye
 new RouteAction('Encounter 0x2C 4'), // trap undead tile 
 new RouteAction('Burn 6'),
-new RouteAction('Encounter 0x2E'), // FrGiant
+new RouteAction('Encounter 0x2E 3 50'), // FrGiant
 new RouteAction('Encounter 0x6C'), // Sorcs
 new RouteAction('Encounter 0x6C'), // Sorcs
-new RouteAction('Encounter 0x31'), // GrPede
+new RouteAction('Encounter 0x31 3 50'), // GrPede
 new RouteAction('Encounter 0x12'), // Arachnid
 new RouteAction('Encounter 0x0D'), // Asp
 new RouteAction('Encounter 0x5F'), // Caribe
-new RouteAction('Encounter 0xE0'), // Hydra
-new RouteAction('Encounter 0x20'), // Hydra
+new RouteAction('Encounter 0xE0 3 50'), // Hydra
+new RouteAction('Encounter 0x20 3 50'), // Hydra
 new RouteAction('Encounter 0x5B'), // OddEye
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
@@ -3009,6 +3009,9 @@ async function runRoute()
 	let endingRNGValuesBestTime = [].concat(array256PositiveTemplate);
 	endingRNGValuesBestTime[startingState.randomNumberIndex] = 200;
 	let endingRngValuesCount = 1;
+	let backupEndingRngValuesCount = 0;
+	let backupEndingRngValues;
+	let backup2EndingRngValues;
 	// calculating ideal rng values in route by scores 
 	for(let i = 0; i < route.length; i++)
 	{
@@ -3047,13 +3050,20 @@ async function runRoute()
 				
 				let possibleStartingRngValues = {};
 				if(endingRngValuesCount == 0)
-					endingRngValues = backupEndingRngValues;
+				{
+					if(backupEndingRngValuesCount > 0)
+						endingRngValues = backupEndingRngValues;
+					else
+						endingRngValues = backup2EndingRngValues;
+				}
 				for(let key in endingRngValues)
 					if(endingRngValues[key].startTime + endingRngValues[key].estimatedTime == endingRNGValuesBestTime[endingRngValues[key].randomNumberIndex])
 						possibleStartingRngValues[key] = endingRngValues[key];
 				endingRngValues = {};
-				 endingRngValuesCount = 0;
+				endingRngValuesCount = 0;
+				backupEndingRngValuesCount = 0;
 				backupEndingRngValues = {};
+				backup2EndingRngValues = {}
 				
 				endingRNGValuesBestTime = [].concat(array256PositiveTemplate);
 				
@@ -3108,7 +3118,12 @@ async function runRoute()
 									endingRngValues[endScore.key] = endScore.battleState;
 								}
 								else if(endScore.status == 0 && currentAction.encounter.next && minimumEnemies + 1 >= endScore.enemies)
+								{
+									backupEndingRngValuesCount++;
 									backupEndingRngValues[endScore.key] = endScore.battleState;
+								}
+								else if(endScore.status == 0 && currentAction.encounter.next && minimumEnemies + 2 >= endScore.enemies)
+									backup2EndingRngValues[endScore.key] = endScore.battleState;
 								
 								endingRNGValuesBestTime[endScore.rng] = endScore.battleState.startTime + endScore.battleState.estimatedTime;
 							}
