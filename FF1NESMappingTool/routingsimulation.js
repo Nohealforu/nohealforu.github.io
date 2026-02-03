@@ -2271,6 +2271,11 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 		
 		if(battleState.partyWipe || battleState.badTurn) 
 		{
+			if (setDelays != null)
+			{
+				iterationAbortCount++;
+				return battleStartState;
+			}
 			priorBattleState = battleStates[battleState.index - 2];
 			battleState = battleStates[battleState.index - 1];
 			delayIndex = delayStates[battleState.index];
