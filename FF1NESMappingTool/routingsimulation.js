@@ -2493,7 +2493,6 @@ new RouteAction('TimeTarget'),
 new RouteAction('Heal')];*/
 
 var route = [
-new RouteAction('Encounter 0x0C'), // Ogre
 new RouteAction('Encounter 0x5D'), // Shark
 new RouteAction('Encounter 0x01'), // Bone
 new RouteAction('Encounter 0x01'), // Bone
@@ -2554,8 +2553,6 @@ new RouteAction('Heal 60'),
 new RouteAction('Encounter 0x19 4'), // Tiger
 new RouteAction('Encounter 0x5B'), // OddEye
 new RouteAction('Encounter 0xDB'), // Sahag
-new RouteAction('Encounter 0x88'), // Ghoul
-new RouteAction('Encounter 0x5B'), // OddEye
 new RouteAction('Encounter 0x63'), // Troll
 new RouteAction('Encounter 0x17 3 80'), // Pede
 new RouteAction('TimeTarget'),
@@ -2577,6 +2574,7 @@ new RouteAction('Encounter 0x2C 4'), // trap undead tile // Ice spikes?
 new RouteAction('Encounter 0xAC 3 40'), // Wraith
 new RouteAction('Burn 6'),
 new RouteAction('Encounter 0xAC 3 40'), // Wraith
+new RouteAction('EquipArmor IceShield'),
 new RouteAction('Encounter 0x69 4 299'), // Eye
 new RouteAction('Encounter 0x2C 4'), // trap undead tile 
 new RouteAction('Burn 6'),
@@ -2597,15 +2595,13 @@ new RouteAction('Burn 48'),        // These burns aren't right but does it even 
 new RouteAction('Encounter 0x28 3 10'), // Grey W
 new RouteAction('Burn 167'),
 new RouteAction('EquipWeapon IceSword'),
-new RouteAction('EquipArmor IceShield'),
 //new RouteAction('UnequipArmor SilverGauntlet'),
 new RouteAction('Burn 29'),
 new RouteAction('Encounter 0x27 3 10'), // Fire
 new RouteAction('Burn 45'),
 new RouteAction('Encounter 0x79 4 100'), // Kary
-new RouteAction('Encounter 0x26 3 10'), // R. Giant
 new RouteAction('TimeTarget'),
-new RouteAction('ChangeGold -50000'), // bottle, I'm not even tracking gold so w/e who cares right now
+//new RouteAction('ChangeGold -50000'), // bottle
 new RouteAction('Heal'),
 new RouteAction('EquipArmor ProRing'),
 new RouteAction('Encounter 0x65'), // Ocho
@@ -2628,18 +2624,19 @@ new RouteAction('Encounter 0x48 4 20'), // GrShark
 new RouteAction('Encounter 0xE1 4'), // SeaTroll
 new RouteAction('Encounter 0x78 15 330'), // Kraken
 new RouteAction('Heal 120'),
+//new RouteAction('Heal 30'), // pick one fight to skip
 new RouteAction('Encounter 0x41'), // Naocho
 new RouteAction('Encounter 0xCA 3 20'), // WzMummy/Mummy
 new RouteAction('Encounter 0xCA 3 20'), // WzMummy/Mummy
 new RouteAction('Encounter 0x3F 3 20'), // MudGol
 new RouteAction('Encounter 0x4F'), // Nitemare
 new RouteAction('Encounter 0x4F'), // Nitemare
-new RouteAction('Encounter 0x4F'), // Nitemare
 new RouteAction('Encounter 0xCA 3 20'), // WzMummy/Mummy
 new RouteAction('Encounter 0x3F 3 20'), // MudGol
 new RouteAction('Encounter 0x4F'), // Nitemare
 new RouteAction('Encounter 0xCA 3 20'), // WzMummy/Mummy
 new RouteAction('Encounter 0x4F'), // Nitemare
+//new RouteAction('Heal 30'), // pick one fight to skip
 new RouteAction('Encounter 0x62 3 20'), // FrGator
 new RouteAction('Encounter 0x31 3 20'), // GrPede
 new RouteAction('TimeTarget'),
@@ -2653,8 +2650,8 @@ new RouteAction('Encounter 0x3B'), // Chimera
 new RouteAction('Encounter 0xED'), // Cerebus
 new RouteAction('Encounter 0x4C'), // Guard
 new RouteAction('Encounter 0xE7'), // CatMan
-new RouteAction('Encounter 0x68'), // Vampire
 new RouteAction('EquipWeapon SunSword'),
+new RouteAction('Encounter 0x68'), // Vampire
 new RouteAction('Encounter 0x4C'), // Guard
 new RouteAction('Encounter 0xBE'), // Wyvern
 new RouteAction('Encounter 0x4E'), // BlueD
