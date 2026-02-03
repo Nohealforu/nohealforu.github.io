@@ -2394,6 +2394,7 @@ function RouteAction(actionString)
 				this.action = Action.Encounter;
 				this.encounterIndex = (parseInt(splitAction[1]) || 0);
 				this.encounterDanger = (parseInt(splitAction[2]) || 3);
+				this.encounterHPBudget = (parseInt(splitAction[3]) || 0);
 				let encounterAction = splitAction[3];
 				if (encounterAction == 'Bane')
 					this.encounterAction = EncounterAction.Bane;
@@ -2548,7 +2549,7 @@ new RouteAction('Encounter 0x16'), // Coctrice
 new RouteAction('Encounter 0x0E'), // GrImp
 new RouteAction('Encounter 0x1B'), // Troll
 new RouteAction('Encounter 0x18'), // Image
-new RouteAction('Encounter 0x7A 5'), // LICH
+new RouteAction('Encounter 0x7A 5 227'), // LICH
 new RouteAction('Heal 120'),
 new RouteAction('Encounter 0x19 4'), // Tiger
 new RouteAction('Encounter 0x5B'), // OddEye
@@ -3061,7 +3062,10 @@ async function runRoute()
 					currentState = possibleStartingRngValues[key];
 					let startRng = currentState.randomNumberIndex;
 					// full heal so we can see what is possible, not accurate for like Kary after lava
-					currentState.battleCharacters[0x80].heal(-1);
+					if(currentAction.encounterHPBudget > 0)
+						currentState.battleCharacters[0x80].currentHp = currentAction.encounterHPBudget;
+					else
+						currentState.battleCharacters[0x80].heal(-1);
 					let endOfBattleState = await runBattle(currentState, currentAction.encounter, currentAction.encounterAction, encounterEnemyCounts);
 					
 					if(endOfBattleState.startState)
