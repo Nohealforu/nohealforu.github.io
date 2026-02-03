@@ -2210,8 +2210,8 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					{
 						battleState.score += rngScores[battleState.getKey()].score;
 						// idk if this is good, feels like we might be skipping entire decent route that could be corrected somehow? idk
-						if(rngScores[battleState.getKey()].taken >= currentState.battleCharacters[0x80].currentHp)
-							battleState.score -= 10000;
+						//if(rngScores[battleState.getKey()].taken >= currentState.battleCharacters[0x80].currentHp)
+						//	battleState.score -= 10000;
 					}
 					else
 					{
@@ -2628,7 +2628,7 @@ new RouteAction('Encounter 0xC3'), // Lobster
 new RouteAction('Encounter 0xC2 4'), // SeaTroll/Lobster
 new RouteAction('Encounter 0x48 4 20'), // GrShark
 new RouteAction('Encounter 0xE1 4'), // SeaTroll
-new RouteAction('Encounter 0x78 9 300'), // Kraken
+new RouteAction('Encounter 0x78 15 300'), // Kraken
 new RouteAction('Encounter 0xA0'), // Hydra
 new RouteAction('Encounter 0x41'), // Naocho
 new RouteAction('Encounter 0xCA'), // WzMummy/Mummy
@@ -2657,7 +2657,7 @@ new RouteAction('Encounter 0xED'), // Cerebus
 new RouteAction('Encounter 0x4C'), // Guard
 new RouteAction('Encounter 0xE7'), // CatMan
 new RouteAction('Encounter 0x68'), // Vampire
-new RouteAction('EquipWeapon SunSword'),
+//new RouteAction('EquipWeapon SunSword'),
 new RouteAction('Encounter 0x4C'), // Guard
 new RouteAction('Encounter 0xBE'), // Wyvern
 new RouteAction('Encounter 0x4E'), // BlueD
