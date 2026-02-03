@@ -1,4 +1,4 @@
-var timeScoreFactor = 1;
+var timeScoreFactor = 2;
 var damageDealtScoreFactor = 1000;
 var damageTakenScoreFactor = 2000;
 
