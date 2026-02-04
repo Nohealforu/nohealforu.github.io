@@ -1331,6 +1331,8 @@ BattleState.prototype.incrementRandomIndex = function(value)
 	this.randomNumberIndex += value;
 	while(this.randomNumberIndex > 255)
 		this.randomNumberIndex -= 256;
+	if(this.randomNumberIndex == NaN)
+		console.log('wtf');
 }
 
 BattleState.prototype.getKey = function()
@@ -2673,24 +2675,25 @@ new RouteAction('Encounter 0xBD'), // Tyro
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
 new RouteAction('Encounter 0x04'), // Zombie
-new RouteAction('Encounter 0x57'), // Worm
-new RouteAction('Encounter 0xD9 3 100'), // Gas D
-new RouteAction('Encounter 0xD9 3 100'), // Gas D
+new RouteAction('Encounter 0x57 4'), // Worm
+new RouteAction('Encounter 0xD9 6 100'), // Gas D
+new RouteAction('Encounter 0xD9 6 100'), // Gas D
 new RouteAction('Encounter 0x46'), // Phantom
+new RouteAction('Heal 60'),
 new RouteAction('Encounter 0xCB'), // ZombieD
-new RouteAction('Encounter 0x57'), // Worm
-new RouteAction('Encounter 0xBB'), // Chimera
+new RouteAction('Encounter 0x57 4'), // Worm
+new RouteAction('Encounter 0xBB 5 60'), // Chimera
 new RouteAction('Encounter 0xC0'), // GrMedusa
 new RouteAction('Encounter 0xC0'), // GrMedusa
-new RouteAction('Encounter 0x73'), // Lich2
+new RouteAction('Encounter 0x73 5 50'), // Lich2
 new RouteAction('Encounter 0xA9'), // Agama
 new RouteAction('Encounter 0xA6'), // R.Giant/Agama
 new RouteAction('Encounter 0x74 3 100'), // Kary2
 new RouteAction('Encounter 0xC8'), // GrShark/BigEye
-new RouteAction('Encounter 0x44'), // SeaTroll/Lobster/SeaSnake
-new RouteAction('Encounter 0x44'), // SeaTroll/Lobster/SeaSnake
+new RouteAction('Encounter 0x44 3 50'), // SeaTroll/Lobster/SeaSnake
+new RouteAction('Encounter 0x44 3 50'), // SeaTroll/Lobster/SeaSnake
 new RouteAction('Encounter 0x75 4 100 Bane'), // Kraken2
-new RouteAction('Encounter 0xD8'), // RockGol
+new RouteAction('Encounter 0xD8 50'), // RockGol
 new RouteAction('Encounter 0x76 4 100 Bane'), // Tiamat2
 new RouteAction('Encounter 0x7B 4 100 Bane'), // CHAOS
 new RouteAction('TimeTarget'),
