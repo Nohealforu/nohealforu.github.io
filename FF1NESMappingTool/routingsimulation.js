@@ -1331,7 +1331,7 @@ BattleState.prototype.incrementRandomIndex = function(value)
 	this.randomNumberIndex += value;
 	while(this.randomNumberIndex > 255)
 		this.randomNumberIndex -= 256;
-	if(this.randomNumberIndex == NaN)
+	if(Number.isNaN(this.randomNumberIndex))
 		console.log('wtf');
 }
 
