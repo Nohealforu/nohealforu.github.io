@@ -2278,7 +2278,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 		
 		if(battleState.partyWipe || battleState.badTurn) 
 		{
-			if (setDelays != null)
+			if (!redoBattle)
 			{
 				iterationAbortCount++;
 				return battleStartState;
@@ -2762,7 +2762,7 @@ new RouteAction('Encounter 0x93'), // GrOgre
 new RouteAction('Encounter 0x1C 4'), // Wizard
 new RouteAction('Encounter 0x93'), // GrOgre
 new RouteAction('Encounter 0x16'), // Coctrice
-new RouteAction('Encounter 0x8F 3 Flee'), // Spect/Geist
+new RouteAction('Encounter 0x8F 3 100 Flee'), // Spect/Geist
 new RouteAction('Encounter 0x7C 5'), // Vampire
 new RouteAction('Encounter 0x1C 5'), // Wizard
 new RouteAction('Encounter 0x93'), // GrOgre
@@ -2788,7 +2788,7 @@ new RouteAction('Encounter 0x64'), // Bull
 new RouteAction('Encounter 0x93'), // GrOgre
 new RouteAction('Encounter 0x91'), // WrWolf
 new RouteAction('Encounter 0x1C 4'), // Wizard
-new RouteAction('Encounter 0x8F 3 Flee'), // Spect/Geist
+new RouteAction('Encounter 0x8F 3 100 Flee'), // Spect/Geist
 new RouteAction('Encounter 0x93'), // GrOgre
 new RouteAction('Encounter 0x1C 4'), // Wizard
 new RouteAction('Encounter 0x0E'), // WrWolf
@@ -2916,7 +2916,7 @@ new RouteAction('Encounter 0x51'), // Air
 new RouteAction('Encounter 0xC1'), // Naocho
 new RouteAction('Encounter 0x51'), // Air
 new RouteAction('Encounter 0xC1'), // Naocho
-new RouteAction('Encounter 0x77 4 Bane'), // Tiamat
+new RouteAction('Encounter 0x77 4 100 Bane'), // Tiamat
 new RouteAction('Encounter 0xBD'), // Tyro
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
@@ -2938,10 +2938,10 @@ new RouteAction('Encounter 0xA6'), // R.Giant/Agama
 new RouteAction('Encounter 0x74'), // Kary2
 new RouteAction('Encounter 0xC9'), // Water
 new RouteAction('Encounter 0xC9'), // Water
-new RouteAction('Encounter 0x75 4 Bane'), // Kraken2
+new RouteAction('Encounter 0x75 4 100 Bane'), // Kraken2
 new RouteAction('Encounter 0xD4'), // Evilman/Nightmare
-new RouteAction('Encounter 0x76 4 Bane'), // Tiamat2
-new RouteAction('Encounter 0x7B 4 Bane'), // CHAOS
+new RouteAction('Encounter 0x76 4 100 Bane'), // Tiamat2
+new RouteAction('Encounter 0x7B 4 100 Bane'), // CHAOS
 new RouteAction('TimeTarget'),
 ];*/
 
@@ -3353,16 +3353,36 @@ async function runRoute()
 	let turnCount = 0;
 	let shortBounces = 0;
 	let longBounces = 0;
+	let outputLines = [];
 	for(let i = 0; i < endingBattleSummaries.length; i++)
 	{
 		let endingSummary = endingBattleSummaries[i];
-		for (let j = 0; j < endingSummary.delay.length; j++)
+		let enemyList = [];
+		for(let key in endingSummary.characters)
+		{
+			let enemyCounts = {};
+			if(key < 128)
+			{
+				let name = endingSummary.characters[key].characterData.name;
+				if(enemyCounts[name] == null)
+					enemyCounts[name] = 1;
+				else
+					enemyCounts[name]++;
+			}
+			for(let name in enemyCounts)
+				enemyList.push(enemyCounts[name] + " " + name);
+		}
+		outputLines.push("<tr><td>Encounter " + i + "</td><td>" + enemyList.join(", ") + "</td><td>Hp " + endingSummary.hp + "</td>td>preRNG " + endingSummary.preRNG + "</td></tr>");
+		for(let j = 0; j < endingSummary.delay.length; j++)
 		{
 			turnCount++;
 			shortBounces += endingSummary.delay[j] < 6 ? endingSummary.delay[j] : endingSummary.delay[j] % 3;
 			longBounces += endingSummary.delay[j] < 6 ? 0 : Math.floor(endingSummary.delay[j] / 3);
+			outputLines.push("<tr><td>Round " + (j + 1) + "</td><td>" + longBounces + " full / " + shortBounces + " short </td><td>Dealt " + endingSummary.dealt + "</td>td>Taken " + endingSummary.taken + "</td></tr>");
 		}
+		outputLines.push("<tr></tr>");
 	}
+	document.getElementById('outputTableBody').innerHTML = outputLines.join();
 	console.log(turnCount);
 	console.log(shortBounces);
 	console.log(longBounces);
