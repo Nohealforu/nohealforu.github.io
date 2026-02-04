@@ -2223,7 +2223,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					else
 					{
 						nextEncounterState = encounterEnemyCounts[battleState.randomNumberIndex];
-						battleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
+						battleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 2) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
 					}
 				}
 				
@@ -2351,7 +2351,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					if(additionalBattleState.battleComplete && encounter.next?.encounterIndex != null)
 					{
 						nextEncounterState = encounterEnemyCounts[battleState.randomNumberIndex];
-						additionalBattleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
+						additionalBattleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 2) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
 					}
 					
 					//if(additionalBattleState.encounterIndex != 0x7D)
