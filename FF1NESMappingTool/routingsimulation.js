@@ -1,7 +1,7 @@
 var timeScoreFactor = 2;
 var damageDealtScoreFactor = 1000;
 var damageTakenScoreFactor = 2000;
-var debugFight = 150;
+var debugFight = 152;
 
 const Formation = {
 	small: 0,
@@ -3270,6 +3270,8 @@ async function runRoute()
 				if(i == highestIndex)
 					encounterIndexes[encounterCount] = i;
 				startingBattleStates[encounterCount] = currentState;
+				if(encounterCount == debugFight)
+					debugFight = encounterCount;
 				let encounterEnemyCounts = allEncounterEnemyCounts[encounterCount];
 				let endOfBattleState = await runBattle(currentState, currentAction.encounter, currentAction.encounterAction, encounterEnemyCounts, redoBattle ? endingBattleStates[encounterCount] : null, redoBattle ? startingBattleStates[encounterCount + 1] : null, rngScoring[encounterCount + 1], rngScoring[encounterCount][currentState.getKey()].endingScores[0].delayCommands);
 				//targetTime = null;
