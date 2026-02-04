@@ -2350,7 +2350,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					let nextEncounterState;
 					if(additionalBattleState.battleComplete && encounter.next?.encounterIndex != null)
 					{
-						nextEncounterState = encounterEnemyCounts[battleState.randomNumberIndex];
+						nextEncounterState = encounterEnemyCounts[additionalBattleState.randomNumberIndex];
 						additionalBattleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 2) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
 					}
 					
