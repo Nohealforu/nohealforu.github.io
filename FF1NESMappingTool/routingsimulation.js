@@ -1,7 +1,7 @@
 var timeScoreFactor = 2;
 var damageDealtScoreFactor = 1000;
 var damageTakenScoreFactor = 2000;
-var debugFight = 152;
+var debugFight = 150;
 
 const Formation = {
 	small: 0,
@@ -1335,7 +1335,7 @@ BattleState.prototype.incrementRandomIndex = function(value)
 
 BattleState.prototype.getKey = function()
 {
-	return this.randomNumberIndex + ":" + this.battleCharacters[0x80].characterData.exp;
+	return this.randomNumberIndex + ":" + this.battleCharacters[0x80].characterData.exp  + ":" + this.battleCharacters[0x80].characterData.agi;
 }
 
 BattleState.prototype.getRandomNumber = function(minimum = 0, maximum = -1)
