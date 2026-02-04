@@ -720,7 +720,7 @@ const encounters = {
 	0x87: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.Creep, 1, 3), new EncounterSlot(enemies.Ogre, 1, 1)),
 	0x08: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Ghoul, 1, 1)),
 	0x88: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Ghoul, 2, 5), new EncounterSlot(enemies.Geist, 0, 4)),
-	0x09: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Iguana, 1, 1)),
+	0x09: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Giant, 0, 0), new EncounterSlot(enemies.Iguana, 1, 1)),
 	0x89: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Giant, 1, 3), new EncounterSlot(enemies.Iguana, 0, 2)),
 	0x0A: new EncounterInfo(Formation.small, true, 90, new EncounterSlot(enemies.Shadow, 2, 4)),
 	0x8A: new EncounterInfo(Formation.small, true, 90, new EncounterSlot(enemies.Shadow, 3, 7)),
@@ -732,7 +732,7 @@ const encounters = {
 	0x8D: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Asp, 3, 7)),
 	0x0E: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.GrImp, 0, 5), new EncounterSlot(enemies.WrWolf, 1, 3), new EncounterSlot(enemies.Giant, 0, 2)),
 	0x8E: new EncounterInfo(Formation.mix, true, 4, new EncounterSlot(enemies.GrImp, 2, 5), new EncounterSlot(enemies.WrWolf, 0, 2)),
-	0x0F: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Geist, 1, 4)),
+	0x0F: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Specter, 0, 0), new EncounterSlot(enemies.Geist, 1, 4)),
 	0x8F: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Specter, 2, 5), new EncounterSlot(enemies.Geist, 2, 5)),
 	0x10: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Gargoyle, 2, 3)),
 	0x90: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Gargoyle, 3, 8)),
@@ -902,8 +902,8 @@ const encounters = {
 	0xE2: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.FrGator, 1, 1), new EncounterSlot(enemies['R.Caribe'], 1, 4)),
 	0x63: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Troll, 1, 2)),
 	0xE3: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Troll, 2, 4)),
-	0x64: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Bull, 1, 2)),
-	0xE4: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Bull, 2, 4)),
+	0x64: new EncounterInfo(Formation.large, true, 27, new EncounterSlot(enemies.Bull, 1, 2)),
+	0xE4: new EncounterInfo(Formation.large, true, 27, new EncounterSlot(enemies.Bull, 2, 4)),
 	0x65: new EncounterInfo(Formation.mix, true, 30, new EncounterSlot(enemies.Caribe, 0, 2), new EncounterSlot(enemies.Gator, 0, 2), new EncounterSlot(enemies.Ocho, 1, 1)),
 	0xE5: new EncounterInfo(Formation.mix, true, 30, new EncounterSlot(enemies.Caribe, 2, 4), new EncounterSlot(enemies.Gator, 0, 2)),
 	0x66: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Arachnid, 1, 2), new EncounterSlot(enemies.Spider, 0, 2)),
@@ -2505,6 +2505,7 @@ new RouteAction('TimeTarget'),
 new RouteAction('Heal')];*/
 
 var route = [
+new RouteAction('Encounter 0x0C'), // Ogre
 new RouteAction('Encounter 0xDC'), // Shark
 new RouteAction('Encounter 0x01'), // Bone
 new RouteAction('Encounter 0x01'), // Bone
