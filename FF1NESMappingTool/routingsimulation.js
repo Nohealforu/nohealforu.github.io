@@ -1,6 +1,7 @@
 var timeScoreFactor = 2;
 var damageDealtScoreFactor = 1000;
 var damageTakenScoreFactor = 2000;
+var debugFight = 150;
 
 const Formation = {
 	small: 0,
@@ -2673,8 +2674,8 @@ new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
 new RouteAction('Encounter 0x04'), // Zombie
 new RouteAction('Encounter 0x57'), // Worm
-new RouteAction('Encounter 0xD9'), // Gas D
-new RouteAction('Encounter 0xD9'), // Gas D
+new RouteAction('Encounter 0xD9 3 100'), // Gas D
+new RouteAction('Encounter 0xD9 3 100'), // Gas D
 new RouteAction('Encounter 0x46'), // Phantom
 new RouteAction('Encounter 0xCB'), // ZombieD
 new RouteAction('Encounter 0x57'), // Worm
@@ -2684,7 +2685,8 @@ new RouteAction('Encounter 0xC0'), // GrMedusa
 new RouteAction('Encounter 0x73'), // Lich2
 new RouteAction('Encounter 0xA9'), // Agama
 new RouteAction('Encounter 0xA6'), // R.Giant/Agama
-new RouteAction('Encounter 0x74'), // Kary2
+new RouteAction('Encounter 0x74 3 100'), // Kary2
+new RouteAction('Encounter 0xC8'), // GrShark/BigEye
 new RouteAction('Encounter 0x44'), // SeaTroll/Lobster/SeaSnake
 new RouteAction('Encounter 0x44'), // SeaTroll/Lobster/SeaSnake
 new RouteAction('Encounter 0x75 4 100 Bane'), // Kraken2
@@ -3024,7 +3026,8 @@ async function runRoute()
 				let encounterEnemyCounts = Array(256);
 				let minimumExp = 999999;
 				let minimumEnemies = 9;
-				
+				if(encounterCount == debugFight)
+					debugFight = encounterCount;
 				
 				if(currentAction.encounter.next)
 				{
