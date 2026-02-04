@@ -3376,9 +3376,11 @@ async function runRoute()
 		for(let j = 0; j < endingSummary.delay.length; j++)
 		{
 			turnCount++;
-			shortBounces += endingSummary.delay[j] < 6 ? endingSummary.delay[j] : endingSummary.delay[j] % 3;
-			longBounces += endingSummary.delay[j] < 6 ? 0 : Math.floor(endingSummary.delay[j] / 3);
-			outputLines.push("<tr><td>Round " + (j + 1) + "</td><td>" + longBounces + " full / " + shortBounces + " short </td><td>Dealt " + endingSummary.dealt[j] + "</td><td>Taken " + endingSummary.taken[j] + "</td></tr>");
+			let shortBounce = endingSummary.delay[j] < 6 ? endingSummary.delay[j] : endingSummary.delay[j] % 3;
+			let longBounce = endingSummary.delay[j] < 6 ? 0 : Math.floor(endingSummary.delay[j] / 3);
+			shortBounces += shortBounce;
+			longBounces += longBounce;
+			outputLines.push("<tr><td>Round " + (j + 1) + "</td><td>" + longBounce + " full / " + shortBounce + " short </td><td>Dealt " + endingSummary.dealt[j] + "</td><td>Taken " + endingSummary.taken[j] + "</td></tr>");
 		}
 		outputLines.push("<tr></tr>");
 	}
