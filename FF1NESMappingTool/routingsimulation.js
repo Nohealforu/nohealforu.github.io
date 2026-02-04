@@ -2505,7 +2505,7 @@ new RouteAction('TimeTarget'),
 new RouteAction('Heal')];*/
 
 var route = [
-new RouteAction('Encounter 0x5D'), // Shark
+new RouteAction('Encounter 0xDC'), // Shark
 new RouteAction('Encounter 0x01'), // Bone
 new RouteAction('Encounter 0x01'), // Bone
 new RouteAction('Encounter 0x0C'), // Ogre
@@ -3358,9 +3358,9 @@ async function runRoute()
 	{
 		let endingSummary = endingBattleSummaries[i];
 		let enemyList = [];
+		let enemyCounts = {};
 		for(let key in endingSummary.characters)
 		{
-			let enemyCounts = {};
 			if(key < 128)
 			{
 				let name = endingSummary.characters[key].characterData.name;
@@ -3369,16 +3369,16 @@ async function runRoute()
 				else
 					enemyCounts[name]++;
 			}
-			for(let name in enemyCounts)
-				enemyList.push(enemyCounts[name] + " " + name);
 		}
+		for(let name in enemyCounts)
+			enemyList.push(enemyCounts[name] + " " + name);
 		outputLines.push("<tr><td>Encounter " + i + "</td><td>" + enemyList.join(", ") + "</td><td>Hp " + endingSummary.hp + "</td><td>preRNG " + endingSummary.preRNG + "</td></tr>");
 		for(let j = 0; j < endingSummary.delay.length; j++)
 		{
 			turnCount++;
 			shortBounces += endingSummary.delay[j] < 6 ? endingSummary.delay[j] : endingSummary.delay[j] % 3;
 			longBounces += endingSummary.delay[j] < 6 ? 0 : Math.floor(endingSummary.delay[j] / 3);
-			outputLines.push("<tr><td>Round " + (j + 1) + "</td><td>" + longBounces + " full / " + shortBounces + " short </td><td>Dealt " + endingSummary.dealt + "</td><td>Taken " + endingSummary.taken + "</td></tr>");
+			outputLines.push("<tr><td>Round " + (j + 1) + "</td><td>" + longBounces + " full / " + shortBounces + " short </td><td>Dealt " + endingSummary.dealt[j] + "</td><td>Taken " + endingSummary.taken[j] + "</td></tr>");
 		}
 		outputLines.push("<tr></tr>");
 	}
