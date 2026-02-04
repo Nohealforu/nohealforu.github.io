@@ -3382,7 +3382,7 @@ async function runRoute()
 		}
 		outputLines.push("<tr></tr>");
 	}
-	document.getElementById('outputTableBody').innerHTML = outputLines.join();
+	document.getElementById('outputTableBody').innerHTML = outputLines.join("");
 	console.log(turnCount);
 	console.log(shortBounces);
 	console.log(longBounces);
