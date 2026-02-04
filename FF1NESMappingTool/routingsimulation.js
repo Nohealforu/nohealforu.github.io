@@ -2223,7 +2223,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					else
 					{
 						nextEncounterState = encounterEnemyCounts[battleState.randomNumberIndex];
-						battleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 2) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
+						battleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
 					}
 				}
 				
@@ -2255,7 +2255,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 			else
 			{
 				nextEncounterState = battleState.newEncounter(encounter.next?.encounterIndex, EncounterAction.Fight, true);
-				battleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 2) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
+				battleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
 			}
 		}
 		
@@ -2351,7 +2351,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					if(additionalBattleState.battleComplete && encounter.next?.encounterIndex != null)
 					{
 						nextEncounterState = encounterEnemyCounts[additionalBattleState.randomNumberIndex];
-						additionalBattleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 2) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
+						additionalBattleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
 					}
 					
 					//if(additionalBattleState.encounterIndex != 0x7D)
@@ -2530,7 +2530,7 @@ new RouteAction('Encounter 0x64'), // Bull
 new RouteAction('Encounter 0x93'), // GrOgre
 new RouteAction('Encounter 0x1D'), // Mummy
 new RouteAction('Encounter 0x18'), // Image
-new RouteAction('Encounter 0x7C 5'), // Vampire
+new RouteAction('Encounter 0x7C 5 100'), // Vampire
 new RouteAction('Encounter 0x1C 5'), // Wizard
 new RouteAction('Encounter 0x18'), // Image
 new RouteAction('Encounter 0x18'), // Image
