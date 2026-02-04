@@ -738,7 +738,7 @@ const encounters = {
 	0x90: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Gargoyle, 3, 8)),
 	0x11: new EncounterInfo(Formation.small, true, 33, new EncounterSlot(enemies.WrWolf, 3, 6)),
 	0x91: new EncounterInfo(Formation.small, true, 33, new EncounterSlot(enemies.WrWolf, 2, 5), new EncounterSlot(enemies.GrWolf, 0, 5)),
-	0x12: new EncounterInfo(Formation.small, true, 55, new EncounterSlot(enemies.Arachnid, 1, 4)),
+	0x12: new EncounterInfo(Formation.small, true, 55, new EncounterSlot(enemies.Ooze, 0, 0), new EncounterSlot(enemies.Arachnid, 1, 4)),
 	0x92: new EncounterInfo(Formation.small, true, 55, new EncounterSlot(enemies.Ooze, 2, 5), new EncounterSlot(enemies.Arachnid, 0, 5)),
 	0x13: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.GrOgre, 1, 1), new EncounterSlot(enemies.Ogre, 1, 2)),
 	0x93: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.GrOgre, 1, 4), new EncounterSlot(enemies.Ogre, 0, 2)),
