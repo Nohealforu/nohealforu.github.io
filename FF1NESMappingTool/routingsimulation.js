@@ -752,7 +752,7 @@ const encounters = {
 	0x97: new EncounterInfo(Formation.large, true, 4, new EncounterSlot(enemies.Pede, 1, 6)),
 	0x18: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Image, 2, 6)),
 	0x98: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Image, 2, 6), new EncounterSlot(enemies.Wraith, 0, 4)),
-	0x19: new EncounterInfo(Formation.large, true, 27, new EncounterSlot(enemies.Tiger, 1, 3)),
+	0x19: new EncounterInfo(Formation.large, true, 27, new EncounterSlot(enemies['Saber T'], 0, 0), new EncounterSlot(enemies.Tiger, 1, 3)),
 	0x99: new EncounterInfo(Formation.large, true, 27, new EncounterSlot(enemies['Saber T'], 1, 3), new EncounterSlot(enemies.Tiger, 0, 2)),
 	0x1A: new EncounterInfo(Formation.mix, true, 27, new EncounterSlot(enemies.Scorpion, 2, 4)),
 	0x9A: new EncounterInfo(Formation.mix, true, 27, new EncounterSlot(enemies.Scorpion, 2, 6), new EncounterSlot(enemies.Bull, 1, 2)),
@@ -2223,7 +2223,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					else
 					{
 						nextEncounterState = encounterEnemyCounts[battleState.randomNumberIndex];
-						battleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 2) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
+						battleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
 					}
 				}
 				
@@ -2351,7 +2351,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					if(additionalBattleState.battleComplete && encounter.next?.encounterIndex != null)
 					{
 						nextEncounterState = encounterEnemyCounts[battleState.randomNumberIndex];
-						additionalBattleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 2) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
+						additionalBattleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
 					}
 					
 					//if(additionalBattleState.encounterIndex != 0x7D)
