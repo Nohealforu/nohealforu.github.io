@@ -1129,7 +1129,7 @@ PlayerInfo.prototype.updateSwings = function()
 
 PlayerInfo.prototype.updateResistances = function()
 {
-	this.resistances = (this.armor[Slot.Armor]?.resistances ?? 0) & (this.armor[Slot.Helmet]?.resistances ?? 0) & (this.armor[Slot.Gloves]?.resistances ?? 0) & (this.armor[Slot.Shield]?.resistances ?? 0);
+	this.resistances = (this.armor[Slot.Armor]?.resistances ?? 0) | (this.armor[Slot.Helmet]?.resistances ?? 0) | (this.armor[Slot.Glove]?.resistances ?? 0) | (this.armor[Slot.Shield]?.resistances ?? 0);
 }
 
 PlayerInfo.prototype.unequipWeapon = function()
