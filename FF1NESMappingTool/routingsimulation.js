@@ -2648,8 +2648,8 @@ new RouteAction('Encounter 0x3F 3 20'), // MudGol
 new RouteAction('Encounter 0x4F'), // Nitemare
 new RouteAction('Encounter 0xCA 3 20'), // WzMummy/Mummy
 new RouteAction('Encounter 0x4F'), // Nitemare
-//new RouteAction('Heal 30'), // pick one fight to skip
-new RouteAction('Encounter 0x62 3 20'), // FrGator
+new RouteAction('Heal 30'), // pick one fight to skip
+//new RouteAction('Encounter 0x62 3 20'), // FrGator
 new RouteAction('Encounter 0x31 3 20'), // GrPede
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
