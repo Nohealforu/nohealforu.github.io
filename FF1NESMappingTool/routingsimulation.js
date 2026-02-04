@@ -1331,8 +1331,6 @@ BattleState.prototype.incrementRandomIndex = function(value)
 	this.randomNumberIndex += value;
 	while(this.randomNumberIndex > 255)
 		this.randomNumberIndex -= 256;
-	if(Number.isNaN(this.randomNumberIndex))
-		console.log('wtf');
 }
 
 BattleState.prototype.getKey = function()
@@ -2183,6 +2181,12 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 		else if (setDelays != null)
 		{
 			bestDelay = setDelays[battleState.turn - 1];
+			if(bestDelay == null)
+			{
+				console.log('Delay is null??????????????????');
+				iterationAbortCount++;
+				return battleStartState;
+			}
 		}
 		else
 		{
