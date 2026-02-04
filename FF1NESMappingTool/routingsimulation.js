@@ -1,6 +1,7 @@
 var timeScoreFactor = 2;
 var damageDealtScoreFactor = 1000;
 var damageTakenScoreFactor = 2000;
+var enemyCountScoreFactor = 2000;
 var debugFight = 150;
 
 const Formation = {
@@ -1755,7 +1756,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 					let damageRatio = damageSum / targetCharacter.characterData.hp;
 					if(damageRatio > 0.75) // more than 75% damage but not a kill should be capped off in score
 						damageRatio = 0.75;	
-					this.score += damageDealtScoreFactor * damageRatio * damageRatio * dangerRatio;
+					this.score += damageDealtScoreFactor * damageRatio * dangerRatio;
 				}
 				
 				this.estimatedTime += 150;
@@ -2223,7 +2224,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					else
 					{
 						nextEncounterState = encounterEnemyCounts[battleState.randomNumberIndex];
-						battleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
+						battleState.score -= enemyCountScoreFactor * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
 					}
 				}
 				
@@ -2255,7 +2256,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 			else
 			{
 				nextEncounterState = battleState.newEncounter(encounter.next?.encounterIndex, EncounterAction.Fight, true);
-				battleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
+				battleState.score -= enemyCountScoreFactor * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
 			}
 		}
 		
@@ -2351,7 +2352,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					if(additionalBattleState.battleComplete && encounter.next?.encounterIndex != null)
 					{
 						nextEncounterState = encounterEnemyCounts[additionalBattleState.randomNumberIndex];
-						additionalBattleState.score -= 3000 * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
+						additionalBattleState.score -= enemyCountScoreFactor * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
 					}
 					
 					//if(additionalBattleState.encounterIndex != 0x7D)
@@ -2635,7 +2636,7 @@ new RouteAction('Encounter 0xC3'), // Lobster
 new RouteAction('Encounter 0xC2 4'), // SeaTroll/Lobster
 new RouteAction('Encounter 0x48 4 20'), // GrShark
 new RouteAction('Encounter 0xE1 4'), // SeaTroll
-new RouteAction('Encounter 0x78 15 330'), // Kraken
+new RouteAction('Encounter 0x78 5 330'), // Kraken
 new RouteAction('Heal 120'),
 //new RouteAction('Heal 30'), // pick one fight to skip
 new RouteAction('Encounter 0x41'), // Naocho
@@ -2680,13 +2681,13 @@ new RouteAction('Encounter 0xBD'), // Tyro
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
 new RouteAction('Encounter 0x04'), // Zombie
-new RouteAction('Encounter 0x57 4'), // Worm
+new RouteAction('Encounter 0x57 4 50'), // Worm
 new RouteAction('Encounter 0xD9 6 100'), // Gas D
 new RouteAction('Encounter 0xD9 6 100'), // Gas D
-new RouteAction('Encounter 0x46'), // Phantom
+new RouteAction('Encounter 0x46 5 100'), // Phantom
 new RouteAction('Heal 60'),
 new RouteAction('Encounter 0xCB'), // ZombieD
-new RouteAction('Encounter 0x57 4'), // Worm
+new RouteAction('Encounter 0x57 4 50'), // Worm
 new RouteAction('Encounter 0xBB 5 60'), // Chimera
 new RouteAction('Encounter 0xC0'), // GrMedusa
 new RouteAction('Encounter 0xC0'), // GrMedusa
