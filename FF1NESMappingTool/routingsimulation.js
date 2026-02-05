@@ -1815,7 +1815,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 									if((targetCharacter.status & (StatusEffect.dead | StatusEffect.stone)) > 0)
 									{
 										targetCharacter.currentHp = 0;
-										this.score += 10000;
+										this.score += 20000;
 									}
 								}
 							}
