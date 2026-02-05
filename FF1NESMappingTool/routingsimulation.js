@@ -1,6 +1,6 @@
 var timeScoreFactor = 2;
-var damageDealtScoreFactor = 1000;
-var damageTakenScoreFactor = 2000;
+var damageDealtScoreFactor = 3000;
+var damageTakenScoreFactor = 6000;
 var enemyCountScoreFactor = 2000;
 var debugFight = 150;
 
@@ -1930,7 +1930,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 							continue;
 						let resistant = (targetCharacter.resistances & spellInfo.element) > 0;
 						if (resistant)
-							damage /= 2;
+							damage >> 1;
 						let damageRoll = this.getRandomNumber(damage, 2 * damage);
 						
 						// probably need to later add in the if weak thing?
@@ -2531,8 +2531,8 @@ new RouteAction('Encounter 0x64'), // Bull
 new RouteAction('Encounter 0x93'), // GrOgre
 new RouteAction('Encounter 0x1D'), // Mummy
 new RouteAction('Encounter 0x18'), // Image
-new RouteAction('Encounter 0x7C 5 100'), // Vampire
-new RouteAction('Encounter 0x1C 5'), // Wizard
+new RouteAction('Encounter 0x7C 4 90'), // Vampire
+new RouteAction('Encounter 0x1C 4'), // Wizard
 new RouteAction('Encounter 0x18'), // Image
 new RouteAction('Encounter 0x18'), // Image
 new RouteAction('Encounter 0x91'), // WrWolf
@@ -2670,9 +2670,9 @@ new RouteAction('Encounter 0x4C'), // Guard
 new RouteAction('Encounter 0xBE'), // Wyvern
 new RouteAction('Encounter 0x4E'), // BlueD
 new RouteAction('Encounter 0x54'), // Evilman/Nitemare
-new RouteAction('Encounter 0x4D'), // Badman
-new RouteAction('Encounter 0x4D'), // Badman
-new RouteAction('Encounter 0xCC'), // Sentry
+new RouteAction('Encounter 0x4D 3 50'), // Badman
+new RouteAction('Encounter 0x4D 3 50'), // Badman
+new RouteAction('Encounter 0xCC 3 100'), // Sentry
 new RouteAction('Encounter 0x51'), // Air
 new RouteAction('Encounter 0x51'), // Air
 new RouteAction('Encounter 0xB5'), // Sorc/MudGol
