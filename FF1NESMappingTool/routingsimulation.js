@@ -3346,7 +3346,7 @@ async function runRoute()
 						let longBounce = endingSummary.delay[j] < 6 ? 0 : Math.floor(endingSummary.delay[j] / 3);
 						shortBounces += shortBounce;
 						longBounces += longBounce;
-						outputLines.push("<tr><td>Round " + (j + 1) + "</td><td>" + (j == 0 && summary.encounterState == EncounterState.Ambushed ? "Enemy Strikes First" : longBounce + " full / " + shortBounce + " short") + " </td><td>Dealt " + endingSummary.dealt[j] + "</td><td>Taken " + endingSummary.taken[j] + "</td></tr>");
+						outputLines.push("<tr><td>Round " + (j + 1) + "</td><td>" + (j == 0 && endingSummary.encounterState == EncounterState.Ambushed ? "Enemy Strikes First" : longBounce + " full / " + shortBounce + " short") + " </td><td>Dealt " + endingSummary.dealt[j] + "</td><td>Taken " + endingSummary.taken[j] + "</td></tr>");
 					}
 					outputLines.push("<tr></tr>");
 					encounterCount++;
