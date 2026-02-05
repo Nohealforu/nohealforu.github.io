@@ -3071,7 +3071,7 @@ async function runRoute()
 				}
 				else if(endingRngValuesCount == 1 && backupEndingRngValues != null)
 					for(let key in backupEndingRngValues)
-						if(endingRngValues[key] == null || (backupEndingRngValues[key].startTime + backupEndingRngValues[key].estimatedTime < endingRngValues[key].startTime + endingRngValues[key].estimatedTime)
+						if(endingRngValues[key] == null || (backupEndingRngValues[key].startTime + backupEndingRngValues[key].estimatedTime < endingRngValues[key].startTime + endingRngValues[key].estimatedTime))
 							endingRngValues[key] = backupEndingRngValues[key];
 				
 				for(let key in endingRngValues)
