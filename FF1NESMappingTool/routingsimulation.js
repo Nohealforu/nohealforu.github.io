@@ -1184,22 +1184,22 @@ PlayerInfo.prototype.levelUp = function (battleState)
     if(this.hp > 999)
         this.hp = 999;
  
-    if ((levelStats & 0x1000) != 0 || battleState.getRandomNumber() % 4)
+    if ((levelStats & 0x1000) != 0 || !(battleState.getRandomNumber() & 0x03))
 		if(++this.str % 2 == 0) // put in some checks for black belt and black mage to make this right or not
 			this.attack++; 
 	
-    if ((levelStats & 0x0800) != 0 || battleState.getRandomNumber() % 4)
+    if ((levelStats & 0x0800) != 0 || !(battleState.getRandomNumber() & 0x03))
 	{
 		this.agi++;
 		if(++this.evade > 99)
 			this.evade = 99;
 	}
 	
-	if ((levelStats & 0x0400) != 0 || battleState.getRandomNumber() % 4)
+	if ((levelStats & 0x0400) != 0 || !(battleState.getRandomNumber() & 0x03))
 		this.int++;
-	if ((levelStats & 0x0200) != 0 || battleState.getRandomNumber() % 4)
+	if ((levelStats & 0x0200) != 0 || !(battleState.getRandomNumber() & 0x03))
 		this.vit++;
-	if ((levelStats & 0x0100) != 0 || battleState.getRandomNumber() % 4)
+	if ((levelStats & 0x0100) != 0 || !(battleState.getRandomNumber() & 0x03))
 		this.luck++;
 	
 	this.hit += this.characterClass.hitGain;
