@@ -1824,7 +1824,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 								targetCharacter.hitMultiplier = Math.max(targetCharacter.hitMultiplier - 1, 0);
 							}
 						}
-						else if(spellInfo.strength & (StatusEffect.dead | StatusEffect.stone)) > 0)
+						else if((spellInfo.strength & (StatusEffect.dead | StatusEffect.stone)) > 0)
 							this.score -= 20000;
 					}
 				}
