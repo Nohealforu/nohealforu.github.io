@@ -1999,10 +1999,11 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 						this.estimatedTime += 70;
 					}
 				}
-				else if (spellInfo.effect == 0xf)
+				else if (spellInfo.effect == 0x0f)
 				{
 					character.currentHp = character.characterData.hp;
 					character.status = 0;
+					this.estimatedTime += 70;
 				}
 				else if (spellInfo.effect == 0x10)
 				{
@@ -2011,8 +2012,9 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 						character.evade = 255;
 					
 					this.incrementRandomIndex(characterIndex < 2 ? formationRNGPrimaryIncrement[this.formation] : formationRNGSecondaryIncrement[this.formation]);
+					this.estimatedTime += 70;
 				}
-				else if (spellInfo.effect == 0xc)
+				else if (spellInfo.effect == 0x0c)
 				{
 					// status skills
 					let target;
@@ -2020,7 +2022,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 					if (spellInfo.target == Target.Ally)
 						target = this.getEnemyTarget();
 					
-					for (let targetOption of partyTargetList)
+					for (let targetOption of enemyTargetList)
 					{
 						if (target != null && target != targetOption)
 							continue;
@@ -2031,6 +2033,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 						targetCharacter.hitMultiplier = Math.min(targetCharacter.hitMultiplier + 1, 2);
 						
 						this.incrementRandomIndex(targetOption < 2 ? formationRNGPrimaryIncrement[this.formation] : formationRNGSecondaryIncrement[this.formation]);
+						this.estimatedTime += 70;
 					}
 
 
@@ -2597,12 +2600,12 @@ new RouteAction('Burn 6'),
 new RouteAction('Encounter 0x2E 3'), // FrGiant
 new RouteAction('Encounter 0x6C'), // Sorcs
 new RouteAction('Encounter 0x6C'), // Sorcs
-new RouteAction('Encounter 0x31 3'), // GrPede
+new RouteAction('Encounter 0x31 3 50'), // GrPede
 new RouteAction('Encounter 0x12'), // Arachnid
 new RouteAction('Encounter 0x0D'), // Asp
 new RouteAction('Encounter 0x5F'), // Caribe
 new RouteAction('Encounter 0xE0 3'), // Hydra
-new RouteAction('Encounter 0x20 3'), // Hydra
+new RouteAction('Encounter 0x20 3 45'), // Hydra
 new RouteAction('Encounter 0x5B'), // OddEye
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
@@ -3338,7 +3341,7 @@ async function runRoute()
 					}
 					for(let name in enemyCounts)
 						enemyList.push(enemyCounts[name] + " " + name);
-					outputLines.push("<tr><td>Encounter " + encounterCount + "</td><td>" + enemyList.join(", ") + "</td><td>Hp " + endingSummary.hp + "</td><td>preRNG " + endingSummary.preRNG + "</td></tr>");
+					outputLines.push("<tr><td>Encounter " + i + "</td><td>" + enemyList.join(", ") + "</td><td>Hp " + endingSummary.hp + "</td><td>preRNG " + endingSummary.preRNG + "</td></tr>");
 					for(let j = 0; j < endingSummary.delay.length; j++)
 					{
 						turnCount++;
