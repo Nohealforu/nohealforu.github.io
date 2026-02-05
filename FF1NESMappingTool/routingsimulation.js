@@ -2560,9 +2560,9 @@ new RouteAction('Encounter 0x93'), // GrOgre
 new RouteAction('Encounter 0x63'), // Troll
 new RouteAction('Encounter 0x16'), // Coctrice
 new RouteAction('Encounter 0x0E'), // GrImp
-new RouteAction('Encounter 0x1B'), // Troll
+new RouteAction('Encounter 0x1B 3 50'), // Troll
 new RouteAction('Encounter 0x18'), // Image
-new RouteAction('Encounter 0x7A 5 205'), // LICH
+new RouteAction('Encounter 0x7A 5 140'), // LICH
 new RouteAction('Heal 60'),
 new RouteAction('Encounter 0x19 4'), // Tiger
 new RouteAction('Encounter 0x5B'), // OddEye
@@ -2572,35 +2572,37 @@ new RouteAction('Encounter 0x17 3 80'), // Pede
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
 new RouteAction('EquipArmor SilverGauntlet'),
-new RouteAction('Encounter 0x17 3 20'), // Pede
-new RouteAction('Encounter 0x1E 3 20'), // Giant
-new RouteAction('Encounter 0xE0 3 20'), // Hydra
-new RouteAction('Encounter 0xE0 3 20'), // Hydra
-new RouteAction('Encounter 0x20 3 20'), // Hydra
+new RouteAction('EquipArmor SilverShield'),
+new RouteAction('EquipArmor SilverHelmet'),
+new RouteAction('Encounter 0x17 3'), // Pede
+new RouteAction('Encounter 0x1E 3'), // Giant
+new RouteAction('Encounter 0xE0 3'), // Hydra
+new RouteAction('Encounter 0xE0 3'), // Hydra
+new RouteAction('Encounter 0x20 3'), // Hydra
 new RouteAction('Encounter 0x0B'), // GrWolf
 new RouteAction('Encounter 0x8E'), // GrImp
-new RouteAction('Encounter 0x9C 3 50'), // Wizard
+new RouteAction('Encounter 0x9C 3'), // Wizard
 new RouteAction('Encounter 0x2C 4'), // Wraith
 new RouteAction('Encounter 0x98'), // Image
-new RouteAction('Encounter 0xAC 3 40'), // Wraith
+new RouteAction('Encounter 0xAC 3'), // Wraith
 new RouteAction('Encounter 0x2F'), // Mage
 new RouteAction('Encounter 0x2C 4'), // trap undead tile // Ice spikes?
-new RouteAction('Encounter 0xAC 3 40'), // Wraith
+new RouteAction('Encounter 0xAC 3'), // Wraith
 new RouteAction('Burn 6'),
-new RouteAction('Encounter 0xAC 3 40'), // Wraith
+new RouteAction('Encounter 0xAC 3'), // Wraith
 new RouteAction('EquipArmor IceShield'),
 new RouteAction('Encounter 0x69 4 299'), // Eye
 new RouteAction('Encounter 0x2C 4'), // trap undead tile 
 new RouteAction('Burn 6'),
-new RouteAction('Encounter 0x2E 3 40'), // FrGiant
+new RouteAction('Encounter 0x2E 3'), // FrGiant
 new RouteAction('Encounter 0x6C'), // Sorcs
 new RouteAction('Encounter 0x6C'), // Sorcs
-new RouteAction('Encounter 0x31 3 20'), // GrPede
+new RouteAction('Encounter 0x31 3'), // GrPede
 new RouteAction('Encounter 0x12'), // Arachnid
 new RouteAction('Encounter 0x0D'), // Asp
 new RouteAction('Encounter 0x5F'), // Caribe
-new RouteAction('Encounter 0xE0 3 20'), // Hydra
-new RouteAction('Encounter 0x20 3 20'), // Hydra
+new RouteAction('Encounter 0xE0 3'), // Hydra
+new RouteAction('Encounter 0x20 3'), // Hydra
 new RouteAction('Encounter 0x5B'), // OddEye
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
@@ -2699,7 +2701,7 @@ new RouteAction('Encounter 0xC8'), // GrShark/BigEye
 new RouteAction('Encounter 0x44 3 50'), // SeaTroll/Lobster/SeaSnake
 new RouteAction('Encounter 0x44 3 50'), // SeaTroll/Lobster/SeaSnake
 new RouteAction('Encounter 0x75 4 100 Bane'), // Kraken2
-new RouteAction('Encounter 0xD8 50'), // RockGol
+new RouteAction('Encounter 0xD8 3 50'), // RockGol
 new RouteAction('Encounter 0x76 4 100 Bane'), // Tiamat2
 new RouteAction('Encounter 0x7B 4 100 Bane'), // CHAOS
 new RouteAction('TimeTarget'),
@@ -3067,6 +3069,11 @@ async function runRoute()
 					else
 						endingRngValues = backup2EndingRngValues;
 				}
+				else if(endingRngValuesCount == 1 && backupEndingRngValues != null)
+					for(let key in backupEndingRngValues)
+						if(endingRngValues[key] == null || (backupEndingRngValues[key].startTime + backupEndingRngValues[key].estimatedTime < endingRngValues[key].startTime + endingRngValues[key].estimatedTime)
+							endingRngValues[key] = backupEndingRngValues[key];
+				
 				for(let key in endingRngValues)
 					if(endingRngValues[key].startTime + endingRngValues[key].estimatedTime == endingRNGValuesBestTime[endingRngValues[key].randomNumberIndex])
 						possibleStartingRngValues[key] = endingRngValues[key];
