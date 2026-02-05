@@ -2604,8 +2604,9 @@ new RouteAction('Encounter 0x31 3 50'), // GrPede
 new RouteAction('Encounter 0x12'), // Arachnid
 new RouteAction('Encounter 0x0D'), // Asp
 new RouteAction('Encounter 0x5F'), // Caribe
-new RouteAction('Encounter 0xE0 3'), // Hydra
-new RouteAction('Encounter 0x20 3 45'), // Hydra
+//new RouteAction('Encounter 0xE0 3'), // Hydra
+new RouteAction('Heal 60'), // cabin skip Hydra
+new RouteAction('Encounter 0x20 3'), // Hydra
 new RouteAction('Encounter 0x5B'), // OddEye
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
