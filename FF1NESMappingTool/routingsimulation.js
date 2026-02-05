@@ -1663,7 +1663,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 	
 	for (let i = 0x80; i < 0x84; i++)
 	{
-		if (this.battleCharacters[i] != null && this.battleCharacters[i].canAct())
+		if (this.battleCharacters[i] != null && this.battleCharacters[i].canAct() && this.encounterState != EncounterState.Ambushed)
 		{
 			this.incrementRandomIndex(formationRNGHoldA[this.formation]);
 			this.estimatedTime += 50;
