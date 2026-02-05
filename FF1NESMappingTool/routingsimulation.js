@@ -1930,7 +1930,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 							continue;
 						let resistant = (targetCharacter.resistances & spellInfo.element) > 0;
 						if (resistant)
-							damage >> 1;
+							damage = damage >> 1;
 						let damageRoll = this.getRandomNumber(damage, 2 * damage);
 						
 						// probably need to later add in the if weak thing?
@@ -2678,6 +2678,7 @@ new RouteAction('Encounter 0x54'), // Evilman/Nitemare
 new RouteAction('Encounter 0x4D 3 50'), // Badman
 new RouteAction('Encounter 0x4D 3 50'), // Badman
 new RouteAction('Encounter 0xCC 3 100'), // Sentry
+new RouteAction('Encounter 0xC1'), // Naocho
 new RouteAction('Encounter 0x51'), // Air
 new RouteAction('Encounter 0x51'), // Air
 new RouteAction('Encounter 0xB5'), // Sorc/MudGol
