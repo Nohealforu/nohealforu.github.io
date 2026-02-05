@@ -3132,12 +3132,14 @@ async function runRoute()
 							{
 								if(endScore.status == 0 && currentAction.encounter.next && minimumEnemies == endScore.enemies && minimumExp == encounterEnemyCounts[endScore.rng].expValue)
 								{
-									endingRngValuesCount++;
+									if(endingRngValues[endScore.key] == null)
+										endingRngValuesCount++;
 									endingRngValues[endScore.key] = endScore.battleState;
 								}
 								else if(endScore.status == 0 && currentAction.encounter.next && minimumEnemies + 1 >= endScore.enemies)
 								{
-									backupEndingRngValuesCount++;
+									if(backupEndingRngValues[endScore.key] == null)
+										backupEndingRngValuesCount++;
 									backupEndingRngValues[endScore.key] = endScore.battleState;
 								}
 								else if(endScore.status == 0 && currentAction.encounter.next && minimumEnemies + 2 >= endScore.enemies)
