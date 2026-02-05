@@ -3341,7 +3341,7 @@ async function runRoute()
 					}
 					for(let name in enemyCounts)
 						enemyList.push(enemyCounts[name] + " " + name);
-					outputLines.push("<tr><td>Encounter " + i + "</td><td>" + enemyList.join(", ") + "</td><td>Hp " + endingSummary.hp + "</td><td>preRNG " + endingSummary.preRNG + "</td></tr>");
+					outputLines.push("<tr><td>Encounter " + encounterCount + "</td><td>" + enemyList.join(", ") + "</td><td>Hp " + endingSummary.hp + "</td><td>preRNG " + endingSummary.preRNG + "</td></tr>");
 					for(let j = 0; j < endingSummary.delay.length; j++)
 					{
 						turnCount++;
