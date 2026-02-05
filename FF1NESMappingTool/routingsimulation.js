@@ -2388,7 +2388,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 	for(let i = 0; i < completedScores.length; i++)
 		if(endingRNGValueScores[completedScores[i].rng] == completedScores[i].score)
 			bestCompletedScores.push(completedScores[i]);
-	battleState.encounterSummary = {hp: battleStartState.battleCharacters[0x80].currentHp, hp2: battleState.battleCharacters[0x80].currentHp, encounter: encounter, characters: battleStartState.battleCharacters, delay: delayCommands, score: scoreStates, dealt: damageDealtStates, taken: damageTakenStates, time: estimatedTimeStates, totalTime: estimatedTimeTotalStates, startIndex: battleStartState.index + 1, preRNG: currentState.randomNumberIndex, startRNG: battleStartState.randomNumberIndex, endingRNG: battleState.randomNumberIndex, endingScores: bestCompletedScores};
+	battleState.encounterSummary = {hp: battleStartState.battleCharacters[0x80].currentHp, hp2: battleState.battleCharacters[0x80].currentHp, encounter: encounter, characters: battleStartState.battleCharacters, delay: delayCommands, score: scoreStates, dealt: damageDealtStates, taken: damageTakenStates, time: estimatedTimeStates, totalTime: estimatedTimeTotalStates, startIndex: battleStartState.index + 1, preRNG: currentState.randomNumberIndex, startRNG: battleStartState.randomNumberIndex, endingRNG: battleState.randomNumberIndex, endingScores: bestCompletedScores, encounterState: battleStartState.encounterState};
 	return battleState;
 }
 
@@ -3266,6 +3266,11 @@ async function runRoute()
 	startingState = new BattleState(0, 254, 630, testCharacters);
 	currentState = startingState;
 	
+	let outputLines = [];
+	let turnCount = 0;
+	let shortBounces = 0;
+	let longBounces = 0;
+	
 	// calculating ideal path using rng values as reference  
 	for(let i = 0; i < route.length; i++)
 	{
@@ -3317,6 +3322,33 @@ async function runRoute()
 					endingBattleSummaries[encounterCount] = endOfBattleState.encounterSummary;
 					currentState = endOfBattleState;
 					redoBattle = false;
+					let endingSummary = endOfBattleState.encounterSummary;
+					let enemyList = [];
+					let enemyCounts = {};
+					for(let key in endingSummary.characters)
+					{
+						if(key < 128)
+						{
+							let name = endingSummary.characters[key].characterData.name;
+							if(enemyCounts[name] == null)
+								enemyCounts[name] = 1;
+							else
+								enemyCounts[name]++;
+						}
+					}
+					for(let name in enemyCounts)
+						enemyList.push(enemyCounts[name] + " " + name);
+					outputLines.push("<tr><td>Encounter " + i + "</td><td>" + enemyList.join(", ") + "</td><td>Hp " + endingSummary.hp + "</td><td>preRNG " + endingSummary.preRNG + "</td></tr>");
+					for(let j = 0; j < endingSummary.delay.length; j++)
+					{
+						turnCount++;
+						let shortBounce = endingSummary.delay[j] < 6 ? endingSummary.delay[j] : endingSummary.delay[j] % 3;
+						let longBounce = endingSummary.delay[j] < 6 ? 0 : Math.floor(endingSummary.delay[j] / 3);
+						shortBounces += shortBounce;
+						longBounces += longBounce;
+						outputLines.push("<tr><td>Round " + (j + 1) + "</td><td>" + (j == 0 && summary.encounterState == EncounterState.Ambushed ? "Enemy Strikes First" : longBounce + " full / " + shortBounce + " short") + " </td><td>Dealt " + endingSummary.dealt[j] + "</td><td>Taken " + endingSummary.taken[j] + "</td></tr>");
+					}
+					outputLines.push("<tr></tr>");
 					encounterCount++;
 				}
 				break;
@@ -3324,18 +3356,28 @@ async function runRoute()
 				currentState.gold += currentAction.amount;
 				break;
 			case Action.EquipWeapon:
+				outputLines.push("<tr><td>Equip Weapon</td><td>" + currentState.battleCharacters[currentAction.characterSlot].characterData.name + "</td><td></td><td>" + currentAction.weapon.name + "</td></tr>");
+				outputLines.push("<tr></tr>");
 				currentState.battleCharacters[currentAction.characterSlot].characterData.equipWeapon(currentAction.weapon);
 				break;
 			case Action.UnequipWeapon:
+				outputLines.push("<tr><td>Unequip Weapon</td><td>" + currentState.battleCharacters[currentAction.characterSlot].characterData.name + "</td><td></td><td>" + currentState.battleCharacters[currentAction.characterSlot].characterData.weapon.name + "</td></tr>");
+				outputLines.push("<tr></tr>");
 				currentState.battleCharacters[currentAction.characterSlot].characterData.unequipWeapon();
 				break;
 			case Action.EquipArmor:
+				outputLines.push("<tr><td>Equip Armor</td><td>" + currentState.battleCharacters[currentAction.characterSlot].characterData.name + "</td><td></td><td>" + currentAction.armor.name + "</td></tr>");
+				outputLines.push("<tr></tr>");
 				currentState.battleCharacters[currentAction.characterSlot].characterData.equipArmor(currentAction.armor);
 				break;
 			case Action.UnequipArmor:
+				outputLines.push("<tr><td>Unequip Armor</td><td>" + currentState.battleCharacters[currentAction.characterSlot].characterData.name + "</td><td></td><td>" + currentState.battleCharacters[currentAction.characterSlot].characterData.armor[currentAction.slot].name + "</td></tr>");
+				outputLines.push("<tr></tr>");
 				currentState.battleCharacters[currentAction.characterSlot].characterData.unequipArmor(currentAction.slot);
 				break;
 			case Action.Heal: // might need a heal all or parameter for that
+				outputLines.push("<tr><td>Heal</td><td>" + currentState.battleCharacters[currentAction.characterSlot].characterData.name + "</td><td></td><td>" + (currentAction.amount == -1 ? "Full" : currentAction.amount) + "</td></tr>");
+				outputLines.push("<tr></tr>");
 				currentState.battleCharacters[currentAction.characterSlot].heal(currentAction.amount);
 				break;
 			case Action.Burn: // should hit all characters alive
@@ -3361,42 +3403,8 @@ async function runRoute()
 	console.log(endingBattleSummaries);
 	console.log(scoreTracker); 
 	console.log(iterationAbortCount);
-	let turnCount = 0;
-	let shortBounces = 0;
-	let longBounces = 0;
-	let outputLines = [];
-	for(let i = 0; i < endingBattleSummaries.length; i++)
-	{
-		let endingSummary = endingBattleSummaries[i];
-		let enemyList = [];
-		let enemyCounts = {};
-		for(let key in endingSummary.characters)
-		{
-			if(key < 128)
-			{
-				let name = endingSummary.characters[key].characterData.name;
-				if(enemyCounts[name] == null)
-					enemyCounts[name] = 1;
-				else
-					enemyCounts[name]++;
-			}
-		}
-		for(let name in enemyCounts)
-			enemyList.push(enemyCounts[name] + " " + name);
-		outputLines.push("<tr><td>Encounter " + i + "</td><td>" + enemyList.join(", ") + "</td><td>Hp " + endingSummary.hp + "</td><td>preRNG " + endingSummary.preRNG + "</td></tr>");
-		for(let j = 0; j < endingSummary.delay.length; j++)
-		{
-			turnCount++;
-			let shortBounce = endingSummary.delay[j] < 6 ? endingSummary.delay[j] : endingSummary.delay[j] % 3;
-			let longBounce = endingSummary.delay[j] < 6 ? 0 : Math.floor(endingSummary.delay[j] / 3);
-			shortBounces += shortBounce;
-			longBounces += longBounce;
-			outputLines.push("<tr><td>Round " + (j + 1) + "</td><td>" + longBounce + " full / " + shortBounce + " short </td><td>Dealt " + endingSummary.dealt[j] + "</td><td>Taken " + endingSummary.taken[j] + "</td></tr>");
-		}
-		outputLines.push("<tr></tr>");
-	}
-	document.getElementById('outputTableBody').innerHTML = outputLines.join("");
 	console.log(turnCount);
 	console.log(shortBounces);
 	console.log(longBounces);
+	document.getElementById('outputTableBody').innerHTML = outputLines.join("");
 }
