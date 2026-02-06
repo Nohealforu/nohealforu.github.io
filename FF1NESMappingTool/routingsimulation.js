@@ -1665,7 +1665,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 	{
 		if (this.battleCharacters[i] != null && this.battleCharacters[i].canAct() && this.encounterState != EncounterState.Ambushed)
 		{
-			this.incrementRandomIndex(formationRNGHoldA[this.formation]);
+			this.incrementRandomIndex(this.playerCommands[i] == Command.Item ? 3 : formationRNGHoldA[this.formation]);
 			this.estimatedTime += 50;
 		}
 	}
@@ -2215,8 +2215,9 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					battleState.encounterState = battleStartState.encounterState;
 				battleState.runTurn(i, damageTakenRatio, dangerRatio);
 				
-				// If we are using Bane and fail, try attacking instead to calculate quicker buffer options idk
-				if(!battleState.battleComplete && encounterAction == EncounterAction.Bane)
+				// If we are using Bane and fail, try attacking instead to calculate quicker buffer options
+				// Also don't allow Bane sword with no buffer (0 delay)
+				if(encounterAction == EncounterAction.Bane && (!battleState.battleComplete || i == 0))
 				{
 					battleState = priorBattleState.newTurn(EncounterAction.Fight);
 					battleState.estimatedTime += (i < 6 ? i * 41 : 50 * Math.floor(i / 3) + 41 * (i % 3));
