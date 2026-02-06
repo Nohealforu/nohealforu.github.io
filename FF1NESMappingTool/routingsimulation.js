@@ -2176,7 +2176,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 	do 
 	{
 		currentIterationCount++;
-		
+		let adjustedEncounterAction = encounterAction;
 		// ideally we get rid of redoing battles, or use it for the pathfinding (RCSPP)?
 		if(redoBattle && scoreTracker[battleState.index] != null && scoreTracker[battleState.index][delayIndex] != null)
 		{
@@ -2191,6 +2191,8 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 				iterationAbortCount++;
 				return battleStartState;
 			}
+			if(encounterAction == EncounterAction.Bane && setDelays.length > battleState.turn)
+				adjustedEncounterAction = EncounterAction.Fight;
 		}
 		else
 		{
@@ -2256,7 +2258,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 		}
 		
 		delay = bestDelay;
-		battleState = priorBattleState.newTurn(encounterAction);
+		battleState = priorBattleState.newTurn(adjustedEncounterAction);
 		if(priorBattleState == battleStartState)
 			battleState.encounterState = battleStartState.encounterState;
 		battleState.estimatedTime += (delay < 6 ? delay * 41 : 50 * Math.floor(delay / 3) + 41 * (delay % 3));
@@ -2350,18 +2352,18 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 				let additionalBattleState = score.battleState;
 				let priorAdditionalBattleState = additionalBattleState;
 				let canDelay = false;
-				for (let i = 0x80; i < 0x84; i++)
+				for (let j = 0x80; j < 0x84; j++)
 				{
-					let character = additionalBattleState.battleCharacters[i];
+					let character = additionalBattleState.battleCharacters[j];
 					if (character != null && character.canAct())
 						canDelay = true;
 				}
 				
-				for (let i = 0; i < (canDelay ? 256 : 1); i++)
+				for (let j = 0; j < (canDelay ? 256 : 1); j++)
 				{
 					additionalBattleState = priorAdditionalBattleState.newTurn(encounterAction);
-					additionalBattleState.estimatedTime += (i < 6 ? i * 41 : 50 * Math.floor(i / 3) + 41 * (i % 3));
-					additionalBattleState.runTurn(i, damageTakenRatio, dangerRatio);
+					additionalBattleState.estimatedTime += (j < 6 ? j * 41 : 50 * Math.floor(j / 3) + 41 * (j % 3));
+					additionalBattleState.runTurn(j, damageTakenRatio, dangerRatio);
 					let nextEncounterState;
 					if(additionalBattleState.battleComplete && encounter.next?.encounterIndex != null)
 					{
@@ -2371,12 +2373,12 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					
 					//if(additionalBattleState.encounterIndex != 0x7D)
 						additionalBattleState.score -= additionalBattleState.estimatedTime * timeScoreFactor;
-					additionalScores[i] = {score: additionalBattleState.score + priorAdditionalBattleState.score, delayCommands: delayCommands.concat(score.delay, i), delay: i, dmg: additionalBattleState.damageDealt + priorAdditionalBattleState.damageDealt, lost: additionalBattleState.damageTaken + priorAdditionalBattleState.damageTaken, rng: additionalBattleState.randomNumberIndex, complete: additionalBattleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: additionalBattleState, key: additionalBattleState.getKey(), status: additionalBattleState.battleCharacters[0x80].status};
+					additionalScores[j] = {score: additionalBattleState.score + priorAdditionalBattleState.score, delayCommands: delayCommands.concat(score.delay, j), delay: j, dmg: additionalBattleState.damageDealt + priorAdditionalBattleState.damageDealt, lost: additionalBattleState.damageTaken + priorAdditionalBattleState.damageTaken, rng: additionalBattleState.randomNumberIndex, complete: additionalBattleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: additionalBattleState, key: additionalBattleState.getKey(), status: additionalBattleState.battleCharacters[0x80].status};
 				}
 				additionalScores.sort((a, b) => b.score - a.score);
-				for(let i = 0; i < additionalScores.length; i++)
+				for(let j = 0; j < additionalScores.length; j++)
 				{
-					let score = additionalScores[i];
+					let score = additionalScores[j];
 					if(score.complete && score.score > endingRNGValueScores[score.rng])
 					{
 						completedScores.push(score);
