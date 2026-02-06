@@ -1665,7 +1665,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 	{
 		if (this.battleCharacters[i] != null && this.battleCharacters[i].canAct() && this.encounterState != EncounterState.Ambushed)
 		{
-			this.incrementRandomIndex(this.playerCommands[i] == Command.Item ? 3 : formationRNGHoldA[this.formation]);
+			this.incrementRandomIndex(this.playerCommands[i].command == Command.Item ? 3 : formationRNGHoldA[this.formation]);
 			this.estimatedTime += 50;
 		}
 	}
