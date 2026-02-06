@@ -1418,8 +1418,8 @@ BattleState.prototype.rollAttacks = function(swings, hit, damage, critThreshold,
 {
 	let returnArray = [];
 	let rollStatus = false;
-	if(statusThreshold < 0)
-		statusThreshold = 0;
+	if(statusThreshold < 1)
+		statusThreshold = 1;
 	let stunSleep = (targetStatus & (StatusEffect.stop | StatusEffect.sleep)) > 0;
 	let characterDark = (characterStatus & StatusEffect.dark) > 0;
 	let targetDark = (targetStatus & StatusEffect.dark) > 0;
