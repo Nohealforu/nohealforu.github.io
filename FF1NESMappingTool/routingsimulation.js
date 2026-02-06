@@ -1824,8 +1824,6 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 								targetCharacter.hitMultiplier = Math.max(targetCharacter.hitMultiplier - 1, 0);
 							}
 						}
-						else if((spellInfo.strength & (StatusEffect.dead | StatusEffect.stone)) > 0)
-							this.score -= 20000;
 					}
 				}
 			}
@@ -2214,6 +2212,17 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 				if(priorBattleState == battleStartState)
 					battleState.encounterState = battleStartState.encounterState;
 				battleState.runTurn(i, damageTakenRatio, dangerRatio);
+				
+				// If we are using Bane and fail, try attacking instead to calculate quicker buffer options idk
+				if(!battleState.battleComplete && encounterAction == EncounterAction.Bane)
+				{
+					battleState = priorBattleState.newTurn(EncounterAction.Fight);
+					battleState.estimatedTime += (i < 6 ? i * 41 : 50 * Math.floor(i / 3) + 41 * (i % 3));
+					if(priorBattleState == battleStartState)
+						battleState.encounterState = battleStartState.encounterState;
+					battleState.runTurn(i, damageTakenRatio, dangerRatio);
+				}
+				
 				if(battleState.battleComplete && !canDelay)
 					canDelay = false; // this was here for a breakpoint, but could break stuff if like a single enemy ambushes and flees or something idk
 				let nextEncounterState;
