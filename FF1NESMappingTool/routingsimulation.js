@@ -1792,10 +1792,10 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 					{
 						if (target != null && target != targetOption)
 							continue;
-						this.incrementRandomIndex(targetOption < 2 ? formationRNGPrimaryIncrement[this.formation] : formationRNGSecondaryIncrement[this.formation]);
 						let targetCharacter = this.battleCharacters[targetOption];
 						if (targetCharacter == null || !targetCharacter.canTarget())
 							continue;
+						this.incrementRandomIndex(targetOption < 2 ? formationRNGPrimaryIncrement[this.formation] : formationRNGSecondaryIncrement[this.formation]);
 						let resistant = (targetCharacter.resistances & spellInfo.element) > 0;
 						let weak = (targetCharacter.characterData.weaknesses & spellInfo.element) > 0;
 						this.incrementRandomIndex(1);
