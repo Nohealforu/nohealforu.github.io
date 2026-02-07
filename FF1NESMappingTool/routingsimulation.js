@@ -2828,38 +2828,38 @@ new RouteAction('Heal 60'),
 new RouteAction('Encounter 91'), // OddEye
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
-new RouteAction('Encounter 0x22 3 20'), // WizOgre
-new RouteAction('Burn 48'),        // These burns aren't right but does it even matter as long as the total is correct?
+new RouteAction('Encounter 0x22 3 40'), // WizOgre
+new RouteAction('Burn 148'),        // These burns aren't right but does it even matter as long as the total is correct?
 new RouteAction('EquipWeapon IceSword'),
 new RouteAction('Encounter 0x28 3 20'), // Grey W
-new RouteAction('Burn 167'),
+new RouteAction('Burn 67'),
 new RouteAction('Burn 29'),
-new RouteAction('Encounter 41'), // Agama
+new RouteAction('Encounter 41 3 20'), // Agama
 new RouteAction('Burn 45'),
-new RouteAction('Encounter 0x79 4 120'), // Kary
+new RouteAction('Encounter 0x79 4 50'), // Kary
 new RouteAction('TimeTarget'),
 //new RouteAction('ChangeGold -50000'), // bottle
 new RouteAction('Heal'),
 new RouteAction('EquipArmor ProRing'),
 new RouteAction('Heal 60'),
 new RouteAction('Heal 60'),
-new RouteAction('Encounter 71'),   // Naga
-new RouteAction('Encounter 72'), // GrShark
-new RouteAction('Encounter 114'), // SeaSnake
+new RouteAction('Encounter 71 3 30'),   // Naga
+new RouteAction('Encounter 72 3 30'), // GrShark
+new RouteAction('Encounter 114 3 30'), // SeaSnake
 new RouteAction('EquipArmor OpalBracelet'),
 new RouteAction('Encounter 114'), // SeaSnake
-new RouteAction('Encounter 73'), // Water
-new RouteAction('Encounter 90-2'), // GrShark 
-new RouteAction('Encounter 71'), // Naga
-new RouteAction('Encounter 66-2'), // SeaTroll
-new RouteAction('Encounter 66-2'), // SeaTroll
-new RouteAction('Encounter 66'), // SeaTroll
-new RouteAction('Encounter 72'), // GrShark
-new RouteAction('Encounter 97-2'), // SeaTroll
-new RouteAction('Encounter 73'), // Water
-new RouteAction('Encounter 68-2'), // Lobster
-new RouteAction('Encounter 97-2'), // SeaTroll
-new RouteAction('Encounter 0x78 5 330'), // Kraken
+new RouteAction('Encounter 73 3 30'), // Water
+new RouteAction('Encounter 90-2 3 30'), // GrShark 
+new RouteAction('Encounter 71 3 30'), // Naga
+new RouteAction('Encounter 66-2 3 30'), // SeaTroll
+new RouteAction('Encounter 66-2 3 30'), // SeaTroll
+new RouteAction('Encounter 66 3 30'), // SeaTroll
+new RouteAction('Encounter 72 3 30'), // GrShark
+new RouteAction('Encounter 97-2 3 30'), // SeaTroll
+new RouteAction('Encounter 73 3 30'), // Water
+new RouteAction('Encounter 68-2 3 30'), // Lobster
+new RouteAction('Encounter 97-2 3 30'), // SeaTroll
+new RouteAction('Encounter 0x78 5 350'), // Kraken
 new RouteAction('Heal 120'),
 new RouteAction('Heal 60'), 
 new RouteAction('Encounter 63'), // MudGol
@@ -2901,27 +2901,27 @@ new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
 new RouteAction('Heal 60'),
 new RouteAction('Encounter 8'), // Ghoul
-new RouteAction('Encounter 48-2'), // Frost D
-new RouteAction('Encounter 47-2'), // Fighter
+new RouteAction('Encounter 48-2 3 100'), // Frost D
+new RouteAction('Encounter 47-2 3 100'), // Fighter
 new RouteAction('Encounter 0x46 5 100'), // Phantom
-//new RouteAction('Heal 60'),
+new RouteAction('Heal 60'),
 new RouteAction('Encounter 75-2'), // ZombieD
 new RouteAction('Encounter 87'), // Worm
 new RouteAction('Encounter 59-2'), // Chimera
-new RouteAction('Encounter 33-2'), // Earth
+new RouteAction('Encounter 33-2 3 80'), // Earth
 new RouteAction('Encounter 63-2'), // MudGol
 new RouteAction('Encounter 0x73 5 50'), // Lich2
 new RouteAction('Encounter 41-2'), // Agama
 new RouteAction('Encounter 40-2'), // Grey W
 new RouteAction('Encounter 41-2'), // Agama
 new RouteAction('Encounter 0x74 3 100'), // Kary2
-new RouteAction('Encounter 68'), // SeaTroll
-new RouteAction('Encounter 69-2'), // WzSahag
-new RouteAction('Encounter 73-2'), // Water
+new RouteAction('Encounter 68 3 50'), // SeaTroll
+new RouteAction('Encounter 69-2 3 50'), // WzSahag
+new RouteAction('Encounter 73-2 3 50'), // Water
+new RouteAction('Encounter 68 3 50'), // SeaTroll
 new RouteAction('Encounter 0x75 4 100 Bane'), // Kraken2
-new RouteAction('Encounter 68'), // SeaTroll
 new RouteAction('Encounter 0x76 4 100 Bane'), // Tiamat2
-new RouteAction('Encounter 88-2'), // RockGol
+new RouteAction('Encounter 88-2 3 50'), // RockGol
 new RouteAction('Encounter 0x7B 4 100 Bane'), // CHAOS
 new RouteAction('TimeTarget'),
 ];
