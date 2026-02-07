@@ -2885,15 +2885,20 @@ new RouteAction('Heal 60'),
 new RouteAction('Heal 60'),
 new RouteAction('Encounter 76'), // Guard
 new RouteAction('Encounter 74'), // WzMummy
-new RouteAction('Encounter 104'), // Vampire
-new RouteAction('Encounter 104'), // Vampire
+new RouteAction('Encounter 104 3 100'), // Vampire
+new RouteAction('Encounter 104 3 100'), // Vampire
 new RouteAction('EquipWeapon SunSword'),
-new RouteAction('Encounter 103-2'), // CatMan
-new RouteAction('Encounter 0x4E'), // BlueD
-new RouteAction('Encounter 54-2'), // Mancat
-new RouteAction('Encounter 83'), // WzVamp
+new RouteAction('Encounter 103-2 3 100'), // CatMan
+new RouteAction('Encounter 0x4E 3 100'), // BlueD
+new RouteAction('Encounter 54-2'), // Manticore
+new RouteAction('Encounter 77 3 50'), // Badman
+new RouteAction('Encounter 77 3 50'), // Badman
+new RouteAction('Encounter 64'), // GrMedusa
+new RouteAction('Encounter 76-2 3 50'), // Sentry
+new RouteAction('Encounter 51-2 3 50'), // Mancat
+new RouteAction('Encounter 83 3 50'), // WzVamp
 new RouteAction('Encounter 53-2'), // Sorcerer
-new RouteAction('Encounter 80'), // Slime
+new RouteAction('Encounter 80 3 100'), // Slime
 new RouteAction('Encounter 0x77 4 100 Bane'), // Tiamat
 new RouteAction('Heal 60'),
 //new RouteAction('Encounter 0xBD'), // Tyro
@@ -2901,27 +2906,28 @@ new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
 new RouteAction('Heal 60'),
 new RouteAction('Encounter 8'), // Ghoul
-new RouteAction('Encounter 48-2 3 100'), // Frost D
+new RouteAction('Encounter 48-2 3 50'), // Frost D
 new RouteAction('Encounter 47-2 3 100'), // Fighter
 new RouteAction('Encounter 0x46 5 100'), // Phantom
 new RouteAction('Heal 60'),
 new RouteAction('Encounter 75-2'), // ZombieD
 new RouteAction('Encounter 87'), // Worm
-new RouteAction('Encounter 59-2'), // Chimera
-new RouteAction('Encounter 33-2 3 80'), // Earth
+new RouteAction('Encounter 59-2 3 50'), // Chimera
+new RouteAction('Encounter 33-2 3 50'), // Earth
 new RouteAction('Encounter 63-2'), // MudGol
+new RouteAction('Encounter 33-2 3 50'), // Earth
 new RouteAction('Encounter 0x73 5 50'), // Lich2
 new RouteAction('Encounter 41-2'), // Agama
 new RouteAction('Encounter 40-2'), // Grey W
 new RouteAction('Encounter 41-2'), // Agama
 new RouteAction('Encounter 0x74 3 100'), // Kary2
-new RouteAction('Encounter 68 3 50'), // SeaTroll
+new RouteAction('Encounter 68 3 40'), // SeaTroll
 new RouteAction('Encounter 69-2 3 50'), // WzSahag
-new RouteAction('Encounter 73-2 3 50'), // Water
-new RouteAction('Encounter 68 3 50'), // SeaTroll
+new RouteAction('Encounter 73-2 3 40'), // Water
+new RouteAction('Encounter 68 3 40'), // SeaTroll
 new RouteAction('Encounter 0x75 4 100 Bane'), // Kraken2
 new RouteAction('Encounter 0x76 4 100 Bane'), // Tiamat2
-new RouteAction('Encounter 88-2 3 50'), // RockGol
+new RouteAction('Encounter 88-2 3 40'), // RockGol
 new RouteAction('Encounter 0x7B 4 100 Bane'), // CHAOS
 new RouteAction('TimeTarget'),
 ];
