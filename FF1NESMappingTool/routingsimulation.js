@@ -3116,6 +3116,7 @@ new RouteAction('Encounter 97-2 3 30'), // SeaTroll
 new RouteAction('Encounter 0x78 5 318'), // Kraken
 new RouteAction('Heal 120'),
 new RouteAction('Heal 60'), 
+new RouteAction('Heal 60'), 
 new RouteAction('Encounter 63'), // MudGol
 new RouteAction('Encounter 63'), // MudGol
 new RouteAction('Encounter 63'), // MudGol
