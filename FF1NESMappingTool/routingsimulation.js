@@ -2728,6 +2728,7 @@ new RouteAction('Encounter 0x7B 4 100 Bane'), // CHAOS
 new RouteAction('TimeTarget'),
 ];*/
 
+/*
 var route = [
 new RouteAction('Encounter 0x0C'), // Ogre
 new RouteAction('Encounter 0xDC'), // Shark
@@ -2736,6 +2737,241 @@ new RouteAction('Encounter 0x01'), // Bone
 new RouteAction('Encounter 0x0C'), // Ogre
 new RouteAction('Encounter 0xDB'), // Sahag
 new RouteAction('Encounter 0xDB'), // Sahag
+new RouteAction('TimeTarget'),
+new RouteAction('Heal'),
+new RouteAction('Encounter 0x5C'), // Kyzoku
+new RouteAction('Encounter 0x12'), // Arachnid
+new RouteAction('Encounter 0x83'), // Wolf
+new RouteAction('Encounter 0xDC'), // Shark
+new RouteAction('Encounter 0x5D'), // Shark
+new RouteAction('EquipArmor IronShield'),
+new RouteAction('EquipArmor IronHelmet'),
+new RouteAction('Heal 30'),
+new RouteAction('Encounter 0x13'), // GrOgre/Ogre
+new RouteAction('Encounter 0x8D'), // Asp
+new RouteAction('Encounter 0x64'), // Bull
+new RouteAction('Encounter 0x94'), // Arachnid
+new RouteAction('Encounter 0x64'), // Bull
+new RouteAction('Encounter 0x93'), // GrOgre
+new RouteAction('Encounter 0x1D'), // Mummy
+new RouteAction('Encounter 0x18'), // Image
+new RouteAction('Encounter 0x7C 4 90'), // Vampire
+new RouteAction('Encounter 0x1C 4'), // Wizard
+new RouteAction('Encounter 0x18'), // Image
+new RouteAction('Encounter 0x18'), // Image
+new RouteAction('Encounter 0x91'), // WrWolf
+new RouteAction('Encounter 0x16'), // Coctrice
+new RouteAction('Encounter 0x64'), // Bull
+new RouteAction('Encounter 0x91'), // WrWolf
+new RouteAction('Encounter 0x15'), // Cobra
+new RouteAction('Heal 120'),
+new RouteAction('Encounter 0x13'), // GrOgre/Ogre
+new RouteAction('Heal 30'),
+new RouteAction('Encounter 0x19 4'), // Tiger
+new RouteAction('Encounter 0x8A'), // Shadow
+new RouteAction('Heal 30'),
+new RouteAction('Encounter 0x19 4'), // Tiger
+new RouteAction('Encounter 0x8C'), // Ogre
+new RouteAction('Encounter 0x13'), // GrOgre/Ogre
+new RouteAction('Encounter 0x93'), // GrOgre
+new RouteAction('Encounter 0x91'), // WrWolf
+new RouteAction('Encounter 0x8D'), // Asp
+new RouteAction('Encounter 0x16'), // Coctrice
+new RouteAction('Encounter 0x93'), // GrOgre
+new RouteAction('Encounter 0x18'), // Image
+new RouteAction('Encounter 0x91'), // WrWolf
+new RouteAction('Encounter 0x93'), // GrOgre
+new RouteAction('Encounter 0x63'), // Troll
+new RouteAction('Encounter 0x16'), // Coctrice
+new RouteAction('Encounter 0x0E'), // GrImp
+new RouteAction('Encounter 0x1B 3 50'), // Troll
+new RouteAction('Encounter 0x18'), // Image
+new RouteAction('Encounter 0x7A 5 140'), // LICH
+new RouteAction('Heal 60'),
+new RouteAction('Encounter 0x13'), // GrOgre/Ogre
+new RouteAction('Encounter 0xDD'), // Sahag
+new RouteAction('Heal 30'),
+new RouteAction('Encounter 0x63'), // Troll
+new RouteAction('Encounter 0x63'), // Troll
+new RouteAction('TimeTarget'),
+new RouteAction('Heal'),
+new RouteAction('EquipArmor SilverGauntlet'),
+new RouteAction('EquipArmor SilverShield'),
+new RouteAction('EquipArmor SilverHelmet'),
+new RouteAction('Encounter 0x9B'), // Troll
+new RouteAction('Encounter 0x5E'), // Shark
+new RouteAction('Heal 30'),
+new RouteAction('Encounter 0xA5'), // Ocho
+new RouteAction('Heal 60'),
+new RouteAction('Encounter 0x0D'), // Asp
+new RouteAction('Encounter 0x12'), // Arachnid
+new RouteAction('Encounter 0x9C'), // Wizard
+new RouteAction('Encounter 0x2F'), // Mage
+new RouteAction('Encounter 0x98'), // Image
+new RouteAction('Encounter 0x2F'), // Mage
+new RouteAction('Encounter 0x2C'), // trap undead tile
+new RouteAction('Burn 6'),
+new RouteAction('Encounter 0x6C'), // Sorcs
+new RouteAction('Encounter 0x2E'), // FrGiant
+new RouteAction('Encounter 0x2C'), // Wraith
+new RouteAction('EquipArmor IceShield'),
+new RouteAction('Encounter 0x69 4 299'), // Eye
+new RouteAction('Encounter 0x2C'), // trap undead tile 
+new RouteAction('Burn 6'),
+new RouteAction('Encounter 0x6C'), // Sorcs
+new RouteAction('Encounter 0x2F'), // Mage
+new RouteAction('Encounter 0x6C'), // Sorcs
+new RouteAction('Encounter 0x2C'), // Wraith
+new RouteAction('Encounter 14-2'), // GrImp
+new RouteAction('Encounter 95'), // Caribe
+new RouteAction('Encounter 95'), // Caribe
+new RouteAction('Heal 60'),
+new RouteAction('Encounter 91'), // OddEye
+new RouteAction('TimeTarget'),
+new RouteAction('Heal'),
+new RouteAction('Encounter 0x22 3 40'), // WizOgre
+new RouteAction('Burn 148'),        // These burns aren't right but does it even matter as long as the total is correct?
+new RouteAction('EquipWeapon IceSword'),
+new RouteAction('Encounter 0x28 3 20'), // Grey W
+new RouteAction('Burn 67'),
+new RouteAction('Burn 29'),
+new RouteAction('Encounter 41 3 20'), // Agama
+new RouteAction('Burn 45'),
+new RouteAction('Encounter 0x79 4 50'), // Kary
+new RouteAction('TimeTarget'),
+//new RouteAction('ChangeGold -50000'), // bottle
+new RouteAction('Heal'),
+new RouteAction('EquipArmor ProRing'),
+new RouteAction('Heal 60'),
+new RouteAction('Heal 60'),
+new RouteAction('Encounter 71 3 30'),   // Naga
+new RouteAction('Encounter 72 3 30'), // GrShark
+new RouteAction('Encounter 114 3 30'), // SeaSnake
+new RouteAction('EquipArmor OpalBracelet'),
+new RouteAction('Encounter 114'), // SeaSnake
+new RouteAction('Encounter 73 3 30'), // Water
+new RouteAction('Encounter 90-2 3 30'), // GrShark 
+new RouteAction('Encounter 71 3 30'), // Naga
+new RouteAction('Encounter 66-2 3 30'), // SeaTroll
+new RouteAction('Encounter 66-2 3 30'), // SeaTroll
+new RouteAction('Encounter 66 3 30'), // SeaTroll
+new RouteAction('Encounter 72 3 30'), // GrShark
+new RouteAction('Encounter 97-2 3 30'), // SeaTroll
+new RouteAction('Encounter 73 3 30'), // Water
+new RouteAction('Encounter 68-2 3 30'), // Lobster
+new RouteAction('Encounter 97-2 3 30'), // SeaTroll
+new RouteAction('Encounter 0x78 5 350'), // Kraken
+new RouteAction('Heal 120'),
+new RouteAction('Heal 60'), 
+new RouteAction('Encounter 63'), // MudGol
+new RouteAction('Encounter 63'), // MudGol
+new RouteAction('Encounter 63'), // MudGol
+new RouteAction('Encounter 35-2'), // Perilisk
+new RouteAction('Encounter 79'), // Nitemare
+new RouteAction('Encounter 63'), // MudGol
+new RouteAction('Encounter 63'), // MudGol
+new RouteAction('Encounter 79'), // Nitemare
+new RouteAction('Encounter 79'), // Nitemare
+new RouteAction('Heal 60'),
+new RouteAction('Heal 60'),
+new RouteAction('Heal 60'),
+new RouteAction('TimeTarget'),
+new RouteAction('Heal'),
+new RouteAction('Encounter 61'), // Tyro
+new RouteAction('Heal 60'),
+new RouteAction('Encounter 61'), // Tyro
+new RouteAction('Heal 60'),
+new RouteAction('Heal 60'),
+new RouteAction('Heal 60'),
+new RouteAction('Heal 60'),
+new RouteAction('Encounter 76'), // Guard
+new RouteAction('Encounter 74'), // WzMummy
+new RouteAction('Encounter 104 3 100'), // Vampire
+new RouteAction('Encounter 104 3 100'), // Vampire
+new RouteAction('EquipWeapon SunSword'),
+new RouteAction('Encounter 103-2 3 100'), // CatMan
+new RouteAction('Encounter 0x4E 3 100'), // BlueD
+new RouteAction('Encounter 54-2'), // Manticore
+new RouteAction('Encounter 77 3 50'), // Badman
+new RouteAction('Encounter 77 3 50'), // Badman
+new RouteAction('Encounter 64'), // GrMedusa
+new RouteAction('Encounter 76-2 3 50'), // Sentry
+new RouteAction('Encounter 51-2 3 50'), // Mancat
+new RouteAction('Encounter 83 3 50'), // WzVamp
+new RouteAction('Encounter 53-2'), // Sorcerer
+new RouteAction('Encounter 80 3 100'), // Slime
+new RouteAction('Encounter 0x77 4 100 Bane'), // Tiamat
+new RouteAction('Heal 60'),
+//new RouteAction('Encounter 0xBD'), // Tyro
+new RouteAction('TimeTarget'),
+new RouteAction('Heal'),
+new RouteAction('Heal 60'),
+new RouteAction('Encounter 8'), // Ghoul
+new RouteAction('Encounter 48-2 3 50'), // Frost D
+new RouteAction('Encounter 47-2 3 100'), // Fighter
+new RouteAction('Encounter 0x46 5 100'), // Phantom
+new RouteAction('Heal 60'),
+new RouteAction('Encounter 75-2'), // ZombieD
+new RouteAction('Encounter 87'), // Worm
+new RouteAction('Encounter 59-2 3 50'), // Chimera
+new RouteAction('Encounter 33-2 3 50'), // Earth
+new RouteAction('Encounter 63-2'), // MudGol
+new RouteAction('Encounter 33-2 3 50'), // Earth
+new RouteAction('Encounter 0x73 5 50'), // Lich2
+new RouteAction('Encounter 41-2'), // Agama
+new RouteAction('Encounter 40-2'), // Grey W
+new RouteAction('Encounter 41-2'), // Agama
+new RouteAction('Encounter 0x74 3 100'), // Kary2
+new RouteAction('Encounter 68 3 40'), // SeaTroll
+new RouteAction('Encounter 69-2 3 50'), // WzSahag
+new RouteAction('Encounter 73-2 3 40'), // Water
+new RouteAction('Encounter 68 3 40'), // SeaTroll
+new RouteAction('Encounter 0x75 4 100 Bane'), // Kraken2
+new RouteAction('Encounter 0x76 4 100 Bane'), // Tiamat2
+new RouteAction('Encounter 88-2 3 40'), // RockGol
+new RouteAction('Encounter 0x7B 4 100 Bane'), // CHAOS
+new RouteAction('TimeTarget'),
+];*/
+
+//234358
+
+var route = [
+new RouteAction('Encounter 0x02'), // GrImp
+new RouteAction('Encounter 0x83'), // Wolf
+new RouteAction('Encounter 0x07'), // Creep
+new RouteAction('EquipWeapon ShortSword'),
+new RouteAction('Encounter 0x7E'), // pirates
+new RouteAction('TimeTarget'),
+new RouteAction('Heal'),
+new RouteAction('Encounter 0xDC'), // Shark
+new RouteAction('Encounter 0x5D'), // Shark
+new RouteAction('TimeTarget'),
+new RouteAction('Heal'),
+new RouteAction('Encounter 0x87 4'), // Ogre/Creep
+new RouteAction('Encounter 0x87 4'), // Ogre/Creep
+new RouteAction('Encounter 0x87 4'), // Ogre/Creep
+new RouteAction('Encounter 0x0b'), // GrWolf
+new RouteAction('Encounter 0x0a'), // Shadow
+new RouteAction('Encounter 0x66'), // Arachnid
+new RouteAction('Encounter 0x85'), // Scum
+new RouteAction('Encounter 0x66'), // Arachnid 
+new RouteAction('EquipArmor IronArmor'),
+new RouteAction('Encounter 0x1C 5'), // Wizard
+new RouteAction('Encounter 0x85'), // Scum
+new RouteAction('Encounter 0x10'), // Gargoyle
+new RouteAction('Encounter 0x6B'), // Muck
+new RouteAction('Encounter 0x81'), // Bone
+new RouteAction('Encounter 0x6B'), // Muck
+new RouteAction('Encounter 0x0F 5'), // Geist
+new RouteAction('Encounter 0x0D'), // Asp
+new RouteAction('Encounter 0x7D 5'), // Astos
+new RouteAction('Encounter 0x0C'), // Ogre
+new RouteAction('Encounter 0x12'), // Arachnid
+new RouteAction('Encounter 0x8E'), // GrImp
+new RouteAction('Encounter 0x0C'), // Ogre
+new RouteAction('Encounter 91-2'), // Sahag
+new RouteAction('Encounter 91-2'), // Sahag
+new RouteAction('EquipWeapon SilverSword'),
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
 new RouteAction('Encounter 0x5C'), // Kyzoku
@@ -3188,20 +3424,22 @@ async function runRoute()
 		6: null,
 		7: null,
 		8: null,
-		//0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 2, 138, 61, 21, 6, 1, 11, 5, 39, 15, 1, 18, 19, 4, 18, 0, 0, weapons['Rapier'], armor['ChainArmor'], null, null, null), 35),
-		0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 8, 7326, 230, 27, 12, 3, 15, 9, 37, 24, 2, 46, 36, weapons['SilverSword'].crit, 36, 0, 0, weapons['SilverSword'], armor['IronArmor'], null, null, null)),
+		0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 2, 138, 61, 21, 6, 1, 11, 5, 39, 15, 1, 18, 19, 4, 18, 0, 0, weapons['Rapier'], armor['ChainArmor'], null, null, null), 35),
+		//0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 8, 7326, 230, 27, 12, 3, 15, 9, 37, 24, 2, 46, 36, weapons['SilverSword'].crit, 36, 0, 0, weapons['SilverSword'], armor['IronArmor'], null, null, null)),
 		0x81: null,
 		0x82: null,
 		0x83: null,
 	};
-	let startingState = new BattleState(0, 254, 630, testCharacters);
+	let startingState = new BattleState(0, 193, 630, testCharacters);
+	//let startingState = new BattleState(0, 254, 630, testCharacters);
 	let startingBattleStates = [];
 	let endingBattleStates = [];
 	let endingBattleSummaries = [];
 	let encounterIndexes = [];
 	let highestIndex = 0;
 	let encounterCount = 0;
-	let currentState = new BattleState(0, 254, 630, testCharacters);
+	let currentState = new BattleState(0, 193, 630, testCharacters);
+	//let currentState = new BattleState(0, 254, 630, testCharacters);
 	let currentIterationCount = 0;
 	let redoBattle = false;
 	let targetTime;
@@ -3492,13 +3730,14 @@ async function runRoute()
 		6: null,
 		7: null,
 		8: null,
-		//0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 2, 138, 61, 21, 6, 1, 11, 5, 39, 15, 1, 18, 19, 4, 18, 0, 0, weapons['Rapier'], armor['ChainArmor'], null, null, null), 35),
-		0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 8, 7326, 230, 27, 12, 3, 15, 9, 37, 24, 2, 46, 36, weapons['SilverSword'].crit, 36, 0, 0, weapons['SilverSword'], armor['IronArmor'], null, null, null)),
+		0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 2, 138, 61, 21, 6, 1, 11, 5, 39, 15, 1, 18, 19, 4, 18, 0, 0, weapons['Rapier'], armor['ChainArmor'], null, null, null), 35),
+		//0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 8, 7326, 230, 27, 12, 3, 15, 9, 37, 24, 2, 46, 36, weapons['SilverSword'].crit, 36, 0, 0, weapons['SilverSword'], armor['IronArmor'], null, null, null)),
 		0x81: null,
 		0x82: null,
 		0x83: null,
 	};
-	startingState = new BattleState(0, 254, 630, testCharacters);
+	startingState = new BattleState(0, 193, 630, testCharacters);
+	//startingState = new BattleState(0, 254, 630, testCharacters);
 	currentState = startingState;
 	
 	let outputLines = [];
