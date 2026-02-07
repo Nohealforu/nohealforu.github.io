@@ -3,7 +3,7 @@ var damageDealtScoreFactor = 3000;
 var damageTakenScoreFactor = 6000;
 var enemyCountScoreFactor = 2000;
 var hpGainedScoreFactor = 20000;
-var debugFight = 150;
+var debugFight = 103;
 
 const Formation = {
 	small: 0,
@@ -3050,10 +3050,12 @@ new RouteAction('EquipArmor SilverHelmet'),
 new RouteAction('Encounter 0x9B'), // Troll
 new RouteAction('Encounter 0x5E'), // Shark
 new RouteAction('Heal 30'),
+new RouteAction('Encounter 32'), // Hydra
 new RouteAction('Encounter 0xA5'), // Ocho
-new RouteAction('Heal 60'),
+new RouteAction('Encounter 0xA5'), // Ocho
 new RouteAction('Encounter 0x0D'), // Asp
 new RouteAction('Encounter 0x12'), // Arachnid
+/*
 new RouteAction('Encounter 0x9C'), // Wizard
 new RouteAction('Encounter 0x2F'), // Mage
 new RouteAction('Encounter 0x98'), // Image
@@ -3062,7 +3064,9 @@ new RouteAction('Encounter 0x2C'), // trap undead tile
 new RouteAction('Burn 6'),
 new RouteAction('Encounter 0x6C'), // Sorcs
 new RouteAction('Encounter 0x2E'), // FrGiant
+//new RouteAction('Encounter 0x30'), // Frost D
 new RouteAction('Encounter 0x2C'), // Wraith
+//new RouteAction('Encounter 22-2'), // Cocktrice/mummy
 new RouteAction('EquipArmor IceShield'),
 new RouteAction('Encounter 0x69 4 299'), // Eye
 new RouteAction('Encounter 0x2C'), // trap undead tile 
@@ -3070,23 +3074,39 @@ new RouteAction('Burn 6'),
 new RouteAction('Encounter 0x6C'), // Sorcs
 new RouteAction('Encounter 0x2F'), // Mage
 new RouteAction('Encounter 0x6C'), // Sorcs
-new RouteAction('Encounter 0x2C'), // Wraith
+new RouteAction('Encounter 0x2C'), // Wraith*/
+new RouteAction('Encounter 44-2'), // Wraith
+new RouteAction('Encounter 24-2'), // Image
+new RouteAction('Encounter 24-2'), // Image
+new RouteAction('Encounter 46'), // FrGiant
+new RouteAction('Encounter 44'), // trap undead tile
+new RouteAction('Burn 6'),
+new RouteAction('Encounter 46'), // FrGiant
+new RouteAction('Encounter 44-2'), // Wraith
+new RouteAction('Encounter 43-2'), // R. Bone
+new RouteAction('EquipArmor IceShield'),
+new RouteAction('Encounter 0x69 4 299'), // Eye
+new RouteAction('Encounter 0x2C'), // trap undead tile 
+new RouteAction('Burn 6'),
+new RouteAction('Encounter 46'), // FrGiant
+new RouteAction('Encounter 43-2'), // R. Bone
+new RouteAction('Encounter 44-2'), // Wraith
 new RouteAction('Encounter 14-2'), // GrImp
 new RouteAction('Encounter 95'), // Caribe
 new RouteAction('Encounter 95'), // Caribe
-new RouteAction('Heal 60'),
+new RouteAction('Encounter 32'), // Hydra
 new RouteAction('Encounter 91'), // OddEye
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
 new RouteAction('Encounter 0x22 3 40'), // WizOgre
 new RouteAction('Burn 148'),        // These burns aren't right but does it even matter as long as the total is correct?
 new RouteAction('EquipWeapon IceSword'),
-new RouteAction('Encounter 0x28 3 20'), // Grey W
+new RouteAction('Encounter 0x28 3 40'), // Grey W
 new RouteAction('Burn 67'),
 new RouteAction('Burn 29'),
-new RouteAction('Encounter 41 3 20'), // Agama
+new RouteAction('Encounter 41 3 40'), // Agama
 new RouteAction('Burn 45'),
-new RouteAction('Encounter 0x79 4 50'), // Kary
+new RouteAction('Encounter 0x79 4 100'), // Kary
 new RouteAction('TimeTarget'),
 //new RouteAction('ChangeGold -50000'), // bottle
 new RouteAction('Heal'),
@@ -3109,7 +3129,7 @@ new RouteAction('Encounter 97-2 3 30'), // SeaTroll
 new RouteAction('Encounter 73 3 30'), // Water
 new RouteAction('Encounter 68-2 3 30'), // Lobster
 new RouteAction('Encounter 97-2 3 30'), // SeaTroll
-new RouteAction('Encounter 0x78 5 350'), // Kraken
+new RouteAction('Encounter 0x78 5 318'), // Kraken
 new RouteAction('Heal 120'),
 new RouteAction('Heal 60'), 
 new RouteAction('Encounter 63'), // MudGol
@@ -3698,6 +3718,8 @@ async function runRoute()
 	// I don't think this is sufficient, needs to solve (RCSPP) instead of using single score pathfinding 
 	for(let i = encounterCount - 2; i >= 0; i--)
 	{
+		if(i == debugFight)
+			debugFight = i;
 		let rngScores = rngScoring[i];
 		let rngNextScores = rngScoring[i + 1];
 		let maxScore = -999999;
