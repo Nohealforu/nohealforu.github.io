@@ -2,6 +2,7 @@ var timeScoreFactor = 2;
 var damageDealtScoreFactor = 3000;
 var damageTakenScoreFactor = 6000;
 var enemyCountScoreFactor = 2000;
+var hpGainedScoreFactor = 20000;
 var debugFight = 150;
 
 const Formation = {
@@ -1174,11 +1175,16 @@ PlayerInfo.prototype.equipArmor = function(armor)
 PlayerInfo.prototype.levelUp = function (battleState)
 {
 	let levelResult = {};
+	let score = 0;
 	let levelStats = this.characterClass.levelUpTable[this.level++ - 1];
 	
 	let baseHPGain = Math.floor(this.vit / 4) + 1;
     if((levelStats & 0x2000) != 0)
-        baseHPGain += battleState.getRandomNumber(20, 25);
+	{
+		let hpRoll = battleState.getRandomNumber(20, 25);
+		score += hpGainedScoreFactor / this.hp * (hpRoll - 22);
+        baseHPGain += hpRoll;
+	}
 	
     this.hp += baseHPGain;
     if(this.hp > 999)
@@ -1207,6 +1213,8 @@ PlayerInfo.prototype.levelUp = function (battleState)
 		this.hit = 200;
 	this.updateSwings();
 	this.mdef += this.characterClass.mdefGain;
+	
+	return score;
 }
 
 function BattleCharacter(characterData, currentHp = characterData.hp, hitMultiplier = 1, abilityIndex = 0, magicIndex = 0, status = 0, absorb = characterData.absorb, evade = characterData.evade, morale = characterData.morale, resistances = characterData.resistances)
@@ -1613,7 +1621,7 @@ BattleState.prototype.checkEnemyDead = function(dangerRatio)
     exp /= aliveHeros;
     if (exp == 0)
         exp = 1;
- 
+
     for (let i = 0x80; i < 0x84; i++)
 	{
 		let character = this.battleCharacters[i];
@@ -1621,7 +1629,7 @@ BattleState.prototype.checkEnemyDead = function(dangerRatio)
         {
             character.characterData.exp += exp;
             if (character.characterData.exp >= EXPTable[character.characterData.level - 1])
-                character.characterData.levelUp(this);
+                this.score += character.characterData.levelUp(this);
             character.status &= (StatusEffect.poison | StatusEffect.dead | StatusEffect.stone);
 			character.resistances = character.characterData.resistances;
 			character.hitMultiplier = 1;
@@ -2940,7 +2948,7 @@ new RouteAction('Encounter 0x02'), // GrImp
 new RouteAction('Encounter 0x83'), // Wolf
 new RouteAction('Encounter 0x07'), // Creep
 new RouteAction('EquipWeapon ShortSword'),
-new RouteAction('Encounter 0x7E'), // pirates
+new RouteAction('Encounter 0x7E 3 30'), // pirates
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
 new RouteAction('Encounter 0xDC'), // Shark
@@ -2956,22 +2964,28 @@ new RouteAction('Encounter 0x66'), // Arachnid
 new RouteAction('Encounter 0x85'), // Scum
 new RouteAction('Encounter 0x66'), // Arachnid 
 new RouteAction('EquipArmor IronArmor'),
-new RouteAction('Encounter 0x1C 5'), // Wizard
+new RouteAction('Encounter 0x1C 5 40'), // Wizard
 new RouteAction('Encounter 0x85'), // Scum
 new RouteAction('Encounter 0x10'), // Gargoyle
-new RouteAction('Encounter 0x6B'), // Muck
+new RouteAction('Encounter 0x6B 3 20'), // Muck
 new RouteAction('Encounter 0x81'), // Bone
-new RouteAction('Encounter 0x6B'), // Muck
+new RouteAction('Encounter 0x6B 3 20'), // Muck
 new RouteAction('Encounter 0x0F 5'), // Geist
 new RouteAction('Encounter 0x0D'), // Asp
-new RouteAction('Encounter 0x7D 5'), // Astos
+new RouteAction('Encounter 0x7D 5 30'), // Astos
 new RouteAction('Encounter 0x0C'), // Ogre
 new RouteAction('Encounter 0x12'), // Arachnid
 new RouteAction('Encounter 0x8E'), // GrImp
-new RouteAction('Encounter 0x0C'), // Ogre
-new RouteAction('Encounter 91-2'), // Sahag
-new RouteAction('Encounter 91-2'), // Sahag
 new RouteAction('EquipWeapon SilverSword'),
+new RouteAction('TimeTarget'),
+new RouteAction('Heal'),
+new RouteAction('Encounter 0x0C'), // Ogre
+new RouteAction('Encounter 0xDC'), // Shark
+new RouteAction('Encounter 0x01'), // Bone
+new RouteAction('Encounter 0x01'), // Bone
+new RouteAction('Encounter 0x0C'), // Ogre
+new RouteAction('Encounter 0xDB'), // Sahag
+new RouteAction('Encounter 0xDB'), // Sahag
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
 new RouteAction('Encounter 0x5C'), // Kyzoku
@@ -3624,7 +3638,7 @@ async function runRoute()
 						}
 					}
 				}
-				
+				-7
 				//rngScores.sort((a, b) => b.score - a.score);
 				rngScoring[encounterCount] = rngScores;
 				healTracker[encounterCount] = healed;
@@ -3820,7 +3834,7 @@ async function runRoute()
 						let longBounce = endingSummary.delay[j] < 6 ? 0 : Math.floor(endingSummary.delay[j] / 3);
 						shortBounces += shortBounce;
 						longBounces += longBounce;
-						outputLines.push("<tr><td>Round " + (j + 1) + "</td><td>" + (j == 0 && endingSummary.encounterState == EncounterState.Ambushed ? "Enemy Strikes First" : longBounce + " full / " + shortBounce + " short") + " </td><td>Dealt " + endingSummary.dealt[j] + "</td><td>Taken " + endingSummary.taken[j] + "</td><td></td></tr>");
+						outputLines.push("<tr><td>Round " + (j + 1) + "</td><td>" + (j == 0 && endingSummary.encounterState == EncounterState.Ambushed ? "Enemy Strikes First" : (longBounce + shortBounce == 0 ? "Hold A" : longBounce + " full / " + shortBounce + " short")) + " </td><td>Dealt " + endingSummary.dealt[j] + "</td><td>Taken " + endingSummary.taken[j] + "</td><td></td></tr>");
 					}
 					outputLines.push("<tr></tr>");
 					encounterCount++;
