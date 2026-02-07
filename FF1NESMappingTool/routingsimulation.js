@@ -3567,7 +3567,7 @@ async function runRoute()
 					}
 					for(let name in enemyCounts)
 						enemyList.push(enemyCounts[name] + " " + name);
-					outputLines.push("<tr><td>Encounter " + encounterCount + "</td><td>" + enemyList.join(", ") + "</td><td>Hp " + endingSummary.hp + "</td><td>preRNG " + endingSummary.preRNG + "</td></tr>");
+					outputLines.push("<tr><td>Encounter " + encounterCount + "</td><td>" + enemyList.join(", ") + "</td><td>Hp " + endingSummary.hp + "</td><td>preRNG " + endingSummary.preRNG + "</td><td>Formation " + (currentAction.encounterIndex > 127 ? (currentAction.encounterIndex - 128) + "-2" : currentAction.encounterIndex) + "</td></tr>");
 					for(let j = 0; j < endingSummary.delay.length; j++)
 					{
 						turnCount++;
@@ -3575,7 +3575,7 @@ async function runRoute()
 						let longBounce = endingSummary.delay[j] < 6 ? 0 : Math.floor(endingSummary.delay[j] / 3);
 						shortBounces += shortBounce;
 						longBounces += longBounce;
-						outputLines.push("<tr><td>Round " + (j + 1) + "</td><td>" + (j == 0 && endingSummary.encounterState == EncounterState.Ambushed ? "Enemy Strikes First" : longBounce + " full / " + shortBounce + " short") + " </td><td>Dealt " + endingSummary.dealt[j] + "</td><td>Taken " + endingSummary.taken[j] + "</td></tr>");
+						outputLines.push("<tr><td>Round " + (j + 1) + "</td><td>" + (j == 0 && endingSummary.encounterState == EncounterState.Ambushed ? "Enemy Strikes First" : longBounce + " full / " + shortBounce + " short") + " </td><td>Dealt " + endingSummary.dealt[j] + "</td><td>Taken " + endingSummary.taken[j] + "</td><td></td></tr>");
 					}
 					outputLines.push("<tr></tr>");
 					encounterCount++;
@@ -3585,27 +3585,27 @@ async function runRoute()
 				currentState.gold += currentAction.amount;
 				break;
 			case Action.EquipWeapon:
-				outputLines.push("<tr><td>Equip Weapon</td><td>" + currentState.battleCharacters[currentAction.characterSlot].characterData.name + "</td><td></td><td>" + currentAction.weapon.name + "</td></tr>");
+				outputLines.push("<tr><td>Equip Weapon</td><td>" + currentState.battleCharacters[currentAction.characterSlot].characterData.name + "</td><td></td><td>" + currentAction.weapon.name + "</td><td></td></tr>");
 				outputLines.push("<tr></tr>");
 				currentState.battleCharacters[currentAction.characterSlot].characterData.equipWeapon(currentAction.weapon);
 				break;
 			case Action.UnequipWeapon:
-				outputLines.push("<tr><td>Unequip Weapon</td><td>" + currentState.battleCharacters[currentAction.characterSlot].characterData.name + "</td><td></td><td>" + currentState.battleCharacters[currentAction.characterSlot].characterData.weapon.name + "</td></tr>");
+				outputLines.push("<tr><td>Unequip Weapon</td><td>" + currentState.battleCharacters[currentAction.characterSlot].characterData.name + "</td><td></td><td>" + currentState.battleCharacters[currentAction.characterSlot].characterData.weapon.name + "</td><td></td></tr>");
 				outputLines.push("<tr></tr>");
 				currentState.battleCharacters[currentAction.characterSlot].characterData.unequipWeapon();
 				break;
 			case Action.EquipArmor:
-				outputLines.push("<tr><td>Equip Armor</td><td>" + currentState.battleCharacters[currentAction.characterSlot].characterData.name + "</td><td></td><td>" + currentAction.armor.name + "</td></tr>");
+				outputLines.push("<tr><td>Equip Armor</td><td>" + currentState.battleCharacters[currentAction.characterSlot].characterData.name + "</td><td></td><td>" + currentAction.armor.name + "</td><td></td></tr>");
 				outputLines.push("<tr></tr>");
 				currentState.battleCharacters[currentAction.characterSlot].characterData.equipArmor(currentAction.armor);
 				break;
 			case Action.UnequipArmor:
-				outputLines.push("<tr><td>Unequip Armor</td><td>" + currentState.battleCharacters[currentAction.characterSlot].characterData.name + "</td><td></td><td>" + currentState.battleCharacters[currentAction.characterSlot].characterData.armor[currentAction.slot].name + "</td></tr>");
+				outputLines.push("<tr><td>Unequip Armor</td><td>" + currentState.battleCharacters[currentAction.characterSlot].characterData.name + "</td><td></td><td>" + currentState.battleCharacters[currentAction.characterSlot].characterData.armor[currentAction.slot].name + "</td><td></td></tr>");
 				outputLines.push("<tr></tr>");
 				currentState.battleCharacters[currentAction.characterSlot].characterData.unequipArmor(currentAction.slot);
 				break;
 			case Action.Heal: // might need a heal all or parameter for that
-				outputLines.push("<tr><td>Heal</td><td>" + currentState.battleCharacters[currentAction.characterSlot].characterData.name + "</td><td></td><td>" + (currentAction.amount == -1 ? "Full" : currentAction.amount) + "</td></tr>");
+				outputLines.push("<tr><td>Heal</td><td>" + currentState.battleCharacters[currentAction.characterSlot].characterData.name + "</td><td></td><td>" + (currentAction.amount == -1 ? "Full" : currentAction.amount) + "</td><td></td></tr>");
 				outputLines.push("<tr></tr>");
 				currentState.battleCharacters[currentAction.characterSlot].heal(currentAction.amount);
 				break;
