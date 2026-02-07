@@ -121,7 +121,7 @@ const formationRNGSecondaryIncrement = {
 	[Formation.chaos]: 180,
 };
 
-// HoldA on fiends in laters turns adds 3 if a direction button isn't pressed, could be useful
+// HoldA on fiends in laters turns adds 3? 5? if a direction button isn't pressed, could be useful
 const formationRNGHoldA = {
 	[Formation.small]: 6,
 	[Formation.large]: 6,
@@ -3055,7 +3055,6 @@ new RouteAction('Encounter 0xA5'), // Ocho
 new RouteAction('Encounter 0xA5'), // Ocho
 new RouteAction('Encounter 0x0D'), // Asp
 new RouteAction('Encounter 0x12'), // Arachnid
-/*
 new RouteAction('Encounter 0x9C'), // Wizard
 new RouteAction('Encounter 0x2F'), // Mage
 new RouteAction('Encounter 0x98'), // Image
@@ -3074,27 +3073,12 @@ new RouteAction('Burn 6'),
 new RouteAction('Encounter 0x6C'), // Sorcs
 new RouteAction('Encounter 0x2F'), // Mage
 new RouteAction('Encounter 0x6C'), // Sorcs
-new RouteAction('Encounter 0x2C'), // Wraith*/
-new RouteAction('Encounter 44-2'), // Wraith
-new RouteAction('Encounter 24-2'), // Image
-new RouteAction('Encounter 24-2'), // Image
-new RouteAction('Encounter 46'), // FrGiant
-new RouteAction('Encounter 44'), // trap undead tile
-new RouteAction('Burn 6'),
-new RouteAction('Encounter 46'), // FrGiant
-new RouteAction('Encounter 44-2'), // Wraith
-new RouteAction('Encounter 43-2'), // R. Bone
-new RouteAction('EquipArmor IceShield'),
-new RouteAction('Encounter 0x69 4 299'), // Eye
-new RouteAction('Encounter 0x2C'), // trap undead tile 
-new RouteAction('Burn 6'),
-new RouteAction('Encounter 46'), // FrGiant
-new RouteAction('Encounter 43-2'), // R. Bone
-new RouteAction('Encounter 44-2'), // Wraith
+new RouteAction('Encounter 0x2C'), // Wraith
 new RouteAction('Encounter 14-2'), // GrImp
 new RouteAction('Encounter 95'), // Caribe
 new RouteAction('Encounter 95'), // Caribe
-new RouteAction('Encounter 32'), // Hydra
+//new RouteAction('Encounter 32'), // Hydra
+new RouteAction('Heal 30'),
 new RouteAction('Encounter 91'), // OddEye
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
@@ -3176,7 +3160,7 @@ new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
 new RouteAction('Heal 60'),
 new RouteAction('Encounter 8'), // Ghoul
-new RouteAction('Encounter 48-2 3 50'), // Frost D
+new RouteAction('Encounter 48-2 3 100'), // Frost D
 new RouteAction('Encounter 47-2 3 100'), // Fighter
 new RouteAction('Encounter 0x46 5 100'), // Phantom
 new RouteAction('Heal 60'),
