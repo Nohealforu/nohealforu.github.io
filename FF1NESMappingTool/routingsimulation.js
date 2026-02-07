@@ -3285,8 +3285,10 @@ async function runRoute()
 				{
 					if(backupEndingRngValuesCount > 0)
 						endingRngValues = backupEndingRngValues;
-					else
+					else if(backup2EndingRngValuesCount > 0)
 						endingRngValues = backup2EndingRngValues;
+					else
+						endingRngValues = backup3EndingRngValues;
 				}
 				else if(endingRngValuesCount == 1 && backupEndingRngValues != null)
 					for(let key in backupEndingRngValues)
@@ -3299,8 +3301,10 @@ async function runRoute()
 				endingRngValues = {};
 				endingRngValuesCount = 0;
 				backupEndingRngValuesCount = 0;
+				backup2EndingRngValuesCount = 0;
 				backupEndingRngValues = {};
-				backup2EndingRngValues = {}
+				backup2EndingRngValues = {};
+				backup3EndingRngValues = {};
 				
 				endingRNGValuesBestTime = [].concat(array256PositiveTemplate);
 				
@@ -3362,7 +3366,13 @@ async function runRoute()
 									backupEndingRngValues[endScore.key] = endScore.battleState;
 								}
 								else if(endScore.status == 0 && currentAction.encounter.next && minimumEnemies + 2 >= endScore.enemies)
+								{
+									if(backup2EndingRngValues[endScore.key] == null)
+										backup2EndingRngValuesCount++;
 									backup2EndingRngValues[endScore.key] = endScore.battleState;
+								}
+								else if(endScore.status == 0 && currentAction.encounter.next)
+									backup3EndingRngValues[endScore.key] = endScore.battleState;
 								
 								endingRNGValuesBestTime[endScore.rng] = endScore.battleState.startTime + endScore.battleState.estimatedTime;
 							}
