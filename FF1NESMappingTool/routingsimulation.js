@@ -4,6 +4,7 @@ var damageTakenScoreFactor = 6000;
 var enemyCountScoreFactor = 2000;
 var hpGainedScoreFactor = 20000;
 var debugFight = 103;
+var rngValueCheckCount = 10;
 
 const Formation = {
 	small: 0,
@@ -3792,13 +3793,13 @@ async function runRoute()
 					else
 						endingRngValues = backup3EndingRngValues;
 				}
-				else if(endingRngValuesCount < 10)
+				else if(endingRngValuesCount < rngValueCheckCount)
 				{
 					if(backupEndingRngValuesCount > 0)
 						for(let key in backupEndingRngValues)
 							if(endingRngValues[key] == null || (backupEndingRngValues[key].startTime + backupEndingRngValues[key].estimatedTime < endingRngValues[key].startTime + endingRngValues[key].estimatedTime))
 								endingRngValues[key] = backupEndingRngValues[key];
-					if(endingRngValuesCount + backupEndingRngValuesCount < 10)
+					if(endingRngValuesCount + backupEndingRngValuesCount < rngValueCheckCount)
 					{
 						if(backup2EndingRngValuesCount > 0)
 							for(let key in backup2EndingRngValues)
