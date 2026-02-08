@@ -3077,7 +3077,6 @@ new RouteAction('Encounter 0x2C'), // Wraith
 new RouteAction('Encounter 14-2'), // GrImp
 new RouteAction('Encounter 95'), // Caribe
 new RouteAction('Encounter 95'), // Caribe
-//new RouteAction('Encounter 32'), // Hydra
 new RouteAction('Heal 30'),
 new RouteAction('Encounter 91'), // OddEye
 new RouteAction('TimeTarget'),
@@ -3097,23 +3096,23 @@ new RouteAction('Heal'),
 new RouteAction('EquipArmor ProRing'),
 new RouteAction('Heal 60'),
 new RouteAction('Heal 60'),
-new RouteAction('Encounter 71 3 30'),   // Naga
-new RouteAction('Encounter 72 3 30'), // GrShark
-new RouteAction('Encounter 114 3 30'), // SeaSnake
+new RouteAction('Encounter 71 3 100'),   // Naga
+new RouteAction('Encounter 72 3 100'), // GrShark
+new RouteAction('Encounter 114 3 100'), // SeaSnake
 new RouteAction('EquipArmor OpalBracelet'),
-new RouteAction('Encounter 114'), // SeaSnake
-new RouteAction('Encounter 73 3 30'), // Water
-new RouteAction('Encounter 90-2 3 30'), // GrShark 
-new RouteAction('Encounter 71 3 30'), // Naga
-new RouteAction('Encounter 66-2 3 30'), // SeaTroll
-new RouteAction('Encounter 66-2 3 30'), // SeaTroll
-new RouteAction('Encounter 66 3 30'), // SeaTroll
-new RouteAction('Encounter 72 3 30'), // GrShark
-new RouteAction('Encounter 97-2 3 30'), // SeaTroll
-new RouteAction('Encounter 73 3 30'), // Water
-new RouteAction('Encounter 68-2 3 30'), // Lobster
-new RouteAction('Encounter 97-2 3 30'), // SeaTroll
-new RouteAction('Encounter 0x78 5 318'), // Kraken
+new RouteAction('Encounter 114 3 100'), // SeaSnake
+new RouteAction('Encounter 73 3 100'), // Water
+new RouteAction('Encounter 90-2 3 100'), // GrShark 
+new RouteAction('Encounter 71 3 100'), // Naga
+new RouteAction('Encounter 66-2 3 100'), // SeaTroll
+new RouteAction('Encounter 66-2 3 100'), // SeaTroll
+new RouteAction('Encounter 66 3 100'), // SeaTroll
+new RouteAction('Encounter 72 3 100'), // GrShark
+new RouteAction('Encounter 97-2 3 100'), // SeaTroll
+new RouteAction('Encounter 73 3 100'), // Water
+new RouteAction('Encounter 68-2 3 100'), // Lobster
+new RouteAction('Encounter 97-2 3 100'), // SeaTroll
+new RouteAction('Encounter 0x78 5 100'), // Kraken
 new RouteAction('Heal 120'),
 new RouteAction('Heal 60'), 
 new RouteAction('Heal 60'), 
@@ -3127,62 +3126,59 @@ new RouteAction('Encounter 63'), // MudGol
 new RouteAction('Encounter 79'), // Nitemare
 new RouteAction('Encounter 79'), // Nitemare
 new RouteAction('Heal 60'),
-new RouteAction('Heal 60'),
-new RouteAction('Heal 60'),
+new RouteAction('Encounter 65'),
+new RouteAction('Encounter 101'),
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
 new RouteAction('Encounter 61'), // Tyro
+//new RouteAction('Heal 60'),
+new RouteAction('Encounter 50-2'),
 new RouteAction('Heal 60'),
-new RouteAction('Encounter 61'), // Tyro
-new RouteAction('Heal 60'),
-new RouteAction('Heal 60'),
-new RouteAction('Heal 60'),
-new RouteAction('Heal 60'),
-new RouteAction('Encounter 76'), // Guard
+new RouteAction('Encounter 56-2'),
+new RouteAction('Encounter 113-2'),
+new RouteAction('Encounter 103-2'),
+new RouteAction('Encounter 109-2'),
 new RouteAction('Encounter 74'), // WzMummy
-new RouteAction('Encounter 104 3 100'), // Vampire
-new RouteAction('Encounter 104 3 100'), // Vampire
 new RouteAction('EquipWeapon SunSword'),
-new RouteAction('Encounter 103-2 3 100'), // CatMan
+new RouteAction('Encounter 59'),
+new RouteAction('Encounter 109-2'),
 new RouteAction('Encounter 0x4E 3 100'), // BlueD
-new RouteAction('Encounter 54-2'), // Manticore
 new RouteAction('Encounter 77 3 50'), // Badman
-new RouteAction('Encounter 77 3 50'), // Badman
+new RouteAction('Encounter 84 3 50'), // Evilman
 new RouteAction('Encounter 64'), // GrMedusa
-new RouteAction('Encounter 76-2 3 50'), // Sentry
+new RouteAction('Encounter 85-5'), 
 new RouteAction('Encounter 51-2 3 50'), // Mancat
-new RouteAction('Encounter 83 3 50'), // WzVamp
-new RouteAction('Encounter 53-2'), // Sorcerer
-new RouteAction('Encounter 80 3 100'), // Slime
+new RouteAction('Encounter 81'), // Air
+new RouteAction('Encounter 82-2'),
+new RouteAction('Encounter 65'),
+new RouteAction('Encounter 36-2 3 100'), // R. Hydra
 new RouteAction('Encounter 0x77 4 100 Bane'), // Tiamat
-new RouteAction('Heal 60'),
-//new RouteAction('Encounter 0xBD'), // Tyro
+new RouteAction('Encounter 0xBD'), // Tyro
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
 new RouteAction('Heal 60'),
-new RouteAction('Encounter 8'), // Ghoul
 new RouteAction('Encounter 48-2 3 100'), // Frost D
 new RouteAction('Encounter 47-2 3 100'), // Fighter
 new RouteAction('Encounter 0x46 5 100'), // Phantom
 new RouteAction('Heal 60'),
-new RouteAction('Encounter 75-2'), // ZombieD
+new RouteAction('Encounter 85'), // Jimera
+new RouteAction('Encounter 46-2'), // Frost G
+new RouteAction('Encounter 59-2'), // Chimera
 new RouteAction('Encounter 87'), // Worm
-new RouteAction('Encounter 59-2 3 50'), // Chimera
+new RouteAction('Encounter 64-2 3 50'), // GrMedusa
 new RouteAction('Encounter 33-2 3 50'), // Earth
-new RouteAction('Encounter 63-2'), // MudGol
-new RouteAction('Encounter 33-2 3 50'), // Earth
+//new RouteAction('Encounter 63-2'), // MudGol -- pick one
 new RouteAction('Encounter 0x73 5 50'), // Lich2
-new RouteAction('Encounter 41-2'), // Agama
-new RouteAction('Encounter 40-2'), // Grey W
+new RouteAction('Encounter 40-2'), // Grey W -- pick one
+new RouteAction('Encounter 38-2'), // R Giant
 new RouteAction('Encounter 41-2'), // Agama
 new RouteAction('Encounter 0x74 3 100'), // Kary2
-new RouteAction('Encounter 68 3 40'), // SeaTroll
-new RouteAction('Encounter 69-2 3 50'), // WzSahag
-new RouteAction('Encounter 73-2 3 40'), // Water
-new RouteAction('Encounter 68 3 40'), // SeaTroll
+new RouteAction('Encounter 73-2 3 70'), // Water
+new RouteAction('Encounter 73-2 3 70'), // Water
 new RouteAction('Encounter 0x75 4 100 Bane'), // Kraken2
-new RouteAction('Encounter 0x76 4 100 Bane'), // Tiamat2
+new RouteAction('Encounter 84-2 3 50'), // EvilMan
 new RouteAction('Encounter 88-2 3 40'), // RockGol
+new RouteAction('Encounter 0x76 4 100 Bane'), // Tiamat2
 new RouteAction('Encounter 0x7B 4 100 Bane'), // CHAOS
 new RouteAction('TimeTarget'),
 ];
@@ -3200,9 +3196,9 @@ new RouteAction('Encounter 0xDC'), // Shark
 new RouteAction('Encounter 0x5D'), // Shark
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
-new RouteAction('Encounter 0x87 4'), // Ogre/Creep
-new RouteAction('Encounter 0x87 4'), // Ogre/Creep
-new RouteAction('Encounter 0x87 4'), // Ogre/Creep
+new RouteAction('Encounter 0x87'), // Ogre/Creep
+new RouteAction('Encounter 0x87'), // Ogre/Creep
+new RouteAction('Encounter 0x87'), // Ogre/Creep
 new RouteAction('Encounter 0x0b'), // GrWolf
 new RouteAction('Encounter 0x0a'), // Shadow
 new RouteAction('Encounter 0x66'), // Arachnid
@@ -3319,11 +3315,10 @@ new RouteAction('Encounter 0x6C'), // Sorcs
 new RouteAction('Encounter 0x2F'), // Mage
 new RouteAction('Encounter 0x6C'), // Sorcs
 new RouteAction('Encounter 0x2C'), // Wraith
-new RouteAction('Encounter 14-2'), // GrImp
-new RouteAction('Encounter 95'), // Caribe
-new RouteAction('Encounter 95'), // Caribe
-//new RouteAction('Encounter 32'), // Hydra
 new RouteAction('Heal 30'),
+new RouteAction('Encounter 95'), // Caribe
+new RouteAction('Encounter 95'), // Caribe
+new RouteAction('Encounter 32'), // Hydra
 new RouteAction('Encounter 91'), // OddEye
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
@@ -3358,7 +3353,7 @@ new RouteAction('Encounter 97-2 3 100'), // SeaTroll
 new RouteAction('Encounter 73 3 100'), // Water
 new RouteAction('Encounter 68-2 3 100'), // Lobster
 new RouteAction('Encounter 97-2 3 100'), // SeaTroll
-new RouteAction('Encounter 0x78 10 100'), // Kraken
+new RouteAction('Encounter 0x78 10 170'), // Kraken
 new RouteAction('Heal 120'),
 new RouteAction('Heal 60'), 
 new RouteAction('Heal 60'), 
@@ -3797,13 +3792,13 @@ async function runRoute()
 					else
 						endingRngValues = backup3EndingRngValues;
 				}
-				else if(endingRngValuesCount < 5)
+				else if(endingRngValuesCount < 10)
 				{
 					if(backupEndingRngValuesCount > 0)
 						for(let key in backupEndingRngValues)
 							if(endingRngValues[key] == null || (backupEndingRngValues[key].startTime + backupEndingRngValues[key].estimatedTime < endingRngValues[key].startTime + endingRngValues[key].estimatedTime))
 								endingRngValues[key] = backupEndingRngValues[key];
-					if(endingRngValuesCount + backupEndingRngValuesCount < 5)
+					if(endingRngValuesCount + backupEndingRngValuesCount < 10)
 					{
 						if(backup2EndingRngValuesCount > 0)
 							for(let key in backup2EndingRngValues)
