@@ -2019,7 +2019,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 					{
 						if (target != null && target != targetOption)
 							continue; // skip if not target
-						if(targetOption == characterIndex && Target.Party)
+						if(targetOption == characterIndex && spellInfo.target == Target.Party)
 							continue; // skip if self target, bug with enemies
 						let targetCharacter = this.battleCharacters[targetOption];
 						if (targetCharacter == null || !targetCharacter.canTarget())
@@ -3201,8 +3201,8 @@ new RouteAction('Encounter 64'), // GrMedusa
 new RouteAction('Encounter 85-2'), 
 new RouteAction('Encounter 51-2 3 50'), // Mancat
 new RouteAction('Encounter 81'), // Air
-new RouteAction('Encounter 82-2'),
-new RouteAction('Encounter 65'),
+new RouteAction('Encounter 82-2'), // Air
+new RouteAction('Encounter 65-2'), // Naocho 
 new RouteAction('Encounter 36-2 3 100'), // R. Hydra
 new RouteAction('Encounter 0x77 4 100 Bane'), // Tiamat
 new RouteAction('Encounter 0xBD'), // Tyro
@@ -3228,8 +3228,8 @@ new RouteAction('Encounter 73-2 3 70'), // Water
 new RouteAction('Encounter 73-2 3 70'), // Water
 new RouteAction('Encounter 0x75 4 100 Bane'), // Kraken2
 new RouteAction('Encounter 84-2 3 50'), // EvilMan
-new RouteAction('Encounter 88-2 3 40'), // RockGol
 new RouteAction('Encounter 0x76 4 100 Bane'), // Tiamat2
+new RouteAction('Encounter 88-2 3 40'), // RockGol
 new RouteAction('Encounter 0x7B 4 100 Bane'), // CHAOS
 new RouteAction('TimeTarget'),
 ];
