@@ -2014,6 +2014,8 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 					
 					if (spellInfo.target == Target.Self)
 						target = characterIndex;
+					else if (spellInfo.target == Target.Ally)
+						target = this.getEnemyTarget();
 					
 					for (let targetOption of enemyTargetList)
 					{
