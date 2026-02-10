@@ -909,7 +909,7 @@ const encounters = {
 	0xE4: new EncounterInfo(Formation.large, true, 27, new EncounterSlot(enemies.Bull, 2, 4)),
 	0x65: new EncounterInfo(Formation.mix, true, 30, new EncounterSlot(enemies.Caribe, 0, 2), new EncounterSlot(enemies.Gator, 0, 2), new EncounterSlot(enemies.Ocho, 1, 1)),
 	0xE5: new EncounterInfo(Formation.mix, true, 30, new EncounterSlot(enemies.Caribe, 2, 4), new EncounterSlot(enemies.Gator, 0, 2)),
-	0x66: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Arachnid, 1, 2), new EncounterSlot(enemies.Spider, 0, 2)),
+	0x66: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Arachnid, 1, 2), new EncounterSlot(enemies.Spider, 0, 2), new EncounterSlot(enemies.Scum, 0, 1), new EncounterSlot(enemies.Muck, 0, 1)),
 	0xE6: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Arachnid, 3, 6), new EncounterSlot(enemies.Spider, 0, 2)),
 	0x67: new EncounterInfo(Formation.mix, true, 27, new EncounterSlot(enemies.Catman, 1, 3), new EncounterSlot(enemies['Saber T'], 0, 2)),
 	0xE7: new EncounterInfo(Formation.mix, true, 27, new EncounterSlot(enemies.Catman, 4, 7)),
