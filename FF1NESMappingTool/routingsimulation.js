@@ -2008,13 +2008,59 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 						this.estimatedTime += 70;
 					}
 				}
-				else if (spellInfo.effect == 0x0f)
+				else if (spellInfo.effect == 0x0a) // wall, a spells, etc. 
+				{
+					let target;
+					
+					if (spellInfo.target == Target.Self)
+						target = characterIndex;
+					
+					for (let targetOption of enemyTargetList)
+					{
+						if (target != null && target != targetOption)
+							continue; // skip if not target
+						if(targetOption == characterIndex && Target.Party)
+							continue; // skip if self target, bug with enemies
+						let targetCharacter = this.battleCharacters[targetOption];
+						if (targetCharacter == null || !targetCharacter.canTarget())
+							continue;
+						
+						// for enemy this doesn't change resistances, but does increment RNG
+						//targetCharacter.resistances &= spellInfo.strength;
+						
+						this.incrementRandomIndex(targetOption < 2 ? formationRNGPrimaryIncrement[this.formation] : formationRNGSecondaryIncrement[this.formation]);
+						this.estimatedTime += 70;
+					}
+				}
+				else if (spellInfo.effect == 0x0c) // FAST
+				{
+					let target;
+					
+					if (spellInfo.target == Target.Ally)
+						target = this.getEnemyTarget();
+					
+					for (let targetOption of enemyTargetList)
+					{
+						if (target != null && target != targetOption)
+							continue;
+						let targetCharacter = this.battleCharacters[targetOption];
+						if (targetCharacter == null || !targetCharacter.canTarget())
+							continue;
+						
+						targetCharacter.hitMultiplier = Math.min(targetCharacter.hitMultiplier + 1, 2);
+						
+						this.incrementRandomIndex(targetOption < 2 ? formationRNGPrimaryIncrement[this.formation] : formationRNGSecondaryIncrement[this.formation]);
+						this.estimatedTime += 70;
+					}
+
+				}
+				else if (spellInfo.effect == 0x0f) // cure 4
 				{
 					character.currentHp = character.characterData.hp;
 					character.status = 0;
 					this.estimatedTime += 70;
 				}
-				else if (spellInfo.effect == 0x10)
+				else if (spellInfo.effect == 0x10) // ruse
 				{
 					character.evade += spellInfo.strength;
 					if(character.evade > 255)
@@ -2052,30 +2098,6 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 						
 						this.estimatedTime += 70;
 					}
-				}
-				else if (spellInfo.effect == 0x0c)
-				{
-					// status skills
-					let target;
-					
-					if (spellInfo.target == Target.Ally)
-						target = this.getEnemyTarget();
-					
-					for (let targetOption of enemyTargetList)
-					{
-						if (target != null && target != targetOption)
-							continue;
-						let targetCharacter = this.battleCharacters[targetOption];
-						if (targetCharacter == null || !targetCharacter.canTarget())
-							continue;
-						
-						targetCharacter.hitMultiplier = Math.min(targetCharacter.hitMultiplier + 1, 2);
-						
-						this.incrementRandomIndex(targetOption < 2 ? formationRNGPrimaryIncrement[this.formation] : formationRNGSecondaryIncrement[this.formation]);
-						this.estimatedTime += 70;
-					}
-
-
 				}
 				else if (spellInfo.effect == 0x12)
 				{
