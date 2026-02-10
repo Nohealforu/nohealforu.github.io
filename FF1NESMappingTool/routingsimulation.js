@@ -1845,7 +1845,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 			let morale = character.morale - 2 * this.battleCharacters[0x80].characterData.level + this.getRandomNumber(0, 50);
 			if (morale < 80) // enemy runs
 			{
-				this.score += 1000;
+				this.score += damageDealtScoreFactor;
 				this.battleCharacters[characterIndex] = null;
 				if(this.checkEnemyDead(dangerRatio))
 					return;
@@ -2022,6 +2022,36 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 					
 					this.incrementRandomIndex(characterIndex < 2 ? formationRNGPrimaryIncrement[this.formation] : formationRNGSecondaryIncrement[this.formation]);
 					this.estimatedTime += 70;
+				}
+				else if (spellInfo.effect == 0x11)
+				{
+					// status skills
+					let target;
+					
+					if (spellInfo.target == Target.Enemy)
+						target = this.getTarget();
+
+					for (let targetOption of partyTargetList)
+					{
+						if (target != null && target != targetOption)
+							continue;
+						let targetCharacter = this.battleCharacters[targetOption];
+						if (targetCharacter == null || !targetCharacter.canTarget())
+							continue;
+						let resistant = (targetCharacter.resistances & spellInfo.element) > 0;
+						
+						// probably need to later add in the if weak thing?
+						// later weakness calculations go here
+						
+						let attackRoll = this.getRandomNumber(0, 200);
+						if(attackRoll != 200 && attackRoll <= Math.max(resistant ? 0 : 148 + spellInfo.hit - targetCharacter.characterData.mdef, 1))
+						{
+							targetCharacter.resistances = 0;
+							this.score -= 100;
+						}
+						
+						this.estimatedTime += 70;
+					}
 				}
 				else if (spellInfo.effect == 0x0c)
 				{
@@ -2959,7 +2989,7 @@ new RouteAction('Heal'),
 new RouteAction('Encounter 0x87'), // Ogre/Creep
 new RouteAction('Encounter 0x87'), // Ogre/Creep
 new RouteAction('Encounter 0x87'), // Ogre/Creep
-new RouteAction('Encounter 0x0b 3 10'), // GrWolf
+new RouteAction('Encounter 0x0b'), // GrWolf
 new RouteAction('Encounter 0x0a'), // Shadow
 new RouteAction('Encounter 0x66'), // Arachnid
 new RouteAction('Encounter 0x85'), // Scum
@@ -3050,7 +3080,6 @@ new RouteAction('EquipArmor SilverShield'),
 new RouteAction('EquipArmor SilverHelmet'),
 new RouteAction('Encounter 0x9B'), // Troll
 new RouteAction('Encounter 0x5E'), // Shark
-new RouteAction('Heal 30'),
 new RouteAction('Encounter 32'), // Hydra
 new RouteAction('Encounter 0xA5'), // Ocho
 new RouteAction('Encounter 0xA5'), // Ocho
@@ -3116,7 +3145,6 @@ new RouteAction('Encounter 97-2 3 100'), // SeaTroll
 new RouteAction('Encounter 0x78 20 100'), // Kraken
 new RouteAction('Heal 120'),
 new RouteAction('Heal 60'), 
-new RouteAction('Heal 60'), 
 new RouteAction('Encounter 63'), // MudGol
 new RouteAction('Encounter 63'), // MudGol
 new RouteAction('Encounter 63'), // MudGol
@@ -3131,8 +3159,9 @@ new RouteAction('Encounter 65'),
 new RouteAction('Encounter 101'),
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
+new RouteAction('Encounter 30-2'), // Giant
 new RouteAction('Encounter 61'), // Tyro
-//new RouteAction('Heal 60'),
+new RouteAction('Heal 60'),
 new RouteAction('Encounter 50-2'),
 new RouteAction('Heal 60'),
 new RouteAction('Encounter 56-2'),
@@ -3147,7 +3176,7 @@ new RouteAction('Encounter 0x4E 3 100'), // BlueD
 new RouteAction('Encounter 77 3 50'), // Badman
 new RouteAction('Encounter 84 3 50'), // Evilman
 new RouteAction('Encounter 64'), // GrMedusa
-new RouteAction('Encounter 85-5'), 
+new RouteAction('Encounter 85-2'), 
 new RouteAction('Encounter 51-2 3 50'), // Mancat
 new RouteAction('Encounter 81'), // Air
 new RouteAction('Encounter 82-2'),
@@ -3158,9 +3187,9 @@ new RouteAction('Encounter 0xBD'), // Tyro
 new RouteAction('TimeTarget'),
 new RouteAction('Heal'),
 new RouteAction('Heal 60'),
-new RouteAction('Encounter 48-2 3 100'), // Frost D
+new RouteAction('Encounter 48-2 3 50'), // Frost D
 new RouteAction('Encounter 47-2 3 100'), // Fighter
-new RouteAction('Encounter 0x46 5 100'), // Phantom
+new RouteAction('Encounter 0x46 5 50'), // Phantom
 new RouteAction('Encounter 85'), // Jimera
 new RouteAction('Encounter 46-2 3 100'), // Frost G
 new RouteAction('Encounter 59-2'), // Chimera
