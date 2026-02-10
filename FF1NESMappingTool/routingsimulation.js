@@ -909,8 +909,8 @@ const encounters = {
 	0xE4: new EncounterInfo(Formation.large, true, 27, new EncounterSlot(enemies.Bull, 2, 4)),
 	0x65: new EncounterInfo(Formation.mix, true, 30, new EncounterSlot(enemies.Caribe, 0, 2), new EncounterSlot(enemies.Gator, 0, 2), new EncounterSlot(enemies.Ocho, 1, 1)),
 	0xE5: new EncounterInfo(Formation.mix, true, 30, new EncounterSlot(enemies.Caribe, 2, 4), new EncounterSlot(enemies.Gator, 0, 2)),
-	0x66: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Arachnid, 1, 2), new EncounterSlot(enemies.Spider, 0, 2), new EncounterSlot(enemies.Scum, 0, 1), new EncounterSlot(enemies.Muck, 0, 1)),
-	0xE6: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Arachnid, 3, 6), new EncounterSlot(enemies.Spider, 0, 2)),
+	0x66: new EncounterInfo(Formation.small, true, 55, new EncounterSlot(enemies.Arachnid, 1, 2), new EncounterSlot(enemies.Spider, 0, 2), new EncounterSlot(enemies.Scum, 0, 1), new EncounterSlot(enemies.Muck, 0, 1)),
+	0xE6: new EncounterInfo(Formation.small, true, 55, new EncounterSlot(enemies.Arachnid, 3, 6), new EncounterSlot(enemies.Spider, 0, 2)),
 	0x67: new EncounterInfo(Formation.mix, true, 27, new EncounterSlot(enemies.Catman, 1, 3), new EncounterSlot(enemies['Saber T'], 0, 2)),
 	0xE7: new EncounterInfo(Formation.mix, true, 27, new EncounterSlot(enemies.Catman, 4, 7)),
 	0x68: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.WzVamp, 0, 0), new EncounterSlot(enemies.Vampire, 2, 5)),
@@ -2959,7 +2959,7 @@ new RouteAction('Heal'),
 new RouteAction('Encounter 0x87'), // Ogre/Creep
 new RouteAction('Encounter 0x87'), // Ogre/Creep
 new RouteAction('Encounter 0x87'), // Ogre/Creep
-new RouteAction('Encounter 0x0b'), // GrWolf
+new RouteAction('Encounter 0x0b 3 10'), // GrWolf
 new RouteAction('Encounter 0x0a'), // Shadow
 new RouteAction('Encounter 0x66'), // Arachnid
 new RouteAction('Encounter 0x85'), // Scum
@@ -2970,10 +2970,10 @@ new RouteAction('Encounter 0x85'), // Scum
 new RouteAction('Encounter 0x10'), // Gargoyle
 new RouteAction('Encounter 0x6B 3 20'), // Muck
 new RouteAction('Encounter 0x81'), // Bone
-new RouteAction('Encounter 0x6B 3 20'), // Muck
+new RouteAction('Encounter 0x6B 3 10'), // Muck
 new RouteAction('Encounter 0x0F 5'), // Geist
 new RouteAction('Encounter 0x0D'), // Asp
-new RouteAction('Encounter 0x7D 5 30'), // Astos
+new RouteAction('Encounter 0x7D 5 22'), // Astos
 new RouteAction('Encounter 0x0C 3 3'), // Ogre
 new RouteAction('Encounter 0x12 3 1'), // Arachnid
 new RouteAction('Encounter 0x8E 3 1'), // GrImp
