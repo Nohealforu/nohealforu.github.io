@@ -4087,7 +4087,7 @@ async function runRoute()
 	// I don't think this is sufficient, needs to solve (RCSPP) instead of using single score pathfinding 
 	for(let i = encounterCount - 2; i >= 0; i--)
 	{
-		outputProgress.innerHTML = 'Adjusting Score for encounter ' + encounterCount + ' of ' + totalEncounters;
+		outputProgress.innerHTML = 'Adjusting Score for encounter ' + i + ' of ' + totalEncounters;
 		await yieldToMain();
 		if(i == debugFight)
 			debugFight = i;
