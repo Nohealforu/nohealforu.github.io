@@ -7,16 +7,20 @@
 
     <script src="routingsimulation.js"></script>
 	<style> 
-			.container{
-				width:95%;
-				padding-top:10px;
-				padding-bottom:10px;
-				display:inline-block;
-			}
-            .container > .mainElement{
-                float:left; 
-                width:100%;
-				}
+		.body{
+			color: white;
+			background-color: black;
+		}
+		.container{
+			width:95%;
+			padding-top:10px;
+			padding-bottom:10px;
+			display:inline-block;
+		}
+		.container > .mainElement{
+			float:left; 
+			width:100%;
+		}
 		.sideElement{
 			width: 10%;
 			display: inline-block;
@@ -38,6 +42,10 @@
 	<div class="mainElement">
     <br />
 		<div><button id="runRoute" onclick="runRoute();" type="button">Run Route</button></div>
+	</div>
+	<div class="sideElement">
+		<div><button id="runRoute" onclick="loadRoute();" type="button">Load Stored Route</button></div>
+		<div><label for="routeText">Route Data</label><textarea id="routeText" name="routeText" ></textarea></div>
 	</div>
 	<div class="mainElement">
 		<table id="outputTable">
