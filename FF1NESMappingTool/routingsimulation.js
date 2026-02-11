@@ -1,3 +1,5 @@
+const yieldToMain = () => new Promise(resolve => setTimeout(resolve, 0));
+
 var timeScoreFactor = 4;
 var damageDealtScoreFactor = 3000;
 var damageTakenScoreFactor = 6000;
@@ -3786,7 +3788,7 @@ function loadRoute()
 	document.getElementById('routeText').innerHTML = route.join('\n');
 }
 
-function runRoute()
+async function runRoute()
 {
 	let newRoute = document.getElementById('routeText').innerHTML.split(/\r?\n/);
 	route = Array(newRoute.length);
@@ -3886,6 +3888,7 @@ function runRoute()
 				let minimumEnemies = 9;
 				let encounterInfo = encounters[currentAction.encounterIndex];
 				outputProgress.innerHTML = 'Calculating Encounter ' + encounterCount + ' of ' + totalEncounters + '<br />' + 'Formation ' + (currentAction.encounterIndex > 127 ? (currentAction.encounterIndex - 128) + "-2" : currentAction.encounterIndex) + ' ' + encounterInfo;
+				await yieldToMain();
 				
 				if(encounterCount == debugFight)
 					debugFight = encounterCount;
@@ -4024,7 +4027,7 @@ function runRoute()
 						}
 					}
 				}
-				-7
+				
 				//rngScores.sort((a, b) => b.score - a.score);
 				rngScoring[encounterCount] = rngScores;
 				healTracker[encounterCount] = healed;
@@ -4085,6 +4088,7 @@ function runRoute()
 	for(let i = encounterCount - 2; i >= 0; i--)
 	{
 		outputProgress.innerHTML = 'Adjusting Score for encounter ' + encounterCount + ' of ' + totalEncounters;
+		await yieldToMain();
 		if(i == debugFight)
 			debugFight = i;
 		let rngScores = rngScoring[i];
@@ -4167,6 +4171,7 @@ function runRoute()
 					debugFight = encounterCount;
 				let encounterEnemyCounts = allEncounterEnemyCounts[encounterCount];
 				outputProgress.innerHTML = 'Validating Encounter ' + encounterCount + ' of ' + totalEncounters;
+				await yieldToMain();
 				let endOfBattleState = runBattle(currentState, currentAction.encounter, currentAction.encounterAction, encounterEnemyCounts, redoBattle ? endingBattleStates[encounterCount] : null, redoBattle ? startingBattleStates[encounterCount + 1] : null, rngScoring[encounterCount + 1], rngScoring[encounterCount][currentState.getKey()].endingScores[0].delayCommands);
 				//targetTime = null;
 				
