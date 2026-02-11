@@ -3786,9 +3786,9 @@ function loadRoute()
 	document.getElementById('routeText').innerHTML = route.join('\n');
 }
 
-async function runRoute()
+function runRoute()
 {
-	let newRoute = await document.getElementById('routeText').innerHTML.split(/\r?\n/);
+	let newRoute = document.getElementById('routeText').innerHTML.split(/\r?\n/);
 	route = Array(newRoute.length);
 	for(let i = 0; i < newRoute.length; i++)
 		route[i] = new RouteAction(newRoute[i]);
@@ -3830,6 +3830,8 @@ async function runRoute()
 	let nextEncounter;
 	let stepsToHeal = 1;
 	let healed = 0;
+	
+	let outputProgress = document.getElementById('outputProgress');
 	
 	
 	for(let i = route.length; i--; i > 0)
@@ -3883,7 +3885,7 @@ async function runRoute()
 				let minimumExp = 999999;
 				let minimumEnemies = 9;
 				let encounterInfo = encounters[currentAction.encounterIndex];
-				document.getElementById('outputProgress').innerHTML = 'Calculating Encounter ' + encounterCount + ' of ' + totalEncounters + '<br />' + 'Formation ' + (currentAction.encounterIndex > 127 ? (currentAction.encounterIndex - 128) + "-2" : currentAction.encounterIndex) + ' ' + encounterInfo;
+				outputProgress.innerHTML = 'Calculating Encounter ' + encounterCount + ' of ' + totalEncounters + '<br />' + 'Formation ' + (currentAction.encounterIndex > 127 ? (currentAction.encounterIndex - 128) + "-2" : currentAction.encounterIndex) + ' ' + encounterInfo;
 				
 				if(encounterCount == debugFight)
 					debugFight = encounterCount;
@@ -3959,7 +3961,7 @@ async function runRoute()
 						currentState.battleCharacters[0x80].currentHp = currentAction.encounterHPBudget;
 					else
 						currentState.battleCharacters[0x80].heal(-1);
-					let endOfBattleState = await runBattle(currentState, currentAction.encounter, currentAction.encounterAction, encounterEnemyCounts);
+					let endOfBattleState = runBattle(currentState, currentAction.encounter, currentAction.encounterAction, encounterEnemyCounts);
 					
 					if(endOfBattleState.startState)
 						rngScores[key] = {startingRng: startRng, endingRng: null, score: -999999, time: null, taken: null, shortBounce: null, longBounce: null};
@@ -4082,7 +4084,7 @@ async function runRoute()
 	// I don't think this is sufficient, needs to solve (RCSPP) instead of using single score pathfinding 
 	for(let i = encounterCount - 2; i >= 0; i--)
 	{
-		document.getElementById('outputProgress').innerHTML = 'Adjusting Score for encounter ' + encounterCount + ' of ' + totalEncounters;
+		outputProgress.innerHTML = 'Adjusting Score for encounter ' + encounterCount + ' of ' + totalEncounters;
 		if(i == debugFight)
 			debugFight = i;
 		let rngScores = rngScoring[i];
@@ -4164,8 +4166,8 @@ async function runRoute()
 				if(encounterCount == debugFight)
 					debugFight = encounterCount;
 				let encounterEnemyCounts = allEncounterEnemyCounts[encounterCount];
-				document.getElementById('outputProgress').innerHTML = 'Validating Encounter ' + encounterCount + ' of ' + totalEncounters;
-				let endOfBattleState = await runBattle(currentState, currentAction.encounter, currentAction.encounterAction, encounterEnemyCounts, redoBattle ? endingBattleStates[encounterCount] : null, redoBattle ? startingBattleStates[encounterCount + 1] : null, rngScoring[encounterCount + 1], rngScoring[encounterCount][currentState.getKey()].endingScores[0].delayCommands);
+				outputProgress.innerHTML = 'Validating Encounter ' + encounterCount + ' of ' + totalEncounters;
+				let endOfBattleState = runBattle(currentState, currentAction.encounter, currentAction.encounterAction, encounterEnemyCounts, redoBattle ? endingBattleStates[encounterCount] : null, redoBattle ? startingBattleStates[encounterCount + 1] : null, rngScoring[encounterCount + 1], rngScoring[encounterCount][currentState.getKey()].endingScores[0].delayCommands);
 				//targetTime = null;
 				
 				if(endOfBattleState.startState) // if the battle failed, go backwards to the previous battle
@@ -4275,6 +4277,7 @@ async function runRoute()
 		}
 	}
 	console.log('Completed');
+	outputProgress.innerHTML = 'Complete';
 	console.log(encounterTracker);
 	console.log(endingBattleSummaries);
 	console.log(scoreTracker); 
@@ -4282,5 +4285,6 @@ async function runRoute()
 	console.log(turnCount);
 	console.log(shortBounces);
 	console.log(longBounces);
+	
 	document.getElementById('outputTableBody').innerHTML = outputLines.join("");
 }
