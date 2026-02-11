@@ -2272,6 +2272,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 			
 			for (let i = 0; i < (canDelay ? 256 : 1); i++)
 			{
+				let currentAction = encounterAction;
 				battleState = priorBattleState.newTurn(encounterAction);
 				battleState.estimatedTime += (i < 6 ? i * 41 : 50 * Math.floor(i / 3) + 41 * (i % 3));
 				if(priorBattleState == battleStartState)
@@ -2282,7 +2283,8 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 				// Also don't allow Bane sword with no buffer (0 delay)
 				if(encounterAction == EncounterAction.Bane && (!battleState.battleComplete || i == 0))
 				{
-					battleState = priorBattleState.newTurn(EncounterAction.Fight);
+					currentAction = EncounterAction.Fight;
+					battleState = priorBattleState.newTurn(currentAction);
 					battleState.estimatedTime += (i < 6 ? i * 41 : 50 * Math.floor(i / 3) + 41 * (i % 3));
 					if(priorBattleState == battleStartState)
 						battleState.encounterState = battleStartState.encounterState;
@@ -2314,6 +2316,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 				{
 					bestScore = battleState.score;
 					bestDelay = i;
+					adjustedEncounterAction = currentAction;
 				}
 				scores[i] = {score: battleState.score, delayCommands: null, delay: i, dmg: battleState.damageDealt, lost: battleState.damageTaken, rng: battleState.randomNumberIndex, complete: battleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: battleState, key: battleState.getKey(), status: battleState.battleCharacters[0x80].status};
 			}
