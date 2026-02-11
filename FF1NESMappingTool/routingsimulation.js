@@ -3785,12 +3785,12 @@ new RouteAction('TimeTarget'),
 //PlayerInfo(name, characterClass, classChanged, level, exp, hp, str, agi, int, vit, luck, evade, absorb, hits, hit, attack, crit, mdef, weaknesses, resistances, weapon, armor, shield, helmet, glove)
 function loadRoute()
 {
-	document.getElementById('routeText').innerHTML = route.join('\n');
+	document.getElementById('routeText').value = route.join('\n');
 }
 
 async function runRoute()
 {
-	let newRoute = document.getElementById('routeText').innerHTML.split(/\r?\n/);
+	let newRoute = document.getElementById('routeText').value.split(/\r?\n/);
 	route = Array(newRoute.length);
 	for(let i = 0; i < newRoute.length; i++)
 		route[i] = new RouteAction(newRoute[i]);
