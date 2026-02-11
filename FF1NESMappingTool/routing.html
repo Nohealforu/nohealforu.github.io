@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-    <title>FF1 NES Route Simulation Tool 0.0.1</title>
+    <title>FF1 NES Route Simulation Tool 0.3.6</title>
     <meta charset="utf-8">
     <!--link rel="stylesheet" href="styles.css" type="text/css"-->
 
@@ -35,22 +35,22 @@
 
 <header class="main-header">
     <h1><a href="../index.html">Home</a></h1>
-    <p>FF1 NES Route Simulation Tool 0.0.1</p>
+    <p>FF1 NES Route Simulation Tool 0.3.6</p>
 </header>
 
 <div class="container">
 	<div class="mainElement">
     <br />
 		<div><button id="runRoute" onclick="runRoute();" type="button">Run Route</button></div>
-	</div>
-	<div class="sideElement">
-		<div><button id="runRoute" onclick="loadRoute();" type="button">Load Stored Route</button></div>
-		<div><label for="routeText">Route Data</label><textarea id="routeText" name="routeText" ></textarea></div>
-	</div>
-	<div class="mainElement">
-		<table id="outputTable" style="min-height:450px;min-width:450px">
-			<tbody id="outputTableBody"></tbody>
-		</table>
+		<div style="float: right;">
+			<div><button id="runRoute" onclick="loadRoute();" type="button">Load Stored Route</button></div>
+			<div><label for="routeText">Route Data<br /></label><textarea id="routeText" name="routeText" style="width: 300px; height: 200px; color: white; background-color: black;"></textarea></div>
+		</div>
+		<div class="sideElement">
+			<table id="outputTable" style="min-height:450px;min-width:450px">
+				<tbody id="outputTableBody"></tbody>
+			</table>
+		</div>
 	</div>
     <footer class="main-footer">
         <div>Source code on <a href="https://github.com/Nohealforu/noealforu.github.io/" target="_top">the Github repository</a>.</div>
