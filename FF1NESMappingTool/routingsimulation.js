@@ -1814,7 +1814,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 						
 						let attackRoll = this.getRandomNumber(0, 200);
 						
-						if(attackRoll != 200 && attackRoll <= Math.max((resistant ? 0 : 148) + (weak ? 40 : 0) + spellInfo.hit - targetCharacter.characterData.mdef, 1))
+						if(attackRoll != 200 && attackRoll <= Math.max((resistant ? 0 : 148) + (weak ? 40 : 0) + spellInfo.hit - targetCharacter.characterData.mdef, 0))
 						{
 							if(spellInfo.effect == 3)
 							{
@@ -1946,7 +1946,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 						// later weakness calculations go here
 						
 						let attackRoll = this.getRandomNumber(0, 200);
-						if(attackRoll != 200 && attackRoll <= Math.max(resistant ? 0 : 148 + spellInfo.hit - targetCharacter.characterData.mdef, 1))
+						if(attackRoll != 200 && attackRoll <= Math.max(resistant ? 0 : 148 + spellInfo.hit - targetCharacter.characterData.mdef, 0))
 							damageRoll *= 2;
 						
 						targetCharacter.currentHp -= damageRoll;
@@ -1987,7 +1987,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 						// later weakness calculations go here
 						
 						let attackRoll = this.getRandomNumber(0, 200);
-						if(attackRoll != 200 && attackRoll <= Math.max(resistant ? 0 : 148 + spellInfo.hit - targetCharacter.characterData.mdef, 1))
+						if(attackRoll != 200 && attackRoll <= Math.max(resistant ? 0 : 148 + spellInfo.hit - targetCharacter.characterData.mdef, 0))
 						{
 							if(spellInfo.effect == 3)
 							{
@@ -2092,7 +2092,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 						// later weakness calculations go here
 						
 						let attackRoll = this.getRandomNumber(0, 200);
-						if(attackRoll != 200 && attackRoll <= Math.max(resistant ? 0 : 148 + spellInfo.hit - targetCharacter.characterData.mdef, 1))
+						if(attackRoll != 200 && attackRoll <= Math.max(resistant ? 0 : 148 + spellInfo.hit - targetCharacter.characterData.mdef, 0))
 						{
 							targetCharacter.resistances = 0;
 							this.score -= 100;
