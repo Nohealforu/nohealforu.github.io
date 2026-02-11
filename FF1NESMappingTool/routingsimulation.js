@@ -2556,7 +2556,7 @@ RouteAction.prototype.toString  = function RouteActionToString()
 	switch(this.action)
 	{
 		case Action.Encounter:
-			if(this.encounterAction == EncounterAction.Fight && encounterHPBudget == 0 && encounterDanger == 3)
+			if(this.encounterAction == EncounterAction.Fight && this.encounterHPBudget == 0 && this.encounterDanger == 3)
 				result = 'Encounter ' + (this.encounterIndex > 127 ? (this.encounterIndex - 128) + '-2' : this.encounterIndex);
 			else
 				result = 'Encounter ' + (this.encounterIndex > 127 ? (this.encounterIndex - 128) + '-2' : this.encounterIndex) + ' ' + this.encounterDanger + ' ' + this.encounterHPBudget + EncounterActionString[this.encounterAction];
