@@ -2544,6 +2544,53 @@ function RouteAction(actionString)
 	}
 }
 
+const EncounterActionString = {
+	[EncounterAction.Bane]: ' Bane',
+	[EncounterAction.Flee]: ' Flee',
+	[EncounterAction.Fight]: ''
+};
+
+RouteAction.prototype.toString  = function RouteActionToString()
+{
+	let result;
+	switch(this.action)
+	{
+		case Action.Encounter:
+			if(this.encounterAction == EncounterAction.Fight && encounterHPBudget == 0 && encounterDanger == 3)
+				result = 'Encounter ' + (this.encounterIndex > 127 ? (this.encounterIndex - 128) + '-2' : this.encounterIndex);
+			else
+				result = 'Encounter ' + (this.encounterIndex > 127 ? (this.encounterIndex - 128) + '-2' : this.encounterIndex) + ' ' + this.encounterDanger + ' ' + this.encounterHPBudget + EncounterActionString[this.encounterAction];
+			break;
+		case Action.ChangeGold:
+			result = 'ChangeGold ' + this.amount;
+			break;
+		case Action.EquipWeapon:
+			result = 'EquipWeapon ' + this.weapon.name + ' ' + this.characterSlot;
+			break;
+		case Action.UnequipWeapon:
+			result = 'UnequipWeapon ' + this.characterSlot;
+			break;
+		case Action.EquipArmor:
+			result = 'EquipArmor ' + this.armor.name + ' ' + this.characterSlot;
+			break;
+		case Action.UnequipArmor:
+			result = 'UnequipArmor ' + this.slot + ' ' + this.characterSlot;
+			break;
+		case Action.Heal: // might need a heal all or parameter for that
+			result = 'Heal ' + this.amount + ' ' + this.characterSlot;
+			break;
+		case Action.Burn: // should hit all but I don't care atm
+			result = 'Burn ' + this.amount + ' ' + this.characterSlot;
+			break;
+		case Action.TimeTarget:
+			result = 'TimeTarget ' + this.amount;
+			break;
+		default:
+			result = 'Invalid Action: ' + this.inputString;
+	}
+	return result;
+}
+
 /*
 // shortened route for faster bugfix
 var route = [
@@ -3723,9 +3770,18 @@ new RouteAction('TimeTarget'),
 ];*/
 
 //PlayerInfo(name, characterClass, classChanged, level, exp, hp, str, agi, int, vit, luck, evade, absorb, hits, hit, attack, crit, mdef, weaknesses, resistances, weapon, armor, shield, helmet, glove)
+function loadRoute()
+{
+	document.getElementById('routeText').innerHTML = route.join('\n');
+}
 
 async function runRoute()
 {
+	let newRoute = document.getElementById('routeText').innerHTML.split(/\r?\n/);
+	route = Array(newRoute.length);
+	for(let i = 0; i < newRoute.length; i++)
+		route[i] = new RouteAction(newRoute[i]);
+	
 	let testCharacters = {
 		0: null,
 		1: null,
