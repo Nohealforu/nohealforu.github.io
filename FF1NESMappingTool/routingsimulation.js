@@ -706,6 +706,15 @@ EncounterInfo.prototype.getSlotInfo = function(slot)
 	return (encounterSlot.minimum == encounterSlot.maximum ? encounterSlot.minimum : encounterSlot.minimum + '-' + encounterSlot.maximum) + ' ' + encounterSlot.enemy.name + '(' + encounterSlot.enemy.hp + ' hp)';
 };
 
+EncounterInfo.prototype.toString = function EncounterInfoToString()
+{
+	let fightDetails = (this.slot1.maximum > 0 ? this.getSlotInfo('slot1') : '') + 
+					   (this.slot2.maximum > 0 ? ', ' + this.getSlotInfo('slot2') : '') + 
+					   (this.slot3.maximum > 0 ? ', ' + this.getSlotInfo('slot3') : '') + 
+					   (this.slot4.maximum > 0 ? ', ' + this.getSlotInfo('slot4') : '');
+	return 'surprise(' + this.surprise +') can run(' + this.runnable + '): ' + fightDetails;
+}
+
 const encounters = {
 	0x00: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Imp, 3, 5)),
 	0x80: new EncounterInfo(Formation.small, true, 4, new EncounterSlot(enemies.Imp, 3, 6), new EncounterSlot(enemies.GrImp, 0, 4)),
@@ -3779,7 +3788,7 @@ function loadRoute()
 
 async function runRoute()
 {
-	let newRoute = document.getElementById('routeText').innerHTML.split(/\r?\n/);
+	let newRoute = await document.getElementById('routeText').innerHTML.split(/\r?\n/);
 	route = Array(newRoute.length);
 	for(let i = 0; i < newRoute.length; i++)
 		route[i] = new RouteAction(newRoute[i]);
@@ -3844,6 +3853,7 @@ async function runRoute()
 	}
 	
 	console.log("Calculating Good RNG seeds...");
+	let totalEncounters = encounterCount;
 	encounterCount = 0;
 	let endingRngValues = {};
 	let allEncounterEnemyCounts = Array(encounterCount);
@@ -3872,9 +3882,11 @@ async function runRoute()
 				let encounterEnemyCounts = Array(256);
 				let minimumExp = 999999;
 				let minimumEnemies = 9;
+				let encounterInfo = encounters[currentAction.encounterIndex];
+				document.getElementById('outputProgress').innerHTML = 'Calculating Encounter ' + encounterCount + ' of ' + totalEncounters + '<br />' + 'Formation ' + (currentAction.encounterIndex > 127 ? (currentAction.encounterIndex - 128) + "-2" : currentAction.encounterIndex) + ' ' + encounterInfo;
+				
 				if(encounterCount == debugFight)
 					debugFight = encounterCount;
-				
 				if(currentAction.encounter.next)
 				{
 					
@@ -4070,6 +4082,7 @@ async function runRoute()
 	// I don't think this is sufficient, needs to solve (RCSPP) instead of using single score pathfinding 
 	for(let i = encounterCount - 2; i >= 0; i--)
 	{
+		document.getElementById('outputProgress').innerHTML = 'Adjusting Score for encounter ' + encounterCount + ' of ' + totalEncounters;
 		if(i == debugFight)
 			debugFight = i;
 		let rngScores = rngScoring[i];
@@ -4151,6 +4164,7 @@ async function runRoute()
 				if(encounterCount == debugFight)
 					debugFight = encounterCount;
 				let encounterEnemyCounts = allEncounterEnemyCounts[encounterCount];
+				document.getElementById('outputProgress').innerHTML = 'Validating Encounter ' + encounterCount + ' of ' + totalEncounters;
 				let endOfBattleState = await runBattle(currentState, currentAction.encounter, currentAction.encounterAction, encounterEnemyCounts, redoBattle ? endingBattleStates[encounterCount] : null, redoBattle ? startingBattleStates[encounterCount + 1] : null, rngScoring[encounterCount + 1], rngScoring[encounterCount][currentState.getKey()].endingScores[0].delayCommands);
 				//targetTime = null;
 				
