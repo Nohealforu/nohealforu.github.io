@@ -3834,6 +3834,7 @@ async function runRoute()
 	let healed = 0;
 	
 	let outputProgress = document.getElementById('outputProgress');
+	document.getElementById('outputTableBody').innerHTML = '';
 	
 	
 	for(let i = route.length; i--; i > 0)
@@ -4291,5 +4292,5 @@ async function runRoute()
 	console.log(shortBounces);
 	console.log(longBounces);
 	
-	document.getElementById('outputTableBody').innerHTML = outputLines.join("");
+	document.getElementById('outputTableBody').innerHTML = outputLines.join('');
 }
