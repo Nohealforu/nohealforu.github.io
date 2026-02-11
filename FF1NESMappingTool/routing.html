@@ -43,10 +43,11 @@
     <br />
 		<div><button id="runRoute" onclick="runRoute();" type="button">Run Route</button></div>
 		<div style="float: right;">
-			<div><button id="runRoute" onclick="loadRoute();" type="button">Load Stored Route</button></div>
+			<div><button id="loadRoute" onclick="loadRoute();" type="button">Load Stored Route</button></div>
 			<div><label for="routeText">Route Data<br /></label><textarea id="routeText" name="routeText" style="width: 300px; height: 200px; color: white; background-color: black;"></textarea></div>
 		</div>
 		<div class="sideElement">
+			<div id="outputProgress"></div>
 			<table id="outputTable" style="min-height:450px;min-width:450px">
 				<tbody id="outputTableBody"></tbody>
 			</table>
