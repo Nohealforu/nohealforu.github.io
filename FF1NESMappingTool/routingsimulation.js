@@ -165,6 +165,92 @@ function ArmorInfo(name, evade, absorb, resistances, spell, slot)
 	this.slot = slot;
 }
 
+const weaponNames = [
+	'WoodenNunchucks',
+	'SmallKnife',
+	'WoodenStaff',
+	'Rapier',
+	'IronHammer',
+	'ShortSword',
+	'HandAxe',
+	'Scimtar',
+	'IronNunchucks',
+	'LargeKnife',
+	'IronStaff',
+	'Sabre',
+	'LongSword',
+	'GreatAxe',
+	'Falchon',
+	'SilverKnife',
+	'SilverSword',
+	'SilverHammer',
+	'SilverAxe',
+	'FlameSword',
+	'IceSword',
+	'DragonSword',
+	'GiantSword',
+	'SunSword',
+	'CoralSword',
+	'WereSword',
+	'RuneSword',
+	'PowerStaff',
+	'LightAxe',
+	'HealStaff',
+	'MageStaff ',
+	'Defense',
+	'WizardStaff',
+	'Vorpal',
+	'CatClaw',
+	'ThorsHammer',
+	'BaneSword',
+	'Katana',
+	'XCalbur',
+	'Masmune',
+];
+
+const armorNames = [
+	'Cloth',
+	'WoodenArmor',
+	'ChainArmor',
+	'IronArmor',
+	'SteelArmor',
+	'SilverArmor',
+	'FlameArmor',
+	'IceArmor',
+	'OpalArmor',
+	'DragonArmor',
+	'CopperBracelet',
+	'SilverBracelet',
+	'GoldBracelet',
+	'OpalBracelet',
+	'WhiteShirt',
+	'BlackShirt',
+	'WoodenShield',
+	'IronShield',
+	'SilverShield',
+	'FlameShield',
+	'IceShield',
+	'OpalShield',
+	'AegisShield',
+	'Buckler',
+	'ProCape',
+	'Cap',
+	'WoodenHelmet',
+	'IronHelmet',
+	'SilverHelmet',
+	'OpalHelmet',
+	'HealHelmet',
+	'Ribbon',
+	'Gloves',
+	'CopperGauntlet',
+	'IronGauntlet',
+	'SilverGauntlet',
+	'ZeusGauntlet',
+	'PowerGauntlet',
+	'OpalGauntlet',
+	'ProRing',
+]
+
 const weapons = {
 	'WoodenNunchucks': new WeaponInfo('Wooden Nunchucks', 0x00, 0x0c, 0x01, 0x00),
 	'SmallKnife': new WeaponInfo('Small Knife', 0x0a, 0x05, 0x02, 0x00),
@@ -2565,13 +2651,13 @@ RouteAction.prototype.toString  = function RouteActionToString()
 			result = 'ChangeGold ' + this.amount;
 			break;
 		case Action.EquipWeapon:
-			result = 'EquipWeapon ' + this.weapon.name + ' ' + this.characterSlot;
+			result = 'EquipWeapon ' + weaponNames[this.weapon] + ' ' + this.characterSlot;
 			break;
 		case Action.UnequipWeapon:
 			result = 'UnequipWeapon ' + this.characterSlot;
 			break;
 		case Action.EquipArmor:
-			result = 'EquipArmor ' + this.armor.name + ' ' + this.characterSlot;
+			result = 'EquipArmor ' + armorNames[this.armor] + ' ' + this.characterSlot;
 			break;
 		case Action.UnequipArmor:
 			result = 'UnequipArmor ' + this.slot + ' ' + this.characterSlot;
