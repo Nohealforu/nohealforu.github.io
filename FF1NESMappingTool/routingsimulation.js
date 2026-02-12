@@ -7,6 +7,7 @@ var enemyCountScoreFactor = 2000;
 var hpGainedScoreFactor = 20000;
 var debugFight = 103;
 var rngValueCheckCount = 2;
+var logValues = false;
 
 const Formation = {
 	small: 0,
@@ -4039,8 +4040,12 @@ async function runRoute()
 				if(currentState == null || currentState.battleCharacters == null)
 				{
 					console.log('Failed fight');
-					console.log(rngScoring);
-					console.log(encounterTracker);
+					outputProgress.innerHTML = 'Unable to complete fight ' + encounterCount + ' of ' + totalEncounters + '<br />' + 'Formation ' + (currentAction.encounterIndex > 127 ? (currentAction.encounterIndex - 128) + "-2" : currentAction.encounterIndex) + ' ' + encounterInfo;
+					if(logValues)
+					{
+						console.log(rngScoring);
+						console.log(encounterTracker);
+					}
 					return;
 				}
 				
@@ -4152,6 +4157,7 @@ async function runRoute()
 	let turnCount = 0;
 	let shortBounces = 0;
 	let longBounces = 0;
+	let times = [];
 	
 	// calculating ideal path using rng values as reference  
 	for(let i = 0; i < route.length; i++)
@@ -4180,6 +4186,8 @@ async function runRoute()
 				{
 					// after we pathfind this, just abort 
 					console.log('Path failed to execute');
+					let encounterInfo = encounters[currentAction.encounterIndex];
+					outputProgress.innerHTML = 'Ran out of hp in encounter ' + encounterCount + ' of ' + totalEncounters + '<br />' + 'Formation ' + (currentAction.encounterIndex > 127 ? (currentAction.encounterIndex - 128) + "-2" : currentAction.encounterIndex) + ' ' + encounterInfo;
 					stop = true;
 					break;
 					
@@ -4270,7 +4278,10 @@ async function runRoute()
 			case Action.TimeTarget: 
 				//targetTime = currentAction.amount;
 				if(i == highestIndex)
+				{
+					times.push(currentState.startTime + currentState.estimatedTime);
 					console.log('index ' + i + ': ' + (currentState.startTime + currentState.estimatedTime));
+				}
 				break;
 			default:
 				console.log('UnknownCommand: ' + currentAction.inputString);
@@ -4284,13 +4295,13 @@ async function runRoute()
 	}
 	console.log('Completed');
 	outputProgress.innerHTML = 'Complete';
-	console.log(encounterTracker);
-	console.log(endingBattleSummaries);
-	console.log(scoreTracker); 
-	console.log(iterationAbortCount);
-	console.log(turnCount);
-	console.log(shortBounces);
-	console.log(longBounces);
-	
+	if(logValues)
+	{
+		console.log(encounterTracker);
+		console.log(endingBattleSummaries);
+		console.log(scoreTracker); 
+		console.log(iterationAbortCount);
+	}
+	document.getElementById('outputSummary').innerHTML = 'TimeTargets: ' + times.join(', ') + '<br />Turns: ' + turnCount + '<br />Short: ' +  shortBounces + '<br />Long: ' +  longBounces;	
 	document.getElementById('outputTableBody').innerHTML = outputLines.join('');
 }
