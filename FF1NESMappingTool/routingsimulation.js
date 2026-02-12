@@ -3806,7 +3806,7 @@ async function runRoute()
 		6: null,
 		7: null,
 		8: null,
-		0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 2, 161, 61, 21, 6, 1, 11, 5, 39, 15, 1, 18, 19, 4, 18, 0, 0, weapons['Rapier'], armor['ChainArmor'], null, null, null), 35),
+		0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 2, 168, 61, 21, 6, 1, 11, 5, 39, 15, 1, 18, 19, 4, 18, 0, 0, weapons['Rapier'], armor['ChainArmor'], null, null, null), 35),
 		//0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 8, 7326, 230, 27, 12, 3, 15, 9, 37, 24, 2, 46, 36, weapons['SilverSword'].crit, 36, 0, 0, weapons['SilverSword'], armor['IronArmor'], null, null, null)),
 		0x81: null,
 		0x82: null,
@@ -4130,7 +4130,8 @@ async function runRoute()
 		}
 	}
 	
-	console.log(rngScoring);
+	if(logValues)
+		console.log(rngScoring);
 	
 	encounterCount = 0;
 	testCharacters = {
@@ -4143,7 +4144,7 @@ async function runRoute()
 		6: null,
 		7: null,
 		8: null,
-		0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 2, 161, 61, 21, 6, 1, 11, 5, 39, 15, 1, 18, 19, 4, 18, 0, 0, weapons['Rapier'], armor['ChainArmor'], null, null, null), 35),
+		0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 2, 168, 61, 21, 6, 1, 11, 5, 39, 15, 1, 18, 19, 4, 18, 0, 0, weapons['Rapier'], armor['ChainArmor'], null, null, null), 35),
 		//0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 8, 7326, 230, 27, 12, 3, 15, 9, 37, 24, 2, 46, 36, weapons['SilverSword'].crit, 36, 0, 0, weapons['SilverSword'], armor['IronArmor'], null, null, null)),
 		0x81: null,
 		0x82: null,
