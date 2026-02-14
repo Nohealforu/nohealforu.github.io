@@ -3911,7 +3911,7 @@ async function runRoute()
 	let rngScoring = Array(encounterCount);
 	endingRngValues[startingState.getKey()] = startingState;
 	let endingRNGValuesBestTime = [].concat(array256PositiveTemplate);
-	endingRNGValuesBestTime[startingState.randomNumberIndex] = 200;
+	endingRNGValuesBestTime[startingState.randomNumberIndex] = 0;
 	let endingRngValuesCount = 1;
 	let backupEndingRngValuesCount = 0;
 	let backup2EndingRngValuesCount = 0;
