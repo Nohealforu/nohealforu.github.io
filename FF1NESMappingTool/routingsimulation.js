@@ -2339,7 +2339,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 				scores[i] = {score: battleState.score, delayCommands: null, delay: i, dmg: battleState.damageDealt, lost: battleState.damageTaken, rng: battleState.randomNumberIndex, complete: battleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: battleState, key: battleState.getKey(), status: battleState.battleCharacters[0x80].status};
 			}
 			scores.sort((a, b) => b.score - a.score);
-			if(!battleComplete)
+			if(fightLookAhead && !battleComplete && canDelay)
 			{
 				for(let i = 0; i < fightLookAheadWidth; i++)
 				{
