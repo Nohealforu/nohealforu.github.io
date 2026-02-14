@@ -1328,7 +1328,7 @@ function BattleState(index, randomNumberIndex, gold, battleCharacters, startTime
 	this.encounterState = EncounterState.Normal;
 	this.turn = turn;
 	this.startTime = startTime;
-	this.estimatedTime = 200;
+	this.estimatedTime = 0;
 	this.damageTaken = 0;
 	this.damageDealt = 0;
 	this.score = 0;
