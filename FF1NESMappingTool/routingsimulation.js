@@ -2375,7 +2375,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 							topNextScore = additionalBattleState.score;
 					}
 					
-					score.score += topNextScore * 0.8;
+					score.score += topNextScore;
 				}
 			}
 			scores.sort((a, b) => b.score - a.score);
