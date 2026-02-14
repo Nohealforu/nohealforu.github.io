@@ -4338,7 +4338,8 @@ async function runRoute()
 		}
 	}
 	console.log('Completed');
-	outputProgress.innerHTML = 'Complete';
+	if(!stop)
+		outputProgress.innerHTML = 'Complete';
 	if(logValues)
 	{
 		console.log(encounterTracker);
