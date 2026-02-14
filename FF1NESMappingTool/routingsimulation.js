@@ -6,7 +6,7 @@ var damageTakenScoreFactor = 6000;
 var enemyCountScoreFactor = 2000;
 var hpGainedScoreFactor = 20000;
 var debugFight = 103;
-var rngValueCheckCount = 2;
+var rngValueCheckCount = 10;
 var logValues = false;
 var fightLookAhead = false;
 var fightLookAheadWidth = 10;
@@ -1361,7 +1361,7 @@ BattleState.prototype.incrementRandomIndex = function(value)
 
 BattleState.prototype.getKey = function()
 {
-	return this.randomNumberIndex + ":" + this.battleCharacters[0x80].characterData.exp  + ":" + this.battleCharacters[0x80].characterData.agi;
+	return this.randomNumberIndex + ":" + this.battleCharacters[0x80].characterData.exp + ":" + this.battleCharacters[0x80].characterData.agi + ":" + this.battleCharacters[0x80].characterData.luck;
 }
 
 BattleState.prototype.getRandomNumber = function(minimum = 0, maximum = -1)
