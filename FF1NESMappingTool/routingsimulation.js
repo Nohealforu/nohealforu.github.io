@@ -8,6 +8,8 @@ var hpGainedScoreFactor = 20000;
 var debugFight = 103;
 var rngValueCheckCount = 2;
 var logValues = false;
+var fightLookAhead = false;
+var fightLookAheadWidth = 20;
 
 const Formation = {
 	small: 0,
@@ -2275,6 +2277,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 		{
 			scores = [];
 			let canDelay = false;
+			let battleComplete = false;
 			for (let i = 0x80; i < 0x84; i++)
 			{
 				let character = battleState.battleCharacters[i];
@@ -2304,7 +2307,8 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 						battleState.encounterState = battleStartState.encounterState;
 					battleState.runTurn(i, damageTakenRatio, dangerRatio);
 				}
-				
+				if(battleState.battleComplete)
+					battleComplete = true;
 				if(battleState.battleComplete && !canDelay)
 					canDelay = false; // this was here for a breakpoint, but could break stuff if like a single enemy ambushes and flees or something idk
 				let nextEncounterState;
@@ -2324,8 +2328,8 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					}
 				}
 				
-				//if(battleState.encounterIndex != 0x7D)
-					battleState.score -= battleState.estimatedTime * timeScoreFactor;
+				battleState.score -= battleState.estimatedTime * timeScoreFactor;
+				
 				if(battleState.score > bestScore)
 				{
 					bestScore = battleState.score;
@@ -2333,6 +2337,46 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					adjustedEncounterAction = currentAction;
 				}
 				scores[i] = {score: battleState.score, delayCommands: null, delay: i, dmg: battleState.damageDealt, lost: battleState.damageTaken, rng: battleState.randomNumberIndex, complete: battleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: battleState, key: battleState.getKey(), status: battleState.battleCharacters[0x80].status};
+			}
+			scores.sort((a, b) => b.score - a.score);
+			if(!battleComplete)
+			{
+				for(let i = 0; i < fightLookAheadWidth; i++)
+				{
+					let score = scores[i];
+					if(score.battleState.partyWipe)
+						continue;
+					let additionalScores = [];
+					let additionalBattleState = score.battleState;
+					let priorAdditionalBattleState = additionalBattleState;
+					let canDelay = false;
+					let topNextScore = -999999;
+					for (let j = 0x80; j < 0x84; j++)
+					{
+						let character = additionalBattleState.battleCharacters[j];
+						if (character != null && character.canAct())
+							canDelay = true;
+					}
+					
+					for (let j = 0; j < (canDelay ? 256 : 1); j++)
+					{
+						additionalBattleState = priorAdditionalBattleState.newTurn(encounterAction);
+						additionalBattleState.estimatedTime += (j < 6 ? j * 41 : 50 * Math.floor(j / 3) + 41 * (j % 3));
+						additionalBattleState.runTurn(j, damageTakenRatio, dangerRatio);
+						let nextEncounterState;
+						if(additionalBattleState.battleComplete && encounter.next?.encounterIndex != null)
+						{
+							nextEncounterState = encounterEnemyCounts[additionalBattleState.randomNumberIndex];
+							additionalBattleState.score -= enemyCountScoreFactor * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
+						}
+						
+						additionalBattleState.score -= additionalBattleState.estimatedTime * timeScoreFactor;
+						if(additionalBattleState.score > topNextScore)
+							topNextScore = additionalBattleState.score;
+					}
+					
+					score.score += topNextScore * 0.8;
+				}
 			}
 			scores.sort((a, b) => b.score - a.score);
 			scoreTracker[battleState.index] = scores;
@@ -2427,7 +2471,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					endingRNGValueScores[score.rng] = score.score;
 				}
 			}
-			else if(i < 10) // calculate next turn for top 10 scores that aren't complete
+			else if(i < fightLookAheadWidth) // calculate next turn for top scores that aren't complete
 			{
 				let additionalScores = [];
 				let additionalBattleState = score.battleState;
@@ -2452,8 +2496,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 						additionalBattleState.score -= enemyCountScoreFactor * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
 					}
 					
-					//if(additionalBattleState.encounterIndex != 0x7D)
-						additionalBattleState.score -= additionalBattleState.estimatedTime * timeScoreFactor;
+					additionalBattleState.score -= additionalBattleState.estimatedTime * timeScoreFactor;
 					additionalScores[j] = {score: additionalBattleState.score + priorAdditionalBattleState.score, delayCommands: delayCommands.concat(score.delay, j), delay: j, dmg: additionalBattleState.damageDealt + priorAdditionalBattleState.damageDealt, lost: additionalBattleState.damageTaken + priorAdditionalBattleState.damageTaken, rng: additionalBattleState.randomNumberIndex, complete: additionalBattleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: additionalBattleState, key: additionalBattleState.getKey(), status: additionalBattleState.battleCharacters[0x80].status};
 				}
 				additionalScores.sort((a, b) => b.score - a.score);
