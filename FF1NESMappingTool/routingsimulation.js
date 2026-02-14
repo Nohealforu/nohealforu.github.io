@@ -9,7 +9,7 @@ var debugFight = 103;
 var rngValueCheckCount = 2;
 var logValues = false;
 var fightLookAhead = false;
-var fightLookAheadWidth = 20;
+var fightLookAheadWidth = 10;
 
 const Formation = {
 	small: 0,
