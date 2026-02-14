@@ -2496,7 +2496,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 						additionalBattleState.score -= enemyCountScoreFactor * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
 					}
 					
-					additionalBattleState.score -= additionalBattleState.estimatedTime * timeScoreFactor;
+					additionalBattleState.score -= (additionalBattleState.estimatedTime + priorAdditionalBattleState.estimatedTime) * timeScoreFactor;
 					additionalScores[j] = {score: additionalBattleState.score + priorAdditionalBattleState.score, delayCommands: delayCommands.concat(score.delay, j), delay: j, dmg: additionalBattleState.damageDealt + priorAdditionalBattleState.damageDealt, lost: additionalBattleState.damageTaken + priorAdditionalBattleState.damageTaken, rng: additionalBattleState.randomNumberIndex, complete: additionalBattleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: additionalBattleState, key: additionalBattleState.getKey(), status: additionalBattleState.battleCharacters[0x80].status};
 				}
 				additionalScores.sort((a, b) => b.score - a.score);
