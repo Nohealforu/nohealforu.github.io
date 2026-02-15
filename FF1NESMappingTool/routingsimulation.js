@@ -4183,7 +4183,7 @@ async function runRoute()
 		if(!validScoreFound)
 		{
 			console.log('No valid routes');
-			outputProgress.innerHTML = 'No valid routes (likely not enough hp to continue) from fight ' + encounterCount + ' of ' + totalEncounters + '<br />';
+			outputProgress.innerHTML = 'No valid routes (likely not enough hp to continue) from fight ' + i + ' of ' + totalEncounters + '<br />';
 			if(logValues)
 			{
 				console.log(rngScoring);
