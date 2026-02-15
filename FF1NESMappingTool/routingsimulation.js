@@ -4044,7 +4044,7 @@ async function runRoute()
 						//else
 						//	scoreSum -= 1000 * damageRatio * damageRatio * (stepsToHeal + 8) * stepsToHeal / 8;
 						scoreSum -= 3000 * ((endOfBattleState.startingEnemies) / (endOfBattleState.minimumEnemies + 1) - 1);*/
-						rngScores[key] = {startingRng: startRng, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, taken: takenSum, currentHp: startingHp - takenSum, totalTaken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum, endingScores: summary.endingScores};
+						rngScores[key] = {startingRng: startRng, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, taken: takenSum, startingHp: startingHp, totalTaken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum, endingScores: summary.endingScores};
 						for(let k = 0; k < summary.endingScores.length; k++)
 						{
 							let endScore = summary.endingScores[k];
@@ -4165,10 +4165,7 @@ async function runRoute()
 					if(rngNextScores[rngScores[key].endingScores[k].key] == null)
 						rngScores[key].endingScores[k].score = -999999;
 					else
-					{
-						if(rngScores[key].endingScores[k].currentHp <= rngNextScores[rngScores[key].endingScores[k].key].totalTaken)
-						rngScores[key].endingScores[k].score += rngNextScores[rngScores[key].endingScores[k].key].score - maxScore - Math.max(0, rngNextScores[rngScores[key].endingScores[k].key].totalTaken - rngScores[key].endingScores[k].currentHp) * deficitHpScoreFactor;
-					}
+						rngScores[key].endingScores[k].score += rngNextScores[rngScores[key].endingScores[k].key].score - maxScore - Math.max(0, rngNextScores[rngScores[key].endingScores[k].key].totalTaken - rngScores[key].startingHp) * deficitHpScoreFactor;
 				}
 				rngScores[key].endingScores.sort((a, b) => b.score - a.score);
 				rngScores[key].score += rngScores[key].endingScores[0].score - baseLineScore;
