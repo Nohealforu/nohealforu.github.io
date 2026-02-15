@@ -1365,7 +1365,7 @@ BattleState.prototype.incrementRandomIndex = function(value)
 
 BattleState.prototype.getKey = function()
 {
-	return this.randomNumberIndex + ":" + this.battleCharacters[0x80].characterData.exp + ":" + this.battleCharacters[0x80].characterData.agi + ":" + this.battleCharacters[0x80].characterData.luck;
+	return this.randomNumberIndex + ":" + this.battleCharacters[0x80].characterData.exp + ":" + this.battleCharacters[0x80].characterData.agi;// + ":" + this.battleCharacters[0x80].characterData.luck;
 }
 
 BattleState.prototype.getRandomNumber = function(minimum = 0, maximum = -1)
