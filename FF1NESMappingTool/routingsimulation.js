@@ -1335,6 +1335,7 @@ function BattleState(index, randomNumberIndex, gold, battleCharacters, startTime
 	this.damageTaken = 0;
 	this.damageDealt = 0;
 	this.score = 0;
+	this.enemyActions = 0;
 	this.minimumEnemies = 9;
 	this.startingEnemies = 0;
 	this.expValue = 0;
@@ -1861,6 +1862,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 		}
 		else if (characterIndex < 9 && this.encounterState != EncounterState.FirstStrike) // monster
 		{
+			this.enemyActions++;
 			let morale = character.morale - 2 * this.battleCharacters[0x80].characterData.level + this.getRandomNumber(0, 50);
 			if (morale < 80) // enemy runs
 			{
@@ -2445,6 +2447,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 			damageDealtStates[battleState.turn - 1] = battleState.damageDealt;
 			estimatedTimeStates[battleState.turn - 1] = battleState.estimatedTime;
 			estimatedTimeTotalStates[battleState.turn - 1] = battleState.startTime + battleState.estimatedTime;
+			enemyActions[battleState.turn - 1] = battleState.enemyActions;
 			priorBattleState = battleState;
 			battleState = priorBattleState.newTurn(encounterAction);
 			delayIndex = redoBattle ? (delayStates[battleState.index] ?? 0) : 0;
@@ -2524,6 +2527,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 	damageDealtStates[battleState.turn - 1] = battleState.damageDealt;
 	estimatedTimeStates[battleState.turn - 1] = battleState.estimatedTime;
 	estimatedTimeTotalStates[battleState.turn - 1] = battleState.startTime + battleState.estimatedTime;
+	enemyActions[battleState.turn - 1] = battleState.enemyActions;
 	
 	battleState.startingEnemies = battleStartState.startingEnemies;
 	battleState.minimumEnemies = battleStartState.minimumEnemies;
@@ -2532,7 +2536,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 	for(let i = 0; i < completedScores.length; i++)
 		if(endingRNGValueScores[completedScores[i].rng] == completedScores[i].score)
 			bestCompletedScores.push(completedScores[i]);
-	battleState.encounterSummary = {hp: battleStartState.battleCharacters[0x80].currentHp, hp2: battleState.battleCharacters[0x80].currentHp, encounter: encounter, characters: battleStartState.battleCharacters, delay: delayCommands, score: scoreStates, dealt: damageDealtStates, taken: damageTakenStates, time: estimatedTimeStates, totalTime: estimatedTimeTotalStates, startIndex: battleStartState.index + 1, preRNG: currentState.randomNumberIndex, startRNG: battleStartState.randomNumberIndex, endingRNG: battleState.randomNumberIndex, endingScores: bestCompletedScores, encounterState: battleStartState.encounterState};
+	battleState.encounterSummary = {hp: battleStartState.battleCharacters[0x80].currentHp, hp2: battleState.battleCharacters[0x80].currentHp, encounter: encounter, characters: battleStartState.battleCharacters, delay: delayCommands, score: scoreStates, dealt: damageDealtStates, taken: damageTakenStates, time: estimatedTimeStates, enemyActions: enemyActions, totalTime: estimatedTimeTotalStates, startIndex: battleStartState.index + 1, preRNG: currentState.randomNumberIndex, startRNG: battleStartState.randomNumberIndex, endingRNG: battleState.randomNumberIndex, endingScores: bestCompletedScores, encounterState: battleStartState.encounterState};
 	return battleState;
 }
 
@@ -4210,6 +4214,7 @@ async function runRoute()
 	let turnCount = 0;
 	let shortBounces = 0;
 	let longBounces = 0;
+	let enemyActions = 0;
 	let times = [];
 	
 	// calculating ideal path using rng values as reference  
@@ -4291,6 +4296,7 @@ async function runRoute()
 						let longBounce = endingSummary.delay[j] < 6 ? 0 : Math.floor(endingSummary.delay[j] / 3);
 						shortBounces += shortBounce;
 						longBounces += longBounce;
+						enemyActions += endingSummary.enemyActions[j];
 						outputLines.push("<tr><td>Round " + (j + 1) + "</td><td>" + (j == 0 && endingSummary.encounterState == EncounterState.Ambushed ? "Enemy Strikes First" : (longBounce + shortBounce == 0 ? "Hold A" : longBounce + " full / " + shortBounce + " short")) + " </td><td>Dealt " + endingSummary.dealt[j] + "</td><td>Taken " + endingSummary.taken[j] + "</td><td></td></tr>");
 					}
 					outputLines.push("<tr></tr>");
@@ -4356,6 +4362,6 @@ async function runRoute()
 		console.log(scoreTracker); 
 		console.log(iterationAbortCount);
 	}
-	document.getElementById('outputSummary').innerHTML = 'TimeTargets: ' + times.join(', ') + '<br />Turns: ' + turnCount + '<br />Short: ' +  shortBounces + '<br />Long: ' +  longBounces;	
+	document.getElementById('outputSummary').innerHTML = 'TimeTargets: ' + times.join(', ') + '<br />Turns: ' + turnCount + '<br />Short: ' +  shortBounces + '<br />Long: ' +  longBounces + '<br />Enemy Actions: ' + enemyActions;	
 	document.getElementById('outputTableBody').innerHTML = outputLines.join('');
 }
