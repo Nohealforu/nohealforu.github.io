@@ -2227,6 +2227,7 @@ BattleState.prototype.improvedEndState = function(battleStartState, redoBattleEn
 var iterationAbortCount;
 var array256NegativeTemplate = Array(256).fill(-999999);
 var array256PositiveTemplate = Array(256).fill(999999);
+var array256ZeroTemplate = Array(256).fill(0);
 
 function runBattle(currentState, encounter, encounterAction, encounterEnemyCounts, redoBattleEndState, redoBattleNextState, rngScores, setDelays)
 {
@@ -2337,7 +2338,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					bestDelay = i;
 					adjustedEncounterAction = currentAction;
 				}
-				scores[i] = {score: battleState.score, delayCommands: null, delay: i, dmg: battleState.damageDealt, lost: battleState.damageTaken, rng: battleState.randomNumberIndex, complete: battleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: battleState, key: battleState.getKey(), status: battleState.battleCharacters[0x80].status, currentHp: battleState.battleCharacters[0x80].currentHp};
+				scores[i] = {score: battleState.score, delayCommands: null, delay: i, dmg: battleState.damageDealt, lost: battleState.damageTaken, rng: battleState.randomNumberIndex, complete: battleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: battleState, key: battleState.getKey(), status: battleState.battleCharacters[0x80].status};
 			}
 			scores.sort((a, b) => b.score - a.score);
 			if(fightLookAhead && !battleComplete && canDelay)
@@ -2498,7 +2499,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					}
 					
 					additionalBattleState.score -= (additionalBattleState.estimatedTime + priorAdditionalBattleState.estimatedTime) * timeScoreFactor;
-					additionalScores[j] = {score: additionalBattleState.score + priorAdditionalBattleState.score, delayCommands: delayCommands.concat(score.delay, j), delay: j, dmg: additionalBattleState.damageDealt + priorAdditionalBattleState.damageDealt, lost: additionalBattleState.damageTaken + priorAdditionalBattleState.damageTaken, rng: additionalBattleState.randomNumberIndex, complete: additionalBattleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: additionalBattleState, key: additionalBattleState.getKey(), status: additionalBattleState.battleCharacters[0x80].status, currentHp: battleState.battleCharacters[0x80].currentHp};
+					additionalScores[j] = {score: additionalBattleState.score + priorAdditionalBattleState.score, delayCommands: delayCommands.concat(score.delay, j), delay: j, dmg: additionalBattleState.damageDealt + priorAdditionalBattleState.damageDealt, lost: additionalBattleState.damageTaken + priorAdditionalBattleState.damageTaken, rng: additionalBattleState.randomNumberIndex, complete: additionalBattleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: additionalBattleState, key: additionalBattleState.getKey(), status: additionalBattleState.battleCharacters[0x80].status};
 				}
 				additionalScores.sort((a, b) => b.score - a.score);
 				for(let j = 0; j < additionalScores.length; j++)
@@ -3913,6 +3914,8 @@ async function runRoute()
 	endingRngValues[startingState.getKey()] = startingState;
 	let endingRNGValuesBestTime = [].concat(array256PositiveTemplate);
 	endingRNGValuesBestTime[startingState.randomNumberIndex] = 0;
+	let endingRNGValuesCurrentHp = [].concat(array256ZeroTemplate);
+	endingRNGValuesCurrentHp[startingState.randomNumberIndex] = testCharacters[0x80].currentHp;
 	let endingRngValuesCount = 1;
 	let backupEndingRngValuesCount = 0;
 	let backup2EndingRngValuesCount = 0;
@@ -4016,6 +4019,7 @@ async function runRoute()
 						rngScores[key] = {startingRng: startRng, endingRng: null, score: -999999, time: null, taken: null, shortBounce: null, longBounce: null};
 					else
 					{
+						startingHp = Math.min(currentState.battleCharacters[0x80].characterData.hp, endingRNGValuesCurrentHp[startRng] + healed);
 						let scoreSum = 0, timeSum = 0, takenSum = 0, shortBounceSum = 0, longBounceSum = 0;
 						let summary = endOfBattleState.encounterSummary;
 						for(let k = 0; k < summary.score.length; k++)
@@ -4040,7 +4044,7 @@ async function runRoute()
 						//else
 						//	scoreSum -= 1000 * damageRatio * damageRatio * (stepsToHeal + 8) * stepsToHeal / 8;
 						scoreSum -= 3000 * ((endOfBattleState.startingEnemies) / (endOfBattleState.minimumEnemies + 1) - 1);*/
-						rngScores[key] = {startingRng: startRng, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, taken: takenSum, totalTaken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum, endingScores: summary.endingScores};
+						rngScores[key] = {startingRng: startRng, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, taken: takenSum, currentHp: startingHp - takenSum, totalTaken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum, endingScores: summary.endingScores};
 						for(let k = 0; k < summary.endingScores.length; k++)
 						{
 							let endScore = summary.endingScores[k];
@@ -4068,6 +4072,8 @@ async function runRoute()
 									backup3EndingRngValues[endScore.key] = endScore.battleState;
 								
 								endingRNGValuesBestTime[endScore.rng] = endScore.battleState.startTime + endScore.battleState.estimatedTime;
+								// is the first score guaranteed to be the one that was calculated as the damage taken in the fight? could have been excluded?
+								endingRNGValuesCurrentHp[endScore.rng] = startingHp - takenSum + summary.endingScores[0].lost - endScore.lost;
 							}
 							endScore.battleState = null; // clear reference so that when we're done memory can be reused.
 						}
@@ -4116,12 +4122,12 @@ async function runRoute()
 					endingRngValues[key].battleCharacters[currentAction.characterSlot].characterData.unequipArmor(currentAction.slot);
 				break;
 			case Action.Heal: // full heal every fight anyway so only for tracking in this loop
-				healed = currentAction.amount;
+				healed += currentAction.amount;
 				if(healed == -1)
 					healed = 999;
 				break;
 			case Action.Burn: // todo: verify this works properly
-				healed = 0 - currentAction.amount;
+				healed -= currentAction.amount;
 				break;
 			case Action.TimeTarget: 
 				//targetTime = currentAction.amount;
