@@ -2243,6 +2243,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 	let damageTakenStates = [];
 	let damageDealtStates = [];
 	let estimatedTimeStates = [];
+	let enemyActions = [];
 	let estimatedTimeTotalStates = [battleStartState.startTime];
 	let priorBattleState = battleStartState;
 	let battleState = battleStartState.newTurn(encounterAction);
