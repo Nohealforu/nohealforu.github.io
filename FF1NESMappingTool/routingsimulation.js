@@ -5,7 +5,7 @@ var damageDealtScoreFactor = 3000; // score adjustment for damage dealt as % of 
 var damageTakenScoreFactor = 6000; // score adjustment for damage taken as % of current hp
 var enemyCountScoreFactor = 2000; // score adjustment per enemy spawned
 var hpGainedScoreFactor = 20000; // score adjustment for hp gained from strong level ups
-var deficitHpScoreFactor = 100; // score penalty for paths taking more than current hp so that adjustments happen
+var deficitHpScoreFactor = 0; // score penalty for paths taking more than current hp so that adjustments happen
 var debugFight = 103; // for easier setting of breakpoints
 var rngValueCheckCount = 10; // number of RNG values minimum before adding additional values 
 var logValues = false; // log information to console, warning: high memory usage, clear console frequently if active
@@ -4016,7 +4016,7 @@ async function runRoute()
 					let endOfBattleState = runBattle(currentState, currentAction.encounter, currentAction.encounterAction, encounterEnemyCounts);
 					
 					if(endOfBattleState.startState)
-						rngScores[key] = {startingRng: startRng, endingRng: null, score: -999999, time: null, taken: null, shortBounce: null, longBounce: null};
+						rngScores[key] = {startingRng: startRng, endingRng: null, score: -999999, time: null, taken: null, totalTaken: 0, shortBounce: null, longBounce: null};
 					else
 					{
 						startingHp = Math.min(currentState.battleCharacters[0x80].characterData.hp, endingRNGValuesCurrentHp[startRng] + healed);
