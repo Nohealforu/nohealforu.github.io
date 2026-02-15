@@ -1,11 +1,13 @@
 const yieldToMain = () => new Promise(resolve => setTimeout(resolve, 0));
 
 var timeScoreFactor = 4; // score adjustment for time taken 
+var priorTimeScoreFactor = 0; // score adjustment for time taken in previous turn for delaying 1 turn after ending fight possible
 var damageDealtScoreFactor = 3000; // score adjustment for damage dealt as % of enemy hp
 var damageTakenScoreFactor = 6000; // score adjustment for damage taken as % of current hp
 var enemyCountScoreFactor = 2000; // score adjustment per enemy spawned
 var hpGainedScoreFactor = 20000; // score adjustment for hp gained from strong level ups
-var deficitHpScoreFactor = 0; // score penalty for paths taking more than current hp so that adjustments happen
+var deficitHpScoreFactor = 0; // score penalty for paths taking more than current hp so that adjustments happens
+var turnScorePenalty = 800; // score penalty for each turn
 var debugFight = 103; // for easier setting of breakpoints
 var rngValueCheckCount = 10; // number of RNG values minimum before adding additional values 
 var logValues = false; // log information to console, warning: high memory usage, clear console frequently if active
@@ -2330,7 +2332,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					}
 				}
 				
-				battleState.score -= battleState.estimatedTime * timeScoreFactor;
+				battleState.score -= turnScorePenalty + battleState.estimatedTime * timeScoreFactor;
 				
 				if(battleState.score > bestScore)
 				{
@@ -2372,7 +2374,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 							additionalBattleState.score -= enemyCountScoreFactor * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
 						}
 						
-						additionalBattleState.score -= additionalBattleState.estimatedTime * timeScoreFactor;
+						additionalBattleState.score -= turnScorePenalty + additionalBattleState.estimatedTime * timeScoreFactor;
 						if(additionalBattleState.score > topNextScore)
 							topNextScore = additionalBattleState.score;
 					}
@@ -2404,7 +2406,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 		}
 		
 		//if(battleState.encounterIndex != 0x7D)
-			battleState.score -= battleState.estimatedTime * timeScoreFactor;
+			battleState.score -= turnScorePenalty + battleState.estimatedTime * timeScoreFactor;
 		
 		if(battleState.score < -20000)
 			battleState.badTurn = true;
@@ -2498,7 +2500,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 						additionalBattleState.score -= enemyCountScoreFactor * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
 					}
 					
-					additionalBattleState.score -= (additionalBattleState.estimatedTime + priorAdditionalBattleState.estimatedTime) * timeScoreFactor;
+					additionalBattleState.score -= turnScorePenalty + additionalBattleState.estimatedTime * timeScoreFactor + priorAdditionalBattleState.estimatedTime * priorTimeScoreFactor;
 					additionalScores[j] = {score: additionalBattleState.score + priorAdditionalBattleState.score, delayCommands: delayCommands.concat(score.delay, j), delay: j, dmg: additionalBattleState.damageDealt + priorAdditionalBattleState.damageDealt, lost: additionalBattleState.damageTaken + priorAdditionalBattleState.damageTaken, rng: additionalBattleState.randomNumberIndex, complete: additionalBattleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: additionalBattleState, key: additionalBattleState.getKey(), status: additionalBattleState.battleCharacters[0x80].status};
 				}
 				additionalScores.sort((a, b) => b.score - a.score);
