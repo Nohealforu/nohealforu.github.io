@@ -1,13 +1,13 @@
 const yieldToMain = () => new Promise(resolve => setTimeout(resolve, 0));
 
 var timeScoreFactor = 4; // score adjustment for time taken 
-var priorTimeScoreFactor = 0; // score adjustment for time taken in previous turn for delaying 1 turn after ending fight possible
+var priorTimeScoreFactor = 1; // score adjustment for time taken in previous turn for delaying 1 turn after ending fight possible
 var damageDealtScoreFactor = 3000; // score adjustment for damage dealt as % of enemy hp
 var damageTakenScoreFactor = 6000; // score adjustment for damage taken as % of current hp
 var enemyCountScoreFactor = 2000; // score adjustment per enemy spawned
 var hpGainedScoreFactor = 20000; // score adjustment for hp gained from strong level ups
-var deficitHpScoreFactor = 0; // score penalty for paths taking more than current hp so that adjustments happens
-var turnScorePenalty = 800; // score penalty for each turn
+var deficitHpScoreFactor = 10; // score penalty for paths taking more than current hp so that adjustments happens
+var turnScorePenalty = 2000; // score penalty for each turn
 var debugFight = 103; // for easier setting of breakpoints
 var rngValueCheckCount = 10; // number of RNG values minimum before adding additional values 
 var logValues = false; // log information to console, warning: high memory usage, clear console frequently if active
