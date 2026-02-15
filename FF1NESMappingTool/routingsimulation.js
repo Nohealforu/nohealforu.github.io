@@ -1,5 +1,7 @@
 const yieldToMain = () => new Promise(resolve => setTimeout(resolve, 0));
 
+const emptyRowString = "<tr><td/><td/><td/><td/><td/></tr>"
+
 var timeScoreFactor = 4; // score adjustment for time taken 
 var priorTimeScoreFactor = 1; // score adjustment for time taken in previous turn for delaying 1 turn after ending fight possible
 var damageDealtScoreFactor = 3000; // score adjustment for damage dealt as % of enemy hp
@@ -4300,7 +4302,7 @@ async function runRoute()
 						enemyActions += endingSummary.enemyActions[j];
 						outputLines.push("<tr><td>Round " + (j + 1) + "</td><td>" + (j == 0 && endingSummary.encounterState == EncounterState.Ambushed ? "Enemy Strikes First" : (longBounce + shortBounce == 0 ? "Hold A" : longBounce + " full / " + shortBounce + " short")) + " </td><td>Dealt " + endingSummary.dealt[j] + "</td><td>Taken " + endingSummary.taken[j] + "</td><td></td></tr>");
 					}
-					outputLines.push("<tr></tr>");
+					outputLines.push(emptyRowString);
 					encounterCount++;
 				}
 				break;
@@ -4309,27 +4311,27 @@ async function runRoute()
 				break;
 			case Action.EquipWeapon:
 				outputLines.push("<tr><td>Equip Weapon</td><td>" + currentState.battleCharacters[currentAction.characterSlot].characterData.name + "</td><td></td><td>" + currentAction.weapon.name + "</td><td></td></tr>");
-				outputLines.push("<tr></tr>");
+				outputLines.push(emptyRowString);
 				currentState.battleCharacters[currentAction.characterSlot].characterData.equipWeapon(currentAction.weapon);
 				break;
 			case Action.UnequipWeapon:
 				outputLines.push("<tr><td>Unequip Weapon</td><td>" + currentState.battleCharacters[currentAction.characterSlot].characterData.name + "</td><td></td><td>" + currentState.battleCharacters[currentAction.characterSlot].characterData.weapon.name + "</td><td></td></tr>");
-				outputLines.push("<tr></tr>");
+				outputLines.push(emptyRowString);
 				currentState.battleCharacters[currentAction.characterSlot].characterData.unequipWeapon();
 				break;
 			case Action.EquipArmor:
 				outputLines.push("<tr><td>Equip Armor</td><td>" + currentState.battleCharacters[currentAction.characterSlot].characterData.name + "</td><td></td><td>" + currentAction.armor.name + "</td><td></td></tr>");
-				outputLines.push("<tr></tr>");
+				outputLines.push(emptyRowString);
 				currentState.battleCharacters[currentAction.characterSlot].characterData.equipArmor(currentAction.armor);
 				break;
 			case Action.UnequipArmor:
 				outputLines.push("<tr><td>Unequip Armor</td><td>" + currentState.battleCharacters[currentAction.characterSlot].characterData.name + "</td><td></td><td>" + currentState.battleCharacters[currentAction.characterSlot].characterData.armor[currentAction.slot].name + "</td><td></td></tr>");
-				outputLines.push("<tr></tr>");
+				outputLines.push(emptyRowString);
 				currentState.battleCharacters[currentAction.characterSlot].characterData.unequipArmor(currentAction.slot);
 				break;
 			case Action.Heal: // might need a heal all or parameter for that
 				outputLines.push("<tr><td>Heal</td><td>" + currentState.battleCharacters[currentAction.characterSlot].characterData.name + "</td><td></td><td>" + (currentAction.amount == -1 ? "Full" : currentAction.amount) + "</td><td></td></tr>");
-				outputLines.push("<tr></tr>");
+				outputLines.push(emptyRowString);
 				currentState.battleCharacters[currentAction.characterSlot].heal(currentAction.amount);
 				break;
 			case Action.Burn: // should hit all characters alive
