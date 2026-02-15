@@ -4163,13 +4163,16 @@ async function runRoute()
 						if(rngScores[key].endingScores[k].currentHp <= rngNextScores[rngScores[key].endingScores[k].key].totalTaken)
 							rngScores[key].endingScores[k].score = -999999;
 						else
+						{
 							rngScores[key].endingScores[k].score += rngNextScores[rngScores[key].endingScores[k].key].score - maxScore;
+							validScoreFound = true;
+						}
 					}
 				}
 				if(!validScoreFound)
 				{
 					console.log('No valid routes');
-					outputProgress.innerHTML = 'No valid routes (likely not enough hp to continue) from fight ' + encounterCount + ' of ' + totalEncounters + '<br />' + 'Formation ' + (currentAction.encounterIndex > 127 ? (currentAction.encounterIndex - 128) + "-2" : currentAction.encounterIndex) + ' ' + encounterInfo;
+					outputProgress.innerHTML = 'No valid routes (likely not enough hp to continue) from fight ' + encounterCount + ' of ' + totalEncounters + '<br />';
 					if(logValues)
 					{
 						console.log(rngScoring);
