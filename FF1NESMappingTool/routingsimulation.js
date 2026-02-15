@@ -1,15 +1,16 @@
 const yieldToMain = () => new Promise(resolve => setTimeout(resolve, 0));
 
-var timeScoreFactor = 4;
-var damageDealtScoreFactor = 3000;
-var damageTakenScoreFactor = 6000;
-var enemyCountScoreFactor = 2000;
-var hpGainedScoreFactor = 20000;
-var debugFight = 103;
-var rngValueCheckCount = 10;
-var logValues = false;
-var fightLookAhead = false;
-var fightLookAheadWidth = 10;
+var timeScoreFactor = 4; // score adjustment for time taken 
+var damageDealtScoreFactor = 3000; // score adjustment for damage dealt as % of enemy hp
+var damageTakenScoreFactor = 6000; // score adjustment for damage taken as % of current hp
+var enemyCountScoreFactor = 2000; // score adjustment per enemy spawned
+var hpGainedScoreFactor = 20000; // score adjustment for hp gained from strong level ups
+var deficitHpScoreFactor = 100; // score penalty for paths taking more than current hp so that adjustments happen
+var debugFight = 103; // for easier setting of breakpoints
+var rngValueCheckCount = 10; // number of RNG values minimum before adding additional values 
+var logValues = false; // log information to console, warning: high memory usage, clear console frequently if active
+var fightLookAhead = false; // look ahead an aditional turn in battle, high processing, currently little benefit if any
+var fightLookAheadWidth = 10; // number of top scores to process for both in battle look ahead (optional) and end of battle look ahead (always on)
 
 const Formation = {
 	small: 0,
@@ -4143,7 +4144,6 @@ async function runRoute()
 		let rngScores = rngScoring[i];
 		let rngNextScores = rngScoring[i + 1];
 		let maxScore = -999999;
-		let validScoreFound = false;
 		healed = healTracker[i + 1];
 		for(let key in rngNextScores)
 			if(rngNextScores[key].score > maxScore)
@@ -4161,12 +4161,7 @@ async function runRoute()
 					else
 					{
 						if(rngScores[key].endingScores[k].currentHp <= rngNextScores[rngScores[key].endingScores[k].key].totalTaken)
-							rngScores[key].endingScores[k].score = -999999;
-						else
-						{
-							rngScores[key].endingScores[k].score += rngNextScores[rngScores[key].endingScores[k].key].score - maxScore;
-							validScoreFound = true;
-						}
+						rngScores[key].endingScores[k].score += rngNextScores[rngScores[key].endingScores[k].key].score - maxScore - Math.max(0, rngNextScores[rngScores[key].endingScores[k].key].totalTaken - rngScores[key].endingScores[k].currentHp) * deficitHpScoreFactor;
 					}
 				}
 				rngScores[key].endingScores.sort((a, b) => b.score - a.score);
@@ -4179,17 +4174,6 @@ async function runRoute()
 				if(rngNextScores[rngScores[key].endingScores[0].key] != null)
 					rngScores[key].totalTaken += rngScores[key].endingScores[0].lost - baseLineTaken + Math.max(rngNextScores[rngScores[key].endingScores[0].key].totalTaken - healed, 0);
 			}
-		}
-		if(!validScoreFound)
-		{
-			console.log('No valid routes');
-			outputProgress.innerHTML = 'No valid routes (likely not enough hp to continue) from fight ' + i + ' of ' + totalEncounters + '<br />';
-			if(logValues)
-			{
-				console.log(rngScoring);
-				console.log(encounterTracker);
-			}
-			return;
 		}
 	}
 	
