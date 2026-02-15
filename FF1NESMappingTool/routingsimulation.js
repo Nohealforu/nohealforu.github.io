@@ -2336,7 +2336,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					bestDelay = i;
 					adjustedEncounterAction = currentAction;
 				}
-				scores[i] = {score: battleState.score, delayCommands: null, delay: i, dmg: battleState.damageDealt, lost: battleState.damageTaken, rng: battleState.randomNumberIndex, complete: battleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: battleState, key: battleState.getKey(), status: battleState.battleCharacters[0x80].status};
+				scores[i] = {score: battleState.score, delayCommands: null, delay: i, dmg: battleState.damageDealt, lost: battleState.damageTaken, rng: battleState.randomNumberIndex, complete: battleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: battleState, key: battleState.getKey(), status: battleState.battleCharacters[0x80].status, currentHp: battleState.battleCharacters[0x80].currentHp};
 			}
 			scores.sort((a, b) => b.score - a.score);
 			if(fightLookAhead && !battleComplete && canDelay)
@@ -2497,7 +2497,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					}
 					
 					additionalBattleState.score -= (additionalBattleState.estimatedTime + priorAdditionalBattleState.estimatedTime) * timeScoreFactor;
-					additionalScores[j] = {score: additionalBattleState.score + priorAdditionalBattleState.score, delayCommands: delayCommands.concat(score.delay, j), delay: j, dmg: additionalBattleState.damageDealt + priorAdditionalBattleState.damageDealt, lost: additionalBattleState.damageTaken + priorAdditionalBattleState.damageTaken, rng: additionalBattleState.randomNumberIndex, complete: additionalBattleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: additionalBattleState, key: additionalBattleState.getKey(), status: additionalBattleState.battleCharacters[0x80].status};
+					additionalScores[j] = {score: additionalBattleState.score + priorAdditionalBattleState.score, delayCommands: delayCommands.concat(score.delay, j), delay: j, dmg: additionalBattleState.damageDealt + priorAdditionalBattleState.damageDealt, lost: additionalBattleState.damageTaken + priorAdditionalBattleState.damageTaken, rng: additionalBattleState.randomNumberIndex, complete: additionalBattleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: additionalBattleState, key: additionalBattleState.getKey(), status: additionalBattleState.battleCharacters[0x80].status, currentHp: battleState.battleCharacters[0x80].currentHp};
 				}
 				additionalScores.sort((a, b) => b.score - a.score);
 				for(let j = 0; j < additionalScores.length; j++)
@@ -4153,12 +4153,29 @@ async function runRoute()
 			{
 				let baseLineScore = rngScores[key].endingScores[0].score;
 				let baseLineTaken = rngScores[key].endingScores[0].lost;
+				let validScoreFound = false;
 				for(let k = 0; k < rngScores[key].endingScores.length; k++)
 				{
 					if(rngNextScores[rngScores[key].endingScores[k].key] == null)
 						rngScores[key].endingScores[k].score = -999999;
 					else
-						rngScores[key].endingScores[k].score += rngNextScores[rngScores[key].endingScores[k].key].score - maxScore;
+					{
+						if(rngScores[key].endingScores[k].currentHp <= rngNextScores[rngScores[key].endingScores[k].key].totalTaken)
+							rngScores[key].endingScores[k].score = -999999;
+						else
+							rngScores[key].endingScores[k].score += rngNextScores[rngScores[key].endingScores[k].key].score - maxScore;
+					}
+				}
+				if(!validScoreFound)
+				{
+					console.log('No valid routes');
+					outputProgress.innerHTML = 'No valid routes (likely not enough hp to continue) from fight ' + encounterCount + ' of ' + totalEncounters + '<br />' + 'Formation ' + (currentAction.encounterIndex > 127 ? (currentAction.encounterIndex - 128) + "-2" : currentAction.encounterIndex) + ' ' + encounterInfo;
+					if(logValues)
+					{
+						console.log(rngScoring);
+						console.log(encounterTracker);
+					}
+					return;
 				}
 				rngScores[key].endingScores.sort((a, b) => b.score - a.score);
 				rngScores[key].score += rngScores[key].endingScores[0].score - baseLineScore;
