@@ -4143,6 +4143,7 @@ async function runRoute()
 		let rngScores = rngScoring[i];
 		let rngNextScores = rngScoring[i + 1];
 		let maxScore = -999999;
+		let validScoreFound = false;
 		healed = healTracker[i + 1];
 		for(let key in rngNextScores)
 			if(rngNextScores[key].score > maxScore)
@@ -4153,7 +4154,6 @@ async function runRoute()
 			{
 				let baseLineScore = rngScores[key].endingScores[0].score;
 				let baseLineTaken = rngScores[key].endingScores[0].lost;
-				let validScoreFound = false;
 				for(let k = 0; k < rngScores[key].endingScores.length; k++)
 				{
 					if(rngNextScores[rngScores[key].endingScores[k].key] == null)
@@ -4169,17 +4169,6 @@ async function runRoute()
 						}
 					}
 				}
-				if(!validScoreFound)
-				{
-					console.log('No valid routes');
-					outputProgress.innerHTML = 'No valid routes (likely not enough hp to continue) from fight ' + encounterCount + ' of ' + totalEncounters + '<br />';
-					if(logValues)
-					{
-						console.log(rngScoring);
-						console.log(encounterTracker);
-					}
-					return;
-				}
 				rngScores[key].endingScores.sort((a, b) => b.score - a.score);
 				rngScores[key].score += rngScores[key].endingScores[0].score - baseLineScore;
 				rngScores[key].endingRng = rngScores[key].endingScores[0].rng;
@@ -4190,6 +4179,17 @@ async function runRoute()
 				if(rngNextScores[rngScores[key].endingScores[0].key] != null)
 					rngScores[key].totalTaken += rngScores[key].endingScores[0].lost - baseLineTaken + Math.max(rngNextScores[rngScores[key].endingScores[0].key].totalTaken - healed, 0);
 			}
+		}
+		if(!validScoreFound)
+		{
+			console.log('No valid routes');
+			outputProgress.innerHTML = 'No valid routes (likely not enough hp to continue) from fight ' + encounterCount + ' of ' + totalEncounters + '<br />';
+			if(logValues)
+			{
+				console.log(rngScoring);
+				console.log(encounterTracker);
+			}
+			return;
 		}
 	}
 	
