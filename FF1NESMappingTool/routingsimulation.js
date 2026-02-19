@@ -4325,15 +4325,23 @@ async function runRoute()
 				let encounterEnemyCounts = allEncounterEnemyCounts[encounterCount];
 				outputProgress.innerHTML = 'Validating Encounter ' + encounterCount + ' of ' + totalEncounters;
 				await yieldToMain();
-				let endingScores = rngScoring[encounterCount][currentState.getKey()].endingScores;
+				let rngScore = rngScoring[encounterCount][currentState.getKey()];
+				let endingScores = rngScore.endingScores;
 				let bestScore = 0;
 				if(optimizePass)
 				{
+					let baseLineTaken = endingScores[0].lost;
+					let baseLineTime = endingScores[0].time;
+					let rngNextScores = rngScoring[encounterCount + 1];
 					for(let j = 0, lowestTime = 999999; j < endingScores.length; j++)
 					{
-						if(currentState.battleCharacters[0x80].currentHp > endingScores[j].totalTaken && endingScores[j].futureTime < lowestTime)
+						let endingScore = endingScores[j];
+						if(endingScore.score < -900000)
+							continue;
+						let rngNextScore = rngNextScores[endingScore.key];
+						if(currentState.battleCharacters[0x80].currentHp > rngNextScore.totalTaken + endingScore.lost - baseLineTaken && rngNextScore.futureTime + endingScore.time - baseLineTime < lowestTime)
 						{
-							lowestTime = endingScores[j].futureTime;
+							lowestTime = endingScore.futureTime;
 							bestScore = j;
 						}
 					}
