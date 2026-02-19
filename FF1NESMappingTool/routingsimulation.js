@@ -5,10 +5,10 @@ const emptyRowString = "<tr><td/><td/><td/><td/><td/></tr>"
 var timeScoreFactor = 4; // score adjustment for time taken 
 var priorTimeScoreFactor = 1; // score adjustment for time taken in previous turn for delaying 1 turn after ending fight possible
 var damageDealtScoreFactor = 3000; // score adjustment for damage dealt as % of enemy hp
-var damageTakenScoreFactor = 6000; // score adjustment for damage taken as % of current hp
+var damageTakenScoreFactor = 12000; // score adjustment for damage taken as % of current hp
 var enemyCountScoreFactor = 2000; // score adjustment per enemy spawned
 var hpGainedScoreFactor = 20000; // score adjustment for hp gained from strong level ups
-var deficitHpScoreFactor = 10; // score penalty for paths taking more than current hp so that adjustments happens
+var deficitHpScoreFactor = 0; // score penalty for paths taking more than current hp so that adjustments happens
 var innRatioAdd = 8; // adjustment based on distance to inn (fights+add)*fights/divisor
 var innRatioDivisor = 0; // adjustment based on distance to inn
 var turnScorePenalty = 2000; // score penalty for each turn
@@ -17,7 +17,7 @@ var rngValueCheckCount = 10; // number of RNG values minimum before adding addit
 var logValues = false; // log information to console, warning: high memory usage, clear console frequently if active
 var fightLookAhead = false; // look ahead an aditional turn in battle, high processing, currently little benefit if any
 var fightLookAheadWidth = 10; // number of top scores to process for both in battle look ahead (optional) and end of battle look ahead (always on)
-var optimizePass = false; // sort scores by time on run and check current hp vs. damage taken
+var optimizePass = true; // sort scores by time on run and check current hp vs. damage taken
 
 const Formation = {
 	small: 0,
@@ -2561,7 +2561,7 @@ function RouteAction(actionString)
 				this.action = Action.Encounter;
 				let formation = splitAction[1].split(/-/);
 				this.encounterIndex = (parseInt(formation[0]) || 0) + (formation[1] == 2 ? 128 : 0);
-				this.encounterDanger = (parseInt(splitAction[2]) || 3);
+				this.encounterDanger = (parseFloat(splitAction[2]) || 3);
 				this.encounterHPBudget = (parseInt(splitAction[3]) || 0);
 				let encounterAction = splitAction[4];
 				if (encounterAction == 'Bane')
