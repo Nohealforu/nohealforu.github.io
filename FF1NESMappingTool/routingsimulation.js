@@ -3916,7 +3916,7 @@ async function runRoute()
 	}
 	
 	console.log("Calculating Good RNG seeds...");
-	let totalEncounters = encounterCount;
+	let totalEncounters = encounterCount - 1;
 	encounterCount = 0;
 	let endingRngValues = {};
 	let allEncounterEnemyCounts = Array(encounterCount);
@@ -4328,7 +4328,7 @@ async function runRoute()
 				let rngScore = rngScoring[encounterCount][currentState.getKey()];
 				let endingScores = rngScore.endingScores;
 				let bestScore = 0;
-				if(optimizePass)
+				if(optimizePass && encounterCount < totalEncounters)
 				{
 					let baseLineTaken = endingScores[0].lost;
 					let baseLineTime = endingScores[0].time;
