@@ -4061,7 +4061,7 @@ async function runRoute()
 							let endScore = summary.endingScores[k];
 							if(endingRNGValuesBestTime[endScore.rng] > endScore.time)
 							{
-								battleState.startTime = endScore.time;
+								endScore.battleState.startTime = endScore.time;
 								if(endScore.status == 0 && currentAction.encounter.next && minimumEnemies == endScore.enemies && minimumExp == encounterEnemyCounts[endScore.rng].expValue)
 								{
 									if(endingRngValues[endScore.key] == null)
