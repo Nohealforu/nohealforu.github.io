@@ -4053,7 +4053,7 @@ async function runRoute()
 						//else
 						//	scoreSum -= 1000 * damageRatio * damageRatio * (stepsToHeal + 8) * stepsToHeal / 8;
 						scoreSum -= 3000 * ((endOfBattleState.startingEnemies) / (endOfBattleState.minimumEnemies + 1) - 1);*/
-						rngScores[key] = {startingRng: startRng, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, taken: takenSum, startingHp: startingHp, totalTaken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum, endingScores: summary.endingScores};
+						rngScores[key] = {startingRng: startRng, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, taken: takenSum, maxHp: currentState.battleCharacters[0x80].characterData.hp, startingHp: startingHp, totalTaken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum, endingScores: summary.endingScores};
 						for(let k = 0; k < summary.endingScores.length; k++)
 						{
 							let endScore = summary.endingScores[k];
@@ -4174,7 +4174,7 @@ async function runRoute()
 					if(rngNextScores[rngScores[key].endingScores[k].key] == null)
 						rngScores[key].endingScores[k].score = -999999;
 					else
-						rngScores[key].endingScores[k].score += rngNextScores[rngScores[key].endingScores[k].key].score - maxScore - Math.max(0, rngNextScores[rngScores[key].endingScores[k].key].totalTaken - rngScores[key].startingHp) * deficitHpScoreFactor;
+						rngScores[key].endingScores[k].score += rngNextScores[rngScores[key].endingScores[k].key].score - maxScore;
 				}
 				rngScores[key].endingScores.sort((a, b) => b.score - a.score);
 				rngScores[key].score += rngScores[key].endingScores[0].score - baseLineScore;
@@ -4184,7 +4184,88 @@ async function runRoute()
 				// trying to get the difference in last round damage if it changed due to score adjustments to a new rng Number
 				// and then adding in damage taken from the next battle + battles after, adjusted by healing amounts
 				if(rngNextScores[rngScores[key].endingScores[0].key] != null)
+				{
+					rngScores[key].taken += rngScores[key].endingScores[0].lost - baseLineTaken;
 					rngScores[key].totalTaken += rngScores[key].endingScores[0].lost - baseLineTaken + Math.max(rngNextScores[rngScores[key].endingScores[0].key].totalTaken - healed, 0);
+				}
+			}
+		}
+	}
+	
+	console.log("Hp score adjustment...");
+	
+	endingRNGValuesCurrentHp[startingState.randomNumberIndex] = testCharacters[0x80].currentHp;
+	endingRNGValuesBestTime[startingState.randomNumberIndex] = 0;
+	
+	// adjust starting hp
+	for(let i = 0; i < encounterCount; i++)
+	{
+		outputProgress.innerHTML = 'Adjusting Starting HP for encounter ' + i + ' of ' + totalEncounters;
+		await yieldToMain();
+
+		if(i == debugFight)
+			debugFight = i;
+		let rngScores = rngScoring[i];
+		healed = healTracker[i];
+		endingRNGValuesBestTime = [].concat(array256PositiveTemplate);
+		
+		for(let key in rngScores)
+		{
+			if(rngScores[key].endingRng != null)
+			{
+				rngScores[key].startingHp = Math.min(rngScores[key].maxHp, endingRNGValuesCurrentHp[rngScores[key].startingRng] + healed);
+				for(let k = 0; k < rngScores[key].endingScores.length; k++)
+				{
+					let endScore = rngScores[key].endingScores[k];
+					if(endingRNGValuesBestTime[endScore.rng] > endScore.battleState.startTime + endScore.battleState.estimatedTime)
+					{
+						endingRNGValuesBestTime[endScore.rng] = endScore.battleState.startTime + endScore.battleState.estimatedTime;
+						endingRNGValuesCurrentHp[endScore.rng] = rngScores[key].startingHp - rngScores[key].taken + rngScores[key].endingScores[0].lost - endScore.lost;
+					}
+				}
+			}
+		}
+	}
+	
+	// adjust ending scores for hp 
+	for(let i = encounterCount - 2; i >= 0; i--)
+	{
+		outputProgress.innerHTML = 'Adjusting HP Scores for encounter ' + i + ' of ' + totalEncounters;
+		await yieldToMain();
+		if(i == debugFight)
+			debugFight = i;
+		let rngScores = rngScoring[i];
+		let rngNextScores = rngScoring[i + 1];
+		let maxScore = -999999;
+		healed = healTracker[i + 1];
+		for(let key in rngNextScores)
+			if(rngNextScores[key].score > maxScore)
+				maxScore = rngNextScores[key].score;
+		for(let key in rngScores)
+		{
+			if(rngScores[key].endingRng != null)
+			{
+				let baseLineScore = rngScores[key].endingScores[0].score;
+				let baseLineTaken = rngScores[key].endingScores[0].lost;
+				for(let k = 0; k < rngScores[key].endingScores.length; k++)
+				{
+					if(rngNextScores[rngScores[key].endingScores[k].key] == null)
+						rngScores[key].endingScores[k].score = -999999;
+					else
+						rngScores[key].endingScores[k].score += Math.max(0, rngNextScores[rngScores[key].endingScores[k].key].totalTaken - rngScores[key].startingHp) * deficitHpScoreFactor;
+				}
+				rngScores[key].endingScores.sort((a, b) => b.score - a.score);
+				rngScores[key].score += rngScores[key].endingScores[0].score - baseLineScore;
+				rngScores[key].endingRng = rngScores[key].endingScores[0].rng;
+				// rngscores.endingscores.lost is only last round damage
+				// rngscores.totaltaken is whole fight Damage
+				// trying to get the difference in last round damage if it changed due to score adjustments to a new rng Number
+				// and then adding in damage taken from the next battle + battles after, adjusted by healing amounts
+				if(rngNextScores[rngScores[key].endingScores[0].key] != null)
+				{
+					rngScores[key].taken += rngScores[key].endingScores[0].lost - baseLineTaken;
+					rngScores[key].totalTaken += rngScores[key].endingScores[0].lost - baseLineTaken + Math.max(rngNextScores[rngScores[key].endingScores[0].key].totalTaken - healed, 0);
+				}
 			}
 		}
 	}
