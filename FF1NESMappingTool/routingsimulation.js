@@ -3987,23 +3987,23 @@ async function runRoute()
 				{
 					if(backupEndingRngValuesCount > 0)
 						for(let key in backupEndingRngValues)
-							if(endingRngValues[key] == null || (backupEndingRngValues[key].startTime + backupEndingRngValues[key].estimatedTime < endingRngValues[key].startTime + endingRngValues[key].estimatedTime))
+							if(endingRngValues[key] == null || (backupEndingRngValues[key].startTime < endingRngValues[key].startTime))
 								endingRngValues[key] = backupEndingRngValues[key];
 					if(endingRngValuesCount + backupEndingRngValuesCount < rngValueCheckCount)
 					{
 						if(backup2EndingRngValuesCount > 0)
 							for(let key in backup2EndingRngValues)
-								if(endingRngValues[key] == null || (backup2EndingRngValues[key].startTime + backup2EndingRngValues[key].estimatedTime < endingRngValues[key].startTime + endingRngValues[key].estimatedTime))
+								if(endingRngValues[key] == null || (backup2EndingRngValues[key].startTime < endingRngValues[key].startTime))
 									endingRngValues[key] = backup2EndingRngValues[key];
 						if(backup2EndingRngValuesCount == 0 && backup3EndingRngValues != null)
 							for(let key in backup3EndingRngValues)
-								if(endingRngValues[key] == null || (backup3EndingRngValues[key].startTime + backup3EndingRngValues[key].estimatedTime < endingRngValues[key].startTime + endingRngValues[key].estimatedTime))
+								if(endingRngValues[key] == null || (backup3EndingRngValues[key].startTime < endingRngValues[key].startTime))
 									endingRngValues[key] = backup3EndingRngValues[key];
 					}
 				}
 				let matchingKeys = 0;
 				for(let key in endingRngValues)
-					if(endingRngValues[key].startTime + endingRngValues[key].estimatedTime == endingRNGValuesBestTime[endingRngValues[key].randomNumberIndex])
+					if(endingRngValues[key].startTime == endingRNGValuesBestTime[endingRngValues[key].randomNumberIndex])
 						{possibleStartingRngValues[key] = endingRngValues[key]; matchingKeys++;}
 				if(logValues)
 					console.log(matchingKeys);
@@ -4063,7 +4063,7 @@ async function runRoute()
 							let endScore = summary.endingScores[k];
 							if(endingRNGValuesBestTime[endScore.rng] > endScore.time)
 							{
-								//endScore.battleState.startTime = endScore.time;
+								endScore.battleState.startTime = endScore.time;
 								if(endScore.status == 0 && currentAction.encounter.next && minimumEnemies == endScore.enemies && minimumExp == encounterEnemyCounts[endScore.rng].expValue)
 								{
 									if(endingRngValues[endScore.key] == null)
