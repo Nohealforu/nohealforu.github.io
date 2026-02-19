@@ -2345,7 +2345,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					bestDelay = i;
 					adjustedEncounterAction = currentAction;
 				}
-				scores[i] = {score: battleState.score, delayCommands: null, delay: i, dmg: battleState.damageDealt, lost: battleState.damageTaken, rng: battleState.randomNumberIndex, complete: battleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: battleState, key: battleState.getKey(), status: battleState.battleCharacters[0x80].status};
+				scores[i] = {score: battleState.score, time: battleState.startTime + battleState.estimatedTime, delayCommands: null, delay: i, dmg: battleState.damageDealt, lost: battleState.damageTaken, rng: battleState.randomNumberIndex, complete: battleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: battleState, key: battleState.getKey(), status: battleState.battleCharacters[0x80].status};
 			}
 			scores.sort((a, b) => b.score - a.score);
 			if(fightLookAhead && !battleComplete && canDelay)
@@ -2507,7 +2507,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					}
 					
 					additionalBattleState.score -= turnScorePenalty + additionalBattleState.estimatedTime * timeScoreFactor + priorAdditionalBattleState.estimatedTime * priorTimeScoreFactor;
-					additionalScores[j] = {score: additionalBattleState.score + priorAdditionalBattleState.score, delayCommands: delayCommands.concat(score.delay, j), delay: j, dmg: additionalBattleState.damageDealt + priorAdditionalBattleState.damageDealt, lost: additionalBattleState.damageTaken + priorAdditionalBattleState.damageTaken, rng: additionalBattleState.randomNumberIndex, complete: additionalBattleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: additionalBattleState, key: additionalBattleState.getKey(), status: additionalBattleState.battleCharacters[0x80].status};
+					additionalScores[j] = {score: additionalBattleState.score + priorAdditionalBattleState.score, time: additionalBattleState.startTime + additionalBattleState.estimatedTime, delayCommands: delayCommands.concat(score.delay, j), delay: j, dmg: additionalBattleState.damageDealt + priorAdditionalBattleState.damageDealt, lost: additionalBattleState.damageTaken + priorAdditionalBattleState.damageTaken, rng: additionalBattleState.randomNumberIndex, complete: additionalBattleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: additionalBattleState, key: additionalBattleState.getKey(), status: additionalBattleState.battleCharacters[0x80].status};
 				}
 				additionalScores.sort((a, b) => b.score - a.score);
 				for(let j = 0; j < additionalScores.length; j++)
@@ -4057,7 +4057,7 @@ async function runRoute()
 						for(let k = 0; k < summary.endingScores.length; k++)
 						{
 							let endScore = summary.endingScores[k];
-							if(endingRNGValuesBestTime[endScore.rng] > endScore.battleState.startTime + endScore.battleState.estimatedTime)
+							if(endingRNGValuesBestTime[endScore.rng] > endScore.time)
 							{
 								if(endScore.status == 0 && currentAction.encounter.next && minimumEnemies == endScore.enemies && minimumExp == encounterEnemyCounts[endScore.rng].expValue)
 								{
@@ -4080,7 +4080,7 @@ async function runRoute()
 								else if(endScore.status == 0 && currentAction.encounter.next)
 									backup3EndingRngValues[endScore.key] = endScore.battleState;
 								
-								endingRNGValuesBestTime[endScore.rng] = endScore.battleState.startTime + endScore.battleState.estimatedTime;
+								endingRNGValuesBestTime[endScore.rng] = endScore.time;
 								// is the first score guaranteed to be the one that was calculated as the damage taken in the fight? could have been excluded?
 								endingRNGValuesCurrentHp[endScore.rng] = startingHp - takenSum + summary.endingScores[0].lost - endScore.lost;
 							}
@@ -4217,9 +4217,9 @@ async function runRoute()
 				for(let k = 0; k < rngScores[key].endingScores.length; k++)
 				{
 					let endScore = rngScores[key].endingScores[k];
-					if(endingRNGValuesBestTime[endScore.rng] > endScore.battleState.startTime + endScore.battleState.estimatedTime)
+					if(endingRNGValuesBestTime[endScore.rng] > endScore.time)
 					{
-						endingRNGValuesBestTime[endScore.rng] = endScore.battleState.startTime + endScore.battleState.estimatedTime;
+						endingRNGValuesBestTime[endScore.rng] = endScore.time;
 						endingRNGValuesCurrentHp[endScore.rng] = rngScores[key].startingHp - rngScores[key].taken + rngScores[key].endingScores[0].lost - endScore.lost;
 					}
 				}
