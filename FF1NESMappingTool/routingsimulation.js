@@ -2561,7 +2561,7 @@ function RouteAction(actionString)
 				this.action = Action.Encounter;
 				let formation = splitAction[1].split(/-/);
 				this.encounterIndex = (parseInt(formation[0]) || 0) + (formation[1] == 2 ? 128 : 0);
-				this.encounterDanger = (parseFloat(splitAction[2]) || 3);
+				this.encounterDanger = (parseInt(splitAction[2]) || 3);
 				this.encounterHPBudget = (parseInt(splitAction[3]) || 0);
 				let encounterAction = splitAction[4];
 				if (encounterAction == 'Bane')
