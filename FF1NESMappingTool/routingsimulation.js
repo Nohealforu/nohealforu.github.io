@@ -4001,10 +4001,12 @@ async function runRoute()
 									endingRngValues[key] = backup3EndingRngValues[key];
 					}
 				}
-				
+				let matchingKeys = 0;
 				for(let key in endingRngValues)
 					if(endingRngValues[key].startTime == endingRNGValuesBestTime[endingRngValues[key].randomNumberIndex])
-						possibleStartingRngValues[key] = endingRngValues[key];
+						{possibleStartingRngValues[key] = endingRngValues[key]; matchingKeys++;}
+				if(logValues)
+					console.log(matchingKeys);
 				endingRngValues = {};
 				endingRngValuesCount = 0;
 				backupEndingRngValuesCount = 0;
