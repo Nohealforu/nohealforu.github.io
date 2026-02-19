@@ -17,6 +17,7 @@ var rngValueCheckCount = 10; // number of RNG values minimum before adding addit
 var logValues = false; // log information to console, warning: high memory usage, clear console frequently if active
 var fightLookAhead = false; // look ahead an aditional turn in battle, high processing, currently little benefit if any
 var fightLookAheadWidth = 10; // number of top scores to process for both in battle look ahead (optional) and end of battle look ahead (always on)
+var optimizePass = false; // sort scores by time on run and check current hp vs. damage taken
 
 const Formation = {
 	small: 0,
@@ -4001,12 +4002,9 @@ async function runRoute()
 									endingRngValues[key] = backup3EndingRngValues[key];
 					}
 				}
-				let matchingKeys = 0;
 				for(let key in endingRngValues)
 					if(endingRngValues[key].startTime == endingRNGValuesBestTime[endingRngValues[key].randomNumberIndex])
-						{possibleStartingRngValues[key] = endingRngValues[key]; matchingKeys++;}
-				if(logValues)
-					console.log(matchingKeys);
+						possibleStartingRngValues[key] = endingRngValues[key];
 				endingRngValues = {};
 				endingRngValuesCount = 0;
 				backupEndingRngValuesCount = 0;
@@ -4057,7 +4055,7 @@ async function runRoute()
 						//else
 						//	scoreSum -= 1000 * damageRatio * damageRatio * (stepsToHeal + 8) * stepsToHeal / 8;
 						scoreSum -= 3000 * ((endOfBattleState.startingEnemies) / (endOfBattleState.minimumEnemies + 1) - 1);*/
-						rngScores[key] = {startingRng: startRng, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, taken: takenSum, maxHp: currentState.battleCharacters[0x80].characterData.hp, startingHp: startingHp, totalTaken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum, endingScores: summary.endingScores};
+						rngScores[key] = {startingRng: startRng, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, futureTime: timeSum, taken: takenSum, maxHp: currentState.battleCharacters[0x80].characterData.hp, startingHp: startingHp, totalTaken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum, endingScores: summary.endingScores};
 						for(let k = 0; k < summary.endingScores.length; k++)
 						{
 							let endScore = summary.endingScores[k];
@@ -4174,6 +4172,7 @@ async function runRoute()
 			{
 				let baseLineScore = rngScores[key].endingScores[0].score;
 				let baseLineTaken = rngScores[key].endingScores[0].lost;
+				let baseLineTime = rngScores[key].endingScores[0].time;
 				for(let k = 0; k < rngScores[key].endingScores.length; k++)
 				{
 					if(rngNextScores[rngScores[key].endingScores[k].key] == null)
@@ -4192,6 +4191,8 @@ async function runRoute()
 				{
 					rngScores[key].taken += rngScores[key].endingScores[0].lost - baseLineTaken;
 					rngScores[key].totalTaken += rngScores[key].endingScores[0].lost - baseLineTaken + Math.max(rngNextScores[rngScores[key].endingScores[0].key].totalTaken - healed, 0);
+					rngScores[key].time +=  rngScores[key].endingScores[0].time - baseLineTime;
+					rngScores[key].futureTime += rngScores[key].endingScores[0].time - baseLineTime;
 				}
 			}
 		}
@@ -4247,6 +4248,7 @@ async function runRoute()
 			{
 				let baseLineScore = rngScores[key].endingScores[0].score;
 				let baseLineTaken = rngScores[key].endingScores[0].lost;
+				let baseLineTime = rngScores[key].endingScores[0].time;
 				for(let k = 0; k < rngScores[key].endingScores.length; k++)
 				{
 					if(rngNextScores[rngScores[key].endingScores[k].key] == null)
@@ -4265,6 +4267,8 @@ async function runRoute()
 				{
 					rngScores[key].taken += rngScores[key].endingScores[0].lost - baseLineTaken;
 					rngScores[key].totalTaken += rngScores[key].endingScores[0].lost - baseLineTaken;
+					rngScores[key].time +=  rngScores[key].endingScores[0].time - baseLineTime;
+					rngScores[key].futureTime += rngNextScores[rngScores[key].endingScores[0].key].futureTime + rngScores[key].endingScores[0].time - baseLineTime;
 				}
 			}
 		}
@@ -4321,7 +4325,22 @@ async function runRoute()
 				let encounterEnemyCounts = allEncounterEnemyCounts[encounterCount];
 				outputProgress.innerHTML = 'Validating Encounter ' + encounterCount + ' of ' + totalEncounters;
 				await yieldToMain();
-				let endOfBattleState = runBattle(currentState, currentAction.encounter, currentAction.encounterAction, encounterEnemyCounts, redoBattle ? endingBattleStates[encounterCount] : null, redoBattle ? startingBattleStates[encounterCount + 1] : null, rngScoring[encounterCount + 1], rngScoring[encounterCount][currentState.getKey()].endingScores[0].delayCommands);
+				let endingScores = rngScoring[encounterCount][currentState.getKey()].endingScores;
+				let bestScore = 0;
+				if(optimizePass)
+				{
+					for(let j = 0, lowestTime = 999999; j < endingScores.length; j++)
+					{
+						if(currentState.battleCharacters[0x80].currentHp > endingScores[j].totalTaken && endingScores[j].futureTime < lowestTime)
+						{
+							lowestTime = endingScores[j].futureTime;
+							bestScore = j;
+						}
+					}
+				}
+				
+				let delayCommands = endingScores[bestScore].delayCommands;
+				let endOfBattleState = runBattle(currentState, currentAction.encounter, currentAction.encounterAction, encounterEnemyCounts, redoBattle ? endingBattleStates[encounterCount] : null, redoBattle ? startingBattleStates[encounterCount + 1] : null, rngScoring[encounterCount + 1], delayCommands);
 				//targetTime = null;
 				
 				if(endOfBattleState.startState) // if the battle failed, go backwards to the previous battle
