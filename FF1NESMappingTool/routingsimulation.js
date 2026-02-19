@@ -10,7 +10,7 @@ var enemyCountScoreFactor = 2000; // score adjustment per enemy spawned
 var hpGainedScoreFactor = 20000; // score adjustment for hp gained from strong level ups
 var deficitHpScoreFactor = 10; // score penalty for paths taking more than current hp so that adjustments happens
 var innRatioAdd = 8; // adjustment based on distance to inn (fights+add)*fights/divisor
-var innRatioDivisor = 64; // adjustment based on distance to inn
+var innRatioDivisor = 0; // adjustment based on distance to inn
 var turnScorePenalty = 2000; // score penalty for each turn
 var debugFight = 103; // for easier setting of breakpoints
 var rngValueCheckCount = 10; // number of RNG values minimum before adding additional values 
@@ -2261,7 +2261,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 	let scores;
 	let dangerRatio = encounter.danger / 3 || 1;
 	let nextDangerRatio = encounter.next?.encounterDanger / 3 || 1;
-	let damageTakenRatio = 1; //(encounter.stepsToHeal + innRatioAdd) * encounter.stepsToHeal / innRatioDivisor;
+	let damageTakenRatio = (innRatioDivisor == 0 ? 1 : (encounter.stepsToHeal + innRatioAdd) * encounter.stepsToHeal / innRatioDivisor);
 	
 	do 
 	{
