@@ -4003,7 +4003,7 @@ async function runRoute()
 				}
 				
 				for(let key in endingRngValues)
-					if(endingRngValues[key].startTime + endingRngValues[key].estimatedTime == endingRNGValuesBestTime[endingRngValues[key].randomNumberIndex])
+					if(endingRngValues[key].startTime == endingRNGValuesBestTime[endingRngValues[key].randomNumberIndex])
 						possibleStartingRngValues[key] = endingRngValues[key];
 				endingRngValues = {};
 				endingRngValuesCount = 0;
@@ -4061,6 +4061,7 @@ async function runRoute()
 							let endScore = summary.endingScores[k];
 							if(endingRNGValuesBestTime[endScore.rng] > endScore.time)
 							{
+								battleState.startTime = endScore.time;
 								if(endScore.status == 0 && currentAction.encounter.next && minimumEnemies == endScore.enemies && minimumExp == encounterEnemyCounts[endScore.rng].expValue)
 								{
 									if(endingRngValues[endScore.key] == null)
