@@ -8,7 +8,7 @@ var damageDealtScoreFactor = 3000; // score adjustment for damage dealt as % of 
 var damageTakenScoreFactor = 6000; // score adjustment for damage taken as % of current hp
 var enemyCountScoreFactor = 2000; // score adjustment per enemy spawned
 var hpGainedScoreFactor = 20000; // score adjustment for hp gained from strong level ups
-var deficitHpScoreFactor = 10; // score penalty for paths taking more than current hp so that adjustments happens
+var deficitHpScoreFactor = 100; // score penalty for paths taking more than current hp so that adjustments happens
 var turnScorePenalty = 2000; // score penalty for each turn
 var debugFight = 103; // for easier setting of breakpoints
 var rngValueCheckCount = 10; // number of RNG values minimum before adding additional values 
@@ -2413,7 +2413,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 		//if(battleState.encounterIndex != 0x7D)
 			battleState.score -= turnScorePenalty + battleState.estimatedTime * timeScoreFactor;
 		
-		if(battleState.score < -20000)
+		if(battleState.score < -20000 && setDelays == null)
 			battleState.badTurn = true;
 		
 		if(battleState.battleComplete && redoBattle && battleState.score < -20000)
@@ -4236,11 +4236,6 @@ async function runRoute()
 			debugFight = i;
 		let rngScores = rngScoring[i];
 		let rngNextScores = rngScoring[i + 1];
-		let maxScore = -999999;
-		healed = healTracker[i + 1];
-		for(let key in rngNextScores)
-			if(rngNextScores[key].score > maxScore)
-				maxScore = rngNextScores[key].score;
 		for(let key in rngScores)
 		{
 			if(rngScores[key].endingRng != null)
