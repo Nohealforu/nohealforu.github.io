@@ -4339,7 +4339,7 @@ async function runRoute()
 						if(endingScore.score < -900000)
 							continue;
 						let rngNextScore = rngNextScores[endingScore.key];
-						if(currentState.battleCharacters[0x80].currentHp > rngNextScore.totalTaken + endingScore.lost - baseLineTaken && rngNextScore.futureTime + endingScore.time - baseLineTime < lowestTime)
+						if(currentState.battleCharacters[0x80].currentHp > rngScore.taken + rngNextScore.totalTaken + endingScore.lost - baseLineTaken && rngNextScore.futureTime + endingScore.time - baseLineTime < lowestTime)
 						{
 							lowestTime = rngNextScore.futureTime + endingScore.time - baseLineTime;
 							bestScore = j;
