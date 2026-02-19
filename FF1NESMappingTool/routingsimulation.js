@@ -4341,7 +4341,7 @@ async function runRoute()
 						let rngNextScore = rngNextScores[endingScore.key];
 						if(currentState.battleCharacters[0x80].currentHp > rngNextScore.totalTaken + endingScore.lost - baseLineTaken && rngNextScore.futureTime + endingScore.time - baseLineTime < lowestTime)
 						{
-							lowestTime = endingScore.futureTime;
+							lowestTime = rngNextScore.futureTime + endingScore.time - baseLineTime;
 							bestScore = j;
 						}
 					}
