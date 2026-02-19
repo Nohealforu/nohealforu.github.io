@@ -4252,7 +4252,7 @@ async function runRoute()
 					if(rngNextScores[rngScores[key].endingScores[k].key] == null)
 						rngScores[key].endingScores[k].score = -999999;
 					else
-						rngScores[key].endingScores[k].score += Math.max(0, rngNextScores[rngScores[key].endingScores[k].key].totalTaken - rngScores[key].startingHp) * deficitHpScoreFactor;
+						rngScores[key].endingScores[k].score += Math.min(0, rngScores[key].startingHp - rngNextScores[rngScores[key].endingScores[k].key].totalTaken) * deficitHpScoreFactor;
 				}
 				rngScores[key].endingScores.sort((a, b) => b.score - a.score);
 				rngScores[key].score += rngScores[key].endingScores[0].score - baseLineScore;
@@ -4264,7 +4264,7 @@ async function runRoute()
 				if(rngNextScores[rngScores[key].endingScores[0].key] != null)
 				{
 					rngScores[key].taken += rngScores[key].endingScores[0].lost - baseLineTaken;
-					rngScores[key].totalTaken += rngScores[key].endingScores[0].lost - baseLineTaken + Math.max(rngNextScores[rngScores[key].endingScores[0].key].totalTaken - healed, 0);
+					rngScores[key].totalTaken += rngScores[key].endingScores[0].lost - baseLineTaken;
 				}
 			}
 		}
