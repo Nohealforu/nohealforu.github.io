@@ -4252,7 +4252,7 @@ async function runRoute()
 				let baseLineTime = rngScores[key].endingScores[0].time;
 				for(let k = 0; k < rngScores[key].endingScores.length; k++)
 				{
-					if(rngNextScores[rngScores[key].endingScores[k].key] == null)
+					if(rngNextScores[rngScores[key].endingScores[k].key] == null || rngScores[key].endingScores[k].score < -900000)
 					{
 						rngScores[key].endingScores[k].score = -999999;
 						rngScores[key].endingScores[k].futureTime = 999999;
