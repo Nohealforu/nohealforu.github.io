@@ -18,6 +18,7 @@ var logValues = false; // log information to console, warning: high memory usage
 var fightLookAhead = false; // look ahead an aditional turn in battle, high processing, currently little benefit if any
 var fightLookAheadWidth = 10; // number of top scores to process for both in battle look ahead (optional) and end of battle look ahead (always on)
 var optimizePass = true; // sort scores by time on run and check current hp vs. damage taken
+var ignoreHp = false; // ignore current hp vs. damage taken
 
 const Formation = {
 	small: 0,
@@ -4340,7 +4341,7 @@ async function runRoute()
 							continue;
 						let rngNextScore = rngNextScores[endingScore.key];
 						healed = healTracker[encounterCount + 1];
-						if(currentState.battleCharacters[0x80].currentHp > rngScore.taken + endingScore.lost - baseLineTaken + Math.max(rngNextScore.totalTaken - healed, 0) && rngNextScore.futureTime + endingScore.time - baseLineTime < lowestTime)
+						if((ignoreHp || currentState.battleCharacters[0x80].currentHp > rngScore.taken + endingScore.lost - baseLineTaken + Math.max(rngNextScore.totalTaken - healed, 0)) && rngNextScore.futureTime + endingScore.time - baseLineTime < lowestTime)
 						{
 							lowestTime = rngNextScore.futureTime + endingScore.time - baseLineTime;
 							bestScore = j;
