@@ -4253,11 +4253,17 @@ async function runRoute()
 				for(let k = 0; k < rngScores[key].endingScores.length; k++)
 				{
 					if(rngNextScores[rngScores[key].endingScores[k].key] == null)
+					{
 						rngScores[key].endingScores[k].score = -999999;
+						rngScores[key].endingScores[k].time = 999999;
+					}
 					else
 						rngScores[key].endingScores[k].score += Math.min(0, rngScores[key].startingHp - rngNextScores[rngScores[key].endingScores[k].key].totalTaken) * deficitHpScoreFactor;
 				}
-				rngScores[key].endingScores.sort((a, b) => b.score - a.score);
+				if(ignoreHp)
+					rngScores[key].endingScores.sort((a, b) => a.time - b.time);
+				else
+					rngScores[key].endingScores.sort((a, b) => b.score - a.score);
 				rngScores[key].score += rngScores[key].endingScores[0].score - baseLineScore;
 				rngScores[key].endingRng = rngScores[key].endingScores[0].rng;
 				// rngscores.endingscores.lost is only last round damage
