@@ -2385,7 +2385,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 				}
 			}
 			scores.sort((a, b) => b.score - a.score);
-			let checkingIndex = (battleState.turn == 0 ? fightIteration : 0);
+			let checkingIndex = (battleState.turn == 1 ? fightIteration : 0);
 			bestDelay = scores[checkingIndex].delay;
 			adjustedEncounterAction = scores[checkingIndex].action;
 			scoreTracker[battleState.index] = scores;
@@ -4032,8 +4032,10 @@ async function runRoute()
 						damageTakenScoreFactor = tempDamageTakenScoreFactor;
 						
 						if(endOfBattleState.startState)
+						{
 							if(rngScores[key] == null)
 								rngScores[key] = {startingRng: startRng, endingRng: null, score: -999999, time: null, taken: null, totalTaken: 0, shortBounce: null, longBounce: null};
+						}
 						else
 						{
 							startingHp = Math.min(currentState.battleCharacters[0x80].characterData.hp, endingRNGValuesCurrentHp[startRng] + healed);
