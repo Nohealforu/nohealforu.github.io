@@ -4015,7 +4015,7 @@ async function runRoute()
 				for(let key in possibleStartingRngValues) 
 				{
 					let oneRoundFight = false;
-					for(let j = 0; j < fightWidth && !oneRoundFight) // not the most efficient way to do this, should save round 1 results for reuse or something, idk
+					for(let j = 0; j < fightWidth && !oneRoundFight; j++) // not the most efficient way to do this, should save round 1 results for reuse or something, idk
 					{
 						currentState = possibleStartingRngValues[key];
 						let startRng = currentState.randomNumberIndex;
