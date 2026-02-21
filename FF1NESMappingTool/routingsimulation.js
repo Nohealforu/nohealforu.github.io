@@ -17,6 +17,8 @@ var rngValueCheckCount = 10; // number of RNG values minimum before adding addit
 var logValues = false; // log information to console, warning: high memory usage, clear console frequently if active
 var fightLookAhead = false; // look ahead an aditional turn in battle, high processing, currently little benefit if any
 var fightLookAheadWidth = 10; // number of top scores to process for both in battle look ahead (optional) and end of battle look ahead (always on)
+var fightParallelCheck = false; // if fight not possible to end on turn 1, check additional starting rounds
+var fightParallelWidth = 2; // number of top scores to check 
 var optimizePass = true; // sort scores by time on run and check current hp vs. damage taken
 var ignoreHp = false; // ignore current hp vs. damage taken
 
@@ -4021,11 +4023,16 @@ async function runRoute()
 					currentState = possibleStartingRngValues[key];
 					let startRng = currentState.randomNumberIndex;
 					// full heal so we can see what is possible, not accurate for like Kary after lava
+					let tempDamageTakenScoreFactor = damageTakenScoreFactor;
 					if(currentAction.encounterHPBudget > 0)
 						currentState.battleCharacters[0x80].currentHp = currentAction.encounterHPBudget;
 					else
+					{
 						currentState.battleCharacters[0x80].heal(-1);
+						damageTakenScoreFactor = 0;
+					}
 					let endOfBattleState = runBattle(currentState, currentAction.encounter, currentAction.encounterAction, encounterEnemyCounts);
+					damageTakenScoreFactor = tempDamageTakenScoreFactor;
 					
 					if(endOfBattleState.startState)
 						rngScores[key] = {startingRng: startRng, endingRng: null, score: -999999, time: null, taken: null, totalTaken: 0, shortBounce: null, longBounce: null};
