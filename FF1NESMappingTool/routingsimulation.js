@@ -4054,16 +4054,10 @@ async function runRoute()
 								bestScore = scoreSum;
 								bestScoredState = endOfBattleState;
 							}
-							/*// are all these score adjustments throwing stuff off?
-							scoreSum /= endOfBattleState.minimumEnemies;
-							let damageRatio = takenSum / currentState.battleCharacters[0x80].characterData.hp;
-							let stepsToHeal = currentAction.encounter.stepsToHeal;
-							if(takenSum == 0)
-								scoreSum += 500;
-							//else
-							//	scoreSum -= 1000 * damageRatio * damageRatio * (stepsToHeal + 8) * stepsToHeal / 8;
-							scoreSum -= 3000 * ((endOfBattleState.startingEnemies) / (endOfBattleState.minimumEnemies + 1) - 1);*/
-							rngScores[key] = {startingRng: startRng, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, futureTime: timeSum, taken: takenSum, maxHp: currentState.battleCharacters[0x80].characterData.hp, startingHp: startingHp, totalTaken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum, endingScores: summary.endingScores};
+							if(rngScores[key] == null)
+								rngScores[key] = {startingRng: startRng, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, futureTime: timeSum, taken: takenSum, maxHp: currentState.battleCharacters[0x80].characterData.hp, startingHp: startingHp, totalTaken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum, endingScores: summary.endingScores};
+							else
+								rngScores[key].endingScores.concat(summary.endingScores);
 							for(let k = 0; k < summary.endingScores.length; k++)
 							{
 								let endScore = summary.endingScores[k];
