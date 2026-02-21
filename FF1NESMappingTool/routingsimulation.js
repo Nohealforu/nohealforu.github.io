@@ -4054,7 +4054,7 @@ async function runRoute()
 								bestScore = scoreSum;
 								bestScoredState = endOfBattleState;
 							}
-							if(rngScores[key] == null)
+							if(rngScores[key] == null || rngScores[key].endingRng == null)
 								rngScores[key] = {startingRng: startRng, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, futureTime: timeSum, taken: takenSum, maxHp: currentState.battleCharacters[0x80].characterData.hp, startingHp: startingHp, totalTaken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum, endingScores: summary.endingScores};
 							else
 								rngScores[key].endingScores.concat(summary.endingScores);
