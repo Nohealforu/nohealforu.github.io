@@ -21,7 +21,7 @@ var fightLookAheadWidth = 10; // number of top scores to process for both in bat
 var fightParallelCheck = false; // if fight not possible to end on turn 1, check additional starting rounds
 var fightParallelWidth = 2; // number of top scores to check 
 var optimizePass = true; // sort scores by time on run and check current hp vs. damage taken
-var ignoreHp = false; // ignore current hp vs. damage taken
+var ignoreHp = true; // ignore current hp vs. damage taken
 
 const Formation = {
 	small: 0,
