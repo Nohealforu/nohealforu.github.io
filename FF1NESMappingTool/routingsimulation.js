@@ -2385,9 +2385,9 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 				}
 			}
 			scores.sort((a, b) => b.score - a.score);
-			let checkingIndex = (canDelay && battleState.turn == 1 ? fightIteration : 0);
+			let checkingIndex = (battleState.turn == 0 ? fightIteration : 0);
 			bestDelay = scores[checkingIndex].delay;
-			adjustedEncounterAction = scores[checkingIndex].action;
+			adjustedEncounterAction = scores[checkingIndex].encounterAction;
 			scoreTracker[battleState.index] = scores;
 		}
 		
@@ -4015,7 +4015,7 @@ async function runRoute()
 				for(let key in possibleStartingRngValues) 
 				{
 					let oneRoundFight = false;
-					for(let j = 0; j < fightWidth && !oneRoundFight; j++) // not the most efficient way to do this, should save round 1 results for reuse or something, idk
+					for(let j = 0; j < fightWidth && !oneRoundFight) // not the most efficient way to do this, should save round 1 results for reuse or something, idk
 					{
 						currentState = possibleStartingRngValues[key];
 						let startRng = currentState.randomNumberIndex;
@@ -4032,10 +4032,8 @@ async function runRoute()
 						damageTakenScoreFactor = tempDamageTakenScoreFactor;
 						
 						if(endOfBattleState.startState)
-						{
 							if(rngScores[key] == null)
 								rngScores[key] = {startingRng: startRng, endingRng: null, score: -999999, time: null, taken: null, totalTaken: 0, shortBounce: null, longBounce: null};
-						}
 						else
 						{
 							startingHp = Math.min(currentState.battleCharacters[0x80].characterData.hp, endingRNGValuesCurrentHp[startRng] + healed);
@@ -4054,10 +4052,16 @@ async function runRoute()
 								bestScore = scoreSum;
 								bestScoredState = endOfBattleState;
 							}
-							if(rngScores[key] == null || rngScores[key].endingRng == null)
-								rngScores[key] = {startingRng: startRng, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, futureTime: timeSum, taken: takenSum, maxHp: currentState.battleCharacters[0x80].characterData.hp, startingHp: startingHp, totalTaken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum, endingScores: summary.endingScores};
-							else
-								rngScores[key].endingScores.concat(summary.endingScores);
+							/*// are all these score adjustments throwing stuff off?
+							scoreSum /= endOfBattleState.minimumEnemies;
+							let damageRatio = takenSum / currentState.battleCharacters[0x80].characterData.hp;
+							let stepsToHeal = currentAction.encounter.stepsToHeal;
+							if(takenSum == 0)
+								scoreSum += 500;
+							//else
+							//	scoreSum -= 1000 * damageRatio * damageRatio * (stepsToHeal + 8) * stepsToHeal / 8;
+							scoreSum -= 3000 * ((endOfBattleState.startingEnemies) / (endOfBattleState.minimumEnemies + 1) - 1);*/
+							rngScores[key] = {startingRng: startRng, endingRng: endOfBattleState.randomNumberIndex, score: scoreSum, time: timeSum, futureTime: timeSum, taken: takenSum, maxHp: currentState.battleCharacters[0x80].characterData.hp, startingHp: startingHp, totalTaken: takenSum, shortBounce: shortBounceSum, longBounce: longBounceSum, endingScores: summary.endingScores};
 							for(let k = 0; k < summary.endingScores.length; k++)
 							{
 								let endScore = summary.endingScores[k];
