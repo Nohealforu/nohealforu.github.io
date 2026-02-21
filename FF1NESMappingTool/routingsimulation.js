@@ -17,7 +17,8 @@ var debugFight = 103; // for easier setting of breakpoints
 var rngValueCheckCount = 10; // number of RNG values minimum before adding additional values 
 var logValues = false; // log information to console, warning: high memory usage, clear console frequently if active
 var fightLookAhead = false; // look ahead an aditional turn in battle, high processing, currently little benefit if any
-var fightLookAheadWidth = 10; // number of top scores to process for both in battle look ahead (optional) and end of battle look ahead (always on)
+var fightLookAheadWidth = 2; // number of top scores to process for both in battle look ahead (optional)
+var fightCompleteLookAheadWidth = 10; // end of battle look ahead (always on)
 var fightParallelCheck = false; // if fight not possible to end on turn 1, check additional starting rounds
 var fightParallelWidth = 2; // number of top scores to check 
 var optimizePass = true; // sort scores by time on run and check current hp vs. damage taken
@@ -2480,7 +2481,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					endingRNGValueScores[score.rng] = score.score;
 				}
 			}
-			else if(i < fightLookAheadWidth) // calculate next turn for top scores that aren't complete
+			else if(i < fightCompleteLookAheadWidth) // calculate next turn for top scores that aren't complete
 			{
 				let additionalScores = [];
 				let additionalBattleState = score.battleState;
