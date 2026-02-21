@@ -4042,6 +4042,7 @@ async function runRoute()
 							startingHp = Math.min(currentState.battleCharacters[0x80].characterData.hp, endingRNGValuesCurrentHp[startRng] + healed);
 							let scoreSum = 0, timeSum = 0, takenSum = 0, shortBounceSum = 0, longBounceSum = 0;
 							let summary = endOfBattleState.encounterSummary;
+							oneRoundFight = summary.score.length == 1;
 							for(let k = 0; k < summary.score.length; k++)
 							{
 								scoreSum += summary.score[k];
