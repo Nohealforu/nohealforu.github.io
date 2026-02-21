@@ -2387,7 +2387,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 			scores.sort((a, b) => b.score - a.score);
 			let checkingIndex = (battleState.turn == 0 ? fightIteration : 0);
 			bestDelay = scores[checkingIndex].delay;
-			adjustedEncounterAction = scores[checkingIndex].encounterAction;
+			adjustedEncounterAction = scores[checkingIndex].action;
 			scoreTracker[battleState.index] = scores;
 		}
 		
