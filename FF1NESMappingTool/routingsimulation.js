@@ -23,6 +23,7 @@ var fightLookAheadScoreDiscount = 0.75; // score future discount for next turn, 
 var fightCompleteLookAheadWidth = 10; // end of battle look ahead (always on)
 var fightParallelCheck = false; // if fight not possible to end on turn 1, check additional starting rounds
 var fightParallelWidth = 2; // number of top scores to check 
+var fightParallelCheckDangerThreshold = 10; // check only runs on fights with this much danger.
 var optimizePass = true; // sort scores by time on run and check current hp vs. damage taken
 var ignoreHp = true; // ignore current hp vs. damage taken
 
@@ -3933,7 +3934,6 @@ async function runRoute()
 	let backupEndingRngValues;
 	let backup2EndingRngValues;
 	let backup3EndingRngValues;
-	let fightWidth = fightParallelCheck ? fightParallelWidth : 1;
 	// calculating ideal rng values in route by scores 
 	for(let i = 0; i < route.length; i++)
 	{
@@ -4014,6 +4014,7 @@ async function runRoute()
 				backup3EndingRngValues = {};
 				
 				endingRNGValuesBestTime = [].concat(array256PositiveTemplate);
+				let fightWidth = fightParallelCheck && currentAction.encounter.danger >= fightParallelCheckDangerThreshold ? fightParallelWidth : 1;
 				
 				for(let key in possibleStartingRngValues) 
 				{
