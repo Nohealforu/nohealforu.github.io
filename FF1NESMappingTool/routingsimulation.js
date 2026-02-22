@@ -2189,7 +2189,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 	// failsafe if somehow the enemies are missing
 	if(this.checkEnemyDead(dangerRatio))
 		return;
-	if((this.battleCharacters[0x80].status & ~(StatusEffect.mute | StatusEffect.dark)) > 0) // poison could be acceptable, or secondary characters dying pre garland, but /shrug
+	if((this.battleCharacters[0x80].status & ~(StatusEffect.mute | StatusEffect.dark)) > 0 && damageTakenScoreFactor >= 0) // poison could be acceptable, or secondary characters dying pre garland, but /shrug
 		this.score -= 5000;
 	return;
 };
@@ -4064,11 +4064,13 @@ async function runRoute()
 						let tempDamageTakenScoreFactor = damageTakenScoreFactor;
 						if(currentAction.encounterHPBudget > 0)
 							currentState.battleCharacters[0x80].currentHp = currentAction.encounterHPBudget;
-						else
+						else if(currentAction.encounterHPBudget == 0)
 						{
 							currentState.battleCharacters[0x80].heal(-1);
 							damageTakenScoreFactor = 0;
 						}
+						else
+							damageTakenScoreFactor *= -1;
 						let endOfBattleState = runBattle(currentState, currentAction.encounter, currentAction.encounterAction, encounterEnemyCounts, j);
 						damageTakenScoreFactor = tempDamageTakenScoreFactor;
 						
