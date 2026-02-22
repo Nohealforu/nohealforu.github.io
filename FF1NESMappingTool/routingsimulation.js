@@ -2604,7 +2604,7 @@ function RouteAction(actionString)
 			case 'CreateCharacter':
 				this.action = Action.CreateCharacter;
 				this.characterName = splitAction[1];
-				this.characterClass = splitAction[2];
+				this.characterClass = characterClasses[splitAction[2]];
 				this.characterSlot = (parseInt(splitAction[3]) || 0x80);
 				break;
 			default:
