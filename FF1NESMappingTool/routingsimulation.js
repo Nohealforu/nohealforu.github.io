@@ -17,7 +17,8 @@ var debugFight = 103; // for easier setting of breakpoints
 var rngValueCheckCount = 10; // number of RNG values minimum before adding additional values 
 var logValues = false; // log information to console, warning: high memory usage, clear console frequently if active
 var fightLookAhead = false; // look ahead an aditional turn in battle, high processing, currently little benefit if any
-var fightLookAheadWidth = 2; // number of top scores to process for both in battle look ahead (optional)
+var fightLookAheadDangerThreshold = 10; // look ahead only runs on fights with this much danger.
+var fightLookAheadWidth = 10; // number of top scores to process for both in battle look ahead (optional)
 var fightCompleteLookAheadWidth = 10; // end of battle look ahead (always on)
 var fightParallelCheck = false; // if fight not possible to end on turn 1, check additional starting rounds
 var fightParallelWidth = 2; // number of top scores to check 
@@ -2346,7 +2347,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 				scores[i] = {score: battleState.score, time: battleState.startTime + battleState.estimatedTime, futureTime: 0, delayCommands: null, delay: i, dmg: battleState.damageDealt, lost: battleState.damageTaken, rng: battleState.randomNumberIndex, complete: battleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: battleState, key: battleState.getKey(), status: battleState.battleCharacters[0x80].status, action: currentAction};
 			}
 			scores.sort((a, b) => b.score - a.score);
-			if(fightLookAhead && !battleComplete && canDelay)
+			if(fightLookAhead && encounter.danger >= fightLookAheadDangerThreshold && !battleComplete && canDelay)
 			{
 				for(let i = 0; i < fightLookAheadWidth; i++)
 				{
