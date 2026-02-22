@@ -4059,18 +4059,28 @@ async function runRoute()
 					for(let j = 0; j < fightWidth && !oneRoundFight; j++) // not the most efficient way to do this, should save round 1 results for reuse or something, idk
 					{
 						currentState = possibleStartingRngValues[key];
+						let aliveHeros = 0;
+						for (let i = 0x80; i < 0x84; i++)
+							if (this.battleCharacters[i] != null && this.battleCharacters[i].canTarget())
+								aliveHeros++;
 						let startRng = currentState.randomNumberIndex;
 						// full heal so we can see what is possible, not accurate for like Kary after lava
 						let tempDamageTakenScoreFactor = damageTakenScoreFactor;
-						if(currentAction.encounterHPBudget > 0)
-							currentState.battleCharacters[0x80].currentHp = currentAction.encounterHPBudget;
-						else if(currentAction.encounterHPBudget == 0)
+						if(aliveHeros > 1)
 						{
-							currentState.battleCharacters[0x80].heal(-1);
-							damageTakenScoreFactor = 0;
+							damageTakenScoreFactor *= -1;
 						}
 						else
-							damageTakenScoreFactor *= -1;
+						{
+							if(currentAction.encounterHPBudget > 0)
+								currentState.battleCharacters[0x80].currentHp = currentAction.encounterHPBudget;
+							else
+							{
+								currentState.battleCharacters[0x80].heal(-1);
+								damageTakenScoreFactor = 0;
+							}
+						}
+						
 						let endOfBattleState = runBattle(currentState, currentAction.encounter, currentAction.encounterAction, encounterEnemyCounts, j);
 						damageTakenScoreFactor = tempDamageTakenScoreFactor;
 						
