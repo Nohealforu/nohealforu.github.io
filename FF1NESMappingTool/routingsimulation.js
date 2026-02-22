@@ -2606,6 +2606,7 @@ function RouteAction(actionString)
 				this.characterName = splitAction[1];
 				this.characterClass = splitAction[2];
 				this.characterSlot = (parseInt(splitAction[3]) || 0x80);
+				break;
 			default:
 				this.action = Action.UnknownCommand;
 				this.inputString = actionString;
@@ -2655,7 +2656,8 @@ RouteAction.prototype.toString  = function RouteActionToString()
 			result = 'TimeTarget ' + this.amount;
 			break;
 		case Action.CreateCharacter:
-			result = 'CreateCharacter ' + this.characterName + ' ' + this.characterClass + ' ' + this.characterSlot
+			result = 'CreateCharacter ' + this.characterName + ' ' + this.characterClass + ' ' + this.characterSlot;
+			break;
 		default:
 			result = 'Invalid Action: ' + this.inputString;
 	}
