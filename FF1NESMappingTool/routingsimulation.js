@@ -19,6 +19,7 @@ var logValues = false; // log information to console, warning: high memory usage
 var fightLookAhead = false; // look ahead an aditional turn in battle, high processing, currently little benefit if any
 var fightLookAheadDangerThreshold = 10; // look ahead only runs on fights with this much danger.
 var fightLookAheadWidth = 10; // number of top scores to process for both in battle look ahead (optional)
+var fightLookAheadScoreDiscount = 0.75; // score future discount for next turn, prevent stalling forever
 var fightCompleteLookAheadWidth = 10; // end of battle look ahead (always on)
 var fightParallelCheck = false; // if fight not possible to end on turn 1, check additional starting rounds
 var fightParallelWidth = 2; // number of top scores to check 
@@ -2383,7 +2384,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 							topNextScore = additionalBattleState.score;
 					}
 					
-					score.score += topNextScore;
+					score.score += topNextScore * fightLookAheadScoreDiscount;
 				}
 			}
 			scores.sort((a, b) => b.score - a.score);
