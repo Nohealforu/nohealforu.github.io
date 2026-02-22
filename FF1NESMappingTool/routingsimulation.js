@@ -1684,11 +1684,13 @@ BattleState.prototype.checkEnemyDead = function(dangerRatio)
 		{
 			if(sortStatus[i] > sortStatus[i + 1])
 			{
-				let tempCharacter = this.battleCharacters[i + 0x80];
+				let index1 = sortStatus[i] & 0x03;
+				let index2 = sortStatus[i + 1] & 0x03;
+				let tempCharacter = this.battleCharacters[index1];
 				let tempStatus = sortStatus[i];
-				this.battleCharacters[i + 0x80] = this.battleCharacters[i + 0x81];
+				this.battleCharacters[index1] = this.battleCharacters[index2];
 				sortStatus[i] = sortStatus[i + 1];
-				this.battleCharacters[i + 0x81] = tempCharacter;
+				this.battleCharacters[index2] = tempCharacter;
 				sortStatus[i + 1] = tempStatus;
 			}
 		}
