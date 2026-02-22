@@ -99,7 +99,8 @@ const Action = {
 	UnequipArmor: 7,
 	Heal: 8,
 	Burn: 9,
-	TimeTarget: 10
+	TimeTarget: 10,
+	CreateCharacter: 11,
 }
 
 const EncounterAction = {
@@ -1125,7 +1126,7 @@ const EXPTable = [
 ];
 
 
-function PlayerInfo(name, characterClass, classChanged, level, exp, hp, str, agi, int, vit, luck, evade, absorb, hits, hit, attack, crit, mdef, weaknesses, resistances, weapon, armor, shield, helmet, glove)
+function PlayerInfo(name, characterClass, classChanged = false, level = 1, exp = 0, hp = characterClass.hp, str = characterClass.str, agi = characterClass.agi, int = characterClass.int, vit = characterClass.vit, luck = characterClass.luck, evade = characterClass.evade, absorb = 0, hit = characterClass.hit, attack = characterClass.attack, mdef = characterClass.mdef, weaknesses = 0, resistances = 0, weapon = null, armor = null, shield = null, helmet = null, glove = null)
 {
 	this.name = name;
 	this.characterClass = characterClass;
@@ -1136,12 +1137,12 @@ function PlayerInfo(name, characterClass, classChanged, level, exp, hp, str, agi
 	this.str = str;
 	this.agi = agi;
 	this.int = int;
-	this.vit = vit;
+	this.vit = vit;asdawsf
 	this.luck = luck;
 	this.attack = attack;
-	this.crit = crit;
-	this.hits = hits;
+	this.crit = weapon == null ? 0 : weapon.crit;
 	this.hit = hit;
+	this.updateSwings();
 	this.absorb = absorb;
 	this.evade = evade;
 	this.mdef = mdef;
@@ -1522,12 +1523,12 @@ BattleState.prototype.newTurn = function(playerAction)
 	let battleState = new BattleState(1 + this.index, this.randomNumberIndex, this.gold, battleCharacters, this.startTime + this.estimatedTime, this.encounterIndex, this.formation, this.turn + 1);
 	let command;
 	if(playerAction == EncounterAction.Fight)
-		command = new PlayerCommand(battleState, Command.Fight);
+		command = new PlayerCommand(battleState, Command.Fight, null, Target.Enemy);
 	else if(playerAction == EncounterAction.Flee)
-		command = new PlayerCommand(battleState, Command.Run);
+		command = new PlayerCommand(battleState, Command.Run, null, Target.Party);
 	else if(playerAction == EncounterAction.Bane)
-		command = new PlayerCommand(battleState, Command.Item, weapons['BaneSword']);
-	battleState.playerCommands = {0x80: command, 0x81: null, 0x82: null, 0x83: null};
+		command = new PlayerCommand(battleState, Command.Item, weapons['BaneSword'], Target.Enemies);
+	battleState.playerCommands = {0x80: command, 0x81: command, 0x82: command, 0x83: command};
 	return battleState;
 };
 
@@ -1562,7 +1563,7 @@ BattleState.prototype.loadEnemySlot = function(formation, slot, enemyCounts, for
 	return enemyCounts;
 }
 
-BattleState.prototype.newEncounter = function(encounterIndex, playerAction, futureCheck = false)
+BattleState.prototype.newEncounter = function(encounterIndex, futureCheck = false)
 {
 	if(!futureCheck)
 		battleStates[this.index] = this;
@@ -1608,14 +1609,6 @@ BattleState.prototype.newEncounter = function(encounterIndex, playerAction, futu
 	if(encounterIndex == 0x4A || encounterIndex == 0x2C)
 		battleState.minimumEnemies = 2;
 	
-	let command;
-	if(playerAction == EncounterAction.Fight)
-		command = new PlayerCommand(battleState, Command.Fight);
-	else if(playerAction == EncounterAction.Flee)
-		command = new PlayerCommand(battleState, Command.Run);
-	else if(playerAction == EncounterAction.Bane)
-		command = new PlayerCommand(battleState, Command.Item, weapons['BaneSword']);
-	battleState.playerCommands = {0x80: command, 0x81: null, 0x82: null, 0x83: null};
 	return battleState;
 };
 
@@ -1705,7 +1698,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 	{
 		if (this.battleCharacters[i] != null && this.battleCharacters[i].canAct() && this.encounterState != EncounterState.Ambushed)
 		{
-			this.incrementRandomIndex(this.playerCommands[i].command == Command.Item ? 3 : formationRNGHoldA[this.formation]);
+			this.incrementRandomIndex(this.playerCommands[i].target  ? 3 : formationRNGHoldA[this.formation]);
 			this.estimatedTime += 50;
 		}
 	}
@@ -2246,7 +2239,7 @@ var array256ZeroTemplate = Array(256).fill(0);
 
 function runBattle(currentState, encounter, encounterAction, encounterEnemyCounts, fightIteration, redoBattleEndState, redoBattleNextState, rngScores, setDelays)
 {
-	let battleStartState = currentState.newEncounter(encounter.index, encounterAction);
+	let battleStartState = currentState.newEncounter(encounter.index);
 	battleStartState.startState = true;
 	delayStates[battleStartState.index] = 0;
 	let delayCommands = [];
@@ -2409,7 +2402,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 				battleState.score += rngScores[battleState.getKey()].score;
 			else
 			{
-				nextEncounterState = battleState.newEncounter(encounter.next?.encounterIndex, EncounterAction.Fight, true);
+				nextEncounterState = battleState.newEncounter(encounter.next?.encounterIndex, true);
 				battleState.score -= enemyCountScoreFactor * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
 			}
 		}
@@ -2608,6 +2601,11 @@ function RouteAction(actionString)
 				this.action = Action.TimeTarget;
 				this.amount = (parseInt(splitAction[1]) || 999999);
 				break;
+			case 'CreateCharacter':
+				this.action = Action.CreateCharacter;
+				this.characterName = splitAction[1];
+				this.characterClass = splitAction[2];
+				this.characterSlot = (parseInt(splitAction[3]) || 0x80);
 			default:
 				this.action = Action.UnknownCommand;
 				this.inputString = actionString;
@@ -2656,6 +2654,8 @@ RouteAction.prototype.toString  = function RouteActionToString()
 		case Action.TimeTarget:
 			result = 'TimeTarget ' + this.amount;
 			break;
+		case Action.CreateCharacter:
+			result = 'CreateCharacter ' + this.characterName + ' ' + this.characterClass + ' ' + this.characterSlot
 		default:
 			result = 'Invalid Action: ' + this.inputString;
 	}
@@ -3853,7 +3853,7 @@ async function runRoute()
 	for(let i = 0; i < newRoute.length; i++)
 		route[i] = new RouteAction(newRoute[i]);
 	
-	let testCharacters = {
+	testCharacters = {
 		0: null,
 		1: null,
 		2: null,
@@ -3863,13 +3863,14 @@ async function runRoute()
 		6: null,
 		7: null,
 		8: null,
-		0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 2, 168, 61, 21, 6, 1, 11, 5, 39, 15, 1, 18, 19, 4, 18, 0, 0, weapons['Rapier'], armor['ChainArmor'], null, null, null), 35),
-		//0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 8, 7326, 230, 27, 12, 3, 15, 9, 37, 24, 2, 46, 36, weapons['SilverSword'].crit, 36, 0, 0, weapons['SilverSword'], armor['IronArmor'], null, null, null)),
+		0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 2, 168, 61, 21, 6, 1, 11, 5, 39, 15, 18, 19, 18, 0, 0, weapons['Rapier'], armor['ChainArmor'], null, null, null), 35),
+		//0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 8, 7326, 230, 27, 12, 3, 15, 9, 37, 24, 46, 36, 36, 0, 0, weapons['SilverSword'], armor['IronArmor'], null, null, null)),
 		0x81: null,
 		0x82: null,
 		0x83: null,
 	};
-	let startingState = new BattleState(0, 193, 630, testCharacters);
+	let startingState = new BattleState(0, 0, 0, testCharacters);
+	//let startingState = new BattleState(0, 193, 630, testCharacters);
 	//let startingState = new BattleState(0, 254, 630, testCharacters);
 	let startingBattleStates = [];
 	let endingBattleStates = [];
@@ -3877,7 +3878,8 @@ async function runRoute()
 	let encounterIndexes = [];
 	let highestIndex = 0;
 	let encounterCount = 0;
-	let currentState = new BattleState(0, 193, 630, testCharacters);
+	let currentState = new BattleState(0, 0, 0, testCharacters);
+	//let currentState = new BattleState(0, 193, 630, testCharacters);
 	//let currentState = new BattleState(0, 254, 630, testCharacters);
 	let currentIterationCount = 0;
 	let redoBattle = false;
@@ -3911,6 +3913,10 @@ async function runRoute()
 				break;
 			case Action.TimeTarget: 
 				targetTime = currentAction.amount;
+				break;
+			case Action.CreateCharacter:
+				startingState.battleCharacters[currentAction.characterSlot] = new BattleCharacter(new PlayerInfo(currentAction.characterName, currentAction.characterClass));
+				currentState.battleCharacters[currentAction.characterSlot] = new BattleCharacter(new PlayerInfo(currentAction.characterName, currentAction.characterClass));
 				break;
 		}
 	}
@@ -3959,7 +3965,7 @@ async function runRoute()
 					for(let j = 0; j < 256; j++)
 					{
 						currentState.randomNumberIndex = j;
-						nextEncounterState = currentState.newEncounter(currentAction.encounter.next.encounterIndex, EncounterAction.Fight, true);
+						nextEncounterState = currentState.newEncounter(currentAction.encounter.next.encounterIndex, true);
 						encounterEnemyCounts[j] = {startingEnemies: nextEncounterState.startingEnemies, encounterState: nextEncounterState.encounterState, minimumEnemies: nextEncounterState.minimumEnemies, expValue: nextEncounterState.expValue};
 						if(minimumEnemies > nextEncounterState.startingEnemies)
 							minimumEnemies = nextEncounterState.startingEnemies;
@@ -4152,6 +4158,8 @@ async function runRoute()
 			case Action.TimeTarget: 
 				//targetTime = currentAction.amount;
 				break;
+			case Action.CreateCharacter:
+				break;
 			default:
 				console.log('UnknownCommand: ' + currentAction.inputString);
 		}
@@ -4305,13 +4313,14 @@ async function runRoute()
 		6: null,
 		7: null,
 		8: null,
-		0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 2, 168, 61, 21, 6, 1, 11, 5, 39, 15, 1, 18, 19, 4, 18, 0, 0, weapons['Rapier'], armor['ChainArmor'], null, null, null), 35),
-		//0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 8, 7326, 230, 27, 12, 3, 15, 9, 37, 24, 2, 46, 36, weapons['SilverSword'].crit, 36, 0, 0, weapons['SilverSword'], armor['IronArmor'], null, null, null)),
+		0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 2, 168, 61, 21, 6, 1, 11, 5, 39, 15, 18, 19, 18, 0, 0, weapons['Rapier'], armor['ChainArmor'], null, null, null), 35),
+		//0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 8, 7326, 230, 27, 12, 3, 15, 9, 37, 24, 46, 36, 36, 0, 0, weapons['SilverSword'], armor['IronArmor'], null, null, null)),
 		0x81: null,
 		0x82: null,
 		0x83: null,
 	};
-	startingState = new BattleState(0, 193, 630, testCharacters);
+	startingState = new BattleState(0, 0, 0, testCharacters);
+	// startingState = new BattleState(0, 193, 630, testCharacters);
 	//startingState = new BattleState(0, 254, 630, testCharacters);
 	currentState = startingState;
 	
@@ -4470,6 +4479,10 @@ async function runRoute()
 					times.push(currentState.startTime + currentState.estimatedTime);
 					console.log('index ' + i + ': ' + (currentState.startTime + currentState.estimatedTime));
 				}
+				break;
+			case Action.CreateCharacter:
+				startingState.battleCharacters[currentAction.characterSlot] = new BattleCharacter(new PlayerInfo(currentAction.characterName, currentAction.characterClass));
+				currentState.battleCharacters[currentAction.characterSlot] = new BattleCharacter(new PlayerInfo(currentAction.characterName, currentAction.characterClass));
 				break;
 			default:
 				console.log('UnknownCommand: ' + currentAction.inputString);
