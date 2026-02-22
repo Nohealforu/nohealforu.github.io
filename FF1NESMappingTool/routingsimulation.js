@@ -1137,7 +1137,7 @@ function PlayerInfo(name, characterClass, classChanged = false, level = 1, exp =
 	this.str = str;
 	this.agi = agi;
 	this.int = int;
-	this.vit = vit;asdawsf
+	this.vit = vit;
 	this.luck = luck;
 	this.attack = attack;
 	this.crit = weapon == null ? 0 : weapon.crit;
