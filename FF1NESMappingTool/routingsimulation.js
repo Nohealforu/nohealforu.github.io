@@ -4061,7 +4061,7 @@ async function runRoute()
 						currentState = possibleStartingRngValues[key];
 						let aliveHeros = 0;
 						for (let i = 0x80; i < 0x84; i++)
-							if (this.battleCharacters[i] != null && this.battleCharacters[i].canTarget())
+							if (currentState.battleCharacters[i] != null && currentState.battleCharacters[i].canTarget())
 								aliveHeros++;
 						let startRng = currentState.randomNumberIndex;
 						// full heal so we can see what is possible, not accurate for like Kary after lava
