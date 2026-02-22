@@ -1645,7 +1645,7 @@ BattleState.prototype.checkEnemyDead = function(dangerRatio)
 		if (this.battleCharacters[i] != null && this.battleCharacters[i].canTarget())
 			aliveHeros++;
 
-    exp /= aliveHeros;
+    exp = Math.floor(exp / aliveHeros);
     if (exp == 0)
         exp = 1;
 
@@ -1685,8 +1685,8 @@ BattleState.prototype.checkEnemyDead = function(dangerRatio)
 			if(sortStatus[i] > sortStatus[i + 1])
 			{
 				// implement the bug where we swap the wrong character slots by making new indexes
-				let index1 = sortStatus[i] & 0x03;
-				let index2 = sortStatus[i + 1] & 0x03;
+				let index1 = sortStatus[i] & 0x03 + 0x80;
+				let index2 = sortStatus[i + 1] & 0x03 + 0x80;
 				let tempCharacter = this.battleCharacters[index1];
 				let tempStatus = sortStatus[i];
 				this.battleCharacters[index1] = this.battleCharacters[index2];
