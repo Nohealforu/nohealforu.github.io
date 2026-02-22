@@ -1649,25 +1649,50 @@ BattleState.prototype.checkEnemyDead = function(dangerRatio)
     if (exp == 0)
         exp = 1;
 
+	let sortStatus = [0, 1, 2, 3];
+	
     for (let i = 0x80; i < 0x84; i++)
 	{
 		let character = this.battleCharacters[i];
-		if (character != null && character.canTarget())
+		if (character != null)
         {
-            character.characterData.exp += exp;
-            if (character.characterData.exp >= EXPTable[character.characterData.level - 1])
-                this.score += character.characterData.levelUp(this);
+			if(character.canTarget())
+			{
+				character.characterData.exp += exp;
+				if (character.characterData.exp >= EXPTable[character.characterData.level - 1])
+					this.score += character.characterData.levelUp(this);
+			}
             character.status &= (StatusEffect.poison | StatusEffect.dead | StatusEffect.stone);
 			character.resistances = character.characterData.resistances;
 			character.hitMultiplier = 1;
-			if((character.status & StatusEffect.poison) > 0) // poison could be acceptable, or secondary characters dying pre garland, but /shrug
-				this.score -= 10000;
+			if((character.status & StatusEffect.dead) > 0))
+				sortStatus[i - 0x80] |= 0x40;
+			else if((character.status & StatusEffect.stone) > 0))
+				sortStatus[i - 0x80] |= 0x20;
+			else if((character.status & StatusEffect.poison) > 0) // poison could be acceptable, or secondary characters dying pre garland, but /shrug
+				{this.score -= 10000; sortStatus[i - 0x80] |= 0x10;}
         }
+		else
+			sortStatus[i - 0x80] |= 0x40;
 	}
     this.gold += gold;
 	this.score += encounterFinishScoreFactor * dangerRatio;
 	
-	// TODO: reorder party based on status 
+	for(let passes = 0; passes < 4; passes++)
+	{
+		for(let i = 0; i < 3; i++)
+		{
+			if(sortStatus[i] > sortStatus[i + 1])
+			{
+				let tempCharacter = this.battleCharacters[i + 0x80];
+				let tempStatus = sortStatus[i];
+				this.battleCharacters[i + 0x80] = this.battleCharacters[i + 0x81];
+				sortStatus[i] = sortStatus[i + 1];
+				this.battleCharacters[i + 0x81] = tempCharacter;
+				sortStatus[i + 1] = tempStatus;
+			}
+		}
+	}
 	
 	return true;
 };
