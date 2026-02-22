@@ -1665,9 +1665,9 @@ BattleState.prototype.checkEnemyDead = function(dangerRatio)
             character.status &= (StatusEffect.poison | StatusEffect.dead | StatusEffect.stone);
 			character.resistances = character.characterData.resistances;
 			character.hitMultiplier = 1;
-			if((character.status & StatusEffect.dead) > 0))
+			if((character.status & StatusEffect.dead) > 0)
 				sortStatus[i - 0x80] |= 0x40;
-			else if((character.status & StatusEffect.stone) > 0))
+			else if((character.status & StatusEffect.stone) > 0)
 				sortStatus[i - 0x80] |= 0x20;
 			else if((character.status & StatusEffect.poison) > 0) // poison could be acceptable, or secondary characters dying pre garland, but /shrug
 				{this.score -= 10000; sortStatus[i - 0x80] |= 0x10;}
@@ -1684,6 +1684,7 @@ BattleState.prototype.checkEnemyDead = function(dangerRatio)
 		{
 			if(sortStatus[i] > sortStatus[i + 1])
 			{
+				// implement the bug where we swap the wrong character slots by making new indexes
 				let index1 = sortStatus[i] & 0x03;
 				let index2 = sortStatus[i + 1] & 0x03;
 				let tempCharacter = this.battleCharacters[index1];
