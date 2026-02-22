@@ -1155,7 +1155,7 @@ function PlayerInfo(name, characterClass, classChanged = false, level = 1, exp =
 // create snapshot of player stats at the current point
 PlayerInfo.prototype.saveInstance = function ()
 {
-	return new PlayerInfo(this.name, this.characterClass, this.classChanged, this.level, this.exp, this.hp, this.str, this.agi, this.int, this.vit, this.luck, this.evade, this.absorb, this.hits, this.hit, this.attack, this.crit, this.mdef, this.weaknesses, this.resistances, this.weapon, this.armor[Slot.Armor], this.armor[Slot.Shield], this.armor[Slot.Helmet], this.armor[Slot.Glove]);
+	return new PlayerInfo(this.name, this.characterClass, this.classChanged, this.level, this.exp, this.hp, this.str, this.agi, this.int, this.vit, this.luck, this.evade, this.absorb, this.hit, this.attack, this.mdef, this.weaknesses, this.resistances, this.weapon, this.armor[Slot.Armor], this.armor[Slot.Shield], this.armor[Slot.Helmet], this.armor[Slot.Glove]);
 };
 
 PlayerInfo.prototype.updateSwings = function()
@@ -3841,6 +3841,7 @@ new RouteAction('TimeTarget'),
 ];*/
 
 //PlayerInfo(name, characterClass, classChanged, level, exp, hp, str, agi, int, vit, luck, evade, absorb, hits, hit, attack, crit, mdef, weaknesses, resistances, weapon, armor, shield, helmet, glove)
+//PlayerInfo(name, characterClass, classChanged = false, level = 1, exp = 0, hp = characterClass.hp, str = characterClass.str, agi = characterClass.agi, int = characterClass.int, vit = characterClass.vit, luck = characterClass.luck, evade = characterClass.evade, absorb = 0, hit = characterClass.hit, attack = characterClass.attack, mdef = characterClass.mdef, weaknesses = 0, resistances = 0, weapon = null, armor = null, shield = null, helmet = null, glove = null)
 function loadRoute()
 {
 	document.getElementById('routeText').value = route.join('\n');
