@@ -6,6 +6,7 @@ var timeScoreFactor = 3; // score adjustment for time taken
 var priorTimeScoreFactor = 2; // score adjustment for time taken in previous turn for delaying 1 turn after ending fight possible
 var damageDealtScoreFactor = 3500; // score adjustment for damage dealt as % of enemy hp
 var damageTakenScoreFactor = 7500; // score adjustment for damage taken as % of current hp
+var secondarySacrificeScoreFactor = 7500; // score adjustment for losing non-primary characters in battle
 var enemyCountScoreFactor = 1750; // score adjustment per enemy spawned
 var hpGainedScoreFactor = 20000; // score adjustment for hp gained from strong level ups
 var deficitHpScoreFactor = 10; // score penalty for paths taking more than current hp so that adjustments happens
@@ -1963,6 +1964,8 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 				{
 					targetCharacter.currentHp = 0;
 					targetCharacter.status |= StatusEffect.dead;
+					if(!targetCharacter.characterData.primary)
+						this.score += secondarySacrificeScoreFactor;
 				}
 				else // percent of hp damage dealt in a turn or something, idk 
 				{
@@ -2017,6 +2020,8 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 						{
 							targetCharacter.currentHp = 0;
 							targetCharacter.status |= StatusEffect.dead;
+							if(!targetCharacter.characterData.primary)
+								this.score += secondarySacrificeScoreFactor;
 						}
 						else // percent of hp damage dealt in a turn or something, idk 
 						{
