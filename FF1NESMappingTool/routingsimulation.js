@@ -1686,14 +1686,14 @@ BattleState.prototype.checkEnemyDead = function(dangerRatio)
 			if(sortStatus[i] > sortStatus[i + 1])
 			{
 				// implement the bug where we swap the wrong character slots by making new indexes
-				let index1 = (sortStatus[i] & 0x03) + 0x80;
-				let index2 = (sortStatus[i + 1] & 0x03) + 0x80;
-				let tempCharacter = this.battleCharacters[index1];
-				let tempStatus = sortStatus[i];
-				this.battleCharacters[index1] = this.battleCharacters[index2];
-				sortStatus[i] = sortStatus[i + 1];
-				this.battleCharacters[index2] = tempCharacter;
-				sortStatus[i + 1] = tempStatus;
+				let index1 = (sortStatus[i] & 0x03);
+				let index2 = (sortStatus[i + 1] & 0x03);
+				let tempCharacter = this.battleCharacters[index1 + 0x80];
+				let tempStatus = sortStatus[index1];
+				this.battleCharacters[index1 + 0x80] = this.battleCharacters[index2 + 0x80];
+				sortStatus[index1] = sortStatus[index2];
+				this.battleCharacters[index2 + 0x80] = tempCharacter;
+				sortStatus[index2] = tempStatus;
 			}
 		}
 	}
@@ -1727,7 +1727,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 	{
 		if (this.battleCharacters[i] != null && this.battleCharacters[i].canAct() && this.encounterState != EncounterState.Ambushed)
 		{
-			this.incrementRandomIndex(this.playerCommands[i].target  ? 3 : formationRNGHoldA[this.formation]);
+			this.incrementRandomIndex(this.playerCommands[i].target == Target.Enemies || this.playerCommands[i].target == Target.Party || this.playerCommands[i].target == Target.Self ? 3 : formationRNGHoldA[this.formation]);
 			this.estimatedTime += 50;
 		}
 	}
