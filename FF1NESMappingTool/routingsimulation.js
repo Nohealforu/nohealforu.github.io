@@ -6,7 +6,7 @@ var timeScoreFactor = 3; // score adjustment for time taken
 var priorTimeScoreFactor = 2; // score adjustment for time taken in previous turn for delaying 1 turn after ending fight possible
 var damageDealtScoreFactor = 3500; // score adjustment for damage dealt as % of enemy hp
 var damageTakenScoreFactor = 7500; // score adjustment for damage taken as % of current hp
-var secondarySacrificeScoreFactor = 7500; // score adjustment for losing non-primary characters in battle
+var secondarySacrificeScoreFactor = 5000; // score adjustment for losing non-primary characters in battle
 var enemyCountScoreFactor = 1750; // score adjustment per enemy spawned
 var hpGainedScoreFactor = 20000; // score adjustment for hp gained from strong level ups
 var deficitHpScoreFactor = 10; // score penalty for paths taking more than current hp so that adjustments happens
@@ -3943,6 +3943,7 @@ async function runRoute()
 	
 	let outputProgress = document.getElementById('outputProgress');
 	document.getElementById('outputTableBody').innerHTML = '';
+	document.getElementById('outputSummary').innerHTML = '';
 	
 	
 	for(let i = route.length; i--; i > 0)
