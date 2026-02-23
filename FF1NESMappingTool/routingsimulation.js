@@ -1727,7 +1727,15 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 	{
 		if (this.battleCharacters[i] != null && this.battleCharacters[i].canAct() && this.encounterState != EncounterState.Ambushed)
 		{
-			this.incrementRandomIndex(this.playerCommands[i].target == Target.Enemies || this.playerCommands[i].target == Target.Party || this.playerCommands[i].target == Target.Self ? 3 : formationRNGHoldA[this.formation]);
+			let offSet = formationRNGHoldA[this.formation];
+			if(this.playerCommands[i].targetType == Target.Enemies || this.playerCommands[i].targetType == Target.Party || this.playerCommands[i].targetType == Target.Self)
+				offSet = 2;
+			if(this.playerCommands[i] == Command.Item || this.playerCommands[i] == Command.Magic)
+				offset++;
+			else if(this.playerCommands[i] == Command.Drink)
+				offset += 2;
+			// add offset based on additional menus to get to spell or item
+			this.incrementRandomIndex(offSet);
 			this.estimatedTime += 50;
 		}
 	}
