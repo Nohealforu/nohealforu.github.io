@@ -1126,10 +1126,11 @@ const EXPTable = [
 ];
 
 
-function PlayerInfo(name, characterClass, classChanged = false, level = 1, exp = 0, hp = characterClass.hp, str = characterClass.str, agi = characterClass.agi, int = characterClass.int, vit = characterClass.vit, luck = characterClass.luck, evade = characterClass.evade, absorb = 0, hit = characterClass.hit, attack = characterClass.attack, mdef = characterClass.mdef, weaknesses = 0, resistances = 0, weapon = null, armor = null, shield = null, helmet = null, glove = null)
+function PlayerInfo(name, characterClass, primary = true, classChanged = false, level = 1, exp = 0, hp = characterClass.hp, str = characterClass.str, agi = characterClass.agi, int = characterClass.int, vit = characterClass.vit, luck = characterClass.luck, evade = characterClass.evade, absorb = 0, hit = characterClass.hit, attack = characterClass.attack, mdef = characterClass.mdef, weaknesses = 0, resistances = 0, weapon = null, armor = null, shield = null, helmet = null, glove = null)
 {
 	this.name = name;
 	this.characterClass = characterClass;
+	this.primary = primary;
 	this.classChanged = classChanged;
 	this.level = level;
 	this.exp = exp;
@@ -1155,7 +1156,7 @@ function PlayerInfo(name, characterClass, classChanged = false, level = 1, exp =
 // create snapshot of player stats at the current point
 PlayerInfo.prototype.saveInstance = function ()
 {
-	return new PlayerInfo(this.name, this.characterClass, this.classChanged, this.level, this.exp, this.hp, this.str, this.agi, this.int, this.vit, this.luck, this.evade, this.absorb, this.hit, this.attack, this.mdef, this.weaknesses, this.resistances, this.weapon, this.armor[Slot.Armor], this.armor[Slot.Shield], this.armor[Slot.Helmet], this.armor[Slot.Glove]);
+	return new PlayerInfo(this.name, this.characterClass, this.primary, this.classChanged, this.level, this.exp, this.hp, this.str, this.agi, this.int, this.vit, this.luck, this.evade, this.absorb, this.hit, this.attack, this.mdef, this.weaknesses, this.resistances, this.weapon, this.armor[Slot.Armor], this.armor[Slot.Shield], this.armor[Slot.Helmet], this.armor[Slot.Glove]);
 };
 
 PlayerInfo.prototype.updateSwings = function()
@@ -1959,7 +1960,8 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 				{
 					let damageRatio = damageSum / targetCharacter.characterData.hp; // adjust this by starting hp or something?
 					// calculated danger levels?
-					this.score -= damageTakenScoreFactor * damageRatio * damageRatio * damageTakenRatio / dangerRatio;
+					if(targetCharacter.characterData.primary)
+						this.score -= damageTakenScoreFactor * damageRatio * damageRatio * damageTakenRatio / dangerRatio;
 				}
 				this.damageTaken += damageSum;
 				this.estimatedTime += 90;
@@ -2011,7 +2013,8 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 						else // percent of hp damage dealt in a turn or something, idk 
 						{
 							let damageRatio = damageRoll / targetCharacter.characterData.hp; // adjust this by starting hp or something? idk
-							this.score -= damageTakenScoreFactor * damageRatio * damageRatio * damageTakenRatio / dangerRatio;
+							if(targetCharacter.characterData.primary)
+								this.score -= damageTakenScoreFactor * damageRatio * damageRatio * damageTakenRatio / dangerRatio;
 						}
 						
 						this.damageTaken += damageRoll;
@@ -2189,7 +2192,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 	// failsafe if somehow the enemies are missing
 	if(this.checkEnemyDead(dangerRatio))
 		return;
-	if((this.battleCharacters[0x80].status & ~(StatusEffect.mute | StatusEffect.dark)) > 0 && damageTakenScoreFactor >= 0) // poison could be acceptable, or secondary characters dying pre garland, but /shrug
+	if((this.battleCharacters[0x80].status & ~(StatusEffect.mute | StatusEffect.dark)) > 0 && this.battleCharacters[0x80].characterData.primary) // poison could be acceptable, or secondary characters dying pre garland, but /shrug
 		this.score -= 5000;
 	return;
 };
@@ -2634,6 +2637,7 @@ function RouteAction(actionString)
 				this.characterName = splitAction[1];
 				this.characterClass = characterClasses[splitAction[2]];
 				this.characterSlot = (parseInt(splitAction[3]) || 0x80);
+				this.primary = splitAction[4] == "Primary";
 				break;
 			default:
 				this.action = Action.UnknownCommand;
@@ -3894,7 +3898,7 @@ async function runRoute()
 		6: null,
 		7: null,
 		8: null,
-		0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 2, 168, 61, 21, 6, 1, 11, 5, 39, 15, 18, 19, 18, 0, 0, weapons['Rapier'], armor['ChainArmor'], null, null, null), 35),
+		0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, false, 2, 168, 61, 21, 6, 1, 11, 5, 39, 15, 18, 19, 18, 0, 0, weapons['Rapier'], armor['ChainArmor'], null, null, null), 35),
 		//0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 8, 7326, 230, 27, 12, 3, 15, 9, 37, 24, 46, 36, 36, 0, 0, weapons['SilverSword'], armor['IronArmor'], null, null, null)),
 		0x81: null,
 		0x82: null,
@@ -3946,8 +3950,8 @@ async function runRoute()
 				targetTime = currentAction.amount;
 				break;
 			case Action.CreateCharacter:
-				startingState.battleCharacters[currentAction.characterSlot] = new BattleCharacter(new PlayerInfo(currentAction.characterName, currentAction.characterClass));
-				currentState.battleCharacters[currentAction.characterSlot] = new BattleCharacter(new PlayerInfo(currentAction.characterName, currentAction.characterClass));
+				startingState.battleCharacters[currentAction.characterSlot] = new BattleCharacter(new PlayerInfo(currentAction.characterName, currentAction.characterClass, currentAction.primary));
+				currentState.battleCharacters[currentAction.characterSlot] = new BattleCharacter(new PlayerInfo(currentAction.characterName, currentAction.characterClass, currentAction.primary));
 				break;
 		}
 	}
@@ -4066,11 +4070,7 @@ async function runRoute()
 						let startRng = currentState.randomNumberIndex;
 						// full heal so we can see what is possible, not accurate for like Kary after lava
 						let tempDamageTakenScoreFactor = damageTakenScoreFactor;
-						if(aliveHeros > 1)
-						{
-							damageTakenScoreFactor *= -1;
-						}
-						else
+						if(aliveHeros == 1)
 						{
 							if(currentAction.encounterHPBudget > 0)
 								currentState.battleCharacters[0x80].currentHp = currentAction.encounterHPBudget;
@@ -4356,7 +4356,7 @@ async function runRoute()
 		6: null,
 		7: null,
 		8: null,
-		0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 2, 168, 61, 21, 6, 1, 11, 5, 39, 15, 18, 19, 18, 0, 0, weapons['Rapier'], armor['ChainArmor'], null, null, null), 35),
+		0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, false, 2, 168, 61, 21, 6, 1, 11, 5, 39, 15, 18, 19, 18, 0, 0, weapons['Rapier'], armor['ChainArmor'], null, null, null), 35),
 		//0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 8, 7326, 230, 27, 12, 3, 15, 9, 37, 24, 46, 36, 36, 0, 0, weapons['SilverSword'], armor['IronArmor'], null, null, null)),
 		0x81: null,
 		0x82: null,
@@ -4524,8 +4524,8 @@ async function runRoute()
 				}
 				break;
 			case Action.CreateCharacter:
-				startingState.battleCharacters[currentAction.characterSlot] = new BattleCharacter(new PlayerInfo(currentAction.characterName, currentAction.characterClass));
-				currentState.battleCharacters[currentAction.characterSlot] = new BattleCharacter(new PlayerInfo(currentAction.characterName, currentAction.characterClass));
+				startingState.battleCharacters[currentAction.characterSlot] = new BattleCharacter(new PlayerInfo(currentAction.characterName, currentAction.characterClass, currentAction.primary));
+				currentState.battleCharacters[currentAction.characterSlot] = new BattleCharacter(new PlayerInfo(currentAction.characterName, currentAction.characterClass, currentAction.primary));
 				break;
 			default:
 				console.log('UnknownCommand: ' + currentAction.inputString);
