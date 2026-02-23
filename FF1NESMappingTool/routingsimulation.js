@@ -1731,9 +1731,9 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 			let offSet = formationRNGHoldA[this.formation];
 			if(this.playerCommands[i].targetType == Target.Enemies || this.playerCommands[i].targetType == Target.Party || this.playerCommands[i].targetType == Target.Self)
 				offSet = 2;
-			if(this.playerCommands[i] == Command.Item || this.playerCommands[i] == Command.Magic)
+			if(this.playerCommands[i].command == Command.Item || this.playerCommands[i].command == Command.Magic)
 				offset++;
-			else if(this.playerCommands[i] == Command.Drink)
+			else if(this.playerCommands[i].command == Command.Drink)
 				offset += 2;
 			// add offset based on additional menus to get to spell or item
 			this.incrementRandomIndex(offSet);
