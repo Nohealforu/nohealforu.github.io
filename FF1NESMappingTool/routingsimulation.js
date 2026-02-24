@@ -4508,7 +4508,7 @@ async function runRoute()
 					for(let j = 0; j < endingSummary.delay.length; j++)
 					{
 						turnCount++;
-						let bounceResult = CalculateBounces(j, endingSummary.formation, endingSummary.delay[j]);
+						let bounceResult = calculateBounces(j, endingSummary.formation, endingSummary.delay[j]);
 						shortBounces += bounceResult.shortBounce;
 						longBounces += bounceResult.longBounce;
 						enemyActions += endingSummary.enemyActions[j];
