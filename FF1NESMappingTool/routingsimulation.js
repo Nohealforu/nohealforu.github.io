@@ -2453,7 +2453,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 		battleState = priorBattleState.newTurn(adjustedEncounterAction);
 		if(priorBattleState == battleStartState)
 			battleState.encounterState = battleStartState.encounterState;
-		let bounceResult = calculateBounces(battleState.turn - 1, battleState.formation, j);
+		let bounceResult = calculateBounces(battleState.turn - 1, battleState.formation, delay);
 		battleState.estimatedTime += bounceResult.timeTaken;
 		battleState.runTurn(delay, damageTakenRatio, dangerRatio);
 		
