@@ -4512,7 +4512,7 @@ async function runRoute()
 						shortBounces += bounceResult.shortBounce;
 						longBounces += bounceResult.longBounce;
 						enemyActions += endingSummary.enemyActions[j];
-						outputLines.push("<tr><td>Round " + (j + 1) + "</td><td>" + (j == 0 && endingSummary.encounterState == EncounterState.Ambushed ? "Enemy Strikes First" : (bounceResult.longBounce + bounceResult.shortBounce == 0 ? ("Hold A" + bounceResult.holdDirection ? " and DPAD" : "") : bounceResult.longBounce + " full / " + bounceResult.shortBounce + " short")) + " </td><td>Dealt " + endingSummary.dealt[j] + "</td><td>Taken " + endingSummary.taken[j] + "</td><td></td></tr>");
+						outputLines.push("<tr><td>Round " + (j + 1) + "</td><td>" + (j == 0 && endingSummary.encounterState == EncounterState.Ambushed ? "Enemy Strikes First" : (bounceResult.longBounce + bounceResult.shortBounce == 0 ? ("Hold A" + (bounceResult.holdDirection ? " and DPAD" : "")) : bounceResult.longBounce + " full / " + bounceResult.shortBounce + " short")) + " </td><td>Dealt " + endingSummary.dealt[j] + "</td><td>Taken " + endingSummary.taken[j] + "</td><td></td></tr>");
 					}
 					outputLines.push(emptyRowString);
 					encounterCount++;
