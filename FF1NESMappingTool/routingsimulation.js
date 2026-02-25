@@ -2084,7 +2084,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 							else // spellInfo.effect == 4
 							{
 								targetCharacter.hitMultiplier = Math.max(targetCharacter.hitMultiplier - 1, 0);
-								this.score -= 1000;
+								this.score -= 5000;
 							}
 						}
 						
@@ -2144,6 +2144,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 					character.currentHp = character.characterData.hp;
 					character.status = 0;
 					this.estimatedTime += 70;
+					this.score -= 10000;
 				}
 				else if (spellInfo.effect == 0x10) // ruse
 				{
