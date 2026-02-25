@@ -2514,7 +2514,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 			battleState = priorBattleState.newTurn(encounterAction);
 			delayIndex = redoBattle ? (delayStates[battleState.index] ?? 0) : 0;
 		}
-		if(setDelays == null && (currentIterationCount > 20 || battleState.turn > 10)) // something has probably gone wrong, abort path.  TODO: add better culling to prevent useless turns from eating time/count
+		if(setDelays == null && (currentIterationCount > 50 || battleState.turn > 50)) // something has probably gone wrong, abort path.  TODO: add better culling to prevent useless turns from eating time/count
 		{
 			iterationAbortCount++;
 			return battleStartState;
