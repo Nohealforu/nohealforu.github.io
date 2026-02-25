@@ -229,7 +229,7 @@ const weapons = {
 	'ThorsHammer': new WeaponInfo('ThorsHammer', 'Thor\'s Hammer', 0x0f, 0x12, 0x24, 0x17),
 	'BaneSword': new WeaponInfo('BaneSword', 'Bane Sword', 0x14, 0x16, 0x25, 0x26),
 	'Katana': new WeaponInfo('Katana', 'Katana', 0x23, 0x21, 0x26, 0x00),
-	'XCalbur': new WeaponInfo('XCalbur', 'XCalbur', 0x23, 0x2d, 0x27, 0x00),
+	'XCalber': new WeaponInfo('XCalber', 'XCalber', 0x23, 0x2d, 0x27, 0x00),
 	'Masmune': new WeaponInfo('Masmune', 'Masmune', 0x32, 0x38, 0x28, 0x00),
 };
 
