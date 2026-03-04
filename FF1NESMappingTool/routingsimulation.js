@@ -27,6 +27,7 @@ var fightParallelWidth = 2; // number of top scores to check
 var fightParallelCheckDangerThreshold = 10; // check only runs on fights with this much danger.
 var optimizePass = true; // sort scores by time on run and check current hp vs. damage taken
 var ignoreHp = true; // ignore current hp vs. damage taken
+var challengeMode = false; // track str gain, hp, etc.
 
 const Formation = {
 	small: 0,
@@ -1395,7 +1396,10 @@ BattleState.prototype.incrementRandomIndex = function(value)
 
 BattleState.prototype.getKey = function()
 {
-	return this.randomNumberIndex + ":" + this.battleCharacters[0x80].characterData.exp + ":" + this.battleCharacters[0x80].characterData.str + ":" + this.battleCharacters[0x80].characterData.agi + ":" + this.battleCharacters[0x80].characterData.luck + ":" + this.battleCharacters[0x80].characterData.hp;
+	if(challengeMode)
+		return this.randomNumberIndex + ":" + this.battleCharacters[0x80].characterData.exp + ":" + this.battleCharacters[0x80].characterData.str + ":" + this.battleCharacters[0x80].characterData.agi + ":" + this.battleCharacters[0x80].characterData.luck + ":" + this.battleCharacters[0x80].characterData.hp;
+	else
+		return this.randomNumberIndex + ":" + this.battleCharacters[0x80].characterData.exp + ":" + this.battleCharacters[0x80].characterData.agi + ":" + this.battleCharacters[0x80].characterData.luck;
 }
 
 BattleState.prototype.getRandomNumber = function(minimum = 0, maximum = -1)
