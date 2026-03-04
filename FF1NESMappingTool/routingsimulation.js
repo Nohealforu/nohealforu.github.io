@@ -4118,7 +4118,7 @@ async function runRoute()
 						}
 						else if(currentAction.encounterHPBudget > 0)
 							for (let i = 0x80; i < 0x84; i++)
-								if (currentState.battleCharacters[i] != null && currentState.battleCharacters[i].characterData.primary))
+								if (currentState.battleCharacters[i] != null && currentState.battleCharacters[i].characterData.primary)
 									currentState.battleCharacters[i].currentHp = currentAction.encounterHPBudget;
 						
 						let endOfBattleState = runBattle(currentState, currentAction.encounter, currentAction.encounterAction, encounterEnemyCounts, j);
