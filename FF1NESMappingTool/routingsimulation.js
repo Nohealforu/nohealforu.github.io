@@ -1796,13 +1796,14 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 			{
 				let targetIndex = playerCommand.target;
 				let targetCharacter = this.battleCharacters[targetIndex];
-				this.incrementRandomIndex(targetIndex < 2 ? formationRNGPrimaryIncrement[this.formation] : formationRNGSecondaryIncrement[this.formation]);
 				
 				if(targetCharacter == null || !targetCharacter.canTarget())
 				{
 					this.estimatedTime += 114;
 					continue;
 				}
+				
+				this.incrementRandomIndex(targetIndex < 2 ? formationRNGPrimaryIncrement[this.formation] : formationRNGSecondaryIncrement[this.formation]);
 				
 				let hitCount = character.characterData.hits;
 				hitCount *= character.hitMultiplier;
