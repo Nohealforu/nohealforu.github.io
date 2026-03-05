@@ -1405,7 +1405,7 @@ BattleState.prototype.getKey = function()
 	let heroHp = [];
 	for (let i = 0x80; i < 0x84; i++)
 		if (this.battleCharacters[i] != null && this.battleCharacters[i].canTarget())
-			heroHp.push(this.battleCharacters[i].characterData.hp);
+			heroHp.push(this.battleCharacters[i].currentHp);
 	return this.randomNumberIndex + ":" + this.battleCharacters[0x80].characterData.exp + ":" + this.battleCharacters[0x80].characterData.str + ":" + this.battleCharacters[0x80].characterData.agi + ":" + this.battleCharacters[0x80].characterData.luck + ":" + heroHp.join(":");
 }
 
@@ -4537,7 +4537,7 @@ async function runRoute()
 						let characterOutput = [];
 						for (let j = 0x80; j < 0x84; j++)
 							if (endOfBattleState.battleCharacters[j] != null)
-								characterOutput.push(endOfBattleState.battleCharacters[j].characterData.name + ' hp: ' + endOfBattleState.battleCharacters[j].characterData.hp + ' status: ' + endOfBattleState.battleCharacters[j].status);
+								characterOutput.push(endOfBattleState.battleCharacters[j].characterData.name + ' hp: ' + endOfBattleState.battleCharacters[j].currentHp + ' status: ' + endOfBattleState.battleCharacters[j].status);
 						outputLines.push(characterOutput.join(', '));
 					}
 					encounterCount++;
