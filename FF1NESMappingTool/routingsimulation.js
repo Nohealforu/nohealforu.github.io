@@ -4535,7 +4535,7 @@ async function runRoute()
 					if(debugParty)
 					{
 						let characterOutput = [];
-						for (let j = 0x80; j < 0x84; i++)
+						for (let j = 0x80; j < 0x84; j++)
 							if (endOfBattleState.battleCharacters[j] != null)
 								characterOutput.push(endOfBattleState.battleCharacters[j].characterData.name + ' hp: ' + endOfBattleState.battleCharacters[j].characterData.hp + ' status: ' + endOfBattleState.battleCharacters[j].status);
 						outputLines.push(characterOutput.join(', '));
