@@ -1456,7 +1456,7 @@ BattleState.prototype.getTarget = function()
 			if(targetable2)
 				target = 0x81;
 		}
-		else if(roll > 32)
+		else if(roll >= 32)
 		{
 			if(targetable3)
 				target = 0x82;
