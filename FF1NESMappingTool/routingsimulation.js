@@ -103,6 +103,7 @@ const Action = {
 	Burn: 9,
 	TimeTarget: 10,
 	CreateCharacter: 11,
+	SetRNG: 12,
 }
 
 const EncounterAction = {
@@ -2684,6 +2685,10 @@ function RouteAction(actionString)
 				this.characterSlot = (parseInt(splitAction[3]) || 0x80);
 				this.primary = splitAction[4] == "Primary";
 				break;
+			case 'bRNG':
+				this.action = Action.SetRNG;
+				this.amount = (parseInt(splitAction[1]) || 0);
+				break;
 			default:
 				this.action = Action.UnknownCommand;
 				this.inputString = actionString;
@@ -2734,6 +2739,9 @@ RouteAction.prototype.toString  = function RouteActionToString()
 			break;
 		case Action.CreateCharacter:
 			result = 'CreateCharacter ' + this.characterName + ' ' + this.characterClass + ' ' + this.characterSlot;
+			break;
+		case Action.SetRNG:
+			result = 'bRNG ' + this.amount;
 			break;
 		default:
 			result = 'Invalid Action: ' + this.inputString;
@@ -3999,6 +4007,10 @@ async function runRoute()
 				startingState.battleCharacters[currentAction.characterSlot] = new BattleCharacter(new PlayerInfo(currentAction.characterName, currentAction.characterClass, currentAction.primary));
 				currentState.battleCharacters[currentAction.characterSlot] = new BattleCharacter(new PlayerInfo(currentAction.characterName, currentAction.characterClass, currentAction.primary));
 				break;
+			case Action.SetRNG:
+				startingState.randomNumberIndex = currentAction.amount;
+				currentState.randomNumberIndex = currentAction.amount;
+				break;
 		}
 	}
 	
@@ -4253,6 +4265,7 @@ async function runRoute()
 				//targetTime = currentAction.amount;
 				break;
 			case Action.CreateCharacter:
+			case Action.SetRNG:
 				break;
 			default:
 				console.log('UnknownCommand: ' + currentAction.inputString);
@@ -4584,6 +4597,10 @@ async function runRoute()
 			case Action.CreateCharacter:
 				startingState.battleCharacters[currentAction.characterSlot] = new BattleCharacter(new PlayerInfo(currentAction.characterName, currentAction.characterClass, currentAction.primary));
 				currentState.battleCharacters[currentAction.characterSlot] = new BattleCharacter(new PlayerInfo(currentAction.characterName, currentAction.characterClass, currentAction.primary));
+				break;
+			case Action.SetRNG:
+				startingState.randomNumberIndex = currentAction.amount;
+				currentState.randomNumberIndex = currentAction.amount;
 				break;
 			default:
 				console.log('UnknownCommand: ' + currentAction.inputString);
