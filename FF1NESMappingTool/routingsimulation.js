@@ -27,6 +27,7 @@ var fightParallelWidth = 2; // number of top scores to check
 var fightParallelCheckDangerThreshold = 10; // check only runs on fights with this much danger.
 var optimizePass = true; // sort scores by time on run and check current hp vs. damage taken
 var ignoreHp = true; // ignore current hp vs. damage taken
+var debugParty = true; // output party order, name, hp
 
 const Formation = {
 	small: 0,
@@ -4531,6 +4532,14 @@ async function runRoute()
 						outputLines.push("<tr><td>Round " + (j + 1) + "</td><td>" + (j == 0 && endingSummary.encounterState == EncounterState.Ambushed ? "Enemy Strikes First" : (bounceResult.longBounce + bounceResult.shortBounce == 0 ? ("Hold A" + (bounceResult.holdDirection ? " and DPAD" : "")) : bounceResult.longBounce + " full / " + bounceResult.shortBounce + " short")) + " </td><td>Dealt " + endingSummary.dealt[j] + "</td><td>Taken " + endingSummary.taken[j] + "</td><td></td></tr>");
 					}
 					outputLines.push(emptyRowString);
+					if(debugParty)
+					{
+						let characterOutput = [];
+						for (let j = 0x80; j < 0x84; i++)
+							if (endOfBattleState.battleCharacters[j] != null)
+								characterOutput.push(endOfBattleState.battleCharacters[j].characterData.name + ' hp: ' + endOfBattleState.battleCharacters[j].characterData.hp + ' status: ' + endOfBattleState.battleCharacters[j].status);
+						outputLines.push(characterOutput.join(', '));
+					}
 					encounterCount++;
 				}
 				break;
