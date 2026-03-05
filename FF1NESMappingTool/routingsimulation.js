@@ -27,7 +27,7 @@ var fightParallelWidth = 2; // number of top scores to check
 var fightParallelCheckDangerThreshold = 10; // check only runs on fights with this much danger.
 var optimizePass = true; // sort scores by time on run and check current hp vs. damage taken
 var ignoreHp = true; // ignore current hp vs. damage taken
-var debugParty = true; // output party order, name, hp
+var debugParty = false; // output party order, name, hp
 
 const Formation = {
 	small: 0,
