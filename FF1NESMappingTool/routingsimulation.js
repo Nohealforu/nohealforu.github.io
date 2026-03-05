@@ -1982,9 +1982,6 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 				}
 				});
 				
-				if(applyStatus)
-					targetCharacter.status |= character.characterData.attackEffects;
-				
 				targetCharacter.currentHp -= damageSum;
 				if (targetCharacter.currentHp <= 0)
 				{
@@ -1995,6 +1992,8 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 				}
 				else // percent of hp damage dealt in a turn or something, idk 
 				{
+					if(applyStatus)
+						targetCharacter.status |= character.characterData.attackEffects;
 					let damageRatio = damageSum / targetCharacter.characterData.hp; // adjust this by starting hp or something?
 					// calculated danger levels?
 					if(targetCharacter.characterData.primary)
