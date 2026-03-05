@@ -1310,12 +1310,12 @@ BattleCharacter.prototype.burn = function(amount)
 
 BattleCharacter.prototype.canAct = function()
 {
-	return !(this.status & (StatusEffect.dead | StatusEffect.stone | StatusEffect.stop | StatusEffect.sleep) || this.currentHp <= 0);
+	return !((this.status & (StatusEffect.dead | StatusEffect.stone | StatusEffect.stop | StatusEffect.sleep)) || this.currentHp <= 0);
 };
 
 BattleCharacter.prototype.canTarget = function()
 {
-	return !(this.status & (StatusEffect.dead | StatusEffect.stone) || this.currentHp <= 0);
+	return !((this.status & (StatusEffect.dead | StatusEffect.stone)) || this.currentHp <= 0);
 };
 
 function PlayerCommand(battleState, command, info = null, targetType = 0, target = null)
