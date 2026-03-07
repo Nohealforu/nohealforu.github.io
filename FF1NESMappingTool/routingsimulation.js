@@ -3269,7 +3269,7 @@ async function runRoute()
 										if(!testAllKeys || backup2EndingRngValues[endScore.key] == null || backup2EndingRngValues[endScore.key].startTime > endScore.time)
 											backup2EndingRngValues[endScore.key] = endScore.battleState;
 									}
-									else if(endScore.status == 0 && currentAction.encounter.next && !testAllKeys || backup3EndingRngValues[endScore.key] == null || backup3EndingRngValues[endScore.key].startTime > endScore.time))
+									else if(endScore.status == 0 && currentAction.encounter.next && (!testAllKeys || backup3EndingRngValues[endScore.key] == null || backup3EndingRngValues[endScore.key].startTime > endScore.time))
 										backup3EndingRngValues[endScore.key] = endScore.battleState;
 									
 									endingRNGValuesBestTime[endScore.rng] = endScore.time;
