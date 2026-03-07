@@ -4315,8 +4315,8 @@ async function runRoute()
 				{
 					rngScores[key].taken += rngScores[key].endingScores[0].lost - baseLineTaken;
 					rngScores[key].totalTaken += rngScores[key].endingScores[0].lost - baseLineTaken + Math.max(rngNextScores[rngScores[key].endingScores[0].key].totalTaken - healed, 0);
-					rngScores[key].time +=  rngScores[key].endingScores[0].time - baseLineTime;
-					rngScores[key].futureTime += rngScores[key].endingScores[0].time - baseLineTime;
+					rngScores[key].time += rngScores[key].endingScores[0].time - baseLineTime;
+					rngScores[key].futureTime = rngScores[key].time;
 				}
 			}
 		}
@@ -4328,6 +4328,7 @@ async function runRoute()
 	endingRNGValuesBestTime[startingState.randomNumberIndex] = 0;
 	
 	// adjust starting hp
+	// TODO: fix for multiple character segments at start
 	for(let i = 0; i < encounterCount; i++)
 	{
 		outputProgress.innerHTML = 'Adjusting Starting HP for encounter ' + i + ' of ' + totalEncounters;
@@ -4383,7 +4384,7 @@ async function runRoute()
 					else
 					{
 						rngScores[key].endingScores[k].score += Math.min(0, rngScores[key].startingHp - rngNextScores[rngScores[key].endingScores[k].key].totalTaken) * deficitHpScoreFactor;
-						rngScores[key].endingScores[k].futureTime = rngScores[key].endingScores[k].time + rngNextScores[rngScores[key].endingScores[k].key].futureTime;
+						rngScores[key].endingScores[k].futureTime = rngScores[key].time + rngScores[key].endingScores[k].time - baseLineTime + rngNextScores[rngScores[key].endingScores[k].key].futureTime;
 					}
 				}
 				if(ignoreHp)
@@ -4394,14 +4395,12 @@ async function runRoute()
 				rngScores[key].endingRng = rngScores[key].endingScores[0].rng;
 				// rngscores.endingscores.lost is only last round damage
 				// rngscores.totaltaken is whole fight Damage
-				// trying to get the difference in last round damage if it changed due to score adjustments to a new rng Number
-				// and then adding in damage taken from the next battle + battles after, adjusted by healing amounts
 				if(rngNextScores[rngScores[key].endingScores[0].key] != null)
 				{
 					rngScores[key].taken += rngScores[key].endingScores[0].lost - baseLineTaken;
 					rngScores[key].totalTaken += rngScores[key].endingScores[0].lost - baseLineTaken;
-					rngScores[key].time +=  rngScores[key].endingScores[0].time - baseLineTime;
-					rngScores[key].futureTime += rngNextScores[rngScores[key].endingScores[0].key].futureTime + rngScores[key].endingScores[0].time - baseLineTime;
+					rngScores[key].time += rngScores[key].endingScores[0].time - baseLineTime;
+					rngScores[key].futureTime = rngScores[key].time + rngNextScores[rngScores[key].endingScores[0].key].futureTime;
 				}
 			}
 		}
