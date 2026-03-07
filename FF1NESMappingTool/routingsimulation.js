@@ -3249,7 +3249,7 @@ async function runRoute(rerunCulled = false)
 							for(let k = 0; k < summary.endingScores.length; k++)
 							{
 								let endScore = summary.endingScores[k];
-								if(endingRNGValuesBestTime[endScore.rng] > endScore.time && culledKeys[encounterCount][endScore.key] == null)
+								if(endingRNGValuesBestTime[endScore.rng] > endScore.time && (culledKeys[encounterCount] == null || culledKeys[encounterCount][endScore.key] == null))
 								{
 									endScore.battleState.startTime = endScore.time;
 									if(endScore.status == 0 && currentAction.encounter.next && minimumEnemies == endScore.enemies && minimumExp == encounterEnemyCounts[endScore.rng].expValue)
@@ -3431,6 +3431,8 @@ async function runRoute(rerunCulled = false)
 	// adjust ending scores for hp 
 	for(let i = encounterCount - 2; i >= 0; i--)
 	{
+		if(culledKeys[i] == null)
+			culledKeys[i] = {};
 		outputProgress.innerHTML = 'Adjusting HP Scores for encounter ' + i + ' of ' + totalEncounters;
 		await yieldToMain();
 		if(i == debugFight)
