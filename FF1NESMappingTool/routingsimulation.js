@@ -3450,6 +3450,8 @@ async function runRoute()
 					{
 						rngScores[key].endingScores[k].score += Math.min(0, rngScores[key].startingHp - rngNextScores[rngScores[key].endingScores[k].key].totalTaken) * deficitHpScoreFactor;
 						rngScores[key].endingScores[k].futureTime = rngScores[key].time + rngScores[key].endingScores[k].time - baseLineTime + rngNextScores[rngScores[key].endingScores[k].key].futureTime;
+						if(logValues)
+							rngScores[key].endingScores[k].nextScore = rngNextScores[rngScores[key].endingScores[k].key];
 					}
 				}
 				if(ignoreHp)
