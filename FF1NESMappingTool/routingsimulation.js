@@ -5,7 +5,8 @@ const emptyRowString = "<tr><td/><td/><td/><td/><td/></tr>"
 var timeScoreFactor = 3; // score adjustment for time taken 
 var priorTimeScoreFactor = 2; // score adjustment for time taken in previous turn for delaying 1 turn after ending fight possible
 var damageDealtScoreFactor = 3500; // score adjustment for damage dealt as % of enemy hp
-var damageTakenScoreFactor = 2500; // score adjustment for damage taken as % of current hp
+var damageDealtMaxHpCap = 500; // max hp value of enemy for comparing score
+var damageTakenScoreFactor = 3500; // score adjustment for damage taken as % of current hp
 var secondarySacrificeScoreFactor = 5000; // score adjustment for losing non-primary characters in battle
 var enemyCountScoreFactor = 1750; // score adjustment per enemy spawned
 var hpGainedScoreFactor = 20000; // score adjustment for hp gained from strong level ups
@@ -1851,7 +1852,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 				}
 				else // percent of hp damage dealt in a turn or something, idk 
 				{
-					let damageRatio = damageSum / targetCharacter.characterData.hp;
+					let damageRatio = damageSum / Math.min(damageDealtMaxHpCap, targetCharacter.characterData.hp);
 					if(damageRatio > 0.75) // more than 75% damage but not a kill should be capped off in score
 						damageRatio = 0.75;	
 					this.score += damageDealtScoreFactor * damageRatio * dangerRatio;
