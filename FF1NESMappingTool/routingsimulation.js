@@ -2685,7 +2685,7 @@ function RouteAction(actionString)
 				this.characterName = splitAction[1];
 				this.characterClass = characterClasses[splitAction[2]];
 				this.characterSlot = (parseInt(splitAction[3]) || 0x80);
-				this.primary = splitAction[4] == "Primary";
+				this.primary = splitAction[4] == 'Primary';
 				break;
 			case 'bRNG':
 				this.action = Action.SetRNG;
@@ -2740,7 +2740,7 @@ RouteAction.prototype.toString  = function RouteActionToString()
 			result = 'TimeTarget ' + this.amount;
 			break;
 		case Action.CreateCharacter:
-			result = 'CreateCharacter ' + this.characterName + ' ' + this.characterClass.lookupString + ' ' + this.characterSlot;
+			result = 'CreateCharacter ' + this.characterName + ' ' + this.characterClass.lookupString + ' ' + this.characterSlot + (this.primary ? ' Primary' : '');
 			break;
 		case Action.SetRNG:
 			result = 'bRNG ' + this.amount;
