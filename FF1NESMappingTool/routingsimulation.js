@@ -18,7 +18,7 @@ var turnScorePenalty = 2000; // score penalty for each turn
 var debugFight = 103; // for easier setting of breakpoints
 var rngValueCheckCount = 10; // number of RNG values minimum before adding additional values 
 var logValues = false; // log information to console, warning: high memory usage, clear console frequently if active
-var fightLookAhead = true; // look ahead an aditional turn in battle, high processing, currently little benefit if any
+var fightLookAhead = true; // look ahead an additional turn in battle, high processing, currently little benefit if any
 var fightLookAheadDangerThreshold = 10; // look ahead only runs on fights with this much danger.
 var fightLookAheadWidth = 10; // number of top scores to process for both in battle look ahead (optional)
 var fightLookAheadScoreDiscount = 0.75; // score future discount for next turn, prevent stalling forever
@@ -29,6 +29,7 @@ var fightParallelCheckDangerThreshold = 10; // check only runs on fights with th
 var optimizePass = true; // sort scores by time on run and check current hp vs. damage taken
 var ignoreHp = true; // ignore current hp vs. damage taken
 var debugParty = false; // output party order, name, hp
+var testAllKeys = false; // will test everything and probably crash
 
 const Formation = {
 	small: 0,
@@ -3244,28 +3245,31 @@ async function runRoute()
 							for(let k = 0; k < summary.endingScores.length; k++)
 							{
 								let endScore = summary.endingScores[k];
-								if(endingRNGValuesBestTime[endScore.rng] > endScore.time)
+								if(testAllKeys || endingRNGValuesBestTime[endScore.rng] > endScore.time)
 								{
 									endScore.battleState.startTime = endScore.time;
 									if(endScore.status == 0 && currentAction.encounter.next && minimumEnemies == endScore.enemies && minimumExp == encounterEnemyCounts[endScore.rng].expValue)
 									{
 										if(endingRngValues[endScore.key] == null)
 											endingRngValuesCount++;
-										endingRngValues[endScore.key] = endScore.battleState;
+										if(!testAllKeys || endingRngValues[endScore.key] == null || endingRngValues[endScore.key].startTime > endScore.time)
+											endingRngValues[endScore.key] = endScore.battleState;
 									}
 									else if(endScore.status == 0 && currentAction.encounter.next && minimumEnemies + 1 >= endScore.enemies)
 									{
 										if(backupEndingRngValues[endScore.key] == null)
 											backupEndingRngValuesCount++;
-										backupEndingRngValues[endScore.key] = endScore.battleState;
+										if(!testAllKeys || backupEndingRngValues[endScore.key] == null || backupEndingRngValues[endScore.key].startTime > endScore.time)
+											backupEndingRngValues[endScore.key] = endScore.battleState;
 									}
 									else if(endScore.status == 0 && currentAction.encounter.next && minimumEnemies + 2 >= endScore.enemies)
 									{
 										if(backup2EndingRngValues[endScore.key] == null)
 											backup2EndingRngValuesCount++;
-										backup2EndingRngValues[endScore.key] = endScore.battleState;
+										if(!testAllKeys || backup2EndingRngValues[endScore.key] == null || backup2EndingRngValues[endScore.key].startTime > endScore.time)
+											backup2EndingRngValues[endScore.key] = endScore.battleState;
 									}
-									else if(endScore.status == 0 && currentAction.encounter.next)
+									else if(endScore.status == 0 && currentAction.encounter.next && !testAllKeys || backup3EndingRngValues[endScore.key] == null || backup3EndingRngValues[endScore.key].startTime > endScore.time))
 										backup3EndingRngValues[endScore.key] = endScore.battleState;
 									
 									endingRNGValuesBestTime[endScore.rng] = endScore.time;
