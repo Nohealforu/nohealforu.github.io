@@ -5,7 +5,7 @@ const emptyRowString = "<tr><td/><td/><td/><td/><td/></tr>"
 var timeScoreFactor = 3; // score adjustment for time taken 
 var priorTimeScoreFactor = 2; // score adjustment for time taken in previous turn for delaying 1 turn after ending fight possible
 var damageDealtScoreFactor = 3500; // score adjustment for damage dealt as % of enemy hp
-var damageTakenScoreFactor = 7500; // score adjustment for damage taken as % of current hp
+var damageTakenScoreFactor = 3500; // score adjustment for damage taken as % of current hp
 var secondarySacrificeScoreFactor = 5000; // score adjustment for losing non-primary characters in battle
 var enemyCountScoreFactor = 1750; // score adjustment per enemy spawned
 var hpGainedScoreFactor = 20000; // score adjustment for hp gained from strong level ups
@@ -1998,7 +1998,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 					let damageRatio = damageSum / targetCharacter.characterData.hp; // adjust this by starting hp or something?
 					// calculated danger levels?
 					if(targetCharacter.characterData.primary)
-						this.score -= damageTakenScoreFactor * damageRatio * damageRatio * damageTakenRatio / dangerRatio;
+						this.score -= damageTakenScoreFactor * damageRatio * damageTakenRatio;
 				}
 				this.damageTaken += damageSum;
 				this.estimatedTime += 90;
@@ -2053,7 +2053,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 						{
 							let damageRatio = damageRoll / targetCharacter.characterData.hp; // adjust this by starting hp or something? idk
 							if(targetCharacter.characterData.primary)
-								this.score -= damageTakenScoreFactor * damageRatio * damageRatio * damageTakenRatio / dangerRatio;
+								this.score -= damageTakenScoreFactor * damageRatio * damageTakenRatio;
 						}
 						
 						this.damageTaken += damageRoll;
