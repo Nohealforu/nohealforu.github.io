@@ -989,9 +989,10 @@ const encounters = {
 	0xFF: new EncounterInfo(Formation.mix, false, 4, new EncounterSlot(enemies.Garland, 0, 0), new EncounterSlot(enemies.IronGol, 1, 2))
 };
 
-function ClassInfo(name, index, hp, str, agi, int, vit, luck, evade, hit, hitGain, attack, mdef, mdefGain, levelUpTable)
+function ClassInfo(name, lookupString, index, hp, str, agi, int, vit, luck, evade, hit, hitGain, attack, mdef, mdefGain, levelUpTable)
 {
 	this.name = name;
+	this.lookupString = lookupString;
 	this.index = index;
 	this.hp = hp;
 	this.str = str;
@@ -1009,7 +1010,7 @@ function ClassInfo(name, index, hp, str, agi, int, vit, luck, evade, hit, hitGai
 }
 
 const characterClasses={
-'fighter': new ClassInfo('Fighter', 0, 35, 20, 5, 1, 10, 5, 53, 10, 3, 10, 15, 3,
+'fighter': new ClassInfo('Fighter', 'fighter', 0, 35, 20, 5, 1, 10, 5, 53, 10, 3, 10, 15, 3,
        [0x3a00, 0x3b00, 0x3d00, 0x3a00, 0x3b00,
 		0x3d00, 0x3a00, 0x3b00, 0x3d00, 0x3a00,
 		0x1b00, 0x3d00, 0x3a00, 0x1b07, 0x3d00,
@@ -1020,7 +1021,7 @@ const characterClasses={
 		0x1d07, 0x3200, 0x1907, 0x1600, 0x3807,
 		0x1000, 0x1c07, 0x3000, 0x1807, 0x1000,
 		0x3807, 0x1000, 0x1807, 0x3000]),
-'thief': new ClassInfo('Thief', 1, 30, 5, 10, 5, 5, 15, 58, 5, 2, 2, 15, 2,
+'thief': new ClassInfo('Thief', 'thief', 1, 30, 5, 10, 5, 5, 15, 58, 5, 2, 2, 15, 2,
 	   [0x3900, 0x3700, 0x3900, 0x3500, 0x1b00,
 		0x3500, 0x1900, 0x3300, 0x1d00, 0x2100,
 		0x1b00, 0x3500, 0x0900, 0x330f, 0x1d00,
@@ -1031,7 +1032,7 @@ const characterClasses={
 		0x3d0f, 0x0900, 0x1b0f, 0x1d00, 0x290f,
 		0x1300, 0x0d0f, 0x1100, 0x0b0f, 0x3500,
 		0x090f, 0x1300, 0x0d0f, 0x1100]),
-'monk': new ClassInfo('Black Belt', 2, 33, 5, 5, 5, 20, 5, 53, 5, 3, 2, 10, 4,
+'monk': new ClassInfo('Black Belt', 'monk', 2, 33, 5, 5, 5, 20, 5, 53, 5, 3, 2, 10, 4,
 	   [0x2b00, 0x1700, 0x2a00, 0x1700, 0x0b00,
 		0x3600, 0x0b00, 0x1700, 0x2a00, 0x1700,
 		0x0b00, 0x3600, 0x0b00, 0x1700, 0x2a00,
@@ -1042,7 +1043,7 @@ const characterClasses={
 		0x3600, 0x0b00, 0x1700, 0x2a00, 0x1700,
 		0x0b00, 0x3600, 0x0a00, 0x1700, 0x2a00,
 		0x3600, 0x0b00, 0x3600, 0x0a00]),
-'redmage': new ClassInfo('Red Mage', 3, 30, 10, 10, 10, 5, 5, 58, 7, 2, 5, 20, 2,
+'redmage': new ClassInfo('Red Mage', 'redmage', 3, 30, 10, 10, 10, 5, 5, 58, 7, 2, 5, 20, 2,
 	   [0x3303, 0x0e02, 0x3301, 0x0e02, 0x3304,
 		0x0c05, 0x3302, 0x2c04, 0x3109, 0x0608,
 		0x3904, 0x070a, 0x3001, 0x0f10, 0x311c,
@@ -1053,7 +1054,7 @@ const characterClasses={
 		0x2408, 0x1240, 0x0d80, 0x1120, 0x0602,
 		0x1810, 0x0580, 0x1340, 0x0c04, 0x1020,
 		0x2780, 0x1908, 0x0440, 0x1210]),
-'whitemage': new ClassInfo('White Mage', 4, 28, 5, 5, 15, 10, 5, 53, 5, 1, 2, 20, 2,
+'whitemage': new ClassInfo('White Mage', 'whitemage', 4, 28, 5, 5, 15, 10, 5, 53, 5, 1, 2, 20, 2,
 	   [0x3d03, 0x1e02, 0x3501, 0x0e06, 0x2504,
 		0x1601, 0x2d0c, 0x060a, 0x3501, 0x0e0c,
 		0x2510, 0x1612, 0x2d09, 0x0614, 0x1520,
@@ -1064,7 +1065,7 @@ const characterClasses={
 		0x3080, 0x0902, 0x0240, 0x1010, 0x0980,
 		0x2220, 0x1004, 0x0940, 0x0280, 0x1008,
 		0x2910, 0x0220, 0x1040, 0x0980]),
-'blackmage': new ClassInfo('Black Mage', 5, 25, 1, 10, 20, 1, 10, 58, 5, 1, 1, 20, 2,
+'blackmage': new ClassInfo('Black Mage', 'blackmage', 5, 25, 1, 10, 20, 1, 10, 58, 5, 1, 1, 20, 2,
 	   [0x2403, 0x0e02, 0x3501, 0x0606, 0x2d04,
 		0x1601, 0x250c, 0x0e0a, 0x1501, 0x240c,
 		0x0e10, 0x1412, 0x2509, 0x0c14, 0x1620,
@@ -2739,7 +2740,7 @@ RouteAction.prototype.toString  = function RouteActionToString()
 			result = 'TimeTarget ' + this.amount;
 			break;
 		case Action.CreateCharacter:
-			result = 'CreateCharacter ' + this.characterName + ' ' + this.characterClass + ' ' + this.characterSlot;
+			result = 'CreateCharacter ' + this.characterName + ' ' + this.characterClass.lookupString + ' ' + this.characterSlot;
 			break;
 		case Action.SetRNG:
 			result = 'bRNG ' + this.amount;
