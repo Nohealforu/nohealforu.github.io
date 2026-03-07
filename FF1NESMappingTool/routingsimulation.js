@@ -29,7 +29,6 @@ var fightParallelCheckDangerThreshold = 10; // check only runs on fights with th
 var optimizePass = true; // sort scores by time on run and check current hp vs. damage taken
 var ignoreHp = true; // ignore current hp vs. damage taken
 var debugParty = false; // output party order, name, hp
-var testAllKeys = false; // will test everything and probably crash
 
 const Formation = {
 	small: 0,
@@ -2994,6 +2993,8 @@ new RouteAction('Encounter 123 4 1 Bane'),
 new RouteAction('TimeTarget 999999'),
 ];
 
+var culledKeys;
+
 //PlayerInfo(name, characterClass, classChanged, level, exp, hp, str, agi, int, vit, luck, evade, absorb, hits, hit, attack, crit, mdef, weaknesses, resistances, weapon, armor, shield, helmet, glove)
 //PlayerInfo(name, characterClass, classChanged = false, level = 1, exp = 0, hp = characterClass.hp, str = characterClass.str, agi = characterClass.agi, int = characterClass.int, vit = characterClass.vit, luck = characterClass.luck, evade = characterClass.evade, absorb = 0, hit = characterClass.hit, attack = characterClass.attack, mdef = characterClass.mdef, weaknesses = 0, resistances = 0, weapon = null, armor = null, shield = null, helmet = null, glove = null)
 function loadRoute()
@@ -3001,7 +3002,7 @@ function loadRoute()
 	document.getElementById('routeText').value = route.join('\n');
 }
 
-async function runRoute()
+async function runRoute(rerunCulled = false)
 {
 	let newRoute = document.getElementById('routeText').value.split(/\r?\n/);
 	route = Array(newRoute.length);
@@ -3080,6 +3081,9 @@ async function runRoute()
 				break;
 		}
 	}
+	
+	if(!rerunCulled || culledKeys == null)
+		culledKeys = new Array(encounterCount);
 	
 	console.log("Calculating Good RNG seeds...");
 	let totalEncounters = encounterCount - 1;
@@ -3245,31 +3249,28 @@ async function runRoute()
 							for(let k = 0; k < summary.endingScores.length; k++)
 							{
 								let endScore = summary.endingScores[k];
-								if(testAllKeys || endingRNGValuesBestTime[endScore.rng] > endScore.time)
+								if(endingRNGValuesBestTime[endScore.rng] > endScore.time && culledKeys[encounterCount][endScore.key] == null)
 								{
 									endScore.battleState.startTime = endScore.time;
 									if(endScore.status == 0 && currentAction.encounter.next && minimumEnemies == endScore.enemies && minimumExp == encounterEnemyCounts[endScore.rng].expValue)
 									{
 										if(endingRngValues[endScore.key] == null)
 											endingRngValuesCount++;
-										if(!testAllKeys || endingRngValues[endScore.key] == null || endingRngValues[endScore.key].startTime > endScore.time)
-											endingRngValues[endScore.key] = endScore.battleState;
+										endingRngValues[endScore.key] = endScore.battleState;
 									}
 									else if(endScore.status == 0 && currentAction.encounter.next && minimumEnemies + 1 >= endScore.enemies)
 									{
 										if(backupEndingRngValues[endScore.key] == null)
 											backupEndingRngValuesCount++;
-										if(!testAllKeys || backupEndingRngValues[endScore.key] == null || backupEndingRngValues[endScore.key].startTime > endScore.time)
-											backupEndingRngValues[endScore.key] = endScore.battleState;
+										backupEndingRngValues[endScore.key] = endScore.battleState;
 									}
 									else if(endScore.status == 0 && currentAction.encounter.next && minimumEnemies + 2 >= endScore.enemies)
 									{
 										if(backup2EndingRngValues[endScore.key] == null)
 											backup2EndingRngValuesCount++;
-										if(!testAllKeys || backup2EndingRngValues[endScore.key] == null || backup2EndingRngValues[endScore.key].startTime > endScore.time)
-											backup2EndingRngValues[endScore.key] = endScore.battleState;
+										backup2EndingRngValues[endScore.key] = endScore.battleState;
 									}
-									else if(endScore.status == 0 && currentAction.encounter.next && (!testAllKeys || backup3EndingRngValues[endScore.key] == null || backup3EndingRngValues[endScore.key].startTime > endScore.time))
+									else if(endScore.status == 0)
 										backup3EndingRngValues[endScore.key] = endScore.battleState;
 									
 									endingRNGValuesBestTime[endScore.rng] = endScore.time;
@@ -3473,7 +3474,11 @@ async function runRoute()
 					rngScores[key].time += rngScores[key].endingScores[0].time - baseLineTime;
 					rngScores[key].futureTime = rngScores[key].time + rngNextScores[rngScores[key].endingScores[0].key].futureTime;
 				}
+				if(rngScores[key].endingScores[0].score == -999999)
+					culledKeys[i][endScore.key] = true;
 			}
+			else
+				culledKeys[i][endScore.key] = true;
 		}
 	}
 	
