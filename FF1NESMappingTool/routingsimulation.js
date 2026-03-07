@@ -3477,10 +3477,10 @@ async function runRoute(rerunCulled = false)
 					rngScores[key].futureTime = rngScores[key].time + rngNextScores[rngScores[key].endingScores[0].key].futureTime;
 				}
 				if(rngScores[key].endingScores[0].score == -999999)
-					culledKeys[i][endScore.key] = true;
+					culledKeys[i][key] = true;
 			}
 			else
-				culledKeys[i][endScore.key] = true;
+				culledKeys[i][key] = true;
 		}
 	}
 	
