@@ -1014,7 +1014,15 @@ function ClassInfo(name, lookupString, index, hp, str, agi, int, vit, luck, evad
 	this.levelUpTable = levelUpTable;
 }
 
-const characterClasses={
+const Character = {
+	fighter: 0,
+	thief: 1,
+	monk: 2,
+	redmage: 3,
+	whitemage: 4,
+	blackmage: 5,
+
+const CharacterClasses = {
 'fighter': new ClassInfo('Fighter', 'fighter', 0, 35, 20, 5, 1, 10, 5, 53, 10, 3, 10, 15, 3,
        [0x3a00, 0x3b00, 0x3d00, 0x3a00, 0x3b00,
 		0x3d00, 0x3a00, 0x3b00, 0x3d00, 0x3a00,
@@ -1151,7 +1159,7 @@ function PlayerInfo(name, characterClass, primary = true, classChanged = false, 
 	this.vit = vit;
 	this.luck = luck;
 	this.attack = attack;
-	this.crit = weapon == null ? 0 : weapon.crit;
+	this.crit = weapon == null ? (characterClass.index == Character.monk ? level * 2 : 0) : weapon.crit;
 	this.hit = hit;
 	this.updateSwings();
 	this.absorb = absorb;
@@ -1161,6 +1169,7 @@ function PlayerInfo(name, characterClass, primary = true, classChanged = false, 
 	this.resistances = resistances;
 	this.weapon = weapon;
 	this.armor = [armor, shield, helmet, glove];
+	this.notification = '';
 }
 
 // create snapshot of player stats at the current point
@@ -1171,7 +1180,7 @@ PlayerInfo.prototype.saveInstance = function ()
 
 PlayerInfo.prototype.updateSwings = function()
 {
-	this.hits = Math.floor(1 + this.hit / 32);
+	this.hits = Math.floor(1 + this.hit / 32) * (this.characterClass.index == Character.monk && this.weapon == null ? 2 : 1);
 }
 
 PlayerInfo.prototype.updateResistances = function()
@@ -1181,25 +1190,41 @@ PlayerInfo.prototype.updateResistances = function()
 
 PlayerInfo.prototype.unequipWeapon = function()
 {
-	this.attack -= this.weapon.attack; // put something in here for black belts (and black mage issues)?
-	this.hit -= this.weapon.hit;
-	this.weapon = null; 
-	this.crit = 0;
-	this.updateSwings();
+	if(this.weapon != null)
+	{
+		this.attack -= this.weapon.attack; // put something in here for black belts (and black mage issues)?
+		this.hit -= this.weapon.hit;
+		this.weapon = null; 
+		this.crit = 0;
+		this.updateSwings();
+	}
+	if(this.characterClass.index == Character.monk)
+	{
+		this.attack = this.level * 2;
+		this.crit = this.level * 2;
+		this.updateSwings();
+	}
 }
 
 PlayerInfo.prototype.unequipArmor = function(slot)
 {
-	this.absorb -= this.armor[slot].absorb;
-	this.evade += this.armor[slot].evade;
-	this.armor[slot] = null;
-	this.updateResistances();
+	if(this.armor[slot] != null)
+	{
+		this.absorb -= this.armor[slot].absorb;
+		this.evade += this.armor[slot].evade;
+		this.armor[slot] = null;
+		this.updateResistances();
+	}
+	if(this.characterClass.index == Character.monk && this.armor[Slot.Armor] == null && this.armor[Slot.Helmet] == null && this.armor[Slot.Glove] == null && this.armor[Slot.Shield] == null)
+		this.absorb = this.level;
 }
 
 PlayerInfo.prototype.equipWeapon = function(weapon)
 {
 	if(this.weapon != null)
 		this.unequipWeapon();
+	if(this.characterClass.index == Character.monk)
+		this.attack = Math.ceil(this.str / 2);
 	this.weapon = weapon;
 	this.attack += weapon.attack;
 	this.hit += weapon.hit;
@@ -1209,6 +1234,8 @@ PlayerInfo.prototype.equipWeapon = function(weapon)
 
 PlayerInfo.prototype.equipArmor = function(armor)
 {
+	if(this.characterClass.index == Character.monk && this.armor[Slot.Armor] == null && this.armor[Slot.Helmet] == null && this.armor[Slot.Glove] == null && this.armor[Slot.Shield] == null)
+		this.absorb = 0;
 	if(this.armor[armor.slot] != null)
 		this.unequipArmor(armor.slot);
 	this.absorb += armor.absorb;
@@ -1256,6 +1283,28 @@ PlayerInfo.prototype.levelUp = function (battleState)
 		this.vit++;
 	if ((levelStats & 0x0100) != 0 || !(battleState.getRandomNumber() & 0x03))
 		this.luck++;
+	
+	if(this.characterClass.index == Character.monk)
+	{
+		if(this.weapon == null)
+		{
+			if(this.absorb > this.level)
+				this.notification = 'Monk level, check armor';
+			else
+				this.absorb = this.level;
+			this.attack = this.level * 2;
+			this.crit = this.level * 2;
+		}
+		else if(this.weapon != null && this.absorb < this.level) // weapon equipped, armor worse than level
+		{
+			this.notification = 'Monk w/ weapon level > armor absorb, naked time';
+			unequipArmor(Slot.Armor);
+			unequipArmor(Slot.Shield);
+			unequipArmor(Slot.Helmet);
+			unequipArmor(Slot.Glove);
+		}
+		
+	}
 	
 	this.hit += this.characterClass.hitGain;
 	if(this.hit > 200)
@@ -2694,7 +2743,7 @@ function RouteAction(actionString)
 			case 'CreateCharacter':
 				this.action = Action.CreateCharacter;
 				this.characterName = splitAction[1];
-				this.characterClass = characterClasses[splitAction[2]];
+				this.characterClass = CharacterClasses[splitAction[2]];
 				this.characterSlot = (parseInt(splitAction[3]) || 0x80);
 				this.primary = splitAction[4] == 'Primary';
 				break;
@@ -3048,8 +3097,8 @@ async function runRoute(rerunCulled = false)
 		6: null,
 		7: null,
 		8: null,
-		0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, false, 2, 168, 61, 21, 6, 1, 11, 5, 39, 15, 18, 19, 18, 0, 0, weapons['Rapier'], armor['ChainArmor'], null, null, null), 35),
-		//0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 8, 7326, 230, 27, 12, 3, 15, 9, 37, 24, 46, 36, 36, 0, 0, weapons['SilverSword'], armor['IronArmor'], null, null, null)),
+		0x80: new BattleCharacter(new PlayerInfo('CCCC', CharacterClasses['fighter'], false, false, 2, 168, 61, 21, 6, 1, 11, 5, 39, 15, 18, 19, 18, 0, 0, weapons['Rapier'], armor['ChainArmor'], null, null, null), 35),
+		//0x80: new BattleCharacter(new PlayerInfo('CCCC', CharacterClasses['fighter'], false, 8, 7326, 230, 27, 12, 3, 15, 9, 37, 24, 46, 36, 36, 0, 0, weapons['SilverSword'], armor['IronArmor'], null, null, null)),
 		0x81: null,
 		0x82: null,
 		0x83: null,
@@ -3527,8 +3576,8 @@ async function runRoute(rerunCulled = false)
 		6: null,
 		7: null,
 		8: null,
-		0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, false, 2, 168, 61, 21, 6, 1, 11, 5, 39, 15, 18, 19, 18, 0, 0, weapons['Rapier'], armor['ChainArmor'], null, null, null), 35),
-		//0x80: new BattleCharacter(new PlayerInfo('CCCC', characterClasses['fighter'], false, 8, 7326, 230, 27, 12, 3, 15, 9, 37, 24, 46, 36, 36, 0, 0, weapons['SilverSword'], armor['IronArmor'], null, null, null)),
+		0x80: new BattleCharacter(new PlayerInfo('CCCC', CharacterClasses['fighter'], false, false, 2, 168, 61, 21, 6, 1, 11, 5, 39, 15, 18, 19, 18, 0, 0, weapons['Rapier'], armor['ChainArmor'], null, null, null), 35),
+		//0x80: new BattleCharacter(new PlayerInfo('CCCC', CharacterClasses['fighter'], false, 8, 7326, 230, 27, 12, 3, 15, 9, 37, 24, 46, 36, 36, 0, 0, weapons['SilverSword'], armor['IronArmor'], null, null, null)),
 		0x81: null,
 		0x82: null,
 		0x83: null,
@@ -3651,13 +3700,18 @@ async function runRoute(rerunCulled = false)
 						outputLines.push("<tr><td>Round " + (j + 1) + "</td><td>" + (j == 0 && endingSummary.encounterState == EncounterState.Ambushed ? "Enemy Strikes First" : (bounceResult.longBounce + bounceResult.shortBounce == 0 ? ("Hold A" + (bounceResult.holdDirection ? " and DPAD" : "")) : bounceResult.longBounce + " full / " + bounceResult.shortBounce + " short")) + " </td><td>Dealt " + endingSummary.dealt[j] + "</td><td>Taken " + endingSummary.taken[j] + "</td><td></td></tr>");
 					}
 					outputLines.push(emptyRowString);
+					if(endingSummary.characters[0x80].characterData.notification != null)
+					{
+						outputLines.push("<tr><td>" + endingSummary.characters[0x80].characterData.notification + "</td><td/><td/><td/><td/></tr>");
+						outputLines.push(emptyRowString);
+					}
 					if(settings.debugParty)
 					{
 						let characterOutput = [];
 						for (let j = 0x80; j < 0x84; j++)
 							if (endOfBattleState.battleCharacters[j] != null)
 								characterOutput.push(endOfBattleState.battleCharacters[j].characterData.name + ' hp: ' + endOfBattleState.battleCharacters[j].currentHp + ' status: ' + endOfBattleState.battleCharacters[j].status);
-						outputLines.push(characterOutput.join(', '));
+						outputLines.push("<tr><td>" + characterOutput.join(', ')  + "</td><td/><td/><td/><td/></tr>");
 					}
 					encounterCount++;
 				}
