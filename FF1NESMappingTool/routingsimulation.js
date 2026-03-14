@@ -1021,6 +1021,7 @@ const Character = {
 	redmage: 3,
 	whitemage: 4,
 	blackmage: 5,
+};
 
 const CharacterClasses = {
 'fighter': new ClassInfo('Fighter', 'fighter', 0, 35, 20, 5, 1, 10, 5, 53, 10, 3, 10, 15, 3,
