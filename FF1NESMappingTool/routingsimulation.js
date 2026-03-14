@@ -10,8 +10,10 @@ var damageTakenScoreFactor = 2500; // score adjustment for damage taken as % of 
 var secondarySacrificeScoreFactor = 5000; // score adjustment for losing non-primary characters in battle
 var enemyCountScoreFactor = 1750; // score adjustment per enemy spawned
 var hpGainedScoreFactor = 20000; // score adjustment for hp gained from strong level ups
+var strGainedScoreFactor = 0; // score adjustment when str not gained 
 var deficitHpScoreFactor = 10; // score penalty for paths taking more than current hp so that adjustments happens
 var encounterFinishScoreFactor = 1000; // score bonus for finishing the fight
+var badTurnScore = -20000; // score for considering a turn "bad"
 var innRatioAdd = 8; // adjustment based on distance to inn (fights+add)*fights/divisor
 var innRatioDivisor = 0; // adjustment based on distance to inn
 var turnScorePenalty = 2000; // score penalty for each turn
@@ -1231,8 +1233,12 @@ PlayerInfo.prototype.levelUp = function (battleState)
         this.hp = 999;
  
     if ((levelStats & 0x1000) != 0 || !(battleState.getRandomNumber() & 0x03))
+	{
 		if(++this.str % 2 == 0) // put in some checks for black belt and black mage to make this right or not
 			this.attack++; 
+	}
+	else if((levelStats & 0x1000) == 0)
+		score -= strGainedScoreFactor;
 	
     if ((levelStats & 0x0800) != 0 || !(battleState.getRandomNumber() & 0x03))
 	{
@@ -1254,7 +1260,9 @@ PlayerInfo.prototype.levelUp = function (battleState)
 	this.updateSwings();
 	this.mdef += this.characterClass.mdefGain;
 	
-	return score;
+	if(this.primary)
+		return score;
+	return 0;
 }
 
 function BattleCharacter(characterData, currentHp = characterData.hp, hitMultiplier = 1, abilityIndex = 0, magicIndex = 0, status = 0, absorb = characterData.absorb, evade = characterData.evade, morale = characterData.morale, resistances = characterData.resistances)
@@ -2487,10 +2495,10 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 		//if(battleState.encounterIndex != 0x7D)
 			battleState.score -= turnScorePenalty + battleState.estimatedTime * timeScoreFactor;
 		
-		if(battleState.score < -20000 && setDelays == null)
+		if(battleState.score < badTurnScore && setDelays == null)
 			battleState.badTurn = true;
 		
-		if(battleState.battleComplete && redoBattle && battleState.score < -20000)
+		if(battleState.battleComplete && redoBattle && battleState.score < badTurnScore)
 			delayStates[battleState.index - 1]++;
 		
 		/*if(battleState.battleComplete && redoBattle && !battleState.improvedEndState(nextEncounterState, redoBattleEndState, redoBattleNextState))
