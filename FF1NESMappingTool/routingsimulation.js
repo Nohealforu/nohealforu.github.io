@@ -3013,6 +3013,23 @@ function loadRoute()
 	document.getElementById('routeText').value = route.join('\n');
 }
 
+function loadSettings()
+{
+	document.getElementById('settingsBox').value = JSON.stringify(settings);
+}
+
+function updateSettings()
+{
+	try
+	{
+		settings = JSON.parse(document.getElementById('settingsBox').value);
+	}
+	catch (error)
+	{
+		document.getElementById('settingsError').innerHTML = error;
+	}
+}
+
 async function runRoute(rerunCulled = false)
 {
 	let newRoute = document.getElementById('routeText').value.split(/\r?\n/);
