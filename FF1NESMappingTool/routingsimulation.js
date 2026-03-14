@@ -3022,6 +3022,7 @@ function updateSettings()
 {
 	try
 	{
+		document.getElementById('settingsError').innerHTML = null;
 		settings = JSON.parse(document.getElementById('settingsBox').value);
 	}
 	catch (error)
