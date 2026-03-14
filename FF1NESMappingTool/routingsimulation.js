@@ -1298,11 +1298,11 @@ PlayerInfo.prototype.levelUp = function (battleState)
 		}
 		else if(this.weapon != null && this.absorb < this.level) // weapon equipped, armor worse than level
 		{
-			this.notification = 'Monk w/ weapon level > armor absorb, naked time';
-			unequipArmor(Slot.Armor);
-			unequipArmor(Slot.Shield);
-			unequipArmor(Slot.Helmet);
-			unequipArmor(Slot.Glove);
+			this.notification = 'Monk w/ weapon level > armor absorb, strip/check armor';
+			this.unequipArmor(Slot.Armor);
+			this.unequipArmor(Slot.Shield);
+			this.unequipArmor(Slot.Helmet);
+			this.unequipArmor(Slot.Glove);
 		}
 		
 	}
