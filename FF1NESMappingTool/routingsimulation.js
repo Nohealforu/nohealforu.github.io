@@ -1162,7 +1162,6 @@ function PlayerInfo(name, characterClass, primary = true, classChanged = false, 
 	this.attack = attack;
 	this.crit = weapon == null ? (characterClass.index == Character.monk ? level * 2 : 0) : weapon.crit;
 	this.hit = hit;
-	this.updateSwings();
 	this.absorb = absorb;
 	this.evade = evade;
 	this.mdef = mdef;
@@ -1171,6 +1170,7 @@ function PlayerInfo(name, characterClass, primary = true, classChanged = false, 
 	this.weapon = weapon;
 	this.armor = [armor, shield, helmet, glove];
 	this.notification = '';
+	this.updateSwings();
 }
 
 // create snapshot of player stats at the current point
@@ -3701,9 +3701,9 @@ async function runRoute(rerunCulled = false)
 						outputLines.push("<tr><td>Round " + (j + 1) + "</td><td>" + (j == 0 && endingSummary.encounterState == EncounterState.Ambushed ? "Enemy Strikes First" : (bounceResult.longBounce + bounceResult.shortBounce == 0 ? ("Hold A" + (bounceResult.holdDirection ? " and DPAD" : "")) : bounceResult.longBounce + " full / " + bounceResult.shortBounce + " short")) + " </td><td>Dealt " + endingSummary.dealt[j] + "</td><td>Taken " + endingSummary.taken[j] + "</td><td></td></tr>");
 					}
 					outputLines.push(emptyRowString);
-					if(endingSummary.characters[0x80].characterData.notification != null)
+					if(endOfBattleState.battleCharacters[0x80].characterData.notification != null)
 					{
-						outputLines.push("<tr><td>" + endingSummary.characters[0x80].characterData.notification + "</td><td/><td/><td/><td/></tr>");
+						outputLines.push("<tr><td>" + endOfBattleState.battleCharacters[0x80].characterData.notification + "</td><td/><td/><td/><td/></tr>");
 						outputLines.push(emptyRowString);
 					}
 					if(settings.debugParty)
