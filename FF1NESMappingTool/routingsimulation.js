@@ -2,35 +2,38 @@ const yieldToMain = () => new Promise(resolve => setTimeout(resolve, 0));
 
 const emptyRowString = "<tr><td/><td/><td/><td/><td/></tr>"
 
-var timeScoreFactor = 3; // score adjustment for time taken 
-var priorTimeScoreFactor = 2; // score adjustment for time taken in previous turn for delaying 1 turn after ending fight possible
-var damageDealtScoreFactor = 3500; // score adjustment for damage dealt as % of enemy hp
-var damageDealtMaxHpCap = 500; // max hp value of enemy for comparing score
-var damageTakenScoreFactor = 2500; // score adjustment for damage taken as % of current hp
-var secondarySacrificeScoreFactor = 5000; // score adjustment for losing non-primary characters in battle
-var enemyCountScoreFactor = 1750; // score adjustment per enemy spawned
-var hpGainedScoreFactor = 20000; // score adjustment for hp gained from strong level ups
-var strGainedScoreFactor = 0; // score adjustment when str not gained 
-var deficitHpScoreFactor = 10; // score penalty for paths taking more than current hp so that adjustments happens
-var encounterFinishScoreFactor = 1000; // score bonus for finishing the fight
-var badTurnScore = -20000; // score for considering a turn "bad"
-var innRatioAdd = 8; // adjustment based on distance to inn (fights+add)*fights/divisor
-var innRatioDivisor = 0; // adjustment based on distance to inn
-var turnScorePenalty = 2000; // score penalty for each turn
+var settings = {
+timeScoreFactor: 3, // score adjustment for time taken 
+priorTimeScoreFactor: 2, // score adjustment for time taken in previous turn for delaying 1 turn after ending fight possible
+damageDealtScoreFactor: 3500, // score adjustment for damage dealt as % of enemy hp
+damageDealtMaxHpCap: 500, // max hp value of enemy for comparing score
+damageTakenScoreFactor: 2500, // score adjustment for damage taken as % of current hp
+secondarySacrificeScoreFactor: 5000, // score adjustment for losing non-primary characters in battle
+enemyCountScoreFactor: 1750, // score adjustment per enemy spawned
+hpGainedScoreFactor: 20000, // score adjustment for hp gained from strong level ups
+strGainedScoreFactor: 0, // score adjustment when str not gained 
+deficitHpScoreFactor: 10, // score penalty for paths taking more than current hp so that adjustments happens
+encounterFinishScoreFactor: 1000, // score bonus for finishing the fight
+badTurnScore: -20000, // score for considering a turn "bad"
+innRatioAdd: 8, // adjustment based on distance to inn (fights+add)*fights/divisor
+innRatioDivisor: 0, // adjustment based on distance to inn
+turnScorePenalty: 2000, // score penalty for each turn
+rngValueCheckCount: 10, // number of RNG values minimum before adding additional values 
+fightLookAhead: true, // look ahead an additional turn in battle, high processing, currently little benefit if any
+fightLookAheadDangerThreshold: 10, // look ahead only runs on fights with this much danger.
+fightLookAheadWidth: 10, // number of top scores to process for both in battle look ahead (optional)
+fightLookAheadScoreDiscount: 0.75, // score future discount for next turn, prevent stalling forever
+fightCompleteLookAheadWidth: 10, // end of battle look ahead (always on)
+fightParallelCheck: false, // if fight not possible to end on turn 1, check additional starting rounds
+fightParallelWidth: 2, // number of top scores to check 
+fightParallelCheckDangerThreshold: 10, // check only runs on fights with this much danger.
+optimizePass: true, // sort scores by time on run and check current hp vs. damage taken
+ignoreHp: true, // ignore current hp vs. damage taken
+debugParty: false, // output party order, name, hp
+}
+
 var debugFight = 103; // for easier setting of breakpoints
-var rngValueCheckCount = 10; // number of RNG values minimum before adding additional values 
 var logValues = false; // log information to console, warning: high memory usage, clear console frequently if active
-var fightLookAhead = true; // look ahead an additional turn in battle, high processing, currently little benefit if any
-var fightLookAheadDangerThreshold = 10; // look ahead only runs on fights with this much danger.
-var fightLookAheadWidth = 10; // number of top scores to process for both in battle look ahead (optional)
-var fightLookAheadScoreDiscount = 0.75; // score future discount for next turn, prevent stalling forever
-var fightCompleteLookAheadWidth = 10; // end of battle look ahead (always on)
-var fightParallelCheck = false; // if fight not possible to end on turn 1, check additional starting rounds
-var fightParallelWidth = 2; // number of top scores to check 
-var fightParallelCheckDangerThreshold = 10; // check only runs on fights with this much danger.
-var optimizePass = true; // sort scores by time on run and check current hp vs. damage taken
-var ignoreHp = true; // ignore current hp vs. damage taken
-var debugParty = false; // output party order, name, hp
 
 const Formation = {
 	small: 0,
@@ -1224,7 +1227,7 @@ PlayerInfo.prototype.levelUp = function (battleState)
     if((levelStats & 0x2000) != 0)
 	{
 		let hpRoll = battleState.getRandomNumber(20, 25);
-		score += hpGainedScoreFactor / this.hp * (hpRoll - 22);
+		score += settings.hpGainedScoreFactor / this.hp * (hpRoll - 22);
         baseHPGain += hpRoll;
 	}
 	
@@ -1238,7 +1241,7 @@ PlayerInfo.prototype.levelUp = function (battleState)
 			this.attack++; 
 	}
 	else if((levelStats & 0x1000) == 0)
-		score -= strGainedScoreFactor;
+		score -= settings.strGainedScoreFactor;
 	
     if ((levelStats & 0x0800) != 0 || !(battleState.getRandomNumber() & 0x03))
 	{
@@ -1714,7 +1717,7 @@ BattleState.prototype.checkEnemyDead = function(dangerRatio)
 			sortStatus[i - 0x80] |= 0x40;
 	}
     this.gold += gold;
-	this.score += encounterFinishScoreFactor * dangerRatio;
+	this.score += settings.encounterFinishScoreFactor * dangerRatio;
 	
 	for(let passes = 0; passes < 4; passes++)
 	{
@@ -1856,15 +1859,15 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 				if (targetCharacter.currentHp <= 0)
 				{
 					targetCharacter.currentHp = 0;
-					this.score += damageDealtScoreFactor * dangerRatio;
+					this.score += settings.damageDealtScoreFactor * dangerRatio;
 					targetCharacter.status |= StatusEffect.dead;
 				}
 				else // percent of hp damage dealt in a turn or something, idk 
 				{
-					let damageRatio = damageSum / Math.min(damageDealtMaxHpCap, targetCharacter.characterData.hp);
+					let damageRatio = damageSum / Math.min(settings.damageDealtMaxHpCap, targetCharacter.characterData.hp);
 					if(damageRatio > 0.75) // more than 75% damage but not a kill should be capped off in score
 						damageRatio = 0.75;	
-					this.score += damageDealtScoreFactor * damageRatio * dangerRatio;
+					this.score += settings.damageDealtScoreFactor * damageRatio * dangerRatio;
 				}
 				
 				this.estimatedTime += 150;
@@ -1945,7 +1948,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 			let morale = character.morale - 2 * this.battleCharacters[0x80].characterData.level + this.getRandomNumber(0, 50);
 			if (morale < 80) // enemy runs
 			{
-				this.score += damageDealtScoreFactor;
+				this.score += settings.damageDealtScoreFactor;
 				this.battleCharacters[characterIndex] = null;
 				if(this.checkEnemyDead(dangerRatio))
 					return;
@@ -1999,7 +2002,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 					targetCharacter.currentHp = 0;
 					targetCharacter.status |= StatusEffect.dead;
 					if(!targetCharacter.characterData.primary)
-						this.score += secondarySacrificeScoreFactor;
+						this.score += settings.secondarySacrificeScoreFactor;
 				}
 				else // percent of hp damage dealt in a turn or something, idk 
 				{
@@ -2008,7 +2011,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 					let damageRatio = damageSum / targetCharacter.characterData.hp; // adjust this by starting hp or something?
 					// calculated danger levels?
 					if(targetCharacter.characterData.primary)
-						this.score -= damageTakenScoreFactor * damageRatio * damageTakenRatio;
+						this.score -= settings.damageTakenScoreFactor * damageRatio * damageTakenRatio;
 				}
 				this.damageTaken += damageSum;
 				this.estimatedTime += 90;
@@ -2057,13 +2060,13 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 							targetCharacter.currentHp = 0;
 							targetCharacter.status |= StatusEffect.dead;
 							if(!targetCharacter.characterData.primary)
-								this.score += secondarySacrificeScoreFactor;
+								this.score += settings.secondarySacrificeScoreFactor;
 						}
 						else // percent of hp damage dealt in a turn or something, idk 
 						{
 							let damageRatio = damageRoll / targetCharacter.characterData.hp; // adjust this by starting hp or something? idk
 							if(targetCharacter.characterData.primary)
-								this.score -= damageTakenScoreFactor * damageRatio * damageTakenRatio;
+								this.score -= settings.damageTakenScoreFactor * damageRatio * damageTakenRatio;
 						}
 						
 						this.damageTaken += damageRoll;
@@ -2341,7 +2344,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 	let scores;
 	let dangerRatio = encounter.danger / 3 || 1;
 	let nextDangerRatio = encounter.next?.encounterDanger / 3 || 1;
-	let damageTakenRatio = (innRatioDivisor == 0 ? 1 : (encounter.stepsToHeal + innRatioAdd) * encounter.stepsToHeal / innRatioDivisor);
+	let damageTakenRatio = (settings.innRatioDivisor == 0 ? 1 : (encounter.stepsToHeal + settings.innRatioAdd) * encounter.stepsToHeal / settings.innRatioDivisor);
 	
 	do 
 	{
@@ -2417,17 +2420,17 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					else
 					{
 						nextEncounterState = encounterEnemyCounts[battleState.randomNumberIndex];
-						battleState.score -= enemyCountScoreFactor * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
+						battleState.score -= settings.enemyCountScoreFactor * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
 					}
 				}
 				
-				battleState.score -= turnScorePenalty + battleState.estimatedTime * timeScoreFactor;
+				battleState.score -= settings.turnScorePenalty + battleState.estimatedTime * settings.timeScoreFactor;
 				scores[i] = {score: battleState.score, time: battleState.startTime + battleState.estimatedTime, futureTime: 0, delayCommands: null, delay: i, dmg: battleState.damageDealt, lost: battleState.damageTaken, rng: battleState.randomNumberIndex, complete: battleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: battleState, key: battleState.getKey(), status: battleState.battleCharacters[0x80].status, action: currentAction};
 			}
 			scores.sort((a, b) => b.score - a.score);
-			if(fightLookAhead && encounter.danger >= fightLookAheadDangerThreshold && !battleComplete && canDelay)
+			if(settings.fightLookAhead && encounter.danger >= settings.fightLookAheadDangerThreshold && !battleComplete && canDelay)
 			{
-				for(let i = 0; i < fightLookAheadWidth; i++)
+				for(let i = 0; i < settings.fightLookAheadWidth; i++)
 				{
 					let score = scores[i];
 					if(score.battleState.partyWipe)
@@ -2454,15 +2457,15 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 						if(additionalBattleState.battleComplete && encounter.next?.encounterIndex != null)
 						{
 							nextEncounterState = encounterEnemyCounts[additionalBattleState.randomNumberIndex];
-							additionalBattleState.score -= enemyCountScoreFactor * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
+							additionalBattleState.score -= settings.enemyCountScoreFactor * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
 						}
 						
-						additionalBattleState.score -= turnScorePenalty + additionalBattleState.estimatedTime * timeScoreFactor;
+						additionalBattleState.score -= settings.turnScorePenalty + additionalBattleState.estimatedTime * settings.timeScoreFactor;
 						if(additionalBattleState.score > topNextScore)
 							topNextScore = additionalBattleState.score;
 					}
 					
-					score.score += topNextScore * fightLookAheadScoreDiscount;
+					score.score += topNextScore * settings.fightLookAheadScoreDiscount;
 				}
 			}
 			scores.sort((a, b) => b.score - a.score);
@@ -2488,17 +2491,17 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 			else
 			{
 				nextEncounterState = battleState.newEncounter(encounter.next?.encounterIndex, true);
-				battleState.score -= enemyCountScoreFactor * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
+				battleState.score -= settings.enemyCountScoreFactor * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
 			}
 		}
 		
 		//if(battleState.encounterIndex != 0x7D)
-			battleState.score -= turnScorePenalty + battleState.estimatedTime * timeScoreFactor;
+			battleState.score -= settings.turnScorePenalty + battleState.estimatedTime * settings.timeScoreFactor;
 		
-		if(battleState.score < badTurnScore && setDelays == null)
+		if(battleState.score < settings.badTurnScore && setDelays == null)
 			battleState.badTurn = true;
 		
-		if(battleState.battleComplete && redoBattle && battleState.score < badTurnScore)
+		if(battleState.battleComplete && redoBattle && battleState.score < settings.badTurnScore)
 			delayStates[battleState.index - 1]++;
 		
 		/*if(battleState.battleComplete && redoBattle && !battleState.improvedEndState(nextEncounterState, redoBattleEndState, redoBattleNextState))
@@ -2562,7 +2565,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					endingRNGValueScores[score.rng] = score.score;
 				}
 			}
-			else if(i < fightCompleteLookAheadWidth) // calculate next turn for top scores that aren't complete
+			else if(i < settings.fightCompleteLookAheadWidth) // calculate next turn for top scores that aren't complete
 			{
 				let additionalScores = [];
 				let additionalBattleState = score.battleState;
@@ -2586,10 +2589,10 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					if(additionalBattleState.battleComplete && encounter.next?.encounterIndex != null)
 					{
 						nextEncounterState = encounterEnemyCounts[additionalBattleState.randomNumberIndex];
-						additionalBattleState.score -= enemyCountScoreFactor * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
+						additionalBattleState.score -= settings.enemyCountScoreFactor * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
 					}
 					
-					additionalBattleState.score -= turnScorePenalty + additionalBattleState.estimatedTime * timeScoreFactor + priorAdditionalBattleState.estimatedTime * priorTimeScoreFactor;
+					additionalBattleState.score -= settings.turnScorePenalty + additionalBattleState.estimatedTime * settings.timeScoreFactor + priorAdditionalBattleState.estimatedTime * settings.priorTimeScoreFactor;
 					additionalScores[j] = {score: additionalBattleState.score + priorAdditionalBattleState.score, time: additionalBattleState.startTime + additionalBattleState.estimatedTime, futureTime: 0, delayCommands: delayCommands.concat(score.delay, j), delay: j, dmg: additionalBattleState.damageDealt + priorAdditionalBattleState.damageDealt, lost: additionalBattleState.damageTaken + priorAdditionalBattleState.damageTaken, rng: additionalBattleState.randomNumberIndex, complete: additionalBattleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: additionalBattleState, key: additionalBattleState.getKey(), status: additionalBattleState.battleCharacters[0x80].status};
 				}
 				additionalScores.sort((a, b) => b.score - a.score);
@@ -3162,13 +3165,13 @@ async function runRoute(rerunCulled = false)
 					else
 						endingRngValues = backup3EndingRngValues;
 				}
-				else if(endingRngValuesCount < rngValueCheckCount)
+				else if(endingRngValuesCount < settings.rngValueCheckCount)
 				{
 					if(backupEndingRngValuesCount > 0)
 						for(let key in backupEndingRngValues)
 							if(endingRngValues[key] == null || (backupEndingRngValues[key].startTime < endingRngValues[key].startTime))
 								endingRngValues[key] = backupEndingRngValues[key];
-					if(endingRngValuesCount + backupEndingRngValuesCount < rngValueCheckCount)
+					if(endingRngValuesCount + backupEndingRngValuesCount < settings.rngValueCheckCount)
 					{
 						if(backup2EndingRngValuesCount > 0)
 							for(let key in backup2EndingRngValues)
@@ -3192,7 +3195,7 @@ async function runRoute(rerunCulled = false)
 				backup3EndingRngValues = {};
 				
 				endingRNGValuesBestTime = [].concat(array256PositiveTemplate);
-				let fightWidth = fightParallelCheck && currentAction.encounter.danger >= fightParallelCheckDangerThreshold ? fightParallelWidth : 1;
+				let fightWidth = settings.fightParallelCheck && currentAction.encounter.danger >= settings.fightParallelCheckDangerThreshold ? settings.fightParallelWidth : 1;
 				
 				for(let key in possibleStartingRngValues) 
 				{
@@ -3206,7 +3209,7 @@ async function runRoute(rerunCulled = false)
 								aliveHeros++;
 						let startRng = currentState.randomNumberIndex;
 						// full heal so we can see what is possible, not accurate for like Kary after lava
-						let tempDamageTakenScoreFactor = damageTakenScoreFactor;
+						let tempDamageTakenScoreFactor = settings.damageTakenScoreFactor;
 						if(aliveHeros == 1)
 						{
 							if(currentAction.encounterHPBudget > 0)
@@ -3214,7 +3217,7 @@ async function runRoute(rerunCulled = false)
 							else
 							{
 								currentState.battleCharacters[0x80].heal(-1);
-								damageTakenScoreFactor = 0;
+								settings.damageTakenScoreFactor = 0;
 							}
 						}
 						else if(currentAction.encounterHPBudget > 0)
@@ -3223,7 +3226,7 @@ async function runRoute(rerunCulled = false)
 									currentState.battleCharacters[i].currentHp = currentAction.encounterHPBudget;
 						
 						let endOfBattleState = runBattle(currentState, currentAction.encounter, currentAction.encounterAction, encounterEnemyCounts, j);
-						damageTakenScoreFactor = tempDamageTakenScoreFactor;
+						settings.damageTakenScoreFactor = tempDamageTakenScoreFactor;
 						
 						if(endOfBattleState.startState)
 						{
@@ -3463,13 +3466,13 @@ async function runRoute(rerunCulled = false)
 					}
 					else
 					{
-						rngScores[key].endingScores[k].score += Math.min(0, rngScores[key].startingHp - rngNextScores[rngScores[key].endingScores[k].key].totalTaken) * deficitHpScoreFactor;
+						rngScores[key].endingScores[k].score += Math.min(0, rngScores[key].startingHp - rngNextScores[rngScores[key].endingScores[k].key].totalTaken) * settings.deficitHpScoreFactor;
 						rngScores[key].endingScores[k].futureTime = rngScores[key].time + rngScores[key].endingScores[k].time - baseLineTime + rngNextScores[rngScores[key].endingScores[k].key].futureTime;
 						if(logValues)
 							rngScores[key].endingScores[k].nextScore = rngNextScores[rngScores[key].endingScores[k].key];
 					}
 				}
-				if(ignoreHp)
+				if(settings.ignoreHp)
 					rngScores[key].endingScores.sort((a, b) => a.futureTime - b.futureTime);
 				else
 					rngScores[key].endingScores.sort((a, b) => b.score - a.score);
@@ -3547,7 +3550,7 @@ async function runRoute(rerunCulled = false)
 				let rngScore = rngScoring[encounterCount][currentState.getKey()];
 				let endingScores = rngScore.endingScores;
 				let bestScore = 0;
-				if(optimizePass && encounterCount < totalEncounters)
+				if(settings.optimizePass && encounterCount < totalEncounters)
 				{
 					let baseLineTaken = endingScores[0].lost;
 					let baseLineTime = endingScores[0].time;
@@ -3559,7 +3562,7 @@ async function runRoute(rerunCulled = false)
 							continue;
 						let rngNextScore = rngNextScores[endingScore.key];
 						healed = healTracker[encounterCount + 1];
-						if((ignoreHp || currentState.battleCharacters[0x80].currentHp > rngScore.taken + endingScore.lost - baseLineTaken + Math.max(rngNextScore.totalTaken - healed, 0)) && rngNextScore.futureTime + endingScore.time - baseLineTime < lowestTime)
+						if((settings.ignoreHp || currentState.battleCharacters[0x80].currentHp > rngScore.taken + endingScore.lost - baseLineTaken + Math.max(rngNextScore.totalTaken - healed, 0)) && rngNextScore.futureTime + endingScore.time - baseLineTime < lowestTime)
 						{
 							lowestTime = rngNextScore.futureTime + endingScore.time - baseLineTime;
 							bestScore = j;
@@ -3630,7 +3633,7 @@ async function runRoute(rerunCulled = false)
 						outputLines.push("<tr><td>Round " + (j + 1) + "</td><td>" + (j == 0 && endingSummary.encounterState == EncounterState.Ambushed ? "Enemy Strikes First" : (bounceResult.longBounce + bounceResult.shortBounce == 0 ? ("Hold A" + (bounceResult.holdDirection ? " and DPAD" : "")) : bounceResult.longBounce + " full / " + bounceResult.shortBounce + " short")) + " </td><td>Dealt " + endingSummary.dealt[j] + "</td><td>Taken " + endingSummary.taken[j] + "</td><td></td></tr>");
 					}
 					outputLines.push(emptyRowString);
-					if(debugParty)
+					if(settings.debugParty)
 					{
 						let characterOutput = [];
 						for (let j = 0x80; j < 0x84; j++)
