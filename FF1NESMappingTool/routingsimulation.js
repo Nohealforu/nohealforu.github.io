@@ -2704,6 +2704,7 @@ function RouteAction(actionString)
 				else
 					this.encounterAction = EncounterAction.Fight;
 				break;
+				this.minimumEnemyCount = (parseInt(splitAction[5]) || 0);
 			case 'ChangeGold':
 				this.action = Action.ChangeGold;
 				this.amount = (parseInt(splitAction[1]) || 0);
@@ -2774,7 +2775,7 @@ RouteAction.prototype.toString  = function RouteActionToString()
 			if(this.encounterAction == EncounterAction.Fight && this.encounterHPBudget == 0 && this.encounterDanger == 3)
 				result = 'Encounter ' + (this.encounterIndex > 127 ? (this.encounterIndex - 128) + '-2' : this.encounterIndex);
 			else
-				result = 'Encounter ' + (this.encounterIndex > 127 ? (this.encounterIndex - 128) + '-2' : this.encounterIndex) + ' ' + this.encounterDanger + ' ' + this.encounterHPBudget + EncounterActionString[this.encounterAction];
+				result = 'Encounter ' + (this.encounterIndex > 127 ? (this.encounterIndex - 128) + '-2' : this.encounterIndex) + ' ' + this.encounterDanger + ' ' + this.encounterHPBudget + EncounterActionString[this.encounterAction] + (this.minimumEnemyCount > 0 ? ' ' + this.minimumEnemyCount : '');
 			break;
 		case Action.ChangeGold:
 			result = 'ChangeGold ' + this.amount;
@@ -3204,7 +3205,7 @@ async function runRoute(rerunCulled = false)
 					debugFight = encounterCount;
 				if(currentAction.encounter.next)
 				{
-					
+					let targetMinimumEnemiesPossible = false;
 					for(let j = 0; j < 256; j++)
 					{
 						currentState.randomNumberIndex = j;
@@ -3212,7 +3213,11 @@ async function runRoute(rerunCulled = false)
 						encounterEnemyCounts[j] = {startingEnemies: nextEncounterState.startingEnemies, encounterState: nextEncounterState.encounterState, minimumEnemies: nextEncounterState.minimumEnemies, expValue: nextEncounterState.expValue};
 						if(minimumEnemies > nextEncounterState.startingEnemies)
 							minimumEnemies = nextEncounterState.startingEnemies;
+						if(currentAction.minimumEnemies == minimumEnemies)
+							targetMinimumEnemiesPossible = true;
 					}
+					if(targetMinimumEnemiesPossible == true)
+						minimumEnemies = currentAction.minimumEnemies;
 					
 					for(let j = 0; j < 256; j++)
 					{
