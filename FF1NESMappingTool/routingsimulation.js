@@ -2703,8 +2703,8 @@ function RouteAction(actionString)
 					this.encounterAction = EncounterAction.Flee;
 				else
 					this.encounterAction = EncounterAction.Fight;
-				break;
 				this.minimumEnemyCount = (parseInt(splitAction[5]) || 0);
+				break;
 			case 'ChangeGold':
 				this.action = Action.ChangeGold;
 				this.amount = (parseInt(splitAction[1]) || 0);
@@ -2772,7 +2772,7 @@ RouteAction.prototype.toString  = function RouteActionToString()
 	switch(this.action)
 	{
 		case Action.Encounter:
-			if(this.encounterAction == EncounterAction.Fight && this.encounterHPBudget == 0 && this.encounterDanger == 3)
+			if(this.encounterAction == EncounterAction.Fight && this.encounterHPBudget == 0 && this.encounterDanger == 3 && this.minimumEnemyCount == 0)
 				result = 'Encounter ' + (this.encounterIndex > 127 ? (this.encounterIndex - 128) + '-2' : this.encounterIndex);
 			else
 				result = 'Encounter ' + (this.encounterIndex > 127 ? (this.encounterIndex - 128) + '-2' : this.encounterIndex) + ' ' + this.encounterDanger + ' ' + this.encounterHPBudget + EncounterActionString[this.encounterAction] + (this.minimumEnemyCount > 0 ? ' ' + this.minimumEnemyCount : '');
