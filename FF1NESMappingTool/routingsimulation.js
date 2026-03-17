@@ -3213,11 +3213,11 @@ async function runRoute(rerunCulled = false)
 						encounterEnemyCounts[j] = {startingEnemies: nextEncounterState.startingEnemies, encounterState: nextEncounterState.encounterState, minimumEnemies: nextEncounterState.minimumEnemies, expValue: nextEncounterState.expValue};
 						if(minimumEnemies > nextEncounterState.startingEnemies)
 							minimumEnemies = nextEncounterState.startingEnemies;
-						if(currentAction.encounter.next.minimumEnemies == minimumEnemies)
+						if(currentAction.encounter.next.minimumEnemyCount == minimumEnemies)
 							targetMinimumEnemiesPossible = true;
 					}
 					if(targetMinimumEnemiesPossible == true)
-						minimumEnemies = currentAction.encounter.next.minimumEnemies;
+						minimumEnemies = currentAction.encounter.next.minimumEnemyCount;
 					
 					for(let j = 0; j < 256; j++)
 					{
