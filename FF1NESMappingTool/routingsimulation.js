@@ -3213,7 +3213,7 @@ async function runRoute(rerunCulled = false)
 						encounterEnemyCounts[j] = {startingEnemies: nextEncounterState.startingEnemies, encounterState: nextEncounterState.encounterState, minimumEnemies: nextEncounterState.minimumEnemies, expValue: nextEncounterState.expValue};
 						if(minimumEnemies > nextEncounterState.startingEnemies)
 							minimumEnemies = nextEncounterState.startingEnemies;
-						if(currentAction.encounter.next.minimumEnemyCount == minimumEnemies)
+						if(currentAction.encounter.next.minimumEnemyCount == nextEncounterState.startingEnemies)
 							targetMinimumEnemiesPossible = true;
 					}
 					if(targetMinimumEnemiesPossible == true)
