@@ -3451,8 +3451,13 @@ async function runRoute(rerunCulled = false)
 				maxScore = rngNextScores[key].score;
 		for(let key in rngScores)
 		{
-			if(rngScores[key].endingRng != null && rngScores[key].endingScores[0] != null)
+			if(rngScores[key].endingRng != null)
 			{
+				if(rngScores[key].endingScores[0] == null)
+				{
+					rngScores[key].score = -999999;
+					continue;
+				}
 				let baseLineScore = rngScores[key].endingScores[0].score;
 				let baseLineTaken = rngScores[key].endingScores[0].lost;
 				let baseLineTime = rngScores[key].endingScores[0].time;
