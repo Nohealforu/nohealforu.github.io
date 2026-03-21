@@ -2472,7 +2472,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 						nextEncounterState = encounterEnemyCounts[battleState.randomNumberIndex];
 						battleState.score -= settings.enemyCountScoreFactor * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
 					}
-					if(encounter.maximumPartyCount > battleState.aliveHeroes)
+					if(battleState.aliveHeroes > encounter.maximumPartyCount)
 						battleState.score = -999999;
 				}
 				
@@ -2642,7 +2642,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					{
 						nextEncounterState = encounterEnemyCounts[additionalBattleState.randomNumberIndex];
 						additionalBattleState.score -= settings.enemyCountScoreFactor * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
-						if(encounter.maximumPartyCount > additionalBattleState.aliveHeroes)
+						if(additionalBattleState.aliveHeroes > encounter.maximumPartyCount)
 							additionalBattleState.score = -999999;
 					}
 					
