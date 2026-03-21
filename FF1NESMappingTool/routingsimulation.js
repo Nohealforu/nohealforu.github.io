@@ -3456,6 +3456,8 @@ async function runRoute(rerunCulled = false)
 				if(rngScores[key].endingScores[0] == null)
 				{
 					rngScores[key].score = -999999;
+					rngScores[key].time = 999999;
+					rngScores[key].futureTime = 999999;
 					continue;
 				}
 				let baseLineScore = rngScores[key].endingScores[0].score;
