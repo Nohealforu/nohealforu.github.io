@@ -1421,10 +1421,10 @@ function BattleState(index, randomNumberIndex, gold, battleCharacters, startTime
 	this.randomNumberIndex = randomNumberIndex;
 	this.gold = gold;
 	this.battleCharacters = battleCharacters;
-	this.aliveHeros = 0;
+	this.aliveHeroes = 0;
 	for (let i = 0x80; i < 0x84; i++)
 		if (this.battleCharacters[i] != null && this.battleCharacters[i].canTarget())
-			this.aliveHeros++;
+			this.aliveHeroes++;
 	this.encounterIndex = encounterIndex;
 	this.formation = formation;
 	this.encounterState = EncounterState.Normal;
@@ -1464,7 +1464,7 @@ BattleState.prototype.incrementRandomIndex = function(value)
 
 BattleState.prototype.getKey = function()
 {
-	if(this.aliveHeros <= 1)
+	if(this.aliveHeroes <= 1)
 		return this.randomNumberIndex + ":" + this.battleCharacters[0x80].characterData.exp + ":" + this.battleCharacters[0x80].characterData.str + ":" + this.battleCharacters[0x80].characterData.agi + ":" + this.battleCharacters[0x80].characterData.luck;
 	let heroHp = [];
 	for (let i = 0x80; i < 0x84; i++)
@@ -1731,12 +1731,12 @@ BattleState.prototype.checkEnemyDead = function(dangerRatio)
 		}
 	}
 	
-	this.aliveHeros = 0;
+	this.aliveHeroes = 0;
     for (let i = 0x80; i < 0x84; i++)
 		if (this.battleCharacters[i] != null && this.battleCharacters[i].canTarget())
-			this.aliveHeros++;
+			this.aliveHeroes++;
 
-    exp = Math.floor(exp / this.aliveHeros);
+    exp = Math.floor(exp / this.aliveHeroes);
     if (exp == 0)
         exp = 1;
 
@@ -2472,6 +2472,8 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 						nextEncounterState = encounterEnemyCounts[battleState.randomNumberIndex];
 						battleState.score -= settings.enemyCountScoreFactor * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
 					}
+					if(encounter.maximumPartyCount > battleState.aliveHeroes)
+						battleState.score = -999999;
 				}
 				
 				battleState.score -= settings.turnScorePenalty + battleState.estimatedTime * settings.timeScoreFactor;
@@ -2640,6 +2642,8 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					{
 						nextEncounterState = encounterEnemyCounts[additionalBattleState.randomNumberIndex];
 						additionalBattleState.score -= settings.enemyCountScoreFactor * ((nextEncounterState.startingEnemies + nextEncounterState.encounterState / 4) / (nextEncounterState.minimumEnemies + 1) - 1) * nextDangerRatio;
+						if(encounter.maximumPartyCount > additionalBattleState.aliveHeroes)
+							additionalBattleState.score = -999999;
 					}
 					
 					additionalBattleState.score -= settings.turnScorePenalty + additionalBattleState.estimatedTime * settings.timeScoreFactor + priorAdditionalBattleState.estimatedTime * settings.priorTimeScoreFactor;
@@ -2704,6 +2708,7 @@ function RouteAction(actionString)
 				else
 					this.encounterAction = EncounterAction.Fight;
 				this.minimumEnemyCount = (parseInt(splitAction[5]) || 0);
+				this.maximumPartyCount = (parseInt(splitAction[6]) || 1);
 				break;
 			case 'ChangeGold':
 				this.action = Action.ChangeGold;
@@ -3276,14 +3281,14 @@ async function runRoute(rerunCulled = false)
 					for(let j = 0; j < fightWidth && !oneRoundFight; j++) // not the most efficient way to do this, should save round 1 results for reuse or something, idk
 					{
 						currentState = possibleStartingRngValues[key];
-						let aliveHeros = 0;
+						let aliveHeroes = 0;
 						for (let i = 0x80; i < 0x84; i++)
 							if (currentState.battleCharacters[i] != null && currentState.battleCharacters[i].canTarget())
-								aliveHeros++;
+								aliveHeroes++;
 						let startRng = currentState.randomNumberIndex;
 						// full heal so we can see what is possible, not accurate for like Kary after lava
 						let tempDamageTakenScoreFactor = settings.damageTakenScoreFactor;
-						if(aliveHeros == 1)
+						if(aliveHeroes == 1)
 						{
 							if(currentAction.encounterHPBudget > 0)
 								currentState.battleCharacters[0x80].currentHp = currentAction.encounterHPBudget;
