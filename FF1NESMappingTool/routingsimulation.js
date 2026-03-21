@@ -3145,7 +3145,7 @@ async function runRoute(rerunCulled = false)
 		switch(currentAction.action)
 		{
 			case Action.Encounter:
-				currentAction.encounter = {index: currentAction.encounterIndex, next: nextEncounter, danger: currentAction.encounterDanger, stepsToHeal: stepsToHeal, targetTime: targetTime};
+				currentAction.encounter = {index: currentAction.encounterIndex, next: nextEncounter, danger: currentAction.encounterDanger, maximumPartyCount: currentAction.maximumPartyCount, stepsToHeal: stepsToHeal, targetTime: targetTime};
 				nextEncounter = currentAction;
 				stepsToHeal++;
 				encounterCount++;
