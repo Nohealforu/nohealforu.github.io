@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<head>
+    <title>Armor</title>
+    <meta charset="utf-8">
+	<style> 
+		body{
+			color: white;
+			background-color: black;
+		}
+        </style> 
+</head>
+<body>
+  <p>
+    Encounter: "Encounter encounter_number (danger_level) (hp_allowed) (action) (minimum_enemies) (maximum_heroes)"<br/>
+    Example: "Encounter 37-2 5 100 Fight 2 1<br/>
+    encounter_number: encounter from the encounters table, accepts decimal or hexadecimal format (0x00 through 0x80), append -2 for formation 2<br/>
+    danger_level: default 3, modifies score values of damage dealt in fight, also cutoff for some advanced settings<br/>
+    hp_allowed: default 0, if populated sets main character hp for fight calculation to this value and scores damage taken in fight<br/>
+    action: default Fight, allowed Bane and Flee, this action will be taken by the party each turn<br/>
+    minimum_enemies: default 0, will try to fight this many enemies, may not happen due to rng bottlenecks, formation constraints, etc.<br/>
+    maximum_heroes: default 1, will score fight ending with more heroes as -999999 value.<br/>
+  </p>
+  <p>
+    ChangeGold: "ChangeGold amount"<br/>
+    Can be used to track gold, currently no outputs when used but could be implemented in future and put warnings when going negative.<br/>
+  </p>
+  <p>
+    EquipWeapon: "EquipWeapon weapon (character)"<br/>
+    Equips weapon using name from <a href="weapons.html">weapons table</a>, character slot defaults to first character 128, range 128-131 (0x80-0x84)<br/>
+  </p>
+</body>
+</html>
