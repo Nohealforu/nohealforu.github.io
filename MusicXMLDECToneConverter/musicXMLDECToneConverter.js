@@ -1,6 +1,8 @@
 getTagValue = function(inputString, startingTag, endingTag = null)
 {
 	endingTag = endingTag || startingTag.replace('<', '</');
+	if(inputString.lastIndexOf(endingTag) == -1) // check if there's a space after the last "
+		endingTag = endingTag.replace('"', '" ');
 	return (inputString.substring(inputString.indexOf(startingTag) + startingTag.length, inputString.lastIndexOf(endingTag)));
 }
 
