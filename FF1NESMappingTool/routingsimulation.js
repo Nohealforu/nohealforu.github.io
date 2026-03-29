@@ -30,6 +30,7 @@ fightParallelCheckDangerThreshold: 10, // check only runs on fights with this mu
 optimizePass: true, // sort scores by time on run and check current hp vs. damage taken
 ignoreHp: true, // ignore current hp vs. damage taken
 debugParty: false, // output party order, name, hp
+debugCharacterStats: false, //output first character stats 
 }
 
 var debugFight = 103; // for easier setting of breakpoints
@@ -3730,6 +3731,11 @@ async function runRoute(rerunCulled = false)
 							if (endOfBattleState.battleCharacters[j] != null)
 								characterOutput.push(endOfBattleState.battleCharacters[j].characterData.name + ' hp: ' + endOfBattleState.battleCharacters[j].currentHp + ' status: ' + endOfBattleState.battleCharacters[j].status);
 						outputLines.push("<tr><td>" + characterOutput.join(', ')  + "</td><td/><td/><td/><td/></tr>");
+					}
+					if(settings.debugCharacterStats)
+					{
+						let characterOutput = [];
+						outputLines.push("<tr><td>Level " + endOfBattleState.battleCharacters[0x80].characterData.level + "</td><td>Exp: " + endOfBattleState.battleCharacters[0x80].characterData.exp + "</td><td>Maxhp: " + endOfBattleState.battleCharacters[0x80].characterData.hp + "</td><td>Str: " + endOfBattleState.battleCharacters[0x80].characterData.str + "</td><td>Hit: " + endOfBattleState.battleCharacters[0x80].characterData.hit + "</td></tr>");
 					}
 					encounterCount++;
 				}
