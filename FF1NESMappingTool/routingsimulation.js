@@ -3680,9 +3680,9 @@ async function runRoute(rerunCulled = false)
 							continue;
 						let rngNextScore = rngNextScores[endingScore.key];
 						healed = healTracker[encounterCount + 1];
-						if((settings.ignoreHp || currentState.battleCharacters[0x80].currentHp > rngScore.taken + endingScore.lost - baseLineTaken + Math.max(rngNextScore.totalTaken - healed, 0)) && rngNextScore.futureTime + endingScore.time - baseLineTime < lowestTime)
+						if((settings.ignoreHp || currentState.battleCharacters[0x80].currentHp > rngScore.taken + endingScore.lost - baseLineTaken + Math.max(rngNextScore.totalTaken - healed, 0)) && rngNextScore.futureTime + endingScore.time + endingScore.statTimePenalty - baseLineTime < lowestTime)
 						{
-							lowestTime = rngNextScore.futureTime + endingScore.time - baseLineTime;
+							lowestTime = rngNextScore.futureTime + endingScore.time + endingScore.statTimePenalty - baseLineTime;
 							bestScore = j;
 						}
 					}
