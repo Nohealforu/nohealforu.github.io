@@ -1261,11 +1261,11 @@ PlayerInfo.prototype.levelUp = function (battleState)
     if((levelStats & 0x2000) != 0)
 	{
 		let hpRoll = battleState.getRandomNumber(20, 25);
-		if(settings.hpGainedScoreFactor > 0 || hpGainedTimeFactor > 0)
+		if(settings.hpGainedScoreFactor > 0 || settings.hpGainedTimeFactor > 0)
 		{
 			let hpAdjustment = 1 / this.hp * (hpRoll - 22);
 			levelResult.score += settings.hpGainedScoreFactor * hpAdjustment;
-			levelResult.timePenalty += hpGainedTimeFactor * hpAdjustment;
+			levelResult.timePenalty += settings.hpGainedTimeFactor * hpAdjustment;
 		}
         baseHPGain += hpRoll;
 	}
@@ -1282,7 +1282,7 @@ PlayerInfo.prototype.levelUp = function (battleState)
 	else
 	{
 		levelResult.score -= settings.strGainedScoreFactor;
-		levelResult.timePenalty += strGainedTimeFactor;
+		levelResult.timePenalty += settings.strGainedTimeFactor;
 	}
 	
     if ((levelStats & 0x0800) != 0 || !(battleState.getRandomNumber() & 0x03))
@@ -1294,7 +1294,7 @@ PlayerInfo.prototype.levelUp = function (battleState)
 	else
 	{
 		levelResult.score -= settings.agiGainedScoreFactor;
-		levelResult.timePenalty += agiGainedTimeFactor;
+		levelResult.timePenalty += settings.agiGainedTimeFactor;
 	}
 	
 	if ((levelStats & 0x0400) != 0 || !(battleState.getRandomNumber() & 0x03))
@@ -1307,7 +1307,7 @@ PlayerInfo.prototype.levelUp = function (battleState)
 	else
 	{
 		levelResult.score -= settings.vitGainedScoreFactor;
-		levelResult.timePenalty += vitGainedTimeFactor;
+		levelResult.timePenalty += settings.vitGainedTimeFactor;
 	}
 	
 	if ((levelStats & 0x0100) != 0 || !(battleState.getRandomNumber() & 0x03))
