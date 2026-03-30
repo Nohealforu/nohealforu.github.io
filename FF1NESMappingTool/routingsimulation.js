@@ -1270,13 +1270,6 @@ PlayerInfo.prototype.levelUp = function (battleState)
         baseHPGain += hpRoll;
 	}
 	
-	hpGainedScoreFactor: 20000, // score adjustment for hp gained from strong level ups
-hpGainedTimeFactor: 20, // time penalty for hp gained from strong level ups
-strGainedScoreFactor: 0, // score adjustment when str not gained 
-strGainedTimeFactor: 0, // time penalty when str not gained 
-vitGainedScoreFactor: 0, // score adjustment when vit not gained 
-vitGainedTimeFactor: 0, // time penalty when vit not gained 
-	
     this.hp += baseHPGain;
     if(this.hp > 999)
         this.hp = 999;
