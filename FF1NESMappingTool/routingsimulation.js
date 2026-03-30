@@ -11,7 +11,13 @@ damageTakenScoreFactor: 2500, // score adjustment for damage taken as % of curre
 secondarySacrificeScoreFactor: 5000, // score adjustment for losing non-primary characters in battle
 enemyCountScoreFactor: 1750, // score adjustment per enemy spawned
 hpGainedScoreFactor: 20000, // score adjustment for hp gained from strong level ups
+hpGainedTimeFactor: 0, // time penalty for hp gained from strong level ups
 strGainedScoreFactor: 0, // score adjustment when str not gained 
+strGainedTimeFactor: 0, // time penalty when str not gained 
+agiGainedScoreFactor: 0, // score adjustment when agi not gained 
+agiGainedTimeFactor: 0, // time penalty when agi not gained 
+vitGainedScoreFactor: 0, // score adjustment when vit not gained 
+vitGainedTimeFactor: 0, // time penalty when vit not gained 
 deficitHpScoreFactor: 10, // score penalty for paths taking more than current hp so that adjustments happens
 encounterFinishScoreFactor: 1000, // score bonus for finishing the fight
 badTurnScore: -20000, // score for considering a turn "bad"
@@ -1248,29 +1254,43 @@ PlayerInfo.prototype.equipArmor = function(armor)
 
 PlayerInfo.prototype.levelUp = function (battleState)
 {
-	let levelResult = {};
-	let score = 0;
+	let levelResult = {score: 0, timePenalty: 0};
 	let levelStats = this.characterClass.levelUpTable[this.level++ - 1];
 	
 	let baseHPGain = Math.floor(this.vit / 4) + 1;
     if((levelStats & 0x2000) != 0)
 	{
 		let hpRoll = battleState.getRandomNumber(20, 25);
-		score += settings.hpGainedScoreFactor / this.hp * (hpRoll - 22);
+		if(settings.hpGainedScoreFactor > 0 || hpGainedTimeFactor > 0)
+		{
+			let hpAdjustment = 1 / this.hp * (hpRoll - 22);
+			levelResult.score += settings.hpGainedScoreFactor * hpAdjustment;
+			levelResult.timePenalty += hpGainedTimeFactor * hpAdjustment;
+		}
         baseHPGain += hpRoll;
 	}
+	
+	hpGainedScoreFactor: 20000, // score adjustment for hp gained from strong level ups
+hpGainedTimeFactor: 20, // time penalty for hp gained from strong level ups
+strGainedScoreFactor: 0, // score adjustment when str not gained 
+strGainedTimeFactor: 0, // time penalty when str not gained 
+vitGainedScoreFactor: 0, // score adjustment when vit not gained 
+vitGainedTimeFactor: 0, // time penalty when vit not gained 
 	
     this.hp += baseHPGain;
     if(this.hp > 999)
         this.hp = 999;
- 
+	
     if ((levelStats & 0x1000) != 0 || !(battleState.getRandomNumber() & 0x03))
 	{
-		if(++this.str % 2 == 0) // put in some checks for black belt and black mage to make this right or not
-			this.attack++; 
+		if(++this.str % 2 == 0)
+			this.attack++;
 	}
-	else if((levelStats & 0x1000) == 0)
-		score -= settings.strGainedScoreFactor;
+	else
+	{
+		levelResult.score -= settings.strGainedScoreFactor;
+		levelResult.timePenalty += strGainedTimeFactor;
+	}
 	
     if ((levelStats & 0x0800) != 0 || !(battleState.getRandomNumber() & 0x03))
 	{
@@ -1278,11 +1298,25 @@ PlayerInfo.prototype.levelUp = function (battleState)
 		if(++this.evade > 99)
 			this.evade = 99;
 	}
+	else
+	{
+		levelResult.score -= settings.agiGainedScoreFactor;
+		levelResult.timePenalty += agiGainedTimeFactor;
+	}
 	
 	if ((levelStats & 0x0400) != 0 || !(battleState.getRandomNumber() & 0x03))
 		this.int++;
+	
 	if ((levelStats & 0x0200) != 0 || !(battleState.getRandomNumber() & 0x03))
+	{
 		this.vit++;
+	}
+	else
+	{
+		levelResult.score -= settings.vitGainedScoreFactor;
+		levelResult.timePenalty += vitGainedTimeFactor;
+	}
+	
 	if ((levelStats & 0x0100) != 0 || !(battleState.getRandomNumber() & 0x03))
 		this.luck++;
 	
@@ -1315,8 +1349,8 @@ PlayerInfo.prototype.levelUp = function (battleState)
 	this.mdef += this.characterClass.mdefGain;
 	
 	if(this.primary)
-		return score;
-	return 0;
+		return levelResult;
+	return {score: 0, timePenalty: 0};
 }
 
 function BattleCharacter(characterData, currentHp = characterData.hp, hitMultiplier = 1, abilityIndex = 0, magicIndex = 0, status = 0, absorb = characterData.absorb, evade = characterData.evade, morale = characterData.morale, resistances = characterData.resistances)
@@ -1432,6 +1466,7 @@ function BattleState(index, randomNumberIndex, gold, battleCharacters, startTime
 	this.turn = turn;
 	this.startTime = startTime;
 	this.estimatedTime = 0;
+	this.statTimePenalty = 0;
 	this.damageTaken = 0;
 	this.damageDealt = 0;
 	this.score = 0;
@@ -1752,7 +1787,11 @@ BattleState.prototype.checkEnemyDead = function(dangerRatio)
 			{
 				character.characterData.exp += exp;
 				if (character.characterData.exp >= EXPTable[character.characterData.level - 1])
-					this.score += character.characterData.levelUp(this);
+				{
+					let levelUpResult = character.characterData.levelUp(this);
+					this.score += levelUpResult.score;
+					this.statTimePenalty += levelUpResult.timePenalty;
+				}
 			}
             character.status &= (StatusEffect.poison | StatusEffect.dead | StatusEffect.stone);
 			character.resistances = character.characterData.resistances;
@@ -2478,7 +2517,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 				}
 				
 				battleState.score -= settings.turnScorePenalty + battleState.estimatedTime * settings.timeScoreFactor;
-				scores[i] = {score: battleState.score, time: battleState.startTime + battleState.estimatedTime, futureTime: 0, delayCommands: null, delay: i, dmg: battleState.damageDealt, lost: battleState.damageTaken, rng: battleState.randomNumberIndex, complete: battleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: battleState, key: battleState.getKey(), status: battleState.battleCharacters[0x80].status, action: currentAction};
+				scores[i] = {score: battleState.score, time: battleState.startTime + battleState.estimatedTime, futureTime: 0, statTimePenalty: battleState.statTimePenalty, delayCommands: null, delay: i, dmg: battleState.damageDealt, lost: battleState.damageTaken, rng: battleState.randomNumberIndex, complete: battleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: battleState, key: battleState.getKey(), status: battleState.battleCharacters[0x80].status, action: currentAction};
 			}
 			scores.sort((a, b) => b.score - a.score);
 			if(settings.fightLookAhead && encounter.danger >= settings.fightLookAheadDangerThreshold && !battleComplete && canDelay)
@@ -2648,7 +2687,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					}
 					
 					additionalBattleState.score -= settings.turnScorePenalty + additionalBattleState.estimatedTime * settings.timeScoreFactor + priorAdditionalBattleState.estimatedTime * settings.priorTimeScoreFactor;
-					additionalScores[j] = {score: additionalBattleState.score + priorAdditionalBattleState.score, time: additionalBattleState.startTime + additionalBattleState.estimatedTime, futureTime: 0, delayCommands: delayCommands.concat(score.delay, j), delay: j, dmg: additionalBattleState.damageDealt + priorAdditionalBattleState.damageDealt, lost: additionalBattleState.damageTaken + priorAdditionalBattleState.damageTaken, rng: additionalBattleState.randomNumberIndex, complete: additionalBattleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: additionalBattleState, key: additionalBattleState.getKey(), status: additionalBattleState.battleCharacters[0x80].status};
+					additionalScores[j] = {score: additionalBattleState.score + priorAdditionalBattleState.score, time: additionalBattleState.startTime + additionalBattleState.estimatedTime, futureTime: 0, statTimePenalty: additionalBattleState.statTimePenalty, delayCommands: delayCommands.concat(score.delay, j), delay: j, dmg: additionalBattleState.damageDealt + priorAdditionalBattleState.damageDealt, lost: additionalBattleState.damageTaken + priorAdditionalBattleState.damageTaken, rng: additionalBattleState.randomNumberIndex, complete: additionalBattleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: additionalBattleState, key: additionalBattleState.getKey(), status: additionalBattleState.battleCharacters[0x80].status};
 				}
 				additionalScores.sort((a, b) => b.score - a.score);
 				for(let j = 0; j < additionalScores.length; j++)
@@ -2827,9 +2866,9 @@ new RouteAction('CreateCharacter DDDD blackmage 131'),
 new RouteAction('EquipWeapon Rapier 129'),
 new RouteAction('EquipWeapon Rapier 130'),
 new RouteAction('EquipArmor ChainArmor 130'),
-new RouteAction('Encounter 0 3 0 Flee'),
-new RouteAction('Encounter 8'),
-new RouteAction('Encounter 127'),
+new RouteAction('Encounter 0 3 0 Flee 0 4'),
+new RouteAction('Encounter 8 3 0 Fight 0 2'),
+new RouteAction('Encounter 127 3 0 Fight 0 1'),
 new RouteAction('TimeTarget 999999'),
 new RouteAction('Encounter 2'),
 new RouteAction('Encounter 3-2 1 10'),
@@ -3559,7 +3598,7 @@ async function runRoute(rerunCulled = false)
 					}
 				}
 				if(settings.ignoreHp)
-					rngScores[key].endingScores.sort((a, b) => a.futureTime - b.futureTime);
+					rngScores[key].endingScores.sort((a, b) => (a.futureTime + a.statTimePenalty) - (b.futureTime + b.statTimePenalty));
 				else
 					rngScores[key].endingScores.sort((a, b) => b.score - a.score);
 				rngScores[key].score += rngScores[key].endingScores[0].score - baseLineScore;
