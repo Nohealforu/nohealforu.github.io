@@ -14,33 +14,39 @@
   <p>
     {
     <br/>timeScoreFactor: 3, // score adjustment for time taken 
-    <br/>priorTimeScoreFactor: 2, // score adjustment for time taken in previous turn for delaying 1 turn after ending fight possible
-    <br/>damageDealtScoreFactor: 3500, // score adjustment for damage dealt as % of enemy hp
-    <br/>damageDealtMaxHpCap: 500, // max hp value of enemy for comparing score
-    <br/>damageTakenScoreFactor: 2500, // score adjustment for damage taken as % of current hp
-    <br/>secondarySacrificeScoreFactor: 5000, // score adjustment for losing non-primary characters in battle
-    <br/>enemyCountScoreFactor: 1750, // score adjustment per enemy spawned
-    <br/>hpGainedScoreFactor: 20000, // score adjustment for hp gained from strong level ups
-    <br/>strGainedScoreFactor: 0, // score adjustment when str not gained 
-    <br/>deficitHpScoreFactor: 10, // score penalty for paths taking more than current hp so that adjustments happens
-    <br/>encounterFinishScoreFactor: 1000, // score bonus for finishing the fight
-    <br/>badTurnScore: -20000, // score for considering a turn "bad"
-    <br/>innRatioAdd: 8, // adjustment based on distance to inn (fights+add)*fights/divisor
-    <br/>innRatioDivisor: 0, // adjustment based on distance to inn
-    <br/>turnScorePenalty: 2000, // score penalty for each turn
-    <br/>rngValueCheckCount: 10, // number of RNG values minimum before adding additional values 
-    <br/>fightLookAhead: true, // look ahead an additional turn in battle, high processing, currently little benefit if any
-    <br/>fightLookAheadDangerThreshold: 10, // look ahead only runs on fights with this much danger.
-    <br/>fightLookAheadWidth: 10, // number of top scores to process for both in battle look ahead (optional)
-    <br/>fightLookAheadScoreDiscount: 0.75, // score future discount for next turn, prevent stalling forever
-    <br/>fightCompleteLookAheadWidth: 10, // end of battle look ahead (always on)
-    <br/>fightParallelCheck: false, // if fight not possible to end on turn 1, check additional starting rounds
-    <br/>fightParallelWidth: 2, // number of top scores to check 
-    <br/>fightParallelCheckDangerThreshold: 10, // check only runs on fights with this much danger.
-    <br/>optimizePass: true, // sort scores by time on run and check current hp vs. damage taken
-    <br/>ignoreHp: true, // ignore current hp vs. damage taken
-    <br/>debugParty: false, // output party order, name, hp
-    <br/>}
+	<br/>priorTimeScoreFactor: 2, // score adjustment for time taken in previous turn for delaying 1 turn after ending fight possible
+	<br/>damageDealtScoreFactor: 3500, // score adjustment for damage dealt as % of enemy hp
+	<br/>damageDealtMaxHpCap: 500, // max hp value of enemy for comparing score
+	<br/>damageTakenScoreFactor: 2500, // score adjustment for damage taken as % of current hp
+	<br/>secondarySacrificeScoreFactor: 5000, // score adjustment for losing non-primary characters in battle
+	<br/>enemyCountScoreFactor: 1750, // score adjustment per enemy spawned
+	<br/>hpGainedScoreFactor: 20000, // score adjustment for hp gained from strong level ups
+	<br/>hpGainedTimeFactor: 0, // time penalty for hp gained from strong level ups
+	<br/>strGainedScoreFactor: 0, // score adjustment when str not gained 
+	<br/>strGainedTimeFactor: 0, // time penalty when str not gained 
+	<br/>agiGainedScoreFactor: 0, // score adjustment when agi not gained 
+	<br/>agiGainedTimeFactor: 0, // time penalty when agi not gained 
+	<br/>vitGainedScoreFactor: 0, // score adjustment when vit not gained 
+	<br/>vitGainedTimeFactor: 0, // time penalty when vit not gained 
+	<br/>deficitHpScoreFactor: 10, // score penalty for paths taking more than current hp so that adjustments happens
+	<br/>encounterFinishScoreFactor: 1000, // score bonus for finishing the fight
+	<br/>badTurnScore: -20000, // score for considering a turn "bad"
+	<br/>innRatioAdd: 8, // adjustment based on distance to inn (fights+add)*fights/divisor
+	<br/>innRatioDivisor: 0, // adjustment based on distance to inn
+	<br/>turnScorePenalty: 2000, // score penalty for each turn
+	<br/>rngValueCheckCount: 10, // number of RNG values minimum before adding additional values 
+	<br/>fightLookAhead: true, // look ahead an additional turn in battle, high processing, currently little benefit if any
+	<br/>fightLookAheadDangerThreshold: 10, // look ahead only runs on fights with this much danger.
+	<br/>fightLookAheadWidth: 10, // number of top scores to process for both in battle look ahead (optional)
+	<br/>fightLookAheadScoreDiscount: 0.75, // score future discount for next turn, prevent stalling forever
+	<br/>fightCompleteLookAheadWidth: 10, // end of battle look ahead (always on)
+	<br/>fightParallelCheck: false, // if fight not possible to end on turn 1, check additional starting rounds
+	<br/>fightParallelWidth: 2, // number of top scores to check 
+	<br/>fightParallelCheckDangerThreshold: 10, // check only runs on fights with this much danger.
+	<br/>optimizePass: true, // sort scores by time on run and check current hp vs. damage taken
+	<br/>ignoreHp: true, // ignore current hp vs. damage taken
+	<br/>debugParty: false, // output party order, name, hp
+	<br/>debugCharacterStats: false, //output first character stats 
     </p>
   </body>
 </html>
