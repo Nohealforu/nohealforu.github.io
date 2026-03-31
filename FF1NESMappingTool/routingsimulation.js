@@ -1431,7 +1431,7 @@ var scoreTracker;
 function calculateBounces(turn, formation, delay, priorDelay)
 {
 	let shortBounce = 0, longBounce = 0, timeTaken = 0, holdDirection = false;
-	if ((turn > 0) && (formation == Formation.fiend || formation == Formation.chaos) && (delay == 0 || (delay == 4 && priorDelay == 0))
+	if ((turn > 0) && (formation == Formation.fiend || formation == Formation.chaos) && (delay == 0 || (delay == 4 && (turn == 1 || priorDelay != 0))))
 		holdDirection = delay == 0;
 	else
 	{
