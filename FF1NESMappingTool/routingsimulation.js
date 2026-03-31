@@ -1428,10 +1428,10 @@ var battleStates;
 var delayStates;
 var scoreTracker;
 
-function calculateBounces(turn, formation, delay)
+function calculateBounces(turn, formation, delay, priorDelay)
 {
 	let shortBounce = 0, longBounce = 0, timeTaken = 0, holdDirection = false;
-	if ((turn > 0) && (formation == Formation.fiend || formation == Formation.chaos) && (delay == 0 || delay == 4))
+	if ((turn > 0) && (formation == Formation.fiend || formation == Formation.chaos) && (delay == 0 || (delay == 4 && priorDelay == 0))
 		holdDirection = delay == 0;
 	else
 	{
@@ -2432,6 +2432,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 	do 
 	{
 		currentIterationCount++;
+		let priorDelay = delayCommands[battleState.turn - 2];
 		let adjustedEncounterAction = encounterAction;
 		// ideally we get rid of redoing battles, or use it for the pathfinding (RCSPP)?
 		if(redoBattle && scoreTracker[battleState.index] != null && scoreTracker[battleState.index][delayIndex] != null)
@@ -2468,7 +2469,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 			{
 				let currentAction = encounterAction;
 				battleState = priorBattleState.newTurn(encounterAction);
-				let bounceResult = calculateBounces(battleState.turn - 1, battleState.formation, i);
+				let bounceResult = calculateBounces(battleState.turn - 1, battleState.formation, i, priorDelay);
 				battleState.estimatedTime += bounceResult.timeTaken;
 				if(priorBattleState == battleStartState)
 					battleState.encounterState = battleStartState.encounterState;
@@ -2480,7 +2481,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 				{
 					currentAction = EncounterAction.Fight;
 					battleState = priorBattleState.newTurn(currentAction);
-					let bounceResult = calculateBounces(battleState.turn - 1, battleState.formation, i);
+					let bounceResult = calculateBounces(battleState.turn - 1, battleState.formation, i, priorDelay);
 					battleState.estimatedTime += bounceResult.timeTaken;
 					if(priorBattleState == battleStartState)
 						battleState.encounterState = battleStartState.encounterState;
@@ -2535,7 +2536,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					for (let j = 0; j < (canDelay ? 256 : 1); j++)
 					{
 						additionalBattleState = priorAdditionalBattleState.newTurn(encounterAction);
-						let bounceResult = calculateBounces(additionalBattleState.turn - 1, additionalBattleState.formation, j);
+						let bounceResult = calculateBounces(additionalBattleState.turn - 1, additionalBattleState.formation, j, score.delay);
 						additionalBattleState.estimatedTime += bounceResult.timeTaken;
 						additionalBattleState.runTurn(j, damageTakenRatio, dangerRatio);
 						let nextEncounterState;
@@ -2564,7 +2565,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 		battleState = priorBattleState.newTurn(adjustedEncounterAction);
 		if(priorBattleState == battleStartState)
 			battleState.encounterState = battleStartState.encounterState;
-		let bounceResult = calculateBounces(battleState.turn - 1, battleState.formation, delay);
+		let bounceResult = calculateBounces(battleState.turn - 1, battleState.formation, delay, priorDelay);
 		battleState.estimatedTime += bounceResult.timeTaken;
 		battleState.runTurn(delay, damageTakenRatio, dangerRatio);
 		
@@ -2666,7 +2667,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 				for (let j = 0; j < (canDelay ? 256 : 1); j++)
 				{
 					additionalBattleState = priorAdditionalBattleState.newTurn(encounterAction);
-					let bounceResult = calculateBounces(additionalBattleState.turn - 1, additionalBattleState.formation, j);
+					let bounceResult = calculateBounces(additionalBattleState.turn - 1, additionalBattleState.formation, j, score.delay);
 					additionalBattleState.estimatedTime += bounceResult.timeTaken;
 					
 					additionalBattleState.runTurn(j, damageTakenRatio, dangerRatio);
@@ -3355,7 +3356,7 @@ async function runRoute(rerunCulled = false)
 								scoreSum += summary.score[k];
 								timeSum += summary.time[k];
 								takenSum += summary.taken[k];
-								let bounceResult = calculateBounces(k, summary.formation, summary.delay[k]);
+								let bounceResult = calculateBounces(k, summary.formation, summary.delay[k], summary.delay[k-1]);
 								shortBounceSum += bounceResult.shortBounce;
 								longBounceSum += bounceResult.longBounce;
 							}
@@ -3744,7 +3745,7 @@ async function runRoute(rerunCulled = false)
 					for(let j = 0; j < endingSummary.delay.length; j++)
 					{
 						turnCount++;
-						let bounceResult = calculateBounces(j, endingSummary.formation, endingSummary.delay[j]);
+						let bounceResult = calculateBounces(j, endingSummary.formation, endingSummary.delay[j], endingSummary.delay[j-1]);
 						shortBounces += bounceResult.shortBounce;
 						longBounces += bounceResult.longBounce;
 						enemyActions += endingSummary.enemyActions[j];
