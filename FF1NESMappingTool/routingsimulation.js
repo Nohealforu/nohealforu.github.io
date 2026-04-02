@@ -3375,7 +3375,7 @@ async function runRoute(rerunCulled = false)
 								if(endingRNGValuesBestTime[endScore.rng] > endScore.time && (culledKeys[encounterCount + 1] == null || culledKeys[encounterCount + 1][endScore.key] == null))
 								{
 									endScore.battleState.startTime = endScore.time;
-									if(endScore.status == 0 && currentAction.encounter.next && minimumEnemies == endScore.enemies && minimumExp == encounterEnemyCounts[endScore.rng].expValue)
+									if(endScore.status == 0 && currentAction.encounter.next && minimumEnemies == endScore.enemies && minimumExp == encounterEnemyCounts[endScore.rng].expValue && endScore.statTimePenalty == 0)
 									{
 										if(endingRngValues[endScore.key] == null)
 											endingRngValuesCount++;
