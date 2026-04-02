@@ -1866,7 +1866,7 @@ BattleState.prototype.runTurn = function(delay, damageTakenRatio, dangerRatio)
 	for (let i = 0; i < 9; i++)
 	{
 		let character = this.battleCharacters[i];
-		if (character != null && character.currentHp > 0 && (character.category & 0x80))
+		if (character != null && character.currentHp > 0 && (character.characterData.category & 0x80))
 			character.currentHp = Math.min(character.currentHp + 3, character.characterData.hp);
 	}
 	
