@@ -1735,7 +1735,7 @@ BattleState.prototype.newEncounter = function(encounterIndex, futureCheck = fals
 BattleState.prototype.checkPartyDead = function()
 {
 	for (let i = 0x80; i < 0x84; i++)
-		if (this.battleCharacters[i] != null && this.battleCharacters[i].canTarget())
+		if (this.battleCharacters[i] != null && this.battleCharacters[i].canTarget() && this.battleCharacters[i].characterData.primary)
 			return false;
 	this.partyWipe = true;
 	this.score -= 100000;
