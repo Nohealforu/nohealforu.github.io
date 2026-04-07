@@ -1470,7 +1470,7 @@ function calculateBounces(turn, formation, delay, priorHoldAState)
 	// Held+DPAD 
 	// Held
 	
-	if ((turn > 1) && (formation == Formation.fiend || formation == Formation.chaos) && (delay == 0 || (delay == 2 && priorHoldAState == HoldAState.Held) || (delay == 4 && (priorHoldAState == HoldAState.Clear)))
+	if ((turn > 1) && (formation == Formation.fiend || formation == Formation.chaos) && (delay == 0 || (delay == 2 && priorHoldAState == HoldAState.Held) || (delay == 4 && priorHoldAState == HoldAState.Clear)))
 	{
 		holdDirection = delay == 0;
 		if(holdDirection && priorHoldAState == HoldAState.HeldDPAD)
