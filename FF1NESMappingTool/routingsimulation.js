@@ -1429,15 +1429,14 @@ var delayStates;
 var scoreTracker;
 
 const HoldAState = {
-	None: 0,
+	Clear: 0,
 	HeldDPAD: 1,
 	Held: 2,
-	Held2: 3
 }
 
 function calculateBounces(turn, formation, delay, priorHoldAState)
 {
-	let shortBounce = 0, longBounce = 0, timeTaken = 0, holdDirection = false, newHoldAState = HoldAState.None;
+	let shortBounce = 0, longBounce = 0, timeTaken = 0, holdDirection = false, newHoldAState = HoldAState.Clear;
 	// fiend fights have some weird bugs with holding A targetting with single character
 	// multiple characters hold A seems to be 5, 3, 3, 3
 	// single character is what we care about for the speedrun though:
@@ -1453,35 +1452,33 @@ function calculateBounces(turn, formation, delay, priorHoldAState)
 	// (picking options of 1, 1, 5, 3 vs. 1, 5, 3 vs. 1, 1, 1, 5, 3)
 	// neither of those abilities are available in current design, so we just have it assume only A on turn 1
 	
-	// checks: turn 1 don't do anything
+	// we are adding delay here to the formationRNGHoldA delay of 1, so delay of 1 we add 0, 3 we add 2, 5 we add 4
+	
+	// checks: turn 1 don't do anything (assuming no hold state or hold+dpad)
 	// turn 2+ if we want 0 delay we hold dpad+A
-	// if we want 4 delay and the previous turn isn't a dpad+a (either turn 2 where we assume or later turn), hold a without dpad
+	// if we want 4 delay and we're in clear state, hold A
+	// if we want 2 delay and we're in hold state, hold A
+	
+	// after turn 1: assume clear
+	// after any bounces: clear
+	// after dpad forced 1 state: clear (1, 1, 5, 3 would clear after the second 1)
+	// after the 5 or 3: Held
+	// after any dpad hold: HeldDPAD
+	
 	// hold A states to track what is going on
-	// None (turn 1 this is also the case even if A is held)
+	// Clear (Clear state if after DPAD or turn 1)
 	// Held+DPAD 
 	// Held
-	// Held 2 
 	
-	// we are adding delay here to the formationRNGHoldA delay of 1, so delay of 1 we add 0, 3 we add 2, 5 we add 4
-	if ((turn > 1) && (formation == Formation.fiend || formation == Formation.chaos) && (delay == 0 || (delay == 2 && priorHoldAState == HoldAState.Held2) || (delay == 4 && priorHoldAState == HoldAState.Held)))
+	if ((turn > 1) && (formation == Formation.fiend || formation == Formation.chaos) && (delay == 0 || (delay == 2 && priorHoldAState == HoldAState.Held) || (delay == 4 && (priorHoldAState == HoldAState.Clear)))
 	{
 		holdDirection = delay == 0;
 		if(holdDirection && priorHoldAState == HoldAState.HeldDPAD)
 			holdDirection = false;
-		if(holdDirection)
+		else if(holdDirection)
 			newHoldAState = HoldAState.HeldDPAD;
 		else
-		{
-			switch(priorHoldAState)
-			{
-				case HoldAState.Held:
-				case HoldAState.Held2:
-					newHoldAState = HoldAState.Held2;
-					break;
-				default:
-					newHoldAState = HoldAState.Held;
-			}
-		}
+			newHoldAState = HoldAState.Held;
 	}
 	else
 	{
@@ -2478,7 +2475,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 	let dangerRatio = encounter.danger / 3 || 1;
 	let nextDangerRatio = encounter.next?.encounterDanger / 3 || 1;
 	let damageTakenRatio = (settings.innRatioDivisor == 0 ? 1 : (encounter.stepsToHeal + settings.innRatioAdd) * encounter.stepsToHeal / settings.innRatioDivisor);
-	let nextHoldAState = HoldAState.None;
+	let nextHoldAState = HoldAState.Clear;
 	
 	do 
 	{
@@ -3401,7 +3398,7 @@ async function runRoute(rerunCulled = false)
 						else
 						{
 							startingHp = Math.min(currentState.battleCharacters[0x80].characterData.hp, endingRNGValuesCurrentHp[startRng] + healed);
-							let scoreSum = 0, timeSum = 0, takenSum = 0, shortBounceSum = 0, longBounceSum = 0, priorHoldAState = HoldAState.None;
+							let scoreSum = 0, timeSum = 0, takenSum = 0, shortBounceSum = 0, longBounceSum = 0, priorHoldAState = HoldAState.Clear;
 							let summary = endOfBattleState.encounterSummary;
 							oneRoundFight = summary.score.length == 1;
 							for(let k = 0; k < summary.score.length; k++)
@@ -3796,7 +3793,7 @@ async function runRoute(rerunCulled = false)
 					for(let name in enemyCounts)
 						enemyList.push(enemyCounts[name] + " " + name);
 					outputLines.push("<tr><td>Encounter " + encounterCount + "</td><td>" + enemyList.join(", ") + "</td><td>Hp " + endingSummary.hp + "</td><td>preRNG " + endingSummary.preRNG + "</td><td>Formation " + (currentAction.encounterIndex > 127 ? (currentAction.encounterIndex - 128) + "-2" : currentAction.encounterIndex) + "</td></tr>");
-					let priorHoldAState = HoldAState.None;
+					let priorHoldAState = HoldAState.Clear;
 					for(let j = 0; j < endingSummary.delay.length; j++)
 					{
 						turnCount++;
