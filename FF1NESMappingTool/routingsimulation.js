@@ -1428,18 +1428,68 @@ var battleStates;
 var delayStates;
 var scoreTracker;
 
-function calculateBounces(turn, formation, delay, priorDelay)
+const HoldAState = {
+	None: 0,
+	HeldDPAD: 1,
+	Held: 2,
+	Held2: 3
+}
+
+function calculateBounces(turn, formation, delay, priorHoldAState)
 {
-	let shortBounce = 0, longBounce = 0, timeTaken = 0, holdDirection = false;
-	if ((turn > 0) && (formation == Formation.fiend || formation == Formation.chaos) && (delay == 0 || (delay == 4 && (turn == 1 || priorDelay != 0))))
+	let shortBounce = 0, longBounce = 0, timeTaken = 0, holdDirection = false, newHoldAState = HoldAState.None;
+	// fiend fights have some weird bugs with holding A targetting with single character
+	// multiple characters hold A seems to be 5, 3, 3, 3
+	// single character is what we care about for the speedrun though:
+	// hold A first round = 1 delay
+	// hold A later rounds = 5 delay
+	// hold A+DPAD later rounds = 1 delay
+	// holding A for multiple rounds is where this gets really weird
+	// from start it follows pattern of 1, 5, 3, 3...
+	// from later rounds it follows 5, 3, 3...
+	// if we hold A+DPAD on a round it goes 1, 1, 5, 3, 3...
+	
+	// in theory we can calculate whether to do a A+DPAD on turn 1, but that requires knowing multiple future actions or modifying a past action 2 steps back
+	// (picking options of 1, 1, 5, 3 vs. 1, 5, 3 vs. 1, 1, 1, 5, 3)
+	// neither of those abilities are available in current design, so we just have it assume only A on turn 1
+	
+	// checks: turn 1 don't do anything
+	// turn 2+ if we want 0 delay we hold dpad+A
+	// if we want 4 delay and the previous turn isn't a dpad+a (either turn 2 where we assume or later turn), hold a without dpad
+	// hold A states to track what is going on
+	// None (turn 1 this is also the case even if A is held)
+	// Held+DPAD 
+	// Held
+	// Held 2 
+	
+	// we are adding delay here to the formationRNGHoldA delay of 1, so delay of 1 we add 0, 3 we add 2, 5 we add 4
+	if ((turn > 1) && (formation == Formation.fiend || formation == Formation.chaos) && (delay == 0 || (delay == 2 && priorHoldAState == HoldAState.Held2) || (delay == 4 && priorHoldAState == HoldAState.Held)))
+	{
 		holdDirection = delay == 0;
+		if(holdDirection && priorHoldAState == HoldAState.HeldDPAD)
+			holdDirection = false;
+		if(holdDirection)
+			newHoldAState = HoldAState.HeldDPAD;
+		else
+		{
+			switch(priorHoldAState)
+			{
+				case HoldAState.Held:
+				case HoldAState.Held2:
+					newHoldAState = HoldAState.Held2;
+					break;
+				default:
+					newHoldAState = HoldAState.Held;
+			}
+		}
+	}
 	else
 	{
 		shortBounce = delay < 6 ? delay : delay % 3;
 		longBounce = delay < 6 ? 0 : Math.floor(delay / 3);
 		timeTaken = shortBounce * 41 + longBounce * 50;
 	}
-	return {shortBounce: shortBounce, longBounce: longBounce, timeTaken: timeTaken, holdDirection: holdDirection};
+	return {shortBounce: shortBounce, longBounce: longBounce, timeTaken: timeTaken, holdDirection: holdDirection, holdAState: newHoldAState};
 }
 
 // used to store the state of characters each round in battle, also track changes between battles
@@ -2428,11 +2478,13 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 	let dangerRatio = encounter.danger / 3 || 1;
 	let nextDangerRatio = encounter.next?.encounterDanger / 3 || 1;
 	let damageTakenRatio = (settings.innRatioDivisor == 0 ? 1 : (encounter.stepsToHeal + settings.innRatioAdd) * encounter.stepsToHeal / settings.innRatioDivisor);
+	let nextHoldAState = HoldAState.None;
 	
 	do 
 	{
 		currentIterationCount++;
 		let priorDelay = delayCommands[battleState.turn - 2];
+		let priorHoldAState = nextHoldAState;
 		let adjustedEncounterAction = encounterAction;
 		// ideally we get rid of redoing battles, or use it for the pathfinding (RCSPP)?
 		if(redoBattle && scoreTracker[battleState.index] != null && scoreTracker[battleState.index][delayIndex] != null)
@@ -2469,7 +2521,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 			{
 				let currentAction = encounterAction;
 				battleState = priorBattleState.newTurn(encounterAction);
-				let bounceResult = calculateBounces(battleState.turn - 1, battleState.formation, i, priorDelay);
+				let bounceResult = calculateBounces(battleState.turn, battleState.formation, i, priorHoldAState);
 				battleState.estimatedTime += bounceResult.timeTaken;
 				if(priorBattleState == battleStartState)
 					battleState.encounterState = battleStartState.encounterState;
@@ -2481,7 +2533,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 				{
 					currentAction = EncounterAction.Fight;
 					battleState = priorBattleState.newTurn(currentAction);
-					let bounceResult = calculateBounces(battleState.turn - 1, battleState.formation, i, priorDelay);
+					bounceResult = calculateBounces(battleState.turn, battleState.formation, i, priorHoldAState);
 					battleState.estimatedTime += bounceResult.timeTaken;
 					if(priorBattleState == battleStartState)
 						battleState.encounterState = battleStartState.encounterState;
@@ -2511,7 +2563,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 				}
 				
 				battleState.score -= settings.turnScorePenalty + battleState.estimatedTime * settings.timeScoreFactor;
-				scores[i] = {score: battleState.score, time: battleState.startTime + battleState.estimatedTime, futureTime: 0, statTimePenalty: battleState.statTimePenalty, delayCommands: null, delay: i, dmg: battleState.damageDealt, lost: battleState.damageTaken, rng: battleState.randomNumberIndex, complete: battleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: battleState, key: battleState.getKey(), status: battleState.battleCharacters[0x80].status, action: currentAction};
+				scores[i] = {score: battleState.score, time: battleState.startTime + battleState.estimatedTime, futureTime: 0, statTimePenalty: battleState.statTimePenalty, delayCommands: null, delay: i, dmg: battleState.damageDealt, lost: battleState.damageTaken, rng: battleState.randomNumberIndex, complete: battleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: battleState, key: battleState.getKey(), status: battleState.battleCharacters[0x80].status, action: currentAction, holdAState = bounceResult.holdAState};
 			}
 			scores.sort((a, b) => b.score - a.score);
 			if(settings.fightLookAhead && encounter.danger >= settings.fightLookAheadDangerThreshold && !battleComplete && canDelay)
@@ -2536,7 +2588,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					for (let j = 0; j < (canDelay ? 256 : 1); j++)
 					{
 						additionalBattleState = priorAdditionalBattleState.newTurn(encounterAction);
-						let bounceResult = calculateBounces(additionalBattleState.turn - 1, additionalBattleState.formation, j, score.delay);
+						let bounceResult = calculateBounces(additionalBattleState.turn, additionalBattleState.formation, j, score.holdAState);
 						additionalBattleState.estimatedTime += bounceResult.timeTaken;
 						additionalBattleState.runTurn(j, damageTakenRatio, dangerRatio);
 						let nextEncounterState;
@@ -2565,7 +2617,8 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 		battleState = priorBattleState.newTurn(adjustedEncounterAction);
 		if(priorBattleState == battleStartState)
 			battleState.encounterState = battleStartState.encounterState;
-		let bounceResult = calculateBounces(battleState.turn - 1, battleState.formation, delay, priorDelay);
+		let bounceResult = calculateBounces(battleState.turn, battleState.formation, delay, priorHoldAState);
+		nextHoldAState = bounceResult.holdAState;
 		battleState.estimatedTime += bounceResult.timeTaken;
 		battleState.runTurn(delay, damageTakenRatio, dangerRatio);
 		
@@ -2667,7 +2720,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 				for (let j = 0; j < (canDelay ? 256 : 1); j++)
 				{
 					additionalBattleState = priorAdditionalBattleState.newTurn(encounterAction);
-					let bounceResult = calculateBounces(additionalBattleState.turn - 1, additionalBattleState.formation, j, score.delay);
+					let bounceResult = calculateBounces(additionalBattleState.turn, additionalBattleState.formation, j, score.holdAState);
 					additionalBattleState.estimatedTime += bounceResult.timeTaken;
 					
 					additionalBattleState.runTurn(j, damageTakenRatio, dangerRatio);
@@ -2681,7 +2734,7 @@ function runBattle(currentState, encounter, encounterAction, encounterEnemyCount
 					}
 					
 					additionalBattleState.score -= settings.turnScorePenalty + additionalBattleState.estimatedTime * settings.timeScoreFactor + priorAdditionalBattleState.estimatedTime * settings.priorTimeScoreFactor;
-					additionalScores[j] = {score: additionalBattleState.score + priorAdditionalBattleState.score, time: additionalBattleState.startTime + additionalBattleState.estimatedTime, futureTime: 0, statTimePenalty: additionalBattleState.statTimePenalty, delayCommands: delayCommands.concat(score.delay, j), delay: j, dmg: additionalBattleState.damageDealt + priorAdditionalBattleState.damageDealt, lost: additionalBattleState.damageTaken + priorAdditionalBattleState.damageTaken, rng: additionalBattleState.randomNumberIndex, complete: additionalBattleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: additionalBattleState, key: additionalBattleState.getKey(), status: additionalBattleState.battleCharacters[0x80].status};
+					additionalScores[j] = {score: additionalBattleState.score + priorAdditionalBattleState.score, time: additionalBattleState.startTime + additionalBattleState.estimatedTime, futureTime: 0, statTimePenalty: additionalBattleState.statTimePenalty, delayCommands: delayCommands.concat(score.delay, j), delay: j, dmg: additionalBattleState.damageDealt + priorAdditionalBattleState.damageDealt, lost: additionalBattleState.damageTaken + priorAdditionalBattleState.damageTaken, rng: additionalBattleState.randomNumberIndex, complete: additionalBattleState.battleComplete, enemies: nextEncounterState?.startingEnemies, state: nextEncounterState?.encounterState, battleState: additionalBattleState, key: additionalBattleState.getKey(), status: additionalBattleState.battleCharacters[0x80].status, holdAState = bounceResult.holdAState};
 				}
 				additionalScores.sort((a, b) => b.score - a.score);
 				for(let j = 0; j < additionalScores.length; j++)
@@ -3348,7 +3401,7 @@ async function runRoute(rerunCulled = false)
 						else
 						{
 							startingHp = Math.min(currentState.battleCharacters[0x80].characterData.hp, endingRNGValuesCurrentHp[startRng] + healed);
-							let scoreSum = 0, timeSum = 0, takenSum = 0, shortBounceSum = 0, longBounceSum = 0;
+							let scoreSum = 0, timeSum = 0, takenSum = 0, shortBounceSum = 0, longBounceSum = 0, priorHoldAState = HoldAState.None;
 							let summary = endOfBattleState.encounterSummary;
 							oneRoundFight = summary.score.length == 1;
 							for(let k = 0; k < summary.score.length; k++)
@@ -3356,7 +3409,8 @@ async function runRoute(rerunCulled = false)
 								scoreSum += summary.score[k];
 								timeSum += summary.time[k];
 								takenSum += summary.taken[k];
-								let bounceResult = calculateBounces(k, summary.formation, summary.delay[k], summary.delay[k-1]);
+								let bounceResult = calculateBounces(k + 1, summary.formation, summary.delay[k], priorHoldAState);
+								priorHoldAState = bounceResult.holdAState;
 								shortBounceSum += bounceResult.shortBounce;
 								longBounceSum += bounceResult.longBounce;
 							}
@@ -3742,10 +3796,12 @@ async function runRoute(rerunCulled = false)
 					for(let name in enemyCounts)
 						enemyList.push(enemyCounts[name] + " " + name);
 					outputLines.push("<tr><td>Encounter " + encounterCount + "</td><td>" + enemyList.join(", ") + "</td><td>Hp " + endingSummary.hp + "</td><td>preRNG " + endingSummary.preRNG + "</td><td>Formation " + (currentAction.encounterIndex > 127 ? (currentAction.encounterIndex - 128) + "-2" : currentAction.encounterIndex) + "</td></tr>");
+					let priorHoldAState = HoldAState.None;
 					for(let j = 0; j < endingSummary.delay.length; j++)
 					{
 						turnCount++;
-						let bounceResult = calculateBounces(j, endingSummary.formation, endingSummary.delay[j], endingSummary.delay[j-1]);
+						let bounceResult = calculateBounces(j + 1, endingSummary.formation, endingSummary.delay[j], priorHoldAState);
+						priorHoldAState = bounceResult.holdAState;
 						shortBounces += bounceResult.shortBounce;
 						longBounces += bounceResult.longBounce;
 						enemyActions += endingSummary.enemyActions[j];
