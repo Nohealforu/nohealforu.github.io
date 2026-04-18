@@ -37,6 +37,7 @@ optimizePass: true, // sort scores by time on run and check current hp vs. damag
 ignoreHp: true, // ignore current hp vs. damage taken
 debugParty: false, // output party order, name, hp
 debugCharacterStats: false, //output first character stats 
+minimumExpSkipOn: false, // skip minimum exp check if multiple enemies specified 
 }
 
 var debugFight = 103; // for easier setting of breakpoints
@@ -3426,7 +3427,7 @@ async function runRoute(rerunCulled = false)
 								if(endingRNGValuesBestTime[endScore.rng] > endScore.time && (culledKeys[encounterCount + 1] == null || culledKeys[encounterCount + 1][endScore.key] == null))
 								{
 									endScore.battleState.startTime = endScore.time;
-									if(endScore.status == 0 && currentAction.encounter.next && minimumEnemies == endScore.enemies && (minimumExp == encounterEnemyCounts[endScore.rng].expValue || currentAction.encounter.next.minimumEnemyCount > 0) && endScore.statTimePenalty == 0)
+									if(endScore.status == 0 && currentAction.encounter.next && minimumEnemies == endScore.enemies && (minimumExp == encounterEnemyCounts[endScore.rng].expValue || (settings.minimumExpSkipOn && currentAction.encounter.next.minimumEnemyCount > 0)) && endScore.statTimePenalty == 0)
 									{
 										if(endingRngValues[endScore.key] == null)
 											endingRngValuesCount++;
